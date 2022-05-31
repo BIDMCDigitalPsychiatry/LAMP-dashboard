@@ -16,7 +16,7 @@ import {
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
 import ActivityStreak from "./ActivityStreak"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import TipFooter from "./TipFooter"
@@ -24,8 +24,9 @@ import { Service } from "../../DBService/DBService"
 import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
 import ActivityTab from "./ActivityTab"
+import { createTheme } from "@material-ui/core/styles"
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     secondary: {
       main: "#333",
@@ -307,7 +308,7 @@ export default function Tips({
       }
     }
     reader.onerror = function (error) {
-      enqueueSnackbar(t("An error occured while uploading. Please try again."), {
+      enqueueSnackbar(`${t("An error occured while uploading. Please try again.")}`, {
         variant: "error",
       })
     }
@@ -342,9 +343,12 @@ export default function Tips({
           })
       }
     } else {
-      enqueueSnackbar(t("Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB."), {
-        variant: "error",
-      })
+      enqueueSnackbar(
+        `${t("Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.")}`,
+        {
+          variant: "error",
+        }
+      )
     }
   }
 
@@ -360,7 +364,7 @@ export default function Tips({
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       )
       if (duplicates.length > 0) {
-        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
+        enqueueSnackbar(`${t("Activity with same name already exist.")}`, { variant: "error" })
         return false
       }
     }
@@ -528,7 +532,7 @@ export default function Tips({
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
             <Grid item xs sm={4} md={3} lg={2}>
-              <Tooltip title={!categoryImage ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
+              <Tooltip title={!categoryImage ? `${t("Tap to select a photo.")}` : `${t("Tap to delete the photo.")}`}>
                 <Box
                   width={154}
                   height={154}
@@ -574,7 +578,7 @@ export default function Tips({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label={t("Study")}
+                    label={`${t("Study")}`}
                     value={studyId || ""}
                     onChange={(e) => {
                       setStudyId(e.target.value)
@@ -583,7 +587,7 @@ export default function Tips({
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? t("Please select the Study")
+                        ? `${t("Please select the Study.")}`
                         : ""
                     }
                     variant="filled"
@@ -602,7 +606,7 @@ export default function Tips({
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label={t("Tip")}
+                    label={`${t("Tip")}`}
                     value={category || ""}
                     onChange={(event) => {
                       setCategory(event.target.value)
@@ -610,14 +614,14 @@ export default function Tips({
                     }}
                     helperText={
                       typeof category == "undefined" || category === null || category === ""
-                        ? t("Please select the tip")
+                        ? `${t("Please select the tip.")}`
                         : ""
                     }
                     variant="filled"
                     disabled={!!value ? true : false}
                   >
                     <MenuItem value="add_new" key="add_new">
-                      {t("Add New")}
+                      {`${t("Add New")}`}
                     </MenuItem>
                     {categoryArray.map((x, idx) => (
                       <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
@@ -630,14 +634,14 @@ export default function Tips({
                       error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
                       fullWidth
                       variant="filled"
-                      label={t("New Tip")}
+                      label={`${t("New Tip")}`}
                       defaultValue={newTipText}
                       onChange={(event) => {
                         setNewTipText(event.target.value)
                       }}
                       helperText={
                         category == "add_new" && (newTipText === null || newTipText === "")
-                          ? t("Please add new tip")
+                          ? `${t("Please add new tip.")}`
                           : ""
                       }
                     />
@@ -657,7 +661,7 @@ export default function Tips({
                           color="primary"
                           inputProps={{ "aria-label": "secondary checkbox" }}
                         />{" "}
-                        {t("Duplicate")}
+                        {`${t("Duplicate")}`}
                       </Box>
                     </Grid>
                     <Grid item xs sm={6} md={8} lg={9}>
@@ -667,7 +671,7 @@ export default function Tips({
                             fullWidth
                             error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
                             variant="filled"
-                            label={t("Tip")}
+                            label={`${t("Tip")}`}
                             className="Tips"
                             value={duplicateTipText}
                             onChange={(event) => {
@@ -676,7 +680,7 @@ export default function Tips({
                             }}
                             helperText={
                               isDuplicate && (duplicateTipText === null || duplicateTipText === "")
-                                ? t("Please add new tip")
+                                ? `${t("Please add new tip.")}`
                                 : ""
                             }
                           />
@@ -699,7 +703,7 @@ export default function Tips({
           {data.settings && data.settings.length === 0 && (
             <Grid container spacing={2}>
               <Grid item xs sm={12}>
-                <Alert severity="error">{t("Atleast one tip details required")}</Alert>
+                <Alert severity="error">{`${t("Atleast one tip details required")}`}</Alert>
               </Grid>
             </Grid>
           )}
@@ -707,7 +711,7 @@ export default function Tips({
             <Grid container spacing={2}>
               <Grid item xs sm={12}>
                 <Alert severity="error">
-                  {t("Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.")}
+                  {`${t("Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.")} `}
                 </Alert>
               </Grid>
             </Grid>

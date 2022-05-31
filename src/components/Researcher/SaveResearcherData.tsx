@@ -2,6 +2,13 @@ import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
 
+interface StudyObject {
+  id: string
+  name: string
+  participants: Array<any>
+  activities: Array<any>
+  sensors: Array<any>
+}
 export const fetchResult = async (authString, id, type, modal) => {
   const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "http://api.lamp.digital"
   const token = LAMP.Auth._auth.accessToken
@@ -118,8 +125,8 @@ export const saveDataToCache = (authString, id) => {
       ": $study.id, 'study_name': $study.name}})]," +
       "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
       " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"
-  ).then((data) => {
-    let studies = Object.values(data?.studies || []).map((study) => {
+  ).then((data: any) => {
+    let studies = Object.values(data?.studies || []).map((study: StudyObject) => {
       return {
         id: study?.id || "",
         name: study?.name || "",

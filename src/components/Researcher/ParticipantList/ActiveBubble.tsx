@@ -46,8 +46,8 @@ export default function Active({ participant, ...props }) {
   const dateInfo = (id) => ({
     relative: active?.timestamp ?? 0,
     absolute: new Date(parseInt((logins || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
-    device: (logins || { data: {} }).data?.device_type || t("an unknown device"),
-    userAgent: (logins || { data: {} }).data?.user_agent || t("unknown device model"),
+    device: (logins || { data: {} }).data?.device_type || `${t("an unknown device")}`,
+    userAgent: (logins || { data: {} }).data?.user_agent || `${t("unknown device model")}`,
   })
 
   const userAgentConcat = (userAgent) => {
@@ -56,16 +56,16 @@ export default function Active({ participant, ...props }) {
     let deviceName = userAgent.hasOwnProperty("deviceName") ? userAgent.deviceName : ""
     let model = userAgent.hasOwnProperty("model") ? userAgent.model : ""
     return (
-      t("App Version:") +
+      `${t("App Version:.")}` +
       appVersion +
       " " +
-      t("OS Version:") +
+      `${t("OS Version:.")}` +
       osVersion +
       " " +
-      t("DeviceName:") +
+      `${t("DeviceName:.")}` +
       deviceName +
       " " +
-      t("Model:") +
+      `${t("Model:.")}` +
       model
     )
   }
@@ -82,17 +82,17 @@ export default function Active({ participant, ...props }) {
              typeof dateInfo(participant.id).userAgent === "object"
                ? userAgentConcat(dateInfo(participant.id).userAgent)
                : dateInfo(participant.id).userAgent
-           })`}
+           }`}
         >
           <Chip
-            label={t("Last Active")}
+            label={`${t("Last Active")}`}
             className={classes.dataQuality + " " + dataQuality(passive, timeAgo, t, classes).class}
           />
         </Tooltip>
       ) : (
-        <Tooltip title={t("Never")}>
+        <Tooltip title={`${t("Never")}`}>
           <Chip
-            label={t("Last Active")}
+            label={`${t("Last Active")}`}
             className={classes.dataQuality + " " + dataQuality(passive, timeAgo, t, classes).class}
           />
         </Tooltip>

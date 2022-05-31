@@ -1,38 +1,9 @@
 // Core Imports
 import React, { useState, useEffect, useCallback } from "react"
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  MenuItem,
-  AppBar,
-  Toolbar,
-  Icon,
-  IconButton,
-  Divider,
-  Backdrop,
-  CircularProgress,
-  Chip,
-  Tooltip,
-  Grid,
-  Fab,
-  Container,
-  Typography,
-  Popover,
-  Select,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+import { Box, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
-// External Imports
-import { saveAs } from "file-saver"
-import { useDropzone } from "react-dropzone"
-// Local Imports
-import LAMP, { Study } from "lamp-core"
+import LAMP from "lamp-core"
 
 import { useTranslation } from "react-i18next"
 

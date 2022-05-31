@@ -36,7 +36,7 @@ export default function ActivityCard({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-              ? typeof t.value === "string"
+              ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
                   : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
@@ -71,24 +71,25 @@ export default function ActivityCard({
   })
   return (
     <React.Fragment>
+      ,
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
         {!Boolean(visibleSlice) && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
-          <Tooltip title={t("Switch Views")}>
+          <Tooltip title={`${t("Switch Views")}`}>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
               <Icon fontSize="small">dashboard</Icon>
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title={t("Go Back")}>
+          <Tooltip title={`${t("Go Back")}`}>
             <IconButton onClick={(event) => setVisibleSlice(undefined)}>
               <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title={Boolean(visibleSlice) ? activity.name : t(`Activity Type`)}>
+        <Tooltip title={Boolean(visibleSlice) ? activity.name : `${t("Activity Type")}`}>
           <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
             {!Boolean(visibleSlice) ? (
-              <ReactMarkdown source={t(activity.name)} escapeHtml={false} plugins={[gfm, emoji]} />
+              <ReactMarkdown children={t(activity.name)} skipHtml={false} remarkPlugins={[gfm, emoji]} />
             ) : (
               visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))
             )}
@@ -96,28 +97,28 @@ export default function ActivityCard({
         </Tooltip>
         <Box>
           {!Boolean(visibleSlice) && (
-            <Tooltip title={t("Show App Screenshot")}>
+            <Tooltip title={`${t("Show App Screenshot")}`}>
               <IconButton onClick={(event) => setHelpAnchor(event.currentTarget)}>
                 <Icon fontSize="small">help</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onDeleteAction && (
-            <Tooltip title={t("Delete Entry")}>
+            <Tooltip title={`${t("Delete Entry")}`}>
               <IconButton onClick={(event) => onDeleteAction(visibleSlice)}>
                 <Icon fontSize="small">delete</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onCopyAction && (
-            <Tooltip title={t("Copy Entry")}>
+            <Tooltip title={`${t("Copy Entry")}`}>
               <IconButton onClick={(event) => onCopyAction(visibleSlice)}>
                 <Icon fontSize="small">file_copy</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onEditAction && (
-            <Tooltip title={t("Edit Entry")}>
+            <Tooltip title={`${t("Edit Entry")}`}>
               <IconButton onClick={(event) => onEditAction(visibleSlice)}>
                 <Icon fontSize="small">edit</Icon>
               </IconButton>
@@ -129,7 +130,7 @@ export default function ActivityCard({
       {Boolean(visibleSlice) ? (
         (visibleSlice.slice || []).length === 0 ? (
           <Typography variant="subtitle2" style={{ margin: 16 }}>
-            {t("No detail view available.")}
+            {`${t("No detail view available.")}`}
           </Typography>
         ) : (
           <ArrayView
@@ -170,7 +171,7 @@ export default function ActivityCard({
                   item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                      ? typeof t.value === "string"
+                      ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
                           : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
@@ -194,8 +195,8 @@ export default function ActivityCard({
         <Sparkline
           minWidth={250}
           minHeight={350}
-          XAxisLabel={t("Time")}
-          YAxisLabel={t("Score")}
+          XAxisLabel={`${t("Time")}`}
+          YAxisLabel={`${t("Score")}`}
           color={colors.blue[500]}
           startDate={startDate}
           data={events.map((d) => ({

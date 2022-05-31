@@ -666,16 +666,28 @@ export default function Feed({
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
                     schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
-                    selectedWeekViewDays = selectedWeekViewDays.concat(
+                    if (
+                      first.getTime() <=
                       new Date(
                         new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
-                      ).toLocaleDateString()
+                      ).getTime()
                     )
-                    selectedWeekViewDays = selectedWeekViewDays.concat(
+                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                        new Date(
+                          new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
+                        ).toLocaleDateString()
+                      )
+                    if (
+                      first.getTime() <=
                       new Date(
                         new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
-                      ).toLocaleDateString()
+                      ).getTime()
                     )
+                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                        new Date(
+                          new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
+                        ).toLocaleDateString()
+                      )
                   }
                   first.setDate(first.getDate() + 1)
                 }
@@ -739,7 +751,7 @@ export default function Feed({
             (currentFeed.length === 0 ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>{t("There are no scheduled activities available.")}</p>
+                <p>{`${t("There are no scheduled activities available.")}`}</p>
               </Box>
             ) : null)}
           <Stepper
@@ -779,7 +791,7 @@ export default function Feed({
                         <Grid
                           xs
                           container
-                          justify="center"
+                          justifyContent="center"
                           direction="column"
                           className={classes.feedtasks}
                           spacing={0}
@@ -790,14 +802,14 @@ export default function Feed({
                                 {feed.timeValue}
                               </Box>
                             </Typography>
-                            <Typography variant="h5">{t(feed.title)}</Typography>
+                            <Typography variant="h5">{`${t(feed.title)}`}</Typography>
                             <Typography className={classes.smalltext} color="textSecondary">
                               {feed.spec}
                             </Typography>
                           </Box>
                         </Grid>
 
-                        <Grid container justify="center" direction="column" className={classes.image}>
+                        <Grid container justifyContent="center" direction="column" className={classes.image}>
                           <Box
                             style={{
                               margin: "auto",
@@ -829,10 +841,10 @@ export default function Feed({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
+        <DialogContent>{`${t("This activity is not yet available in mindLAMP 2.")}`}</DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-            {t("Ok")}
+            {`${t("Ok")}`}
           </Button>
         </DialogActions>
       </Dialog>

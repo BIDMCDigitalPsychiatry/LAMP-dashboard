@@ -13,16 +13,15 @@ import {
   Icon,
   Typography,
 } from "@material-ui/core"
-import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
+import { KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import { getDate, dateInUTCformat, manyDates } from "./ScheduleRow"
-// FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
-// and needs to be fixed or it will silently rollback.
 
 export default function InlineMenu({ customTimes, onChange, ...props }) {
   const [items, setItems] = useState(customTimes ?? [])
   const [open, setOpen] = useState<Element>()
   const [current, setCurrent] = useState("")
+
   const { t } = useTranslation()
 
   return (
@@ -41,7 +40,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
         MenuListProps={{ dense: true }}
       >
         <MenuItem disabled divider>
-          <b>{t("Custom Times")}</b>
+          <b>{`${t("Custom Times")}`}</b>
         </MenuItem>
         {items?.map((x, idx) => (
           <MenuItem dense disabled key={idx}>
@@ -49,7 +48,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
               {getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
             </Typography>
             <ListItemSecondaryAction>
-              <Tooltip title={t("Delete this time from the list.")}>
+              <Tooltip title={`${t("Delete this time from the list.")}`}>
                 <IconButton
                   edge="end"
                   aria-label="remove"
@@ -64,18 +63,23 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
         <Divider />
         <MenuItem>
           <KeyboardTimePicker
-            autoOk
-            variant="inline"
+            label="Custom time"
+            placeholder="08:00 AM"
+            mask="__:__ _M"
+            value={getDate(current)}
+            onChange={(date) => {
+              setCurrent(dateInUTCformat(date))
+            }}
+            onAccept={(date) => {
+              setCurrent(dateInUTCformat(date))
+            }}
             inputVariant="outlined"
-            format="h:mm a"
-            label="Time"
-            helperText={t("Add a new custom time.")}
             InputAdornmentProps={{ position: "start" }}
             InputProps={{
               style: { color: "#000" },
               endAdornment: (
                 <InputAdornment position="end">
-                  <Tooltip title={t("Add this time to the list.")}>
+                  <Tooltip title={`${t("Add this time to the list.")}`}>
                     <IconButton
                       edge="end"
                       aria-label="add"
@@ -90,14 +94,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                 </InputAdornment>
               ),
             }}
-            value={current ? getDate(current ?? "") : ""}
-            defaultValue={current ? getDate(current ?? "") : ""}
-            onChange={(date) => {
-              if (!!date) setCurrent(dateInUTCformat(date))
-            }}
-            onAccept={(date) => {
-              if (!!date) setCurrent(dateInUTCformat(date))
-            }}
+            helperText={`${t("Add a new custom time.")}`}
           />
         </MenuItem>
       </Menu>

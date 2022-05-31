@@ -5,8 +5,6 @@ import {
   Button,
   TextField,
   MenuItem,
-  Tooltip,
-  Grid,
   Icon,
   Typography,
   Dialog,
@@ -17,21 +15,13 @@ import {
   makeStyles,
   Theme,
   createStyles,
-  createMuiTheme,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import QRCode from "qrcode.react"
 import LAMP from "lamp-core"
-import SnackMessage from "../../SnackMessage"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import NewPatientDetail from "./NewPatientDetail"
-
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,7 +110,7 @@ export default function AddUser({
           newParticipant["id"] = idData
         }
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
-          enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
+          enqueueSnackbar(`${t("Could not create credential for id.", { id: id })}`, { variant: "error" })
         } else {
           newParticipant.study_id = selectedStudy
           newParticipant.study_name = studies.filter((study) => study.id === selectedStudy)[0]?.name
@@ -178,20 +168,22 @@ export default function AddUser({
     props.onClose as any
   }
 
+  const handleEnter = () => {
+    setSelectedStudy("")
+  }
+
   return (
     <React.Fragment>
       <Dialog
         {...props}
-        onEnter={() => {
-          setSelectedStudy("")
-        }}
+        onEnter={handleEnter}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
         classes={{ paper: classes.addNewDialog }}
       >
         <DialogTitle id="alert-dialog-slide-title" disableTypography>
-          <Typography variant="h6">{t("Create a new user.")}</Typography>
+          <Typography variant="h6">{`${t("Create a new user.")}`}</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -203,7 +195,7 @@ export default function AddUser({
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={3}>
-            <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
+            <Typography variant="body2">{`${t("Choose the Study you want to save this participant.")}`}</Typography>
           </Box>
           <TextField
             error={!validate()}
@@ -211,10 +203,10 @@ export default function AddUser({
             autoFocus
             fullWidth
             variant="outlined"
-            label={t("Study")}
+            label={`${t("Study")}`}
             value={selectedStudy}
             onChange={handleChangeStudy}
-            helperText={!validate() ? t("Please select the Study") : ""}
+            helperText={!validate() ? `${t("Please select the Study")}` : ""}
           >
             {(studies || []).map((study) => (
               <MenuItem key={study.id} value={study.id}>
@@ -224,7 +216,7 @@ export default function AddUser({
           </TextField>
           {!!showErrorMsg && (
             <Box mt={1}>
-              <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
+              <Typography className={classes.errorMsg}>{`${t("Select a Study to create a participant.")}`}</Typography>
             </Box>
           )}
         </DialogContent>
@@ -236,7 +228,7 @@ export default function AddUser({
                 closePopUp(3)
               }}
             >
-              {t("Cancel")}
+              {`${t("Cancel")}`}
             </Button>
             <Button
               //onClick={() => addParticipant()}
@@ -248,7 +240,7 @@ export default function AddUser({
               //disabled={!!studyBtnClicked ? true : false}
               disabled={!validate()}
             >
-              {t("Save")}
+              {`${t("Save")}`}
             </Button>
           </Box>
         </DialogActions>

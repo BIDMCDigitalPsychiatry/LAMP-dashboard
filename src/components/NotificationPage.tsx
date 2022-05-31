@@ -112,6 +112,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [streakActivity, setStreakActivity] = useState(null)
 
   useEffect(() => {
+    setLoading(true)
+    setResponse(false)
     ;(async () => {
       LAMP.Activity.view(activityId).then((data: any) => {
         getImage(activityId, data.spec).then((tag) => {
@@ -163,10 +165,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           </AppBar>
           <Box textAlign="center" pb={4} className={classes.niceWork}>
             <Typography variant="h5" gutterBottom>
-              {t("Success") + "!"}
+              {`${t("Success.")}` + "!"}
             </Typography>
             <Typography className={classes.ribbonText} component="p">
-              {t("You have successfully completed your activity.")}
+              {`${t("You have successfully completed your activity.")}`}
             </Typography>
             <Box textAlign="center" className={classes.niceWorkbadge}>
               <Icon>check_circle</Icon>

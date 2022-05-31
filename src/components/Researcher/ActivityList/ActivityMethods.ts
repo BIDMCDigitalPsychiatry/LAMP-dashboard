@@ -124,6 +124,70 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.memory_game": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          properties: {
+            foils: {
+              title: i18n.t("Foils"),
+              description: "3 from 9 :- 9 imagesand need to select 3, 4 from 12 :- 12 images and need to select 4.",
+              type: "string",
+              enum: [1, 2],
+              enumNames: [i18n.t("3 from 9"), i18n.t("4 from 12")],
+              default: 1,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            sequence_length: {
+              title: i18n.t("Sequence length"),
+              description: "",
+              type: "number",
+              minimum: 3,
+              maximum: 4,
+              default: 3,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            encoding_trials: {
+              title: i18n.t("Encoding trials"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 3,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            animation_interval: {
+              title: i18n.t("Animation interval"),
+              type: "number",
+              minimum: 1,
+              maximum: 5,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            animation_persistance: {
+              title: i18n.t("Animation persistance"),
+              type: "number",
+              minimum: 2,
+              maximum: 6,
+              default: 2,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.spatial_span": {
       type: "object",
       properties: {

@@ -3,7 +3,6 @@ import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/co
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import ResponsiveDialog from "../../ResponsiveDialog"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 
@@ -62,7 +61,7 @@ export default function DeleteActivity({
       }
       Service.delete("activities", activityIds)
       setActivities()
-      enqueueSnackbar(t("Successfully deleted the selected Activities."), {
+      enqueueSnackbar(`${t("Successfully deleted the selected Activities.")}`, {
         variant: "success",
       })
     }
@@ -77,7 +76,7 @@ export default function DeleteActivity({
         classes={{ root: classes.btnText }}
         onClick={(event) => setConfirmationDialog(6)}
       >
-        <Icon>delete_outline</Icon> {t("Delete")}
+        <Icon>delete_outline</Icon> {`${t("Delete")}`}
       </Fab>
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
@@ -86,10 +85,10 @@ export default function DeleteActivity({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? t(
+            ? `${t(
                 "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?"
-              )
-            : t("Are you sure you want to delete this Activity?")
+              )}`
+            : `${t("Are you sure you want to delete this Activity?.")}`
         }
       />
     </span>

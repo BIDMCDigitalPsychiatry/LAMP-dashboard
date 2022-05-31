@@ -32,8 +32,6 @@ import {
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import ResponsiveDialog from "./ResponsiveDialog"
-import Messages from "./Messages"
 import LAMP from "lamp-core"
 import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
@@ -109,7 +107,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
       height: "100%",
-      /*overflowY: "scroll",*/
       overflowY: "auto",
       left: 0,
       top: 0,
@@ -336,7 +333,7 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  {t("Patient View")}: {id}
+                  {`${t("Patient View")}`}: {id}
                 </Box>
               ) : (
                 <Box>
@@ -363,7 +360,8 @@ export default function NavigationLayout({
                     onClick={handleClick}
                   >
                     <Icon>account_circle</Icon>
-                    {t(title)} <Icon>arrow_drop_down</Icon>
+                    {`${t(title)}`}
+                    <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}
@@ -380,16 +378,11 @@ export default function NavigationLayout({
                       horizontal: "left",
                     }}
                   >
-                    {/* <MenuItem>
-                    <Typography variant="h6">{t("Manage team")}</Typography>
-                    <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
-                  </MenuItem> */}
                     {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
-                      <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
+                      <MenuItem onClick={() => setPasswordChange(true)}>{`${t("Manage Credentials")}`}</MenuItem>
                     )}
-                    {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                      {t("Logout")}
+                      {`${t("Logout")}`}
                     </MenuItem>
                     <MenuItem
                       dense
@@ -398,7 +391,7 @@ export default function NavigationLayout({
                         window.open("https://docs.lamp.digital", "_blank")
                       }}
                     >
-                      {t("Help & Support")}
+                      {`${t("Help & Support")}`}
                     </MenuItem>
                     <MenuItem
                       dense
@@ -407,7 +400,7 @@ export default function NavigationLayout({
                         window.open("https://community.lamp.digital", "_blank")
                       }}
                     >
-                      {t("LAMP Community")}
+                      {`${t("LAMP Community")}`}
                     </MenuItem>
                     <MenuItem
                       dense
@@ -416,7 +409,7 @@ export default function NavigationLayout({
                         window.open("mailto:team@digitalpsych.org", "_blank")
                       }}
                     >
-                      {t("Contact Us")}
+                      {`${t("Contact Us")}`}
                     </MenuItem>
                   </Popover>
                 </Box>
@@ -432,29 +425,17 @@ export default function NavigationLayout({
                 )}
             </Toolbar>
           )}
-          <Toolbar
-            classes={{
-              root:
-                classes.toolbarResearcher +
-                (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
-            }}
-          >
-            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
-              <Container className={classes.thumbContainer}>
-                <IconButton
-                  onClick={goBack}
-                  color="default"
-                  className={classes.backbtn}
-                  aria-label="Menu"
-                  style={{
-                    marginLeft:
-                      supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
-                  }}
-                >
-                  <Icon>arrow_back</Icon>
-                </IconButton>
-
-                {sameLineTitle && (
+          {((authType !== "researcher" && authType !== "admin") ||
+            ((authType === "researcher" || authType === "admin") && title.startsWith("Patient"))) && (
+            <Toolbar
+              classes={{
+                root:
+                  classes.toolbarResearcher +
+                  (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
+              }}
+            >
+              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
+                <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"
                     style={{
@@ -462,104 +443,103 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {t(activeTab)}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
+                </Container>
+              )}
+              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
+                <Container className={classes.thumbContainer}>
+                  <Typography
+                    variant="h5"
+                    style={{
+                      textTransform: "capitalize",
+                      marginLeft:
+                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                    }}
+                  >
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
+                  </Typography>
+                </Container>
+              )}
+              <Box flexGrow={1} />
+              {typeof title != "undefined" &&
+                title.startsWith("Patient") &&
+                (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
+                  <Box className={classes.headerRight}>
+                    {hideNotifications.indexOf(activeTab) < 0 ? (
+                      <Tooltip title={`${t("Notifications")}`}>
+                        <Badge
+                          badgeContent={msgCount > 0 ? msgCount : undefined}
+                          color="primary"
+                          onClick={() => {
+                            localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+                            updateAnalytics()
+                          }}
+                        >
+                          <Icon>comment</Icon>
+                        </Badge>
+                      </Tooltip>
+                    ) : (
+                      ""
+                    )}
+                  </Box>
                 )}
-              </Container>
-            )}
-            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
-              <Container className={classes.thumbContainer}>
-                <Typography
-                  variant="h5"
-                  style={{
-                    textTransform: "capitalize",
-                    marginLeft:
-                      supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
-                  }}
-                >
-                  {t(activeTab)}
-                </Typography>
-              </Container>
-            )}
-            <Box flexGrow={1} />
-            {typeof title != "undefined" &&
-              title.startsWith("Patient") &&
-              (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
-                <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
-                    <Tooltip title={t("Notifications")}>
-                      <Badge
-                        badgeContent={msgCount > 0 ? msgCount : undefined}
-                        color="primary"
-                        onClick={() => {
-                          localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
-                          updateAnalytics()
-                        }}
-                      >
-                        <Icon>comment</Icon>
-                      </Badge>
-                    </Tooltip>
-                  ) : (
-                    ""
-                  )}
+              {typeof title != "undefined" && title.startsWith("Patient") && (
+                <Box>
+                  <Tooltip title={`${t("Profile & Settings")}`}>
+                    <IconButton
+                      aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
+                      aria-haspopup="true"
+                      onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
+                      color="default"
+                    >
+                      <Icon>account_circle</Icon>
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    id="menu-appbar"
+                    anchorEl={showCustomizeMenu}
+                    open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
+                    onClose={() => setShowCustomizeMenu(undefined)}
+                  >
+                    <MenuItem disabled divider>
+                      <b>{`${t(title)}`}</b>
+                    </MenuItem>
+                    <MenuItem divider onClick={() => setConfirmLogout(true)}>
+                      {`${t("Logout")}`}
+                    </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://docs.lamp.digital", "_blank")
+                      }}
+                    >
+                      <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+                    </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://community.lamp.digital", "_blank")
+                      }}
+                    >
+                      <b style={{ color: colors.grey["600"] }}>{`${t("LAMP Community")}`}</b>
+                    </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("mailto:team@digitalpsych.org", "_blank")
+                      }}
+                    >
+                      <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
+                    </MenuItem>
+                  </Menu>
                 </Box>
               )}
-            {typeof title != "undefined" && title.startsWith("Patient") && (
-              <Box>
-                <Tooltip title={t("Profile & Settings")}>
-                  <IconButton
-                    aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
-                    aria-haspopup="true"
-                    onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
-                    color="default"
-                  >
-                    {/* <User /> */}
-                    <Icon>account_circle</Icon>
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={showCustomizeMenu}
-                  open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
-                  onClose={() => setShowCustomizeMenu(undefined)}
-                >
-                  <MenuItem disabled divider>
-                    <b>{t(title)}</b>
-                  </MenuItem>
-                  <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                    {t("Logout")}
-                  </MenuItem>
-                  <MenuItem
-                    dense
-                    onClick={() => {
-                      setShowCustomizeMenu(undefined)
-                      window.open("https://docs.lamp.digital", "_blank")
-                    }}
-                  >
-                    <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
-                  </MenuItem>
-                  <MenuItem
-                    dense
-                    onClick={() => {
-                      setShowCustomizeMenu(undefined)
-                      window.open("https://community.lamp.digital", "_blank")
-                    }}
-                  >
-                    <b style={{ color: colors.grey["600"] }}>{t("LAMP Community")}</b>
-                  </MenuItem>
-                  <MenuItem
-                    dense
-                    onClick={() => {
-                      setShowCustomizeMenu(undefined)
-                      window.open("mailto:team@digitalpsych.org", "_blank")
-                    }}
-                  >
-                    <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
-                  </MenuItem>
-                </Menu>
-              </Box>
-            )}
-          </Toolbar>
+            </Toolbar>
+          )}
         </AppBar>
       )}
       <Box
@@ -601,15 +581,17 @@ export default function NavigationLayout({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{t("Are you sure you want to log out of LAMP right now?")}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{`${t(
+          "Are you sure you want to log out of LAMP right now?"
+        )}`}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {t("If you've made some changes, make sure they're saved before you continue to log out.")}
+            {`${t("If you've made some changes, make sure they're saved before you continue to log out.")}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmLogout(false)} color="secondary">
-            {t("Go Back")}
+            {`${t("Go Back")}`}
           </Button>
           <Button
             onClick={() => {
@@ -619,7 +601,7 @@ export default function NavigationLayout({
             color="primary"
             autoFocus
           >
-            {t("Logout")}
+            {`${t("Logout")}`}
           </Button>
         </DialogActions>
       </Dialog>

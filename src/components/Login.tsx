@@ -199,7 +199,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               window.open("https://docs.lamp.digital", "_blank")
             }}
           >
-            <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
+            <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
           </MenuItem>
           <MenuItem
             dense
@@ -208,7 +208,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               window.open("https://community.lamp.digital", "_blank")
             }}
           >
-            <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
+            <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
           </MenuItem>
           <MenuItem
             dense
@@ -217,10 +217,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               window.open("mailto:team@digitalpsych.org", "_blank")
             }}
           >
-            <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
+            <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
           </MenuItem>
         </Menu>
-        <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
+        <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
             <Box>
               <Box className={classes.logoLogin}>

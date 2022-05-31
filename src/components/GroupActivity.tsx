@@ -5,7 +5,8 @@ import LAMP from "lamp-core"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
-import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
+import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
+import { getImage } from "./Manage"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,16 +40,14 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
-        if (activity.spec === "lamp.survey") {
-          LAMP.Type.getAttachment(actId, "lamp.dashboard.survey_description").then((tag) => {
-            const data = spliceActivity({ raw: activity, tag })
-            setCurrentActivity(data)
-            setLoading(false)
-          })
-        } else {
-          setCurrentActivity(activity)
+        getImage(actId, activity.spec).then((tag) => {
+          const dataActivity =
+            activity.spec === "lamp.survey"
+              ? spliceActivity({ raw: activity, tag })
+              : spliceCTActivity({ raw: activity, tag })
+          setCurrentActivity(dataActivity)
           setLoading(false)
-        }
+        })
       })
     }
   }, [index])

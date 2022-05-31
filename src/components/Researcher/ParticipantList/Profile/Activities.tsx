@@ -99,7 +99,7 @@ export default function Activities({
       <Box display="flex" width={1} mt={5}>
         <Box flexGrow={1}>
           <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
-            {t("Activities")}
+            {`${t("Activities")}`}
           </Typography>
         </Box>
         <Box className={classes.secAdd}>
@@ -124,23 +124,23 @@ export default function Activities({
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    {t("Name")}
+                    {`${t("Name")}`}
                   </Typography>
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    {t("Type")}
+                    {`${t("Type")}`}
                   </Typography>
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    {t("Schedule")}
+                    {`${t("Schedule")}`}
                   </Typography>
                 </Grid>
                 <Grid item className={classes.w120}></Grid>
               </Grid>
             ) : (
-              t("No Activities")
+              `${t("No Activities.")}`
             )}
           </Box>
           <Grid container>

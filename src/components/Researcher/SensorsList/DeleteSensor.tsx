@@ -106,7 +106,7 @@ export default function DeleteSensor({
       if (deletedIds.length > 0) {
         Service.delete("sensors", deletedIds)
       } else {
-        enqueueSnackbar(t("An error occured while deleting. Please try again."), {
+        enqueueSnackbar(`${t("An error occured while deleting. Please try again.")}`, {
           variant: "error",
         })
       }
@@ -121,7 +121,7 @@ export default function DeleteSensor({
         classes={{ root: classes.btnText }}
         onClick={(event) => setConfirmationDialog(5)}
       >
-        <Icon>delete_outline</Icon> {t("Delete")}
+        <Icon>delete_outline</Icon> {`${t("Delete")}`}
       </Fab>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />

@@ -45,7 +45,7 @@ export default function ArrayView({
                   ) : (
                     <TableCell key={row[key]}>
                       {typeof row[key] === "string" ? (
-                        <ReactMarkdown source={t(row[key])} escapeHtml={false} plugins={[gfm, emoji]} />
+                        <ReactMarkdown children={t(row[key])} skipHtml={false} remarkPlugins={[gfm, emoji]} />
                       ) : (
                         row[key]
                       )}

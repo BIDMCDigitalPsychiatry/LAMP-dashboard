@@ -164,10 +164,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     </Box>
                     <Typography className={classes.cardlabel}>
                       <ReactMarkdown
-                        source={t(activity.name)}
-                        escapeHtml={false}
-                        plugins={[gfm, emoji]}
-                        renderers={{ link: LinkRenderer }}
+                        children={t(activity.name)}
+                        skipHtml={false}
+                        remarkPlugins={[gfm, emoji]}
+                        components={{ link: LinkRenderer }}
                       />
                     </Typography>
                   </Card>
@@ -177,7 +177,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           : type !== "Portal" && (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>{t("There are no " + type + " activities available.")}</p>
+                <p>{`${t("There are no " + type + " activities available.")}`}</p>
               </Box>
             )}
       </Grid>

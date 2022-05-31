@@ -86,9 +86,9 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
     }, []),
     onDropRejected: useCallback((rejectedFiles) => {
       if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+        enqueueSnackbar(`${t("Image size should not exceed 5 MB.")}`, { variant: "error" })
       } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+        enqueueSnackbar(`${t("Not supported image type.")}`, { variant: "error" })
       }
     }, []),
     accept: "image/*",
@@ -449,22 +449,22 @@ export const CredentialManager: React.FunctionComponent<{
       LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", dataPermissions)
     }
     if (result === -4) {
-      return enqueueSnackbar(t("Could not change password."), {
+      return enqueueSnackbar(`${t("Could not change password.")}`, {
         variant: "error",
       })
     }
     if (result === -1) {
-      enqueueSnackbar(t("Could not perform operation for an unknown reason."), {
+      enqueueSnackbar(`${t("Could not perform operation for an unknown reason.")}`, {
         variant: "error",
       })
     }
     if (typeof result === "string") {
-      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
+      enqueueSnackbar(`${t("Credential management failed. The email address could be in use already.")}`, {
         variant: "error",
       })
     }
     if (result === -2) {
-      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
+      enqueueSnackbar(`${t("Credential management failed. The email address could be in use already.")}`, {
         variant: "error",
       })
     }
@@ -487,13 +487,13 @@ export const CredentialManager: React.FunctionComponent<{
     try {
       id = !!type ? null : id
       if (!!((await LAMP.Credential.delete(id, credential.access_key)) as any).error)
-        return enqueueSnackbar(t("Could not delete."), { variant: "error" })
+        return enqueueSnackbar(`${t("Could not delete.")}`, { variant: "error" })
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
         [credential.access_key]: undefined,
       })
     } catch (err) {
-      enqueueSnackbar(t("Credential management failed."), { variant: "error" })
+      enqueueSnackbar(`${t("Credential management failed.")}`, { variant: "error" })
     }
     LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
@@ -506,10 +506,10 @@ export const CredentialManager: React.FunctionComponent<{
 
   return (
     <Box {...props}>
-      <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
+      <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
-            {t("Manage Credentials")}
+            {`${t("Manage Credentials")}`}
           </Typography>
         </Grid>
         {allCreds.map((x, idx) => (
@@ -543,7 +543,7 @@ export const CredentialManager: React.FunctionComponent<{
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title={t("Add a new member of your care team.")}>
+          <Tooltip title={`${t("Add a new member of your care team.")}`}>
             <IconButton
               onClick={() =>
                 setSelected((selected) => ({
@@ -568,7 +568,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          {t("Update Photo & Role")}
+          {`${t("Update Photo & Role")}`}
         </MenuItem>
         <MenuItem
           onClick={() =>
@@ -592,7 +592,7 @@ export const CredentialManager: React.FunctionComponent<{
             )
           }
         >
-          <b>{t("Delete")}</b>
+          <b>{`${t("Delete")}`}</b>
         </MenuItem>
       </Menu>
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}

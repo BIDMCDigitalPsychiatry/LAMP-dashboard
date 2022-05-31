@@ -26,7 +26,7 @@ import BreatheIcon from "../../../icons/Breathe.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    containerWidth: { maxWidth: 1055, marginBottom: "80px" },
+    containerWidth: { maxWidth: 1055, marginBottom: "10px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -474,20 +474,31 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    ;(settingsData.settings || []).map((x, idx) => {
-      if (
-        !(
-          x.type === "time" ||
-          x.type === "list" ||
-          x.type === "multiselect" ||
-          x.type === "slider" ||
-          x.type === "rating"
-        ) &&
-        typeof x.options !== "undefined"
-      ) {
-        delete settingsData.settings[idx]["options"]
-      }
-    })
+    if (data?.spec === "lamp.survey") {
+      ;(settingsData?.settings || []).map((x, idx) => {
+        if (
+          !(
+            x.type === "time" ||
+            x.type === "list" ||
+            x.type === "multiselect" ||
+            x.type === "slider" ||
+            x.type === "rating"
+          ) &&
+          typeof x.options !== "undefined"
+        ) {
+          delete settingsData.settings[idx]["options"]
+        }
+        if (x.type === "time") {
+          if (!!settingsData.settings[idx]["options"] && settingsData.settings[idx]["options"].length > 1) {
+            settingsData.settings[idx]["options"].map((i, indx) => {
+              if (indx > 0) {
+                settingsData.settings[idx]["options"].splice(indx, 1)
+              }
+            })
+          }
+        }
+      })
+    }
     setData({ ...data, settings: settingsData?.settings })
   }
 
@@ -522,7 +533,7 @@ export default function GameCreator({
           <Box my={2} p={2} border={1} borderColor="#0000001f" className={classes.errorcustom}>
             <Typography variant="h6">Errors</Typography>
             <Box alignItems="center" display="flex" p={2}>
-              <Icon>error</Icon> {t("The audio size should not exceed 10 MB.")}
+              <Icon>error</Icon> {`${t("The audio size should not exceed 10 MB.")}`}
             </Box>
           </Box>
         )}

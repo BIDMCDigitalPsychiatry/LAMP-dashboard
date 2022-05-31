@@ -51,7 +51,7 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
     <Card className={classes.card} ref={ref}>
       <CardActions classes={{ root: classes.actionRoot }}>
         <Typography variant="subtitle2" className={classes.typography}>
-          {t(props.message)}
+          {`${t(props.message)}`}
         </Typography>
         <Box className={classes.icons}>
           <IconButton

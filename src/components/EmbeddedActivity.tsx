@@ -14,7 +14,6 @@ import {
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { sensorEventUpdate } from "./BottomMenu"
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -40,6 +39,7 @@ const demoActivities = {
   "lamp.tips": "tips",
   "lamp.goals": "goals",
   "lamp.medications": "medicationtracker",
+  "lamp.memory_game": "memorygame",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -86,6 +86,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           delete data["timestamp"]
           data["activity"] = currentActivity.id
           data["timestamp"] = activityTimestamp
+          data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           setEmbeddedActivity(undefined)
           setSettings(null)
@@ -129,6 +130,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               console.dir(e)
             })
             .then((x) => {
+              localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
               setSaved(true)
               onComplete(data)
               setLoading(false)
@@ -150,12 +152,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     let response = "about:blank"
+    const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
       setSettings({
         ...settings,
         activity: currentActivity,
         configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
 
@@ -218,7 +222,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }}
             color="primary"
           >
-            {t("Ok")}
+            {`${t("Ok")}`}
           </Button>
         </DialogActions>
       </Dialog>

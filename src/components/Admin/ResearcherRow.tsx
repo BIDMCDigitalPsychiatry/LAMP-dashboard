@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
-import LAMP from "lamp-core"
 import DeleteResearcher from "./DeleteResearcher"
 import AddUpdateResearcher from "./AddUpdateResearcher"
 const useStyles = makeStyles((theme: Theme) =>

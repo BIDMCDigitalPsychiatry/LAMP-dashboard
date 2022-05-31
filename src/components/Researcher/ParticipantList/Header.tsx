@@ -57,7 +57,7 @@ export default function Header({
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">{t("Users")}</Typography>
+          <Typography variant="h5">{`${t("Users")}`}</Typography>
         </Box>
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} order={order} />

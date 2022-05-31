@@ -11,9 +11,7 @@ import {
   useTheme,
 } from "@material-ui/core"
 
-import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
-import { CredentialManager } from "../CredentialManager"
 import { ResponsivePaper } from "../Utils"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
@@ -176,7 +174,7 @@ export default function Root({ updateStore, adminType, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={t("Investigators")} />
+                <ListItemText primary={`${t("Investigators")}`} />
               </ListItem>
               {adminType === "admin" && (
                 <ListItem

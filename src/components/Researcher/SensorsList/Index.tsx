@@ -126,6 +126,8 @@ export default function SensorsList({
           setPaginatedSensors(sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
           setPage(page)
           setRowCount(rowCount)
+        } else {
+          setSensors([])
         }
         setLoading(false)
       })
@@ -194,7 +196,7 @@ export default function SensorsList({
             <Box className={classes.norecordsmain}>
               <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
                 <Icon>info</Icon>
-                {t("No Records Found")}
+                {`${t("No Records Found")}`}
               </Box>
             </Box>
           )}

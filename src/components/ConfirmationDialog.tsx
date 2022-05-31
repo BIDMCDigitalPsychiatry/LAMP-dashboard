@@ -30,13 +30,13 @@ export default function ConfirmationDialog({
 
   return (
     <Dialog {...props} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-      <DialogTitle id="alert-dialog-title">{t("Confirmation")}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">{`${t("Confirmation")}`}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">{t(confirmationMsg)}</DialogContentText>
+        <DialogContentText id="alert-dialog-description">{`${t(confirmationMsg)}`}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => confirmAction("No")} color="primary">
-          {t("No")}
+          {`${t("No")}`}
         </Button>
         <Button
           onClick={() => {
@@ -48,7 +48,7 @@ export default function ConfirmationDialog({
           autoFocus
           disabled={!!isClicked}
         >
-          {t("Yes")}
+          {`${t("Yes")}`}
         </Button>
       </DialogActions>
     </Dialog>

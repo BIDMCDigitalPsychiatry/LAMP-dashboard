@@ -96,33 +96,33 @@ export default function Streak({
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
             <ReactMarkdown
-              source={t(
+              children={t(
                 !!activity?.streakTitle && activity?.streakTitle.trim().length > 0
                   ? activity?.streakTitle
                   : "Nice work!"
               )}
-              escapeHtml={false}
-              plugins={[gfm, emoji]}
-              renderers={{ link: LinkRenderer }}
+              skipHtml={false}
+              remarkPlugins={[gfm, emoji]}
+              components={{ link: LinkRenderer }}
             />
           </Typography>
           <Typography className={classes.ribbonText} component="p">
             <ReactMarkdown
-              source={t(
+              children={t(
                 !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
                   ? activity?.streakDesc
                   : "You’re on a streak, keep it going"
               )}
-              escapeHtml={false}
-              plugins={[gfm, emoji]}
-              renderers={{ link: LinkRenderer }}
+              skipHtml={false}
+              remarkPlugins={[gfm, emoji]}
+              components={{ link: LinkRenderer }}
             />
           </Typography>
           <Box textAlign="center" className={classes.niceWorkbadge}>
             <Ribbon width="170" height="226" />
             <Box className={classes.dayNotification}>
               <Typography variant="h4"> {streak}</Typography>{" "}
-              <Typography variant="h6">{streak > 1 ? " " + t("days") : t("day")}</Typography>
+              <Typography variant="h6">{streak > 1 ? " " + `${t("days")}` : `${t("day")}`}</Typography>
             </Box>
           </Box>
         </Box>

@@ -23,7 +23,7 @@ export default function UpdateCredential({ participant, allRoles, ext, ...props 
         className={classes.linkBtn}
       >
         <Icon>key</Icon>
-        {t("Reset account password")}
+        {`${t("Reset account password")}`}
       </Link>
       <Dialog open={showCredentials} onClose={() => setShowCredentials(false)}>
         <DialogContent style={{ marginBottom: 12 }}>

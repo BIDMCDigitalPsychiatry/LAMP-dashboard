@@ -52,7 +52,7 @@ export default function Home() {
   const classes = useStyles()
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center" style={{ height: "100vh" }}>
+    <Grid container direction="row" justifyContent="center" alignItems="center" style={{ height: "100vh" }}>
       <Grid item className={classes.loginmain}>
         <div>
           <Logo />

@@ -94,7 +94,7 @@ export default function StudyCreator({
       let result = JSON.parse(JSON.stringify(res))
       let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
       Service.addData("studies", [studiesData])
-      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+      enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
         variant: "success",
       })
       studiesData.participant_count = 0
@@ -131,7 +131,7 @@ export default function StudyCreator({
         activity_count: 0,
       }
       Service.addData("studies", [newStudyObj])
-      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+      enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
         variant: "success",
       })
       handleNewStudy(newStudyObj)
@@ -141,12 +141,14 @@ export default function StudyCreator({
     })
   }
 
+  const handleEnter = () => {
+    setStudyName("")
+  }
+
   return (
     <Dialog
       {...props}
-      onEnter={() => {
-        setStudyName("")
-      }}
+      onEnter={handleEnter}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
@@ -156,7 +158,7 @@ export default function StudyCreator({
         <CircularProgress color="inherit" />
       </Backdrop>
       <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{t("Add a new study.")}</Typography>
+        <Typography variant="h6">{`${t("Add a new study.")}`}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
@@ -174,14 +176,18 @@ export default function StudyCreator({
           autoFocus
           fullWidth
           variant="outlined"
-          label={t("Study Name")}
+          label={`${t("Study Name")}`}
           value={studyName}
           onChange={(e) => {
             setStudyName(e.target.value)
           }}
           inputProps={{ maxLength: 80 }}
           helperText={
-            duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""
+            duplicateCnt > 0
+              ? `${t("Unique study name required")}`
+              : !validate()
+              ? `${t("Please enter study name.")}`
+              : ""
           }
         />
       </DialogContent>
@@ -193,7 +199,7 @@ export default function StudyCreator({
               closePopUp(2)
             }}
           >
-            {t("Cancel")}
+            {`${t("Cancel")}`}
           </Button>
           <Button
             onClick={() => {
@@ -203,7 +209,7 @@ export default function StudyCreator({
             autoFocus
             disabled={!validate()}
           >
-            {t("Save")}
+            {`${t("Save")}`}
           </Button>
         </Box>
       </DialogActions>

@@ -161,7 +161,7 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && typeof x?.value !== "undefined")
           return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
-        else if (!!question && !!!question.options) return Math.max(question.options.indexOf(x.value), 0)
+        else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)
         else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
@@ -192,8 +192,8 @@ export const strategies = {
     })
     return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
   },
-  "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
@@ -257,7 +257,7 @@ export default function PreventSelectedActivities({
                 >
                   <Box display="flex">
                     <Box flexGrow={1}>
-                      <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
+                      <Typography className={classes.preventlabel}>{`${t(activity.name)}`}</Typography>
                     </Box>
                     <Box mr={1} className={classes.preventRightSVG}>
                       {
@@ -279,7 +279,7 @@ export default function PreventSelectedActivities({
                     <Typography variant="h2">{(activityEvents?.[activity.name] || []).length}</Typography>
                   </Box>
                   <Typography variant="h6">
-                    {t("entries")} {timeAgo.format(timeSpans[activity.name].timestamp)}
+                    {`${t("entries")}`} {timeAgo.format(timeSpans[activity.name].timestamp)}
                   </Typography>
                 </Card>
               </ButtonBase>
@@ -295,9 +295,9 @@ export default function PreventSelectedActivities({
                 >
                   <Typography className={classes.preventlabelFull}>
                     <ReactMarkdown
-                      source={`${t(activity.name)} (${activityCounts[activity.name]})`}
-                      escapeHtml={false}
-                      plugins={[gfm, emoji]}
+                      children={`${t(activity.name)} ${activityCounts[activity.name]}`}
+                      skipHtml={false}
+                      remarkPlugins={[gfm, emoji]}
                     />
                   </Typography>
                   <Box className={classes.maxw300}>

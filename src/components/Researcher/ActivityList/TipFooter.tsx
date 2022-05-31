@@ -1,15 +1,6 @@
 import React, { useEffect } from "react"
-import {
-  Grid,
-  Tooltip,
-  Icon,
-  Fab,
-  makeStyles,
-  Theme,
-  createStyles,
-  createMuiTheme,
-  ThemeProvider,
-} from "@material-ui/core"
+import { Grid, Tooltip, Icon, Fab, makeStyles, Theme, createStyles, ThemeProvider } from "@material-ui/core"
+import { createTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import red from "@material-ui/core/colors/red"
 const useStyles = makeStyles((theme: Theme) =>
@@ -29,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     secondary: {
       main: red[500],
@@ -59,7 +50,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
     >
       {!!value ? (
         <Grid item>
-          <Tooltip title={t("Duplicate this activity.")}>
+          <Tooltip title={`${t("Duplicate this activity.")}`}>
             <ThemeProvider theme={theme}>
               <Fab
                 color="secondary"
@@ -70,7 +61,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
                 }}
                 disabled={!isError || (value && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""}
               >
-                {t("Duplicate")}
+                {`${t("Duplicate")}`}
                 <span style={{ width: 8 }} />
                 <Icon>save</Icon>
               </Fab>
@@ -81,7 +72,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
         ""
       )}
       <Grid item>
-        <Tooltip title={t("Save this activity.")}>
+        <Tooltip title={`${t("Save this activity.")}`}>
           <span>
             <Fab
               className={classes.btnBlue}
@@ -92,7 +83,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
               }}
               disabled={!isError}
             >
-              {t("Save")}
+              {`${t("Save")}`}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>
