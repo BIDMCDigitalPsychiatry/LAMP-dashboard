@@ -58,10 +58,8 @@ LAMP.initializeDemoDB(demo_db)
 // Login only if we are a participant.
 LAMP.addEventListener("LOGIN", ({ detail }) => {
   // Tie-in for the mobile apps.
-  if (LAMP.Auth._type === "participant") {
-    ;(window as any)?.webkit?.messageHandlers?.login?.postMessage?.(detail)
-    ;(window as any)?.login?.postMessage?.(JSON.stringify(detail))
-  }
+  ;(window as any)?.webkit?.messageHandlers?.login?.postMessage?.(detail)
+  ;(window as any)?.login?.postMessage?.(JSON.stringify(detail))
 })
 
 // Tie-in for the mobile apps.
