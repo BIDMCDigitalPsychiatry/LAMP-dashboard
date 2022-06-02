@@ -142,30 +142,21 @@ export const SchemaList = () => {
                 xs: 6,
               },
             },
-            sequence_length: {
-              title: i18n.t("Sequence length"),
-              description: "",
-              type: "number",
-              minimum: 3,
-              maximum: 4,
-              default: 3,
-              "ui:grid": {
-                xs: 3,
-              },
-            },
-            encoding_trials: {
-              title: i18n.t("Encoding trials"),
-              description: "",
-              type: "number",
-              minimum: 0,
-              maximum: 3,
-              default: 1,
-              "ui:grid": {
-                xs: 3,
-              },
-            },
+            // encoding_trials: {
+            //   title: i18n.t("Encoding trials"),
+            //   description: "",
+            //   type: "number",
+            //   minimum: 0,
+            //   maximum: 3,
+            //   default: 3,
+            //   readonly: true,
+            //   "ui:grid": {
+            //     xs: 3,
+            //   },
+            // },
             animation_interval: {
               title: i18n.t("Animation interval"),
+              description: i18n.t("seconds"),
               type: "number",
               minimum: 1,
               maximum: 5,
@@ -176,9 +167,10 @@ export const SchemaList = () => {
             },
             animation_persistance: {
               title: i18n.t("Animation persistance"),
+              description: i18n.t("seconds"),
               type: "number",
               minimum: 2,
-              maximum: 6,
+              maximum: 5,
               default: 2,
               "ui:grid": {
                 xs: 3,
