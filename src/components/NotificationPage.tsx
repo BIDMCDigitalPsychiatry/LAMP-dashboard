@@ -10,6 +10,10 @@ import {
   Toolbar,
   IconButton,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import Streak from "./Streak"
@@ -110,18 +114,30 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
+  const [openNotFound, setOpenNotFound] = useState(false)
 
   useEffect(() => {
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      LAMP.Activity.view(activityId).then((data: any) => {
-        getImage(activityId, data.spec).then((tag) => {
-          data = data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
-          setActivity(data)
+      LAMP.Activity.view(activityId)
+        .then((data: any) => {
+          if (!!data) {
+            getImage(activityId, data.spec).then((tag) => {
+              data =
+                data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
+              setActivity(data)
+              setLoading(false)
+            })
+          } else {
+            setOpenNotFound(true)
+            setLoading(false)
+          }
+        })
+        .catch((e) => {
+          setOpenNotFound(true)
           setLoading(false)
         })
-      })
     })()
   }, [activityId])
 
@@ -220,6 +236,29 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Dialog
+        open={openNotFound}
+        onClose={() => {
+          setOpenNotFound(false)
+          window.location.href = "/#/"
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>{t("Some error occured. This activity does not exist.")}</DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setLoading(false)
+              setOpenNotFound(false)
+              history.back()
+            }}
+            color="primary"
+          >
+            {`${t("Ok")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
