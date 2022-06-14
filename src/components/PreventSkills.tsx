@@ -221,7 +221,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
   const [expandedSkills, setExpandedSkills] = useState([])
   const [selectedDates, setSelectedDates] = useState(null)
   const [filterChecked, setFilterChecked] = useState(false)
-  const [skillRange, setSkillRange] = useState(storageData.skill ?? dateArray[0]?.timestamp ?? null)
+  const [skillRange, setSkillRange] = useState(storageData?.skill ?? dateArray[0]?.timestamp ?? null)
 
   const data = [
     {
@@ -321,6 +321,14 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
       setSkillData(skillData)
     }
   }, [skillRange])
+
+  useEffect(() => {
+    setSkillRange(dbtRange)
+  }, [dbtRange])
+
+  useEffect(() => {
+    setSkillRange(storageData?.skill ?? dateArray[0]?.timestamp ?? null)
+  }, [storageData])
 
   const handleExpansion = (key) => {
     let data = expandedSkills

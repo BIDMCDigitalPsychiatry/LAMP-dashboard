@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setStorageData, storageData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [notesRange, setNotesRange] = useState(storageData.notes ?? dateArray[0]?.timestamp ?? null)
+  const [notesRange, setNotesRange] = useState(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
   const [notes, setNotes] = useState(null)
 
   useEffect(() => {
@@ -100,6 +100,14 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
       setNotes(notesData)
     }
   }, [notesRange])
+
+  useEffect(() => {
+    setNotesRange(dbtRange)
+  }, [dbtRange])
+
+  useEffect(() => {
+    setNotesRange(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
+  }, [storageData])
 
   return (
     <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>

@@ -88,7 +88,7 @@ export default function PreventNoSkills({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [reasonsRange, setReasonsRange] = useState(storageData.reasons ?? dateArray[0]?.timestamp ?? null)
+  const [reasonsRange, setReasonsRange] = useState(storageData?.reasons ?? dateArray[0]?.timestamp ?? null)
   const [reasons, setReasons] = useState(null)
 
   useEffect(() => {
@@ -108,6 +108,14 @@ export default function PreventNoSkills({
       setReasons(reasonData)
     }
   }, [reasonsRange])
+
+  useEffect(() => {
+    setReasonsRange(dbtRange)
+  }, [dbtRange])
+
+  useEffect(() => {
+    setReasonsRange(storageData?.reasons ?? dateArray[0]?.timestamp ?? null)
+  }, [storageData])
 
   return (
     <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
