@@ -5,8 +5,6 @@ import {
   Theme,
   createStyles,
   NativeSelect,
-  useMediaQuery,
-  useTheme,
   Backdrop,
   CircularProgress,
   Card,
@@ -23,7 +21,6 @@ import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
 import PreventNoSkills from "./PreventNoSkills"
 import PreventNotes from "./PreventNotes"
-import { EmojiPeople } from "@material-ui/icons"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

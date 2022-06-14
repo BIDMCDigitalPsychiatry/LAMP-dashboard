@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { Box, Typography, makeStyles, Theme, createStyles, NativeSelect } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { getDateString } from "./PreventDBT"
-import { SettingsApplicationsRounded } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
