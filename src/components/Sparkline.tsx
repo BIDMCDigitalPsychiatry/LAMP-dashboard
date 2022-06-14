@@ -26,6 +26,7 @@ export default function Sparkline({ ...props }) {
     let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
     props.data[0].x = dateTimeString
   }
+
   const handleClick = (...args) => {
     // console.log(args)
   }
@@ -96,14 +97,14 @@ export default function Sparkline({ ...props }) {
             },
           },
           encoding: {
-            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+            x: { field: "x", type: "ordinal", timeUnit: "yearmonthdate" },
             y: { field: "y", type: "quantitative" },
             strokeWidth: { value: 2 },
             tooltip: [
               {
                 field: "x",
                 type: "ordinal",
-                timeUnit: "utcyearmonthdatehoursminutes",
+                timeUnit: "yearmonthdatehoursminutes",
                 title: "DATE",
               },
               { field: "y", type: "nominal", title: "SCORE" },
