@@ -24,6 +24,7 @@ import {
 import { useTranslation } from "react-i18next"
 import { getDates, getDateVal } from "./PreventDBT"
 import { getDateString } from "./PreventDBT"
+import { SettingsApplicationsRounded } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -220,7 +221,8 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
   const [expandedSkills, setExpandedSkills] = useState([])
   const [selectedDates, setSelectedDates] = useState(null)
   const [filterChecked, setFilterChecked] = useState(false)
-  const [skillRange, setSkillRange] = useState(dateArray[0]?.timestamp ?? null)
+  const [skillRange, setSkillRange] = useState(storageData.skill ?? dateArray[0]?.timestamp ?? null)
+
   const data = [
     {
       title: `${t("Mindfulness")}`,
@@ -331,15 +333,6 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
     setExpanded(data.length > 0)
     setExpandedSkills([...data])
   }
-
-  useEffect(() => {
-    setStorageData({ ...storageData, skill: dbtRange })
-    setSkillRange(dbtRange)
-  }, [dbtRange])
-
-  useEffect(() => {
-    if (!!storageData && storageData.skill) setSkillRange(storageData.skill)
-  }, [storageData])
 
   return (
     <Box>
