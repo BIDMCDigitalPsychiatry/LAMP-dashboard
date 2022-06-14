@@ -21,7 +21,9 @@ import { ineffective } from "./charts/ineffective_chart"
 import { actions } from "./charts/actions_chart"
 import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
+import PreventNoSkills from "./PreventNoSkills"
 import PreventNotes from "./PreventNotes"
+import { ca } from "date-fns/locale"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -159,9 +161,7 @@ export const getDateVal = (dateVal) => {
 
 export default function PreventDBT({ selectedEvents, ...props }) {
   const classes = useStyles()
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"), {
-    noSsr: true,
-  })
+
   const { t } = useTranslation()
   const [emotionsData, setEmotionsData] = useState(null)
   const [effectiveData, setEffectiveData] = useState(null)
@@ -174,9 +174,10 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
   const [summaryRange, setSummaryRange] = useState(null)
-
+  const [storageData, setStorageData] = useState(null)
   const [calculated, setCalculated] = useState(false)
   const [dbtrange, setDBTrange] = useState(null)
+  const [firstLoaded, setLoaded] = useState(false)
 
   useEffect(() => {
     let dateArray = []
@@ -189,45 +190,84 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let i = 0
       while (start >= selectedEvents[0].timestamp) {
         weekend = new Date(start)
-        start.setHours(23)
-        start.setMinutes(59)
-        start.setSeconds(55)
-
-        weekend.setDate(weekend.getDate() - 6)
-        if (weekend.getTime() < selectedEvents[0].timestamp) {
-          weekend = new Date(selectedEvents[0].timestamp)
-        }
-        weekend.setHours(0)
-        weekend.setMinutes(0)
-        weekend.setSeconds(0)
-        let timestampFormat = start.getTime() + "-" + weekend.getTime()
+        let timestampFormat = setTimestamp(start)
         let dateFormat =
           weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
         start.setDate(start.getDate() - 7)
-        if (i === 0) {
-          setDBTrange(timestampFormat)
-        }
+
         i++
         dateArray.push({ timestamp: timestampFormat, date: dateFormat })
       }
       setDateArray(dateArray)
       setCalculated(true)
     }
+    let ranges = localStorage.getItem("DBT" + selectedEvents[0].activity)
+    if (ranges !== null && ranges != "null") {
+      ranges = JSON.parse(ranges)
+      setStorageData(ranges)
+      setDBTrange(ranges["dbt"])
+    } else {
+      setDBTrange(setTimestamp(new Date(selectedEvents[selectedEvents.length - 1].timestamp)))
+      setLoaded(true)
+    }
   }, [selectedEvents])
 
+  const setTimestamp = (start) => {
+    let weekend = new Date(start)
+    start.setHours(23)
+    start.setMinutes(59)
+    start.setSeconds(55)
+
+    weekend.setDate(weekend.getDate() - 6)
+    if (weekend.getTime() < selectedEvents[0].timestamp) {
+      weekend = new Date(selectedEvents[0].timestamp)
+    }
+    weekend.setHours(0)
+    weekend.setMinutes(0)
+    weekend.setSeconds(0)
+    let timestampFormat = start.getTime() + "-" + weekend.getTime()
+    return timestampFormat
+  }
+
   useEffect(() => {
-    setEffectiverange(dbtrange)
-    setEmotionrange(dbtrange)
-    setActionrange(dbtrange)
-    setInEffectiverange(dbtrange)
-    setSummaryRange(dbtrange)
+    if (dbtrange !== null && !!firstLoaded && !!calculated) {
+      setEffectiverange(dbtrange)
+      setEmotionrange(dbtrange)
+      setActionrange(dbtrange)
+      setInEffectiverange(dbtrange)
+      setSummaryRange(dbtrange)
+      setStorageData({
+        ...storageData,
+        dbt: dbtrange,
+        emotion: dbtrange,
+        effective: dbtrange,
+        action: dbtrange,
+        inEffective: dbtrange,
+        summary: dbtrange,
+      })
+    }
   }, [dbtrange])
+
+  useEffect(() => {
+    if (storageData !== null) {
+      if (!!firstLoaded && !!calculated) {
+        localStorage.setItem("DBT" + selectedEvents[0].activity, JSON.stringify(storageData))
+      } else if (!firstLoaded) {
+        setInEffectiverange(storageData.inEffective)
+        setEmotionrange(storageData.emotion)
+        setEffectiverange(storageData.effective)
+        setActionrange(storageData.action)
+        setSummaryRange(storageData.summary)
+        setLoaded(true)
+      }
+    }
+  }, [storageData])
 
   useEffect(() => {
     if (!!summaryRange) {
       let dData = []
       let summaryData = []
-
+      setStorageData({ ...storageData, summary: summaryRange })
       let timeStamp = summaryRange.split("-")
       selectedEvents.map((event) => {
         if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1])) {
@@ -265,6 +305,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   useEffect(() => {
     if (!!emotionrange) {
       let emotionData = []
+      setStorageData({ ...storageData, emotion: emotionrange })
       let timeStamp = emotionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
@@ -302,6 +343,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   useEffect(() => {
     if (!!effectiverange) {
       let effectivesData = []
+      setStorageData({ ...storageData, effective: effectiverange })
       let timeStamp = effectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
@@ -338,6 +380,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   useEffect(() => {
     if (!!inEffectiverange) {
       let inEffectiveData = []
+      setStorageData({ ...storageData, inEffective: inEffectiverange })
       let timeStamp = inEffectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
@@ -389,6 +432,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
     if (!!actionrange) {
       let timelineData = []
       let tData = []
+      setStorageData({ ...storageData, action: actionrange })
       let timeStamp = actionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
@@ -507,8 +551,27 @@ export default function PreventDBT({ selectedEvents, ...props }) {
               </NativeSelect>
               {selfcareData !== null && <Vega spec={selfcareData} />}
 
-              <PreventSkills selectedEvents={selectedEvents} dateArray={dateArray} dbtRange={dbtrange} />
-              <PreventNotes selectedEvents={selectedEvents} dateArray={dateArray} dbtRange={dbtrange} />
+              <PreventSkills
+                selectedEvents={selectedEvents}
+                setStorageData={setStorageData}
+                storageData={storageData}
+                dateArray={dateArray}
+                dbtRange={dbtrange}
+              />
+              <PreventNoSkills
+                selectedEvents={selectedEvents}
+                setStorageData={setStorageData}
+                storageData={storageData}
+                dateArray={dateArray}
+                dbtRange={dbtrange}
+              />
+              <PreventNotes
+                selectedEvents={selectedEvents}
+                setStorageData={setStorageData}
+                storageData={storageData}
+                dateArray={dateArray}
+                dbtRange={dbtrange}
+              />
             </div>
           </Grid>
         </Grid>

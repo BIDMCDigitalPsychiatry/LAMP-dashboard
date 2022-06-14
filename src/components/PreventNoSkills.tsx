@@ -77,37 +77,47 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setStorageData, storageData, ...props }) {
+export default function PreventNoSkills({
+  selectedEvents,
+  dateArray,
+  dbtRange,
+  setStorageData,
+  storageData,
+  ...props
+}) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [notesRange, setNotesRange] = useState(dbtRange ?? dateArray[0]?.timestamp ?? null)
-  const [notes, setNotes] = useState(null)
+  const [reasonsRange, setReasonsRange] = useState(dateArray[0]?.timestamp ?? null)
+  const [reasons, setReasons] = useState(null)
 
   useEffect(() => {
-    if (!!notesRange) {
-      setStorageData({ ...storageData, notes: notesRange })
-      let timeStamp = notesRange.split("-")
-      let notesData = []
+    console.log("tyest")
+  }, [])
+  useEffect(() => {
+    if (!!reasonsRange) {
+      setStorageData({ ...storageData, reasons: reasonsRange })
+      let timeStamp = reasonsRange.split("-")
+      let reasonData = []
       selectedEvents.map((event) => {
         if (
-          event.static_data.notes?.trim().length > 0 &&
+          event.static_data.reason?.trim().length > 0 &&
           event.timestamp <= parseInt(timeStamp[0]) &&
           event.timestamp >= parseInt(timeStamp[1])
         ) {
-          notesData.push({ note: event.static_data.notes, date: getDateString(new Date(event.timestamp)) })
+          reasonData.push({ reason: event.static_data.reason, date: getDateString(new Date(event.timestamp)) })
         }
       })
-      setNotes(notesData)
+      setReasons(reasonData)
     }
-  }, [notesRange])
+  }, [reasonsRange])
 
   useEffect(() => {
-    setStorageData({ ...storageData, notes: dbtRange })
-    setNotesRange(dbtRange)
+    setStorageData({ ...storageData, reasons: dbtRange })
+    setReasonsRange(dbtRange)
   }, [dbtRange])
 
   useEffect(() => {
-    if (!!storageData && storageData.notes) setNotesRange(storageData.notes)
+    if (!!storageData && storageData.reasons) setReasonsRange(storageData.reasons)
   }, [storageData])
 
   return (
@@ -116,16 +126,16 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
       <div style={{ width: "100%" }} className={classes.skillsContainer}>
         <Box sx={{ display: "flex" }}>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h5">{`${t("Optional notes:")}`}</Typography>
+            <Typography variant="h5">{`${t("Didn't use skills because...")}`}</Typography>
           </Box>
           <Box>
             <Typography variant="h5"></Typography>
 
             <NativeSelect
               className={classes.selector}
-              value={notesRange}
+              value={reasonsRange}
               onChange={(event) => {
-                setNotesRange(event.target.value)
+                setReasonsRange(event.target.value)
               }}
             >
               {dateArray.map((dateString) => (
@@ -135,17 +145,17 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
           </Box>
         </Box>
       </div>
-      {(notes || []).length > 0 ? (
+      {!!reasons && (reasons || []).length > 0 ? (
         <Box className={classes.fullWidth}>
-          {(notes || []).map(
+          {(reasons || []).map(
             (data) =>
-              !!data.note && (
+              !!data.reason && (
                 <Box className={classes.blueBoxStyle}>
                   <Typography variant="caption" gutterBottom>
                     {data.date}
                   </Typography>
                   <Typography variant="body2" component="p">
-                    {data.note}
+                    {data.reason}
                   </Typography>
                 </Box>
               )
@@ -153,7 +163,7 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
         </Box>
       ) : (
         <Box className={classes.fullWidth}>
-          <Typography variant="subtitle1">{`${t("No notes added")}`}</Typography>
+          <Typography variant="subtitle1">{`${t("No data found")}`}</Typography>
         </Box>
       )}
     </Box>
