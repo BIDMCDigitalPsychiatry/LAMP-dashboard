@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setStorageData, storageData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [notesRange, setNotesRange] = useState(dbtRange ?? dateArray[0]?.timestamp ?? null)
+  const [notesRange, setNotesRange] = useState(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
   const [notes, setNotes] = useState(null)
 
   useEffect(() => {
@@ -102,12 +102,11 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
   }, [notesRange])
 
   useEffect(() => {
-    setStorageData({ ...storageData, notes: dbtRange })
     setNotesRange(dbtRange)
   }, [dbtRange])
 
   useEffect(() => {
-    if (!!storageData && storageData.notes) setNotesRange(storageData.notes)
+    setNotesRange(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
   }, [storageData])
 
   return (
@@ -120,7 +119,6 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
           </Box>
           <Box>
             <Typography variant="h5"></Typography>
-
             <NativeSelect
               className={classes.selector}
               value={notesRange}

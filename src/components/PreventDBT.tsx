@@ -5,8 +5,6 @@ import {
   Theme,
   createStyles,
   NativeSelect,
-  useMediaQuery,
-  useTheme,
   Backdrop,
   CircularProgress,
   Card,
@@ -23,7 +21,6 @@ import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
 import PreventNoSkills from "./PreventNoSkills"
 import PreventNotes from "./PreventNotes"
-import { ca } from "date-fns/locale"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -191,9 +188,10 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       while (start >= selectedEvents[0].timestamp) {
         weekend = new Date(start)
         let timestampFormat = setTimestamp(start)
+        start.setDate(start.getDate() - 7)
+
         let dateFormat =
           weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
-        start.setDate(start.getDate() - 7)
 
         i++
         dateArray.push({ timestamp: timestampFormat, date: dateFormat })
@@ -244,6 +242,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         action: dbtrange,
         inEffective: dbtrange,
         summary: dbtrange,
+        notes: dbtrange,
+        skill: dbtrange,
+        reasons: dbtrange,
       })
     }
   }, [dbtrange])
@@ -253,10 +254,10 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       if (!!firstLoaded && !!calculated) {
         localStorage.setItem("DBT" + selectedEvents[0].activity, JSON.stringify(storageData))
       } else if (!firstLoaded) {
-        setInEffectiverange(storageData.inEffective)
-        setEmotionrange(storageData.emotion)
         setEffectiverange(storageData.effective)
+        setEmotionrange(storageData.emotion)
         setActionrange(storageData.action)
+        setInEffectiverange(storageData.inEffective)
         setSummaryRange(storageData.summary)
         setLoaded(true)
       }
@@ -478,7 +479,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
 
   return (
     <div className={classes.root}>
-      {!!calculated ? (
+      {!!calculated && !!firstLoaded ? (
         <Grid container spacing={0}>
           <Grid item xs={12} sm={3} />
           <Grid item xs={12} sm={6}>
@@ -553,22 +554,22 @@ export default function PreventDBT({ selectedEvents, ...props }) {
 
               <PreventSkills
                 selectedEvents={selectedEvents}
-                setStorageData={setStorageData}
                 storageData={storageData}
+                setStorageData={setStorageData}
                 dateArray={dateArray}
                 dbtRange={dbtrange}
               />
               <PreventNoSkills
                 selectedEvents={selectedEvents}
-                setStorageData={setStorageData}
                 storageData={storageData}
+                setStorageData={setStorageData}
                 dateArray={dateArray}
                 dbtRange={dbtrange}
               />
               <PreventNotes
                 selectedEvents={selectedEvents}
-                setStorageData={setStorageData}
                 storageData={storageData}
+                setStorageData={setStorageData}
                 dateArray={dateArray}
                 dbtRange={dbtrange}
               />

@@ -87,12 +87,9 @@ export default function PreventNoSkills({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [reasonsRange, setReasonsRange] = useState(dateArray[0]?.timestamp ?? null)
+  const [reasonsRange, setReasonsRange] = useState(storageData?.reasons ?? dateArray[0]?.timestamp ?? null)
   const [reasons, setReasons] = useState(null)
 
-  useEffect(() => {
-    console.log("tyest")
-  }, [])
   useEffect(() => {
     if (!!reasonsRange) {
       setStorageData({ ...storageData, reasons: reasonsRange })
@@ -112,12 +109,11 @@ export default function PreventNoSkills({
   }, [reasonsRange])
 
   useEffect(() => {
-    setStorageData({ ...storageData, reasons: dbtRange })
     setReasonsRange(dbtRange)
   }, [dbtRange])
 
   useEffect(() => {
-    if (!!storageData && storageData.reasons) setReasonsRange(storageData.reasons)
+    setReasonsRange(storageData?.reasons ?? dateArray[0]?.timestamp ?? null)
   }, [storageData])
 
   return (
