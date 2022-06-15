@@ -21,6 +21,12 @@ import Editor from "./Editor"
 import jsonata from "jsonata"
 import { useDrop } from "react-dnd"
 
+export enum EditorStyle {
+  "AsyncGUI",
+  "OnDemandGUI",
+  "Terminal",
+}
+
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
   const editorRef = React.useRef(null)
@@ -32,7 +38,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
 
-  const [isGUIEditor, toggleEditorStyle] = useLocalStorage("_editor_style", true)
+  const [currentEditorStyle, setEditorStyle] = useLocalStorage(EditorStyle, EditorStyle.AsyncGUI)
   const [GUIQuery, setGUIQuery] = React.useState({
     target: "",
     name: "",
@@ -81,8 +87,8 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
 
   const [viewModeSwitch, setViewModeSwitch] = React.useState(false)
   React.useEffect(() => {
-    setViewModeSwitch(!isGUIEditor)
-  }, [isGUIEditor])
+    setViewModeSwitch(!(currentEditorStyle === EditorStyle.AsyncGUI))
+  }, [currentEditorStyle === EditorStyle.AsyncGUI])
 
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     // The type (or types) to accept - strings or symbols
@@ -90,7 +96,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     // if we drop a target in here, we switch to the GUI editor,
     // and load the new query
     drop: (item, monitor) => {
-      toggleEditorStyle(true)
+      setEditorStyle(EditorStyle.AsyncGUI)
       //@ts-ignore: item should always be an object
       setGUIQuery(item)
     },
@@ -126,10 +132,14 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
             <SelectionWindow
-              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
+              openButtonText={`Change Viewing Mode (Currently ${
+                currentEditorStyle === EditorStyle.AsyncGUI ? "GUI" : "Terminal"
+              })`}
               displaySubmitButton={true}
               handleResult={() => {
-                toggleEditorStyle(!viewModeSwitch)
+                currentEditorStyle === EditorStyle.AsyncGUI
+                  ? setEditorStyle(EditorStyle.Terminal)
+                  : setEditorStyle(EditorStyle.AsyncGUI)
               }}
               closesOnSubmit={true}
               submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
@@ -177,7 +187,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                 name={token.name}
                 id={token.type === "Administrator" ? [token.id] : [token.type, token.id]}
                 type={token.type}
-                isGUIEditor={isGUIEditor}
+                isGUIEditor={currentEditorStyle === EditorStyle.AsyncGUI}
                 onSetQuery={(q) => setQuery(q)}
                 onUpdateGUI={(q) => updateGUIQuery(q)}
               />
@@ -194,7 +204,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                 if (editorRef.current) editorRef.current.editor.layout()
               }}
             >
-              {isGUIEditor ? (
+              {currentEditorStyle === EditorStyle.AsyncGUI ? (
                 <QueryBuilder
                   query={GUIQuery}
                   focusMe={() => toggleFocus(true)}
@@ -234,7 +244,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           </Grid>
         </Grid>
       </Box>
-      {!isGUIEditor && (
+      {currentEditorStyle === EditorStyle.Terminal && (
         <Fab color="primary" variant="extended" className={classes.fab} onClick={runQuery}>
           <Icon className={classes.extendedIcon}>get_app</Icon>
           Run Query
