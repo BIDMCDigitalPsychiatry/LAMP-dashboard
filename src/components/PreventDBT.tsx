@@ -21,7 +21,7 @@ import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
 import PreventNoSkills from "./PreventNoSkills"
 import PreventNotes from "./PreventNotes"
-import classNames from "classnames"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
