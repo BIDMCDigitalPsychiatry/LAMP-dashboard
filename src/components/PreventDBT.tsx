@@ -21,6 +21,7 @@ import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
 import PreventNoSkills from "./PreventNoSkills"
 import PreventNotes from "./PreventNotes"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -202,6 +203,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
     let ranges = localStorage.getItem("DBT" + selectedEvents[0].activity)
     if (ranges !== null && ranges != "null") {
       ranges = JSON.parse(ranges)
+    }
+    if (ranges !== null && ranges != "null" && new Date().getTimezoneOffset() === ranges["offset"]) {
       setStorageData(ranges)
       setDBTrange(ranges["dbt"])
     } else {
@@ -252,7 +255,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   useEffect(() => {
     if (storageData !== null) {
       if (!!firstLoaded && !!calculated) {
-        localStorage.setItem("DBT" + selectedEvents[0].activity, JSON.stringify(storageData))
+        let localData = storageData
+        localData["offset"] = new Date().getTimezoneOffset()
+        localStorage.setItem("DBT" + selectedEvents[0].activity, JSON.stringify(localData))
       } else if (!firstLoaded) {
         setEffectiverange(storageData.effective)
         setEmotionrange(storageData.emotion)
