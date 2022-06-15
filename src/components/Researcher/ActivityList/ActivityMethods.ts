@@ -160,7 +160,7 @@ export const SchemaList = () => {
               type: "number",
               minimum: 1,
               maximum: 5,
-              default: 1,
+              default: 2,
               "ui:grid": {
                 xs: 3,
               },
@@ -169,9 +169,9 @@ export const SchemaList = () => {
               title: i18n.t("Animation persistance"),
               description: i18n.t("seconds"),
               type: "number",
-              minimum: 2,
+              minimum: 1,
               maximum: 5,
-              default: 2,
+              default: 1,
               "ui:grid": {
                 xs: 3,
               },

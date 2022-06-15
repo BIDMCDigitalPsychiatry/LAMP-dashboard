@@ -89,18 +89,18 @@ export default function ScheduleRow({
   const { t } = useTranslation()
   const [data, setData] = useState(scheduleRow)
   const intervals = [
-    { key: "hourly", value: `${t("Every hour.")}` },
+    { key: "hourly", value: `${t("Every hour")}` },
     { key: "every3h", value: `${t("Every number hours", { number: 3 })}` },
     { key: "every6h", value: `${t("Every number hours", { number: 6 })}` },
     { key: "every12h", value: `${t("Every number hours", { number: 12 })}` },
-    { key: "daily", value: `${t("Every day.")}` },
-    { key: "biweekly", value: `${t("Two times every week (Tue, Thurs).")}` },
-    { key: "triweekly", value: `${t("Three times every week (Mon, Wed, Fri).")}` },
-    { key: "weekly", value: `${t("Every week.")}` },
-    { key: "bimonthly", value: `${t("Two times every month.")}` },
-    { key: "fortnightly", value: `${t("Every 2 weeks.")}` },
-    { key: "monthly", value: `${t("Every month.")}` },
-    { key: "custom", value: `${t("Use custom times instead.")}` },
+    { key: "daily", value: `${t("Every day")}` },
+    { key: "biweekly", value: `${t("Two times every week (Tue, Thurs)")}` },
+    { key: "triweekly", value: `${t("Three times every week (Mon, Wed, Fri)")}` },
+    { key: "weekly", value: `${t("Every week")}` },
+    { key: "bimonthly", value: `${t("Two times every month")}` },
+    { key: "fortnightly", value: `${t("Every 2 weeks")}` },
+    { key: "monthly", value: `${t("Every month")}` },
+    { key: "custom", value: `${t("Use custom times instead")}` },
     { key: "none", value: `${t("Do not repeat")}` },
   ]
 
