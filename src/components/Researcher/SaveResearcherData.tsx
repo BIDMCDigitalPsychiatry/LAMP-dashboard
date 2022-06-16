@@ -10,7 +10,7 @@ interface StudyObject {
   sensors: Array<any>
 }
 export const fetchResult = async (authString, id, type, modal) => {
-  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "http://api.lamp.digital"
+  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital"
   const token = LAMP.Auth._auth.accessToken
   let authorization
   if (!!token) {
@@ -19,7 +19,7 @@ export const fetchResult = async (authString, id, type, modal) => {
     authorization = "Basic" + authString
   }
   let result = await (
-    await fetch(`http://${baseUrl}/${modal}/${id}/_lookup/${type}`, {
+    await fetch(`https://${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -31,9 +31,9 @@ export const fetchResult = async (authString, id, type, modal) => {
 }
 
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
-  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "http://api.lamp.digital"
+  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital"
   let result = await (
-    await fetch(`http://${baseUrl}/${modal}/${id}/${type}`, {
+    await fetch(`https://${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
       headers: {
         "Content-Type": "application/json",

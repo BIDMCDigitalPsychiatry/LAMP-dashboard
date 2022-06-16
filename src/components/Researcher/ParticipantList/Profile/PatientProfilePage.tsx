@@ -156,7 +156,7 @@ export default function PatientProfile({
   }
 
   const onClose = () => {
-    window.location.href = `/#/researcher/${researcherId}/users`
+    window.location.replace(`/#/researcher/${researcherId}/users`)
   }
 
   return (
