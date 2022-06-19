@@ -12,6 +12,10 @@ import {
   Fab,
   Card,
   FormControlLabel,
+  FormLabel,
+  FormControl,
+  Radio,
+  RadioGroup,
 } from "@material-ui/core"
 import RenderTree from "./RenderTree"
 import QueryRender from "./QueryRender"
@@ -38,7 +42,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
 
-  const [currentEditorStyle, setEditorStyle] = useLocalStorage(EditorStyle, EditorStyle.AsyncGUI)
+  const [currentEditorStyle, setCurrentEditorStyle] = useLocalStorage("_editor_style", EditorStyle.AsyncGUI)
   const [GUIQuery, setGUIQuery] = React.useState({
     target: "",
     name: "",
@@ -96,7 +100,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     // if we drop a target in here, we switch to the GUI editor,
     // and load the new query
     drop: (item, monitor) => {
-      setEditorStyle(EditorStyle.AsyncGUI)
+      setCurrentEditorStyle(EditorStyle.AsyncGUI)
       //@ts-ignore: item should always be an object
       setGUIQuery(item)
     },
@@ -131,56 +135,28 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           alignContent={"flex-start"}
         >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
-            <SelectionWindow
-              openButtonText={`Change Viewing Mode (Currently ${
-                currentEditorStyle === EditorStyle.AsyncGUI ? "GUI" : "Terminal"
-              })`}
-              displaySubmitButton={true}
-              handleResult={() => {
-                currentEditorStyle === EditorStyle.AsyncGUI
-                  ? setEditorStyle(EditorStyle.Terminal)
-                  : setEditorStyle(EditorStyle.AsyncGUI)
-              }}
-              closesOnSubmit={true}
-              submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
-              style={{ minHeight: "10%" }}
-              children={
-                <React.Fragment>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        name={"setToTerminal"}
-                        checked={viewModeSwitch}
-                        onChange={() => setViewModeSwitch(!viewModeSwitch)}
-                      />
-                    }
-                    label={viewModeSwitch ? "Terminal Mode" : "GUI Mode"}
-                  />
-                  {viewModeSwitch ? (
-                    <Typography>
-                      While in Terminal mode, you can directly write JSONata style queries to pull data directly from
-                      your database. <br />
-                      <br />
-                      For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
-                      with a user's id to get a list of the last 10,000 activities completed through LAMP.
-                      <br />
-                      <br />
-                      Want to learn more about JSONata queries or what special data you can pull from LAMP?
-                      <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
-                        Click here!
-                      </a>
-                    </Typography>
-                  ) : (
-                    <Typography>
-                      While in GUI mode, you can directly pull graphs you have already generated from the LAMP database,
-                      easily view information across an entire study or researcher, or quickly view tags that give info
-                      about things like survey scoring. If this is your first time using the LAMP data_portal, or you
-                      need to get data quckly, this is the mode we recommend!
-                    </Typography>
-                  )}
-                </React.Fragment>
-              }
-            />
+            <FormControl>
+              <FormLabel id="viewing-mode-radio-buttons-group-label">Viewing Mode</FormLabel>
+              <RadioGroup
+                aria-labelledby="viewing-mode-radio-buttons-group-label"
+                defaultValue={EditorStyle.AsyncGUI}
+                value={currentEditorStyle}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  // cast value to enum EditorStyle
+                  setCurrentEditorStyle(EditorStyle[EditorStyle[(event.target as HTMLInputElement).value]])
+                }}
+                name="viewing-mode-radio-buttons-group"
+              >
+                <FormControlLabel
+                  value={EditorStyle.AsyncGUI}
+                  control={<Radio />}
+                  label="Asynchronous GUI (Recommended)"
+                />
+                <FormControlLabel value={EditorStyle.OnDemandGUI} control={<Radio />} label="On Demand GUI" />
+                <FormControlLabel value={EditorStyle.Terminal} control={<Radio />} label="Terminal" />
+              </RadioGroup>
+            </FormControl>
+
             <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "90%", marginTop: "10px" }}>
               <RenderTree
                 token={token}
@@ -204,30 +180,39 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                 if (editorRef.current) editorRef.current.editor.layout()
               }}
             >
-              {currentEditorStyle === EditorStyle.AsyncGUI ? (
-                <QueryBuilder
-                  query={GUIQuery}
-                  focusMe={() => toggleFocus(true)}
-                  token={token}
-                  setQueryResult={setResult}
-                  setLoadingGraphs={setLoadingGraphs}
-                  loadingGraphs={loadingGraphs}
-                  queryResult={result}
-                />
-              ) : (
-                <Editor
-                  //@ts-ignore
-                  path="query"
-                  automaticLayout={true}
-                  ref={editorRef}
-                  onChange={(x) => {
-                    setQuery(x)
-                    toggleFocus(true)
-                    editorRef.current.editor.layout()
-                  }}
-                  onMount={onMonacoMount}
-                />
-              )}
+              {(() => {
+                switch (currentEditorStyle) {
+                  case EditorStyle.AsyncGUI:
+                    return (
+                      <QueryBuilder
+                        query={GUIQuery}
+                        focusMe={() => toggleFocus(true)}
+                        token={token}
+                        setQueryResult={setResult}
+                        setLoadingGraphs={setLoadingGraphs}
+                        loadingGraphs={loadingGraphs}
+                        queryResult={result}
+                      />
+                    )
+                  case EditorStyle.Terminal:
+                    return (
+                      <Editor
+                        //@ts-ignore
+                        path="query"
+                        automaticLayout={true}
+                        ref={editorRef}
+                        onChange={(x) => {
+                          setQuery(x)
+                          toggleFocus(true)
+                          editorRef.current.editor.layout()
+                        }}
+                        onMount={onMonacoMount}
+                      />
+                    )
+                  case EditorStyle.OnDemandGUI:
+                    return null
+                }
+              })()}
             </Grid>
             <Grid
               item
