@@ -133,7 +133,7 @@ export const SchemaList = () => {
           properties: {
             foils: {
               title: i18n.t("Foils"),
-              description: "3 from 9 :- 9 imagesand need to select 3, 4 from 12 :- 12 images and need to select 4.",
+              description: "3 from 9 :-  3x3 grid and 9 foils, 4 from 12 :-  3x3 grid and 12 foils.",
               type: "string",
               enum: [1, 2],
               enumNames: [i18n.t("3 from 9"), i18n.t("4 from 12")],
