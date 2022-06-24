@@ -59,6 +59,15 @@ export default function DeleteSensor({
   const [loading, setLoading] = useState(false)
   const [confirmStatus, setConfirmStatus] = useState(false)
   const [deletedStudyIds, setDeletedStudyIds] = useState([])
+  const [participantCount, setParticipantCount] = useState(0)
+
+  useEffect(() => {
+    if (!!profile) {
+      LAMP.Participant.allByStudy(sensors[0].study_id).then((result) => {
+        setParticipantCount(result.length)
+      })
+    }
+  }, [])
 
   const confirmAction = async (status) => {
     setConfirmStatus(status === "Yes" ? true : false)
@@ -132,7 +141,7 @@ export default function DeleteSensor({
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
         confirmationMsg={
-          !!profile
+          !!profile && participantCount > 1
             ? "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
             : "Are you sure you want to delete this sensor?"
         }
