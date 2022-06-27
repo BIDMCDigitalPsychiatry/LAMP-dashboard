@@ -21,14 +21,14 @@ import LAMP from "lamp-core"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
-import { ResponsivePaper, ResponsiveMargin } from "./Utils"
+import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 
 import pkceChallenge from "pkce-challenge"
-import { Fetch } from "lamp-core/dist/service/Fetch"
-import { StartFlowResponse } from "lamp-core/dist/service/OAuth.service"
+import { OAuthParams, StartFlowResponse } from "lamp-core/dist/service/OAuth.service"
+import { Autocomplete } from "@mui/material"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -129,13 +129,19 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               }
 
               if (urls.loginURL) {
-                urls.loginURL.searchParams.set("code_challenge", LAMP.OAuth.params.codeChallenge)
+                let params: OAuthParams
+                params = JSON.parse(sessionStorage?.getItem("LAMP._oauth"))
+                urls.loginURL.searchParams.set("code_challenge", params.codeChallenge)
+                sessionStorage?.setItem("LAMP._oauth_enabled", JSON.stringify(true))
                 window.location.assign(urls.loginURL.href)
               } else {
                 goToScreen(Screen.legacyLogin)
               }
             }}
-            onError={(error: Error) => enqueueSnackbar(error.message, { variant: "error" })}
+            onError={(error: Error) => {
+              enqueueSnackbar(error.message, { variant: "error" })
+              goToScreen(Screen.legacyLogin)
+            }}
           />
         )
       case Screen.legacyLogin:
@@ -240,7 +246,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               <LanguageSelector />
 
               {form()}
-
               <Box textAlign="center" width={1} mt={4} mb={4}>
                 <Link
                   underline="none"
@@ -346,15 +351,13 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
   let handleSubmit = async (event: any) => {
     event.preventDefault()
     setDisabled(true)
-
     await LAMP.Auth.set_identity({ serverAddress: value })
 
     const pkce = pkceChallenge(pkceCodeVerifierLength)
-    LAMP.OAuth.params = {
-      codeVerifier: pkce.code_verifier,
-      codeChallenge: pkce.code_challenge,
-    }
 
+    let param: OAuthParams = { codeChallenge: pkce.code_challenge, codeVerifier: pkce.code_verifier }
+
+    sessionStorage?.setItem("LAMP._oauth", JSON.stringify(param))
     let urls: StartFlowResponse
     try {
       urls = await LAMP.OAuth.start_flow()
@@ -369,21 +372,23 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
 
   return (
     <form onSubmit={handleSubmit}>
-      <TextField
-        margin="normal"
-        name="serverAddress"
-        variant="outlined"
-        style={{ width: "100%" }}
-        placeholder={defaultValue}
-        helperText={t("Don't enter a domain if you're not sure what this option does.")}
-        value={value}
-        onChange={onChange}
-        disabled={disabled || locked}
-        InputProps={{
-          classes: {
-            root: classes.textfieldStyle,
-          },
-        }}
+      <Autocomplete
+        id="serever-selector"
+        options={["localhost:3000", "api.lamp.digital", "api-staging.lamp.digital"]}
+        sx={{ width: "100%", marginTop: "12px" }}
+        onSelect={onChange}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            name="serverAddress"
+            variant="filled"
+            value={value}
+            onChange={onChange}
+            InputProps={{ ...params.InputProps, disableUnderline: true }}
+            label={"Server Address"}
+            helperText={t("Don't enter a domain if you're not sure what this option does.")}
+          />
+        )}
       />
 
       <Box className={classes.buttonNav} width={1} textAlign="center">

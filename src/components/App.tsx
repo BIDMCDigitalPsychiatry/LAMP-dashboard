@@ -919,11 +919,11 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
       return
     }
 
-    LAMP.OAuth.params = oauthParams
+    sessionStorage?.setItem("LAMP._oauth", JSON.stringify(oauthParams))
     LAMP.Auth.refresh_identity()
 
     const code = searchParameters().get("code")
-    LAMP.OAuth.request_authorization(code)
+    LAMP.OAuth.request_authorization(code, oauthParams?.codeVerifier)
       .then(async (json: AuthResponse) => {
         if (!json.success) {
           setState({ finished: true, success: false })

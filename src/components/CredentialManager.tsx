@@ -47,8 +47,10 @@ function compress(file, width, height) {
   })
 }
 
+const isOAuthEnabled = (JSON.parse(sessionStorage?.getItem("LAMP._oauth_enabled")) as boolean) ?? false
+
 const checkPasswordRule = async (value: string) => {
-  if (LAMP.OAuth.is_enabled) return true
+  if (isOAuthEnabled) return true
 
   let rule = (await LAMP.Type.getAttachment(null, "lamp.dashboard.security_preferences")) as any
   if (!!rule.error) return true
@@ -216,7 +218,7 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
             style={{ marginBottom: 16 }}
           />
         )}
-        {!LAMP.OAuth.is_enabled && ["create-new", "reset-password", "update-profile"].includes(mode) && (
+        {!isOAuthEnabled && ["create-new", "reset-password", "update-profile"].includes(mode) && (
           <>
             <TextField
               fullWidth
@@ -342,7 +344,7 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
 }
 
 function validatePassword(password: string): boolean {
-  return LAMP.OAuth.is_enabled || !!password
+  return isOAuthEnabled || !!password
 }
 
 export const CredentialManager: React.FunctionComponent<{
@@ -579,7 +581,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          {!LAMP.OAuth.is_enabled && t("Reset Password")}
+          {!isOAuthEnabled && t("Reset Password")}
         </MenuItem>
         <MenuItem
           onClick={() =>
