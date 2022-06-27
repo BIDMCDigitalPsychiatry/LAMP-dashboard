@@ -189,10 +189,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         id[id.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
           : id[id.length - 1] === "Study"
-          ? `$LAMP.Study.list("${id[id.length - 2]}")}`
+          ? `$LAMP.Study.list("${id[id.length - 2]}")`
           : id[id.length - 1] === "Participant"
           ? queryDictionary.participantsWithName(id[id.length - 2])
-          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")}`
+          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")`
       getData(testQuery).then((res) => {
         if (!Array.isArray(res)) res = [res]
         setTree(res)
@@ -203,7 +203,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")}`
+      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")`
       onSetQuery(testQuery)
     }, [expanded])
   }
