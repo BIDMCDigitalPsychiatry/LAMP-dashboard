@@ -240,7 +240,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     setSelectedLanguage(event.target.value)
                   }}
                   variant="filled"
-                  value={selectedLanguage || ""}
+                  value={selectedLanguage || "en-US"}
                 >
                   {Object.keys(locale_lang).map((key, value) => {
                     if (userLanguages.includes(key)) {

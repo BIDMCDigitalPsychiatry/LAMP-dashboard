@@ -114,6 +114,7 @@ export default function ActivityList({
       searchActivities()
     } else {
       setActivities([])
+      setLoading(false)
     }
   }, [selected])
 
