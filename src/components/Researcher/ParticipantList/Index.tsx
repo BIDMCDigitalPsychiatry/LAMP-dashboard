@@ -169,6 +169,7 @@ export default function ParticipantList({
       searchParticipants()
     } else {
       setParticipants([])
+      setLoading(false)
     }
   }, [selected])
 
