@@ -26,6 +26,7 @@ import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
+import { Autocomplete } from "@mui/material"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -93,6 +94,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
+
+  let handleServerInput = (value) => setState({ ...state, serverAddress: value })
 
   let handleChange = (event) =>
     setState({
@@ -252,23 +255,29 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     }
                   })}
                 </TextField>
-
-                <TextField
-                  margin="normal"
-                  name="serverAddress"
-                  variant="outlined"
-                  style={{ width: "100%", height: 90 }}
-                  // label="Domain"
-                  placeholder="api.lamp.digital"
-                  helperText={`${t("Don't enter a domain if you're not sure what this option does.")}`}
+                <Autocomplete
+                  id="serever-selector"
+                  options={[
+                    "api.lamp.digital",
+                    "mindlamp.pronet.med.yale.edu",
+                    "mindlamp.orygen.org.au",
+                    "mindlamp-qa.dmh.lacounty.gov",
+                  ]}
+                  sx={{ width: "100%", marginTop: "12px" }}
                   value={state.serverAddress || ""}
-                  onChange={handleChange}
-                  disabled={srcLocked}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                  }}
+                  onChange={(event, value) => handleServerInput(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="serverAddress"
+                      variant="filled"
+                      value={state.serverAddress || ""}
+                      onChange={(event) => handleServerInput(event.target.value)}
+                      InputProps={{ ...params.InputProps, disableUnderline: true }}
+                      label={"Server Address"}
+                      helperText={t("Don't enter a domain if you're not sure what this option does.")}
+                    />
+                  )}
                 />
                 <TextField
                   required
