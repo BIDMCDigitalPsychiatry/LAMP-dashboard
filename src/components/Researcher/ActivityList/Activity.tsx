@@ -163,13 +163,15 @@ export default function Activity({
         : x.spec === "lamp.tips"
         ? await saveTipActivity(x)
         : await saveCTestActivity(x)
-    if (!!newItem.error)
+    if (!!newItem.error) {
+      setLoading(false)
       enqueueSnackbar(`${t("Failed to create a new Activity.")}`, {
         variant: "error",
       })
-    else {
+    } else {
       x["id"] = newItem["data"]
       updateDb(x)
+      setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
       })

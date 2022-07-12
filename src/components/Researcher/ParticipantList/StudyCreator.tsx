@@ -22,6 +22,7 @@ import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
+import { CONTINUOUS_DOMAIN_SCALES } from "vega-lite/build/src/scale"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -90,19 +91,24 @@ export default function StudyCreator({
     setLoading(true)
     let study = new Study()
     study.name = studyName
-    LAMP.Study.create(researcherId, study).then(async (res) => {
-      let result = JSON.parse(JSON.stringify(res))
-      let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
-      Service.addData("studies", [studiesData])
-      enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
-        variant: "success",
+    LAMP.Study.create(researcherId, study)
+      .then(async (res) => {
+        let result = JSON.parse(JSON.stringify(res))
+        let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
+        Service.addData("studies", [studiesData])
+        enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
+          variant: "success",
+        })
+        studiesData.participant_count = 0
+        handleNewStudy(studiesData)
+        closePopUp(2)
+        setStudyName("")
+        setLoading(false)
       })
-      studiesData.participant_count = 0
-      handleNewStudy(studiesData)
-      closePopUp(2)
-      setStudyName("")
-      setLoading(false)
-    })
+      .catch((e) => {
+        console.dir(e)
+        setLoading(false)
+      })
   }
 
   const createNewStudy = (studyName) => {
