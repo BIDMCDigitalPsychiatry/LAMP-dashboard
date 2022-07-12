@@ -22,7 +22,6 @@ import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
-import { CONTINUOUS_DOMAIN_SCALES } from "vega-lite/build/src/scale"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
