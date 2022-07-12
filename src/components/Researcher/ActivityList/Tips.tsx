@@ -405,7 +405,7 @@ export default function Tips({
           },
           false
         )
-    setLoading(true)
+    setLoading(false)
   }
 
   const handleSaveTipsData = () => {

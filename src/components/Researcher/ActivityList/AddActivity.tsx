@@ -79,6 +79,7 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "inline-block",
         width: "100%",
         padding: "8px 30px",
+        minWidth: "300px",
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
       "& *": { cursor: "pointer" },
@@ -169,17 +170,21 @@ export default function AddActivity({
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
-      await otherSpecs.map(async (x: any, index: number) => {
-        if (!!x.id) {
-          await getActivitySpec(x.id).then((spec) => {
-            if (!!spec) availableSpecs.push(spec)
-          })
-        }
-        if (index === otherSpecs.length - 1) {
-          setActivitySpecs(availableSpecs)
-          setLoading(false)
-        }
-      })
+      if (otherSpecs.length > 0) {
+        await otherSpecs.map(async (x: any, index: number) => {
+          if (!!x.id) {
+            await getActivitySpec(x.id).then((spec) => {
+              if (!!spec) availableSpecs.push(spec)
+            })
+          }
+          if (index === otherSpecs.length - 1) {
+            setActivitySpecs(availableSpecs)
+            setLoading(false)
+          }
+        })
+      } else {
+        setLoading(false)
+      }
     })()
   }, [])
 
@@ -247,7 +252,7 @@ export default function AddActivity({
                 ))}
             </React.Fragment>
           )}
-          {[
+          {activitySpecs.filter((x) => !["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && [
             <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{`${t("Smartphone Cognitive Tests")}`}</b>
             </MenuItem>,
