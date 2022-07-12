@@ -5,7 +5,13 @@ import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
-    linkBtn: { color: "#6083E7", fontSize: 14, fontWeight: 500, "& svg": { marginRight: 15 } },
+    linkBtn: {
+      color: "#6083E7",
+      fontSize: 14,
+      fontWeight: 500,
+      "& svg": { marginRight: 15 },
+      "& span": { lineHeight: "1.5", marginRight: "2px" },
+    },
   })
 )
 
