@@ -39,12 +39,12 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
         return p.id
       })
       for (let participant of participants) {
-        await LAMP.Participant.delete(participant.id)
         LAMP.Credential.list(participant.id).then((cred) => {
           cred = cred.filter((c) => c.hasOwnProperty("origin"))
           cred.map((each) => {
             LAMP.Credential.delete(participant.id, each["access_key"])
           })
+          await LAMP.Participant.delete(participant.id)
         })
         await LAMP.Type.setAttachment(participant.id, "me", "lamp.name", null)
         Service.updateCount("studies", participant.study_id, "participant_count", 1, 1)
