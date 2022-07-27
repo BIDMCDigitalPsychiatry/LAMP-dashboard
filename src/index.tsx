@@ -11,7 +11,6 @@ import demo_db from "./demo_db.json"
 // External Imports
 import "core-js/stable"
 import "regenerator-runtime/runtime"
-import "url-search-params-polyfill"
 import "material-icons"
 import "./i18n"
 import { sensorEventUpdate } from "./components/BottomMenu"

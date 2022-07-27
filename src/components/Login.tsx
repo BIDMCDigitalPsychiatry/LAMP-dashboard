@@ -374,7 +374,12 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     <form onSubmit={handleSubmit}>
       <Autocomplete
         id="serever-selector"
-        options={["localhost:3000", "api.lamp.digital", "api-staging.lamp.digital"]}
+        options={[
+          "api.lamp.digital",
+          "mindlamp.pronet.med.yale.edu",
+          "mindlamp.orygen.org.au",
+          "mindlamp-qa.dmh.lacounty.gov",
+        ]}
         sx={{ width: "100%", marginTop: "12px" }}
         onSelect={onChange}
         renderInput={(params) => (
