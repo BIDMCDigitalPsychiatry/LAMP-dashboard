@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Chip, Tooltip, makeStyles } from "@material-ui/core"
-import { getTimeAgo, dataQuality } from "./Index"
+import { Chip, Tooltip, makeStyles } from "@material-ui/core"
+import { getTimeAgo } from "./Index"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 
@@ -16,33 +16,41 @@ const useStyles = makeStyles((theme) => ({
   dataGrey: { backgroundColor: "#e4e4e4 !important", color: "#424242" },
 }))
 
+const activeDataQuality = (active, classes) => ({
+  class:
+    (new Date().getTime() - new Date(parseInt(active?.timestamp ?? 0)).getTime()) / (1000 * 3600 * 24) <= 2
+      ? classes.dataGreen
+      : (new Date().getTime() - new Date(parseInt(active?.timestamp ?? 0)).getTime()) / (1000 * 3600 * 24) <= 7
+      ? classes.dataYellow
+      : (new Date().getTime() - new Date(parseInt(active?.timestamp ?? 0)).getTime()) / (1000 * 3600 * 24) <= 30
+      ? classes.dataRed
+      : classes.dataGrey,
+})
+
 export default function Active({ participant, ...props }) {
   const classes = useStyles()
   const [logins, setLogins] = useState(null)
   const [active, setActive] = useState(null)
-  const [passive, setPassive] = useState(null)
   const { t, i18n } = useTranslation()
   const timeAgo = getTimeAgo(i18n.language)
+
   useEffect(() => {
     let isCancelled = false
-    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      if (!isCancelled) {
-        let res = data[0]?.analytics
-        setLogins(!!res && res.length > 0 ? res[0] : null)
-        let passive = {
-          gps: !!data[0]?.gps && data[0].gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
-          accel:
-            !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
+    setTimeout(() => {
+      Service.getDataByKey("participants", [participant.id], "id").then((data) => {
+        if (!isCancelled) {
+          let res = data[0]?.analytics
+          setLogins(!!res && res.length > 0 ? res[0] : null)
+          let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
+          setActive(active)
         }
-        setPassive(passive)
-        let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
-        setActive(active)
+      })
+      return () => {
+        isCancelled = true
       }
-    })
-    return () => {
-      isCancelled = true
-    }
+    }, 3000)
   }, [])
+
   const dateInfo = (id) => ({
     relative: active?.timestamp ?? 0,
     absolute: new Date(parseInt((logins || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
@@ -69,6 +77,7 @@ export default function Active({ participant, ...props }) {
       model
     )
   }
+
   return (
     <span>
       {dateInfo(participant.id).relative !== "in NaN years" &&
@@ -86,14 +95,14 @@ export default function Active({ participant, ...props }) {
         >
           <Chip
             label={`${t("Last Active")}`}
-            className={classes.dataQuality + " " + dataQuality(passive, timeAgo, t, classes).class}
+            className={classes.dataQuality + " " + activeDataQuality(active, classes).class}
           />
         </Tooltip>
       ) : (
         <Tooltip title={`${t("Never")}`}>
           <Chip
             label={`${t("Last Active")}`}
-            className={classes.dataQuality + " " + dataQuality(passive, timeAgo, t, classes).class}
+            className={classes.dataQuality + " " + activeDataQuality(active, classes).class}
           />
         </Tooltip>
       )}
