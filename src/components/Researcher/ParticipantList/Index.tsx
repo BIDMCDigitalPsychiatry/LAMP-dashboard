@@ -90,34 +90,6 @@ export function getTimeAgo(language) {
   return new TimeAgo(currentLanguage)
 }
 
-const daysSinceLast = (passive, timeAgo, t) => ({
-  gpsString: passive?.gps?.timestamp
-    ? timeAgo.format(new Date(((passive || {}).gps || {}).timestamp))
-    : `${t("Never")}`,
-  accelString: passive?.accel?.timestamp
-    ? timeAgo.format(new Date(((passive || {}).accel || {}).timestamp))
-    : `${t("Never")}`,
-  gps:
-    (new Date().getTime() - new Date(parseInt(((passive || {}).gps || {}).timestamp)).getTime()) / (1000 * 3600 * 24),
-  accel:
-    (new Date().getTime() - new Date(parseInt(((passive || {}).accel || {}).timestamp)).getTime()) / (1000 * 3600 * 24),
-})
-
-export const dataQuality = (passive, timeAgo, t, classes) => ({
-  title:
-    `${t("GPS.")}` +
-    `: ${daysSinceLast(passive, timeAgo, t).gpsString}, ` +
-    `${t("Accelerometer.")}` +
-    `: ${daysSinceLast(passive, timeAgo, t).accelString}`,
-  class:
-    daysSinceLast(passive, timeAgo, t).gps <= 2 && daysSinceLast(passive, timeAgo, t).accel <= 2
-      ? classes.dataGreen
-      : daysSinceLast(passive, timeAgo, t).gps <= 7 || daysSinceLast(passive, timeAgo, t).accel <= 7
-      ? classes.dataYellow
-      : daysSinceLast(passive, timeAgo, t).gps <= 30 || daysSinceLast(passive, timeAgo, t).accel <= 30
-      ? classes.dataRed
-      : classes.dataGrey,
-})
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 export default function ParticipantList({
   studies,
