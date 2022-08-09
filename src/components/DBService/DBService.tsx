@@ -163,7 +163,7 @@ class DBService {
       })
   }
 
-  addData(tablespace: any, data: any, user?: boolean) {
+  addData(tablespace: any, data: any) {
     return dbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
