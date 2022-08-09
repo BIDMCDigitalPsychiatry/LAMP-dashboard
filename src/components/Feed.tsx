@@ -729,7 +729,7 @@ export default function Feed({
 
   const getFeedByDate = (date: Date) => {
     setLoading(true)
-    let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
+    let feeds = (activities || []).filter((activity) => (activity?.schedule || [])?.length > 0)
     Service.getAllTags("activitytags").then((data) => {
       setTag(data)
     })
@@ -813,10 +813,10 @@ export default function Feed({
                             style={{
                               margin: "auto",
                               background: !["", null].includes(
-                                tag.filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
                               )
                                 ? `url(${
-                                    tag.filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                    (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
                                   }) center center/contain no-repeat`
                                 : `url(${InfoIcon}) center center/contain no-repeat`,
                             }}
