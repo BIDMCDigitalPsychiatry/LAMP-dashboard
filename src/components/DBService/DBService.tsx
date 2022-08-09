@@ -1,96 +1,19 @@
-import { DBSchema } from "idb"
-import * as idb from "idb"
-const DATABASE_NAME = "LAMP-DB"
-
-interface LampDB extends DBSchema {
-  researcher: {
-    key: string
-    value: {
-      id: string
-    }
-    indexes: { id: string }
-  }
-  studies: {
-    key: string
-    value: {
-      id: string
-      name: string
-      participant_count: number
-      activity_count: number
-      sensor_count: number
-    }
-    indexes: { id: string }
-  }
-  participants: {
-    key: string
-    value: {
-      id: string
-      name: string
-      gps: Array<JSON>
-      accelerometer: Array<JSON>
-      active: Array<JSON>
-      analytics: Array<JSON>
-      study_id: string
-      study_name: string
-    }
-    indexes: { study_name: string; id: string }
-  }
-  activities: {
-    key: string
-    value: {
-      id: string
-      name: string
-      spec: string
-      study_id: string
-      study_name: string
-      schedule: Array<JSON>
-      settings?: Array<JSON>
-    }
-    indexes: { study_name: string; id: string }
-  }
-  sensors: {
-    key: string
-    value: {
-      id: string
-      name: string
-      study_id: string
-      study_name: string
-    }
-    indexes: { study_name: string; id: string }
-  }
-}
-
-const dbPromise = idb.openDB<LampDB>(DATABASE_NAME, 1, {
-  upgrade(lampDb) {
-    if (!lampDb.objectStoreNames.contains("researcher")) {
-      const researcher = lampDb.createObjectStore("researcher", { keyPath: "id" })
-      researcher.createIndex("id", "id", { unique: true })
-    }
-    if (!lampDb.objectStoreNames.contains("studies")) {
-      const studies = lampDb.createObjectStore("studies", { keyPath: "id" })
-      studies.createIndex("id", "id", { unique: true })
-    }
-    if (!lampDb.objectStoreNames.contains("participants")) {
-      const participants = lampDb.createObjectStore("participants", { keyPath: "id" })
-      participants.createIndex("id", "id", { unique: true })
-      participants.createIndex("study_name", "study_name")
-    }
-    if (!lampDb.objectStoreNames.contains("activities")) {
-      const activities = lampDb.createObjectStore("activities", { keyPath: "id" })
-      activities.createIndex("id", "id")
-      activities.createIndex("study_name", "study_name")
-    }
-    if (!lampDb.objectStoreNames.contains("sensors")) {
-      const sensors = lampDb.createObjectStore("sensors", { keyPath: "id" })
-      sensors.createIndex("id", "id")
-      sensors.createIndex("study_name", "study_name")
-    }
-  },
-})
+import { userDbPromise } from "./UserDB"
+import { dbPromise } from "./AdminDB"
 
 class DBService {
-  getAll(tablespace: any) {
+  getAll(tablespace: any, user?: boolean) {
     return dbPromise
+      .then((db) => {
+        return db.transaction(tablespace).objectStore(tablespace).getAll()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  getAllTags(tablespace: any, user?: boolean) {
+    return userDbPromise
       .then((db) => {
         return db.transaction(tablespace).objectStore(tablespace).getAll()
       })
@@ -208,6 +131,28 @@ class DBService {
       })
   }
 
+  getUserDataByKey(tablespace: any, search: Array<string>, key: string) {
+    let results = []
+    return userDbPromise
+      .then(function (db) {
+        var tx = db.transaction([tablespace], "readonly")
+        var store = tx.objectStore(tablespace)
+        return store.openCursor()
+      })
+      .then(function getValues(cursor) {
+        if (!cursor) {
+          return
+        }
+        if (search.includes(cursor.value[key])) {
+          results.push(cursor.value)
+        }
+        return cursor.continue().then(getValues)
+      })
+      .then(function () {
+        return results
+      })
+  }
+
   getData(tablespace: any, key: string) {
     return dbPromise
       .then((db) => {
@@ -218,8 +163,21 @@ class DBService {
       })
   }
 
-  addData(tablespace: any, data: any) {
+  addData(tablespace: any, data: any, user?: boolean) {
     return dbPromise
+      .then((db) => {
+        let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
+        data.map((d) => {
+          store.put(d)
+        })
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  addUserData(tablespace: any, data: any, user?: boolean) {
+    return userDbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
         data.map((d) => {
@@ -327,6 +285,19 @@ class DBService {
 
   deleteDB() {
     return dbPromise
+      .then((db) => {
+        const stores = [...db.objectStoreNames]
+        stores.map((store) => {
+          db.transaction([store], "readwrite").objectStore(store).clear()
+        })
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  deleteUserDB() {
+    return userDbPromise
       .then((db) => {
         const stores = [...db.objectStoreNames]
         stores.map((store) => {

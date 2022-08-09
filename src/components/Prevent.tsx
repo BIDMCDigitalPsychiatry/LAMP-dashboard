@@ -18,7 +18,7 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import { getImage } from "./Manage"
+import { Service } from "./DBService/DBService"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -253,16 +253,9 @@ export default function Prevent({
     let gActivities = allActivities.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
-      let tags = []
-      let count = 0
-      gActivities.map((activity, index) => {
-        getImage(activity.id, activity.spec).then((img) => {
-          tags[activity.id] = img
-          if (count === gActivities.length - 1) {
-            setTag(tags)
-          }
-          count++
-        })
+      Service.getAllTags("activitytags").then((data) => {
+        setTag((data || []).filter((x: any) => !!x?.category && x?.category.includes("prevent")))
+        setLoading(false)
       })
     }
   }

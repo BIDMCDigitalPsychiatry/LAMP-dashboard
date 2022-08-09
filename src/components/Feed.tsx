@@ -24,15 +24,12 @@ import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
 import WeekView from "./WeekView"
-import LAMP, {
-  Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-} from "lamp-core"
+import LAMP from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
 import { getDate } from "./Researcher/ActivityList/ScheduleRow"
+import { Service } from "./DBService/DBService"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -374,7 +371,7 @@ export default function Feed({
   const [events, setEvents] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-
+  const [tag, setTag] = useState(null)
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -733,6 +730,9 @@ export default function Feed({
   const getFeedByDate = (date: Date) => {
     setLoading(true)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
+    Service.getAllTags("activitytags").then((data) => {
+      setTag(data)
+    })
     setFeeds(feeds)
     changeDate(new Date(date))
     getEvents(date).then(setEvents)
@@ -808,13 +808,16 @@ export default function Feed({
                             </Typography>
                           </Box>
                         </Grid>
-
                         <Grid container justifyContent="center" direction="column" className={classes.image}>
                           <Box
                             style={{
                               margin: "auto",
-                              background: feed.icon
-                                ? `url(${feed.icon}) center center/contain no-repeat`
+                              background: !["", null].includes(
+                                tag.filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                              )
+                                ? `url(${
+                                    tag.filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                  }) center center/contain no-repeat`
                                 : `url(${InfoIcon}) center center/contain no-repeat`,
                             }}
                           ></Box>

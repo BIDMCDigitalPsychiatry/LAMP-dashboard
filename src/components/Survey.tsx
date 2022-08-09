@@ -1,9 +1,8 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
-import { useTranslation } from "react-i18next"
 import ActivityBox from "./ActivityBox"
-import { getImage } from "./Manage"
+import { Service } from "./DBService/DBService"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -32,7 +31,6 @@ export const games = [
 
 export default function Survey({ participant, activities, showStreak, ...props }) {
   const classes = useStyles()
-  const { t } = useTranslation()
   const [tag, setTag] = useState([])
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
@@ -51,17 +49,20 @@ export default function Survey({ participant, activities, showStreak, ...props }
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
-      let tags = []
-      let count = 0
-      gActivities.map((activity, index) => {
-        getImage(activity.id, activity.spec).then((img) => {
-          tags[activity.id] = img
-          if (count === gActivities.length - 1) {
-            setTag(tags)
-            setLoading(false)
-          }
-          count++
-        })
+      Service.getAllTags("activitytags").then((data) => {
+        setTag(
+          (data || []).filter(
+            (x) =>
+              ((games.includes(x.spec) ||
+                x.spec === "lamp.group" ||
+                x.spec === "lamp.dbt_diary_card" ||
+                x.spec === "lamp.recording" ||
+                x.spec === "lamp.survey") &&
+                (typeof x?.category === "undefined" || x?.category === null)) ||
+              (!!x?.category && x?.category.includes("assess"))
+          )
+        )
+        setLoading(false)
       })
     } else {
       setLoading(false)
