@@ -17,6 +17,7 @@ import DataPortal from "./data_portal/DataPortal"
 import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
+import { Service } from "./DBService/DBService"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
@@ -258,6 +259,7 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    Service.deleteUserDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
       await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
