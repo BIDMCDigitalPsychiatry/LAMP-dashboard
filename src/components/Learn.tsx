@@ -1,10 +1,10 @@
 ﻿// Core Imports
 import React, { useState, useEffect } from "react"
 import { Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles, Link } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
-import { useTranslation } from "react-i18next"
+import { Participant as ParticipantObj } from "lamp-core"
 import ActivityBox from "./ActivityBox"
-import { getImage } from "./Manage"
+import { Service } from "./DBService/DBService"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     thumbContainer: {
@@ -38,8 +38,6 @@ export default function Learn({
   const [savedActivities, setSavedActivities] = useState([])
   const [tag, setTag] = useState([])
 
-  const { t } = useTranslation()
-
   useEffect(() => {
     let gActivities = activities.filter(
       (x: any) =>
@@ -48,17 +46,15 @@ export default function Learn({
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
-      let tags = []
-      let count = 0
-      gActivities.map((activity, index) => {
-        getImage(activity.id, activity.spec).then((img) => {
-          tags[activity.id] = img
-          if (count === gActivities.length - 1) {
-            setLoading(false)
-            setTag(tags)
-          }
-          count++
-        })
+      Service.getAllTags("activitytags").then((data) => {
+        setTag(
+          (data || []).filter(
+            (x: any) =>
+              (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
+              (!!x?.category && x?.category.includes("learn"))
+          )
+        )
+        setLoading(false)
       })
     } else {
       setLoading(false)

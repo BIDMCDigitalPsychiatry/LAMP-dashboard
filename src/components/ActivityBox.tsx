@@ -150,8 +150,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                         className={classes.mainIcons}
                         style={{
                           margin: "auto",
-                          background: tag[activity.id]?.photo
-                            ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                          background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                            ? `url(${
+                                tag.filter((x) => x.id === activity?.id)[0]?.photo
+                              }) center center/contain no-repeat`
                             : activity.spec === "lamp.breathe"
                             ? `url(${BreatheIcon}) center center/contain no-repeat`
                             : activity.spec === "lamp.journal"

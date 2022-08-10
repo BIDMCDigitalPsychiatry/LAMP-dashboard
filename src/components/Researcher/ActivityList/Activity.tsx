@@ -142,8 +142,8 @@ export default function Activity({
           setActivity(activity)
           setDetails(tag ?? [])
         } else {
-          if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
-            delete activity.settings.audio
+          if (activity.spec === "lamp.breathe" && activity.settings?.audio === null) {
+            delete activity.settings?.audio
           }
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
             !!y.error ? undefined : y.data

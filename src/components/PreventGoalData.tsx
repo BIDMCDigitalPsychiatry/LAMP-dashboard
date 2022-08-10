@@ -1,11 +1,10 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
 import { Typography, makeStyles, Box, Divider, Container, Link, Badge, Icon } from "@material-ui/core"
-import { ReactComponent as WaterBlue } from "../icons/PreventNutrition.svg"
+import { Service } from "./DBService/DBService"
 import { DatePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import { getEvents } from "./Participant"
-import { getImage } from "./Manage"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -62,8 +61,8 @@ export default function GoalEntries({ ...props }) {
   const { t } = useTranslation()
   useEffect(() => {
     let days = []
-    getImage(props.activity.id, props.activity.spec).then((tag) => {
-      setTag(tag)
+    Service.getUserDataByKey("activitytags", [props.activity.id], "id").then((tags) => {
+      setTag(tags[0])
     })
     ;(props.selectedEvents || []).map((event) => {
       const date = new Date(event.timestamp)

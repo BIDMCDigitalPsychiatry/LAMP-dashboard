@@ -1,9 +1,9 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import ActivityBox from "./ActivityBox"
+import { Service } from "./DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,16 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
-export async function getImage(activityId: string, spec: string) {
-  return [
-    await LAMP.Type.getAttachment(
-      activityId,
-      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
-    ),
-  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
-}
-
 export default function Manage({ participant, activities, showStreak, ...props }) {
   const classes = useStyles()
   const [tag, setTag] = useState([])
@@ -48,17 +38,16 @@ export default function Manage({ participant, activities, showStreak, ...props }
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
-      let tags = []
-      let count = 0
-      gActivities.map((activity, index) => {
-        getImage(activity.id, activity.spec).then((img) => {
-          tags[activity.id] = img
-          if (count === gActivities.length - 1) {
-            setLoading(false)
-            setTag(tags)
-          }
-          count++
-        })
+      Service.getAllTags("activitytags").then((data) => {
+        setTag(
+          (data || []).filter(
+            (x: any) =>
+              ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
+                (typeof x?.category === "undefined" || x?.category === null)) ||
+              (!!x?.category && x?.category.includes("manage"))
+          )
+        )
+        setLoading(false)
       })
     } else {
       setLoading(false)

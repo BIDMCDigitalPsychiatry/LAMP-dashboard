@@ -21,8 +21,8 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
-import { getImage } from "./Manage"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
+import { Service } from "./DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -115,7 +115,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [response, setResponse] = useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
   const [openNotFound, setOpenNotFound] = useState(false)
-
+  const [tag, setTag] = useState(null)
   useEffect(() => {
     setLoading(true)
     setResponse(false)
@@ -123,7 +123,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       LAMP.Activity.view(activityId)
         .then((data: any) => {
           if (!!data) {
-            getImage(activityId, data.spec).then((tag) => {
+            Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
+              setTag(tags[0])
+              const tag = tags[0]
               data =
                 data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
               setActivity(data)
@@ -149,23 +151,22 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
 
   const showStreak = (participant, activity) => {
     setLoading(true)
-    getImage(activity?.id, activity?.spec).then((tag) => {
-      setStreakActivity(tag?.streak ?? null)
-      if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
-        getEvents(participant, activity.id).then((streak) => {
-          setStreak(streak)
-          setOpenComplete(true)
-          setTimeout(() => {
-            setOpenComplete(false)
-            returnResult()
-            setLoading(false)
-          }, 6000)
-        })
-      } else {
-        returnResult()
-        setLoading(false)
-      }
-    })
+
+    setStreakActivity(tag?.streak ?? null)
+    if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+      getEvents(participant, activity.id).then((streak) => {
+        setStreak(streak)
+        setOpenComplete(true)
+        setTimeout(() => {
+          setOpenComplete(false)
+          returnResult()
+          setLoading(false)
+        }, 5000)
+      })
+    } else {
+      returnResult()
+      setLoading(false)
+    }
   }
 
   return (

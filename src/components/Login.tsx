@@ -22,7 +22,7 @@ import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
-import { ResponsivePaper, ResponsiveMargin } from "./Utils"
+import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"

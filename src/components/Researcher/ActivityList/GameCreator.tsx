@@ -208,7 +208,7 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        data.settings.threshold > 90 ||
+        data.settings?.threshold > 90 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -360,10 +360,10 @@ export default function GameCreator({
       data.studyID === null ||
       data.studyID === "" ||
       duplicates.length > 0 ||
-      typeof data.settings.value === "undefined" ||
-      (typeof data.settings.value !== "undefined" && data.settings.value < 0) ||
-      typeof data.settings.unit === "undefined" ||
-      (typeof data.settings.unit !== "undefined" && data.settings.unit?.trim() === "") ||
+      typeof data.settings?.value === "undefined" ||
+      (typeof data.settings?.value !== "undefined" && data.settings?.value < 0) ||
+      typeof data.settings?.unit === "undefined" ||
+      (typeof data.settings?.unit !== "undefined" && data.settings?.unit?.trim() === "") ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )
@@ -371,9 +371,9 @@ export default function GameCreator({
 
   const validateDBT = (duplicates) => {
     let validateEffective = false
-    if (data.settings && data.settings.targetEffective !== undefined) {
-      if (data.settings.targetEffective.length > 0) {
-        validateEffective = data.settings.targetEffective.some((item) => {
+    if (data.settings && data.settings?.targetEffective !== undefined) {
+      if (data.settings?.targetEffective.length > 0) {
+        validateEffective = data.settings?.targetEffective.some((item) => {
           return (
             item.target === "" ||
             typeof item.target === "undefined" ||
@@ -388,9 +388,9 @@ export default function GameCreator({
       validateEffective = true
     }
     let validateInEffective = false
-    if (data.settings && data.settings.targetIneffective !== undefined) {
-      if (data.settings.targetIneffective.length > 0) {
-        validateInEffective = data.settings.targetIneffective.some((item) => {
+    if (data.settings && data.settings?.targetIneffective !== undefined) {
+      if (data.settings?.targetIneffective.length > 0) {
+        validateInEffective = data.settings?.targetIneffective.some((item) => {
           return (
             item.target === "" ||
             typeof item.target === "undefined" ||
@@ -405,9 +405,9 @@ export default function GameCreator({
       validateInEffective = true
     }
     let validateEmotions = false
-    if (data.settings && data.settings.emotions !== undefined) {
-      if (data.settings.emotions.length > 0) {
-        validateEmotions = data.settings.emotions.some((item) => {
+    if (data.settings && data.settings?.emotions !== undefined) {
+      if (data.settings?.emotions.length > 0) {
+        validateEmotions = data.settings?.emotions.some((item) => {
           return item.emotion === "" || typeof item.emotion === "undefined"
         })
       } else {

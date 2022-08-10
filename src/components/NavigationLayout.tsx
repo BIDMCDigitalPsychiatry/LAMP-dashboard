@@ -227,19 +227,25 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
   const [researcherId, setResId] = useState(null)
   useEffect(() => {
-    if (
-      (authType === "researcher" || authType === "admin") &&
-      typeof title != "undefined" &&
-      title.startsWith("Patient")
-    ) {
-      Service.getAll("researcher").then((researcher) => {
-        setResId(researcher[0]["id"])
+    let isMounted = true
+    if (isMounted) {
+      if (
+        (authType === "researcher" || authType === "admin") &&
+        typeof title != "undefined" &&
+        title.startsWith("Patient")
+      ) {
+        Service.getAll("researcher").then((researcher) => {
+          setResId(researcher[0]["id"])
+          setLoading(false)
+        })
+      } else {
         setLoading(false)
-      })
-    } else {
-      setLoading(false)
+      }
+      refresh()
     }
-    refresh()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const refresh = () => {
