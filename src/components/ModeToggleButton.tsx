@@ -1,5 +1,4 @@
 import React, { useEffect } from "react"
-import CheckIcon from "@material-ui/icons/Check"
 import ToggleButton from "@material-ui/lab/ToggleButton"
 import { makeStyles, Theme, createStyles } from "@material-ui/core"
 
@@ -8,9 +7,11 @@ const useStyles = makeStyles((theme: Theme) =>
     togglebtn: {
       padding: "5px 15px",
       borderRadius: "30px",
-      color: "#fff !important",
+      color: "#7599FF !important",
       fontSize: "13px",
       textTransform: "capitalize",
+      background: "#fff !important",
+      fontWeight: 600,
     },
   })
 )
