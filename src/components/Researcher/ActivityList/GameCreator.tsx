@@ -387,35 +387,6 @@ export default function GameCreator({
     } else {
       validateEffective = true
     }
-    let validateInEffective = false
-    if (data.settings && data.settings?.targetIneffective !== undefined) {
-      if (data.settings?.targetIneffective.length > 0) {
-        validateInEffective = data.settings?.targetIneffective.some((item) => {
-          return (
-            item.target === "" ||
-            typeof item.target === "undefined" ||
-            item.measure === "" ||
-            typeof item.measure === "undefined"
-          )
-        })
-      } else {
-        validateInEffective = true
-      }
-    } else {
-      validateInEffective = true
-    }
-    let validateEmotions = false
-    if (data.settings && data.settings?.emotions !== undefined) {
-      if (data.settings?.emotions.length > 0) {
-        validateEmotions = data.settings?.emotions.some((item) => {
-          return item.emotion === "" || typeof item.emotion === "undefined"
-        })
-      } else {
-        validateEmotions = true
-      }
-    } else {
-      validateEmotions = true
-    }
     return !(
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
@@ -423,9 +394,7 @@ export default function GameCreator({
       duplicates.length > 0 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-      validateEffective ||
-      validateInEffective ||
-      validateEmotions
+      validateEffective
     )
   }
 

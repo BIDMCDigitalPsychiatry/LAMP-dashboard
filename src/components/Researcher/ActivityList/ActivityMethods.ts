@@ -821,7 +821,6 @@ export const SchemaList = () => {
               type: "array",
               items: {
                 type: "object",
-                required: ["emotion"],
                 properties: {
                   emotion: {
                     title: i18n.t("Emotions"),
