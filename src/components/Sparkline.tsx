@@ -17,15 +17,17 @@ export default function Sparkline({ ...props }) {
     }
   }, [])
 
-  if ((props.data || []).length === 1) {
-    let propsDate = new Date(props.data[0].x)
+  let details = []
+  ;(props.data || []).map((data) => {
+    let propsDate = new Date(data.x.replace("at ", ""))
     let timeString = propsDate.toLocaleTimeString()
     let curreDate = propsDate.getDate().toString().padStart(2, "0")
     var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
     var curreYear = propsDate.getFullYear()
     let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
-    props.data[0].x = dateTimeString
-  }
+    data.x = dateTimeString
+    details.push(data)
+  })
 
   const handleClick = (...args) => {
     // console.log(args)
@@ -111,7 +113,7 @@ export default function Sparkline({ ...props }) {
             ],
           },
           data: {
-            values: props.values ?? props.data,
+            values: props.values ?? details,
           },
         }}
       />
