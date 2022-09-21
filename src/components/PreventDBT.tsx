@@ -192,7 +192,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         start.setDate(start.getDate() - 7)
 
         let dateFormat =
-          weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
+          start.getMonth() + 1 + "/" + start.getDate() + "-" + (weekend.getMonth() + 1) + "/" + weekend.getDate()
 
         i++
         dateArray.push({ timestamp: timestampFormat, date: dateFormat })
