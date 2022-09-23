@@ -19,14 +19,18 @@ export default function Sparkline({ ...props }) {
 
   let details = []
   ;(props.data || []).map((data) => {
-    let propsDate = new Date(data.x.replace("at ", ""))
-    let timeString = propsDate.toLocaleTimeString()
-    let curreDate = propsDate.getDate().toString().padStart(2, "0")
-    var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-    var curreYear = propsDate.getFullYear()
-    let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
-    data.x = dateTimeString
-    details.push(data)
+    if (typeof data?.x === "string") {
+      let propsDate = new Date(data?.x?.replace("at ", ""))
+      let timeString = propsDate.toLocaleTimeString()
+      let curreDate = propsDate.getDate().toString().padStart(2, "0")
+      var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+      var curreYear = propsDate.getFullYear()
+      let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
+      data.x = dateTimeString
+      details.push(data)
+    } else {
+      details.push(data)
+    }
   })
 
   const handleClick = (...args) => {
