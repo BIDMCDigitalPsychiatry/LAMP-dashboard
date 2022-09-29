@@ -185,7 +185,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   if (!cachedOptions) {
     options = [
       { url: "api.lamp.digital" },
-      { url: "mindlamp.pronet.med.yale.edu" },
       { url: "mindlamp-api.pronet.med.yale.edu" },
       { url: "mindlamp.orygen.org.au" },
       { url: "mindlamp-qa.dmh.lacounty.gov" },
