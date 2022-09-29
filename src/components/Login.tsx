@@ -28,6 +28,9 @@ import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 import { Autocomplete } from "@mui/material"
 
+type SuggestedUrlOption = {
+  url: string
+}
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
@@ -57,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
-    loginInner: { maxWidth: 280 },
+    loginInner: { maxWidth: 320 },
     loginDisabled: {
       opacity: 0.5,
     },
@@ -105,6 +108,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
+    if (!options.find((item) => item.url == state.serverAddress)) {
+      options.push({ url: state.serverAddress })
+      localStorage.setItem("cachedOptions", JSON.stringify(options))
+    }
     setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -171,6 +178,19 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
+  }
+
+  const cachedOptions = localStorage.getItem("cachedOptions")
+  let options: SuggestedUrlOption[]
+  if (!cachedOptions) {
+    options = [
+      { url: "api.lamp.digital" },
+      { url: "mindlamp-api.pronet.med.yale.edu" },
+      { url: "mindlamp.orygen.org.au" },
+      { url: "mindlamp-qa.dmh.lacounty.gov" },
+    ]
+  } else {
+    options = JSON.parse(cachedOptions)
   }
 
   return (
@@ -256,13 +276,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   })}
                 </TextField>
                 <Autocomplete
+                  freeSolo={true}
                   id="serever-selector"
-                  options={[
-                    "api.lamp.digital",
-                    "mindlamp.pronet.med.yale.edu",
-                    "mindlamp.orygen.org.au",
-                    "mindlamp-qa.dmh.lacounty.gov",
-                  ]}
+                  options={options.map((item) => item.url)}
                   sx={{ width: "100%", marginTop: "12px" }}
                   value={state.serverAddress || ""}
                   onChange={(event, value) => handleServerInput(value)}
