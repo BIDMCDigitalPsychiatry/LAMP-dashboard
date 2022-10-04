@@ -535,10 +535,10 @@ export const CredentialManager: React.FunctionComponent<{
                 }
               >
                 <Avatar
-                  src={(allRoles[(x || {}).access_key] || {}).photo}
+                  src={(allRoles[(x || {})?.access_key] || {})?.photo}
                   style={{ backgroundColor: theme.palette.primary.main }}
                 >
-                  {x.description.substring(0, 1)}
+                  {x?.description?.substring(0, 1)}
                 </Avatar>
               </IconButton>
             </Tooltip>
