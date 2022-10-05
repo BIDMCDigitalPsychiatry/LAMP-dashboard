@@ -65,18 +65,11 @@ export default function PreventSelectedExperimental({
             </Typography>
             <Grid container justifyContent="center">
               {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
-              visualizations["lamp.dashboard.experimental." + x] !== null ? (
-                <Box className={classes.vega}>
-                  <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
-                </Box>
-              ) : (
-                <img
-                  alt="visualization"
-                  src={visualizations["lamp.dashboard.experimental." + x]}
-                  height="100%"
-                  width="100%"
-                />
-              )}
+                visualizations["lamp.dashboard.experimental." + x] !== null && (
+                  <Box className={classes.vega}>
+                    <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
+                  </Box>
+                )}
             </Grid>
           </Card>
         </Grid>
