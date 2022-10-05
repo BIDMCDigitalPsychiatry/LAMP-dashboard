@@ -159,7 +159,7 @@ function AppRouter({ ...props }) {
         let hrefloc = window.location.href.split("/")[window.location.href.split("/").length - 1]
         hrefloc.split("?").length > 1
           ? sensorEventUpdate(state.activeTab, (LAMP.Auth._me as any)?.id, hrefloc.split("?")[0])
-          : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any).id, null)
+          : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any)?.id, null)
       }
     })
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
@@ -179,7 +179,7 @@ function AppRouter({ ...props }) {
 
   const getAdminType = () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
-      if (!!res.data) {
+      if (res?.data) {
         let checked = false
         Object.keys(res.data).map((key) => {
           if (res.data[key].hasOwnProperty((LAMP.Auth._auth as any).id)) {
