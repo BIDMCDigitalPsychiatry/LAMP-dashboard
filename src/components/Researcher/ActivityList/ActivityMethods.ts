@@ -796,6 +796,9 @@ export const SchemaList = () => {
             },
             targetIneffective: {
               title: i18n.t("Ineffective Target Behaviors"),
+              description: i18n.t(
+                "Default Ineffective Behaviors: Die, Self-Harm, Quit Therapy, Die by Suicide. Do not add these below."
+              ),
               type: "array",
               items: {
                 type: "object",
@@ -817,7 +820,7 @@ export const SchemaList = () => {
             },
             emotions: {
               title: i18n.t("Emotions"),
-              description: i18n.t("Both good and bad emotions."),
+              description: i18n.t("Default Emotions: Sadness, Shame, Anger, Fear/Worry, Joy. Do not add these below."),
               type: "array",
               items: {
                 type: "object",
