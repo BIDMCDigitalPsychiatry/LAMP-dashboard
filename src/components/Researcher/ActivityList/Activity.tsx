@@ -119,8 +119,12 @@ export default function Activity({
   useEffect(() => {
     if (!!activity && details === null) {
       ;(async () => {
-        let data = await LAMP.Activity.view(activity.id)
-        activity.settings = data.settings
+        let lampAuthId = LAMP.Auth._auth.id
+
+        if (!(lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")) {
+          let data = await LAMP.Activity.view(activity.id)
+          activity.settings = data.settings
+        }
         if (activity.spec === "lamp.survey") {
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
             !!y.error ? undefined : y.data
