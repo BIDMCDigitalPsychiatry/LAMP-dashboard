@@ -260,6 +260,7 @@ function AppRouter({ ...props }) {
 
   let reset = async (identity?: any) => {
     Service.deleteUserDB()
+    Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
       await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {

@@ -190,7 +190,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       { url: "mindlamp-qa.dmh.lacounty.gov" },
     ]
   } else {
-    options = JSON.parse(cachedOptions)
+    options = JSON.parse(cachedOptions).filter((o) => typeof o.url !== "undefined")
   }
 
   return (

@@ -75,7 +75,6 @@ const saveSettings = (newVal, key) => {
 }
 
 export const saveDemoData = () => {
-  Service.deleteDB()
   Service.addData("researcher", [{ id: "researcher1" }])
   Service.addData("participants", demo_db.Participant)
   Service.addData("studies", demo_db.Study)
@@ -96,7 +95,6 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
-  Service.deleteDB()
   Service.addData("researcher", [{ id: id }])
 
   LAMP.API.query(
