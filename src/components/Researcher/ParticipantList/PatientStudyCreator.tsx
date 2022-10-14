@@ -344,7 +344,7 @@ export default function PatientStudyCreator({
               autoFocus
               fullWidth
               variant="outlined"
-              label={`${t("Study Name")}`}
+              label={`${t("Group Name")}`}
               value={studyName}
               onChange={(e) => {
                 setStudyName(e.target.value)
@@ -394,7 +394,7 @@ export default function PatientStudyCreator({
             {`${t("Create a new patient under this study")}`}
           </Box>
           {!!createPatient && (
-            <Typography variant="caption">{`${t("Study name and patient name will be same.")}`}</Typography>
+            <Typography variant="caption">{`${t("Group name and patient name will be same.")}`}</Typography>
           )}
         </DialogContent>
         <DialogActions>

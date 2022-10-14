@@ -421,11 +421,11 @@ export default function ImportActivity({ ...props }) {
       <Divider className={classes.dividerHeader} />
       <Container className={classes.containerWidth}>
         <Box mt={2} mb={2}>
-          <Typography variant="h6">{`${t("Choose the Study you want to import activities.")}`}</Typography>
+          <Typography variant="h6">{`${t("Choose the Group you want to import activities.")}`}</Typography>
         </Box>
         <Grid item lg={4} md={6} xs={12}>
           <FormControl variant="filled" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-filled-label">{`${t("Study")}`}</InputLabel>
+            <InputLabel id="demo-simple-select-filled-label">{`${t("Group")}`}</InputLabel>
             <Select
               labelId="demo-simple-select-filled-label"
               id="demo-simple-select-filled"
@@ -479,7 +479,7 @@ export default function ImportActivity({ ...props }) {
             ))}
             <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
             <Typography className={classes.errorMsg}>
-              {`${t("The Activities having same name under the selected study will be duplicated into new name.")}`}
+              {`${t("The Activities having same name under the selected group will be duplicated into new name.")}`}
             </Typography>
           </DialogContent>
           <DialogActions>

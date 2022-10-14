@@ -181,7 +181,7 @@ export default function StudyCreator({
           autoFocus
           fullWidth
           variant="outlined"
-          label={`${t("Study Name")}`}
+          label={`${t("Group Name")}`}
           value={studyName}
           onChange={(e) => {
             setStudyName(e.target.value)

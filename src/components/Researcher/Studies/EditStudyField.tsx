@@ -179,7 +179,7 @@ export default function EditStudyField({
             style: { color: "#000" },
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title={`${t("Update Study name. Saving an empty text box will reset this value.")}`}>
+                <Tooltip title={`${t("Update Group name. Saving an empty text box will reset this value.")}`}>
                   <IconButton
                     edge="end"
                     aria-label="save edit"
