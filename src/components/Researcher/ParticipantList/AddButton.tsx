@@ -167,8 +167,8 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
                 setAddStudy(true)
               }}
             >
-              <Typography variant="h6">{`${t("Add a new study")}`}</Typography>
-              <Typography variant="body2">{`${t("Create a new study.")}`}</Typography>
+              <Typography variant="h6">{`${t("Add a new group")}`}</Typography>
+              <Typography variant="body2">{`${t("Create a new group.")}`}</Typography>
             </MenuItem>
           )}
           <MenuItem
@@ -178,8 +178,8 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
               setAddParticipantStudy(true)
             }}
           >
-            <Typography variant="h6">{`${t("Add a new patient and study.")}`}</Typography>
-            <Typography variant="body2">{`${t("Create a patient under their own study.")}`}</Typography>
+            <Typography variant="h6">{`${t("Add a new patient and group.")}`}</Typography>
+            <Typography variant="body2">{`${t("Create a patient under their own group.")}`}</Typography>
           </MenuItem>
         </React.Fragment>
       </Popover>

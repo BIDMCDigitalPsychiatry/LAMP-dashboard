@@ -254,7 +254,7 @@ export default function ImportActivity({ ...props }) {
       return
     }
 
-    // checking and updating duplicate activities under same study
+    // checking and updating duplicate activities under same group
     checkDuplicateUpdateActivity(_importFile, activities, selectedStudy)
 
     // Surveys only.

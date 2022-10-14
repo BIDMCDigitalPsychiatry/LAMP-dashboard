@@ -323,7 +323,7 @@ export default function PatientStudyCreator({
           <CircularProgress color="inherit" />
         </Backdrop>
         <DialogTitle id="alert-dialog-slide-title" disableTypography>
-          <Typography variant="h6">{`${t("Create a new study.")}`}</Typography>
+          <Typography variant="h6">{`${t("Create a new group.")}`}</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -352,9 +352,9 @@ export default function PatientStudyCreator({
               inputProps={{ maxLength: 80 }}
               helperText={
                 duplicateCnt > 0
-                  ? `${t("Unique study name required")}`
+                  ? `${t("Unique group name required")}`
                   : !validate()
-                  ? `${t("Please enter study name.")}`
+                  ? `${t("Please enter group name.")}`
                   : ""
               }
             />
@@ -391,7 +391,7 @@ export default function PatientStudyCreator({
               classes={{ checked: classes.checkboxActive }}
               inputProps={{ "aria-label": "primary checkbox" }}
             />
-            {`${t("Create a new patient under this study")}`}
+            {`${t("Create a new patient under this group")}`}
           </Box>
           {!!createPatient && (
             <Typography variant="caption">{`${t("Group name and patient name will be same.")}`}</Typography>

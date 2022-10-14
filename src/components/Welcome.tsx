@@ -11,7 +11,7 @@ export default function Welcome({ activities, onClose, ...props }) {
           <Typography variant="h1">{`${t("Welcome to mindLAMP!")}`} </Typography>
           <Typography variant="h4">
             {`${t(
-              "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own."
+              "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research group, part of your care if a clinician ask you to try it, or on your own."
             )}`}
           </Typography>
           <br />
