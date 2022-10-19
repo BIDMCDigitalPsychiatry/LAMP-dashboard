@@ -96,7 +96,7 @@ export default function DeleteActivity({
         confirmationMsg={
           !!profile && participantCount > 1
             ? `${t(
-                "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?"
+                "This activity will be deleted for all the participants under this group. Are you sure you want to proceed?"
               )}`
             : `${t("Are you sure you want to delete this Activity?.")}`
         }

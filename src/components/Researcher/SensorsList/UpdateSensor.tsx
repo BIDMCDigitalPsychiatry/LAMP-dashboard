@@ -101,7 +101,7 @@ export default function UpdateSensor({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? "Changes done to this sensor will reflect for all the participants under the study. Are you sure you want proceed?."
+            ? "Changes done to this sensor will reflect for all the participants under the group. Are you sure you want proceed?."
             : null
         }
       />

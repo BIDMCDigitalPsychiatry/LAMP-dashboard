@@ -195,7 +195,7 @@ export default function AddUser({
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={3}>
-            <Typography variant="body2">{`${t("Choose the Study you want to save this participant.")}`}</Typography>
+            <Typography variant="body2">{`${t("Choose the Group you want to save this participant.")}`}</Typography>
           </Box>
           <TextField
             error={!validate()}
@@ -203,10 +203,10 @@ export default function AddUser({
             autoFocus
             fullWidth
             variant="outlined"
-            label={`${t("Study")}`}
+            label={`${t("Group")}`}
             value={selectedStudy}
             onChange={handleChangeStudy}
-            helperText={!validate() ? `${t("Please select the Study")}` : ""}
+            helperText={!validate() ? `${t("Please select the Group")}` : ""}
           >
             {(studies || []).map((study) => (
               <MenuItem key={study.id} value={study.id}>
@@ -216,7 +216,7 @@ export default function AddUser({
           </TextField>
           {!!showErrorMsg && (
             <Box mt={1}>
-              <Typography className={classes.errorMsg}>{`${t("Select a Study to create a participant.")}`}</Typography>
+              <Typography className={classes.errorMsg}>{`${t("Select a Group to create a participant.")}`}</Typography>
             </Box>
           )}
         </DialogContent>

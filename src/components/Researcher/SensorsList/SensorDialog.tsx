@@ -286,7 +286,7 @@ export default function SensorDialog({
             error={typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""}
             id="filled-select-currency"
             select
-            label={`${t("Study")}`}
+            label={`${t("Group")}`}
             value={selectedStudy}
             //disabled={!!studyId ? true : false}
             disabled={!!sensor ? true : false}
@@ -295,7 +295,7 @@ export default function SensorDialog({
             }}
             helperText={
               typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
-                ? `${t("Please select the Study.")}`
+                ? `${t("Please select the Group.")}`
                 : ""
             }
             variant="filled"

@@ -820,9 +820,7 @@ export const SchemaList = () => {
             },
             emotions: {
               title: i18n.t("Emotions"),
-              description: i18n.t(
-                "Both good and bad emotions can be added here. Default Emotions: Sadness, Shame, Anger, Fear/Worry, Joy. Do not add these below."
-              ),
+              description: i18n.t("Default Emotions: Sadness, Shame, Anger, Fear/Worry, Joy. Do not add these below."),
               type: "array",
               items: {
                 type: "object",

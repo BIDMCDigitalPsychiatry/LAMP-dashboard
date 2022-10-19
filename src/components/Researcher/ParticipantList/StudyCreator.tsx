@@ -95,7 +95,7 @@ export default function StudyCreator({
         let result = JSON.parse(JSON.stringify(res))
         let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
         Service.addData("studies", [studiesData])
-        enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
+        enqueueSnackbar(`${t("Successfully created new group - studyName.", { studyName: studyName })}`, {
           variant: "success",
         })
         studiesData.participant_count = 0
@@ -136,7 +136,7 @@ export default function StudyCreator({
         activity_count: 0,
       }
       Service.addData("studies", [newStudyObj])
-      enqueueSnackbar(`${t("Successfully created new study - studyName.", { studyName: studyName })}`, {
+      enqueueSnackbar(`${t("Successfully created new group - studyName.", { studyName: studyName })}`, {
         variant: "success",
       })
       handleNewStudy(newStudyObj)
@@ -163,7 +163,7 @@ export default function StudyCreator({
         <CircularProgress color="inherit" />
       </Backdrop>
       <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{`${t("Add a new study.")}`}</Typography>
+        <Typography variant="h6">{`${t("Add a new group.")}`}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
@@ -181,7 +181,7 @@ export default function StudyCreator({
           autoFocus
           fullWidth
           variant="outlined"
-          label={`${t("Study Name")}`}
+          label={`${t("Group Name")}`}
           value={studyName}
           onChange={(e) => {
             setStudyName(e.target.value)
@@ -189,9 +189,9 @@ export default function StudyCreator({
           inputProps={{ maxLength: 80 }}
           helperText={
             duplicateCnt > 0
-              ? `${t("Unique study name required")}`
+              ? `${t("Unique group name required")}`
               : !validate()
-              ? `${t("Please enter study name.")}`
+              ? `${t("Please enter group name.")}`
               : ""
           }
         />

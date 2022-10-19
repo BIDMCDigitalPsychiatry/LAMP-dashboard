@@ -120,8 +120,8 @@ export default function Header({ studies, researcherId, searchData, setParticipa
                 setAddParticipantStudy(true)
               }}
             >
-              <Typography variant="h6">{`${t("Add a new study")}`}</Typography>
-              <Typography variant="body2">{`${t("Create a new study.")}`}</Typography>
+              <Typography variant="h6">{`${t("Add a new group")}`}</Typography>
+              <Typography variant="body2">{`${t("Create a new group.")}`}</Typography>
             </MenuItem>
           </React.Fragment>
         </Popover>
