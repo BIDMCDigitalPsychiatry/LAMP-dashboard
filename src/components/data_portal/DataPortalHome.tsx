@@ -163,7 +163,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                   ) : (
                     <Typography>
                       While in GUI mode, you can directly pull graphs you have already generated from the LAMP database,
-                      easily view information across an entire group or researcher, or quickly view tags that give info
+                      easily view information across an entire study or researcher, or quickly view tags that give info
                       about things like survey scoring. If this is your first time using the LAMP data_portal, or you
                       need to get data quckly, this is the mode we recommend!
                     </Typography>
