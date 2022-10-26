@@ -188,8 +188,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               </Box>
             )}
       </Grid>
-      <p>{`${t("There are no Assess activities available")}.`}</p>
-      <p>{`${t("There are no scheduled activities available")}.`}</p>
       <ActivityPopup
         activity={activity}
         tag={tag}
