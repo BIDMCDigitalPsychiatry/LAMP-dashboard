@@ -394,7 +394,7 @@ export default function PatientStudyCreator({
             {`${t("Create a new patient under this group")}`}
           </Box>
           {!!createPatient && (
-            <Typography variant="caption">{`${t("Group name and patient name will be same.")}`}</Typography>
+            <Typography variant="caption">{`${t("Group name and user name will be same.")}`}</Typography>
           )}
         </DialogContent>
         <DialogActions>
