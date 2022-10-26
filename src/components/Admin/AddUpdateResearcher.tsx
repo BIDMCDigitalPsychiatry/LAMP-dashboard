@@ -156,7 +156,7 @@ export default function AddUpdateResearcher({
             onChange={(event) => setResearcherName(event.target.value)}
             value={name}
             helperText={
-              typeof name == "undefined" || name === null || name.trim() === "" ? `${t("Please enter name")}` : ""
+              typeof name == "undefined" || name === null || name.trim() === "" ? `${t("Please enter name.")}` : ""
             }
           />
         </DialogContent>

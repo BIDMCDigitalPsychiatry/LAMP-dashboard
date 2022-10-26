@@ -189,6 +189,7 @@ export default function Participant({
                 description: img?.description ?? "",
                 photo: img?.photo ?? null,
                 streak: img?.streak ?? null,
+                questions: img?.questions ?? null,
               })
               if (count === activities.length - 1) {
                 Service.addUserData("activitytags", data, true).then(() => {

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
@@ -101,6 +101,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [activity, setActivity] = useState(null)
   const [open, setOpen] = useState(false)
   const [questionCount, setQuestionCount] = React.useState(0)
+  const [message, setMessage] = useState("")
   const { t } = useTranslation()
 
   const handleClickOpen = (y: any) => {
@@ -114,6 +115,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         : setQuestionCount(0)
     })
   }
+
+  useEffect(() => {
+    setMessage("There are no " + type + " activities available.")
+  }, [type])
 
   return (
     <Box>
@@ -179,10 +184,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           : type !== "Portal" && (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>{`${t("There are no " + type + " activities available.")}`}</p>
+                <p>{`${t(message)}`}</p>
               </Box>
             )}
       </Grid>
+      <p>{`${t("There are no Assess activities available")}.`}</p>
+      <p>{`${t("There are no scheduled activities available")}.`}</p>
       <ActivityPopup
         activity={activity}
         tag={tag}
