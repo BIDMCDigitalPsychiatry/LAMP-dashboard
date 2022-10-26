@@ -43,7 +43,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
         <Grid item alignItems="center" lg={3} sm={3} xs={12} className={classes.gridFlex}>
           <FormControlLabel
             control={<Switch checked={streak} onChange={() => setStreak(!streak)} name="streak" />}
-            label={!!streak ? "Streak popup on" : "Streak popup off"}
+            label={!!streak ? `${t("Streak popup on")}` : `${t("Streak popup off")}`}
           />
         </Grid>
         <Grid item lg={9} sm={9} xs={12}>
@@ -61,7 +61,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
           <TextField
             fullWidth
             multiline
-            label={`${t("Streak Description")}`}
+            label={`${t("Streak description")}`}
             variant="filled"
             rows={2}
             disabled={!streak}

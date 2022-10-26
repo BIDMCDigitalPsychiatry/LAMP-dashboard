@@ -334,7 +334,7 @@ export default function SensorDialog({
             id="filled-select-currency"
             select
             label={`${t("Sensor spec")}`}
-            value={sensorSpec}
+            value={`${t(sensorSpec)}`}
             onChange={(e) => {
               setSensorSpec(e.target.value)
             }}

@@ -20,6 +20,7 @@ import SelectionWindow from "./SelectionWindow"
 import Editor from "./Editor"
 import jsonata from "jsonata"
 import { useDrop } from "react-dnd"
+import { useTranslation } from "react-i18next"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -31,6 +32,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const [treeCollapsed, setTreeCollapsed] = React.useState(false)
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
+  const { t } = useTranslation()
 
   const [isGUIEditor, toggleEditorStyle] = useLocalStorage("_editor_style", true)
   const [GUIQuery, setGUIQuery] = React.useState({
@@ -126,13 +128,13 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
             <SelectionWindow
-              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
+              openButtonText={`${t(`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`)}`}
               displaySubmitButton={true}
               handleResult={() => {
                 toggleEditorStyle(!viewModeSwitch)
               }}
               closesOnSubmit={true}
-              submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
+              submitText={`${t(`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`)}`}
               style={{ minHeight: "10%" }}
               children={
                 <React.Fragment>
@@ -155,17 +157,17 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                       with a user's id to get a list of the last 10,000 activities completed through LAMP.
                       <br />
                       <br />
-                      Want to learn more about JSONata queries or what special data you can pull from LAMP?
+                      {`${t("Want to learn more about JSONata queries or what special data you can pull from LAMP?")}`}
                       <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
-                        Click here!
+                        {`${t("Click here!")}`}
                       </a>
                     </Typography>
                   ) : (
                     <Typography>
-                      While in GUI mode, you can directly pull graphs you have already generated from the LAMP database,
-                      easily view information across an entire study or researcher, or quickly view tags that give info
-                      about things like survey scoring. If this is your first time using the LAMP data_portal, or you
-                      need to get data quckly, this is the mode we recommend!
+                      {`${t(
+                        "While in GUI mode, you can directly pull graphs you have already generated from the LAMP database, easily view information across an entire study or researcher, or quickly view tags that give info about things like survey scoring. If this is your first time using the LAMP data_portal, or if you need to get data quickly, this is the mode we recommend!!"
+                      )}`}
+                      `
                     </Typography>
                   )}
                 </React.Fragment>
