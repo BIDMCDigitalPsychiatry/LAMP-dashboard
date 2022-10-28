@@ -1,6 +1,7 @@
 import React from "react"
 import { Typography, Button, Icon, TextField, Container, Avatar, makeStyles } from "@material-ui/core"
 import { ajaxRequest } from "./DataPortalShared"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,7 +27,7 @@ export default function SignIn({ onSubmit, ...props }) {
   const classes = useStyles()
   const [isLoading, setLoading] = React.useState(false)
   const [error, setError] = React.useState("")
-
+  const { t } = useTranslation()
   function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
@@ -61,12 +62,14 @@ export default function SignIn({ onSubmit, ...props }) {
           ajaxRequest(sending)
           break
         case 1:
-          setError(`These credentials are valid but don't currently have data portal access.
-								 Please check again later`)
+          setError(
+            `${t("These credentials are valid but don't currently have data portal access. Please check again later")}`
+          )
           break
         case 2:
-          setError(`These credentials are valid but don't currently have data portal access.
-								 Please check again later`)
+          setError(
+            `${t("These credentials are valid but don't currently have data portal access. Please check again later")}`
+          )
           break
       }
       setLoading(false)
@@ -111,7 +114,7 @@ export default function SignIn({ onSubmit, ...props }) {
           <Icon>lock_outlined</Icon>
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          {`${t("Sign in")}`}
         </Typography>
         <form className={classes.form} noValidate onSubmit={handleSubmit}>
           <TextField
@@ -125,7 +128,7 @@ export default function SignIn({ onSubmit, ...props }) {
             id="server-address"
             autoComplete="server"
             placeholder="api.lamp.digital"
-            helperText={"Don't enter a domain if you're not sure what this option does."}
+            helperText={`${t("Don't enter a domain if you're not sure what this option does.")}`}
             autoFocus
           />
           <TextField
@@ -134,7 +137,7 @@ export default function SignIn({ onSubmit, ...props }) {
             required
             fullWidth
             id="username"
-            label="Username"
+            label={`${t("Username")}`}
             name="username"
             autoComplete="username"
           />
@@ -144,7 +147,7 @@ export default function SignIn({ onSubmit, ...props }) {
             required
             fullWidth
             name="password"
-            label="Password"
+            label={`${t("Password")}`}
             type="password"
             id="password"
             autoComplete="current-password"
@@ -157,7 +160,7 @@ export default function SignIn({ onSubmit, ...props }) {
             disabled={isLoading}
             className={classes.submit}
           >
-            {isLoading ? `Loading...` : `Sign In`}
+            {isLoading ? `${t("Loading...")}` : `${t("Sign In")}`}
           </Button>
           {error.length > 0 && <Typography style={{ color: "red" }}>{error}</Typography>}
         </form>
