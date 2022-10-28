@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import { useTranslation } from "react-i18next"
+import DisplayItem from "./DisplayItem"
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -70,14 +71,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }))
-const { t } = useTranslation()
 
 export default function SelectionWindow({
   openButtonText,
   customButton = null,
   exposeButton = false,
   handleResult = console.log,
-  children = <Typography>{`${t("Set the 'children' prop to display elements")}`}</Typography>,
+  children = <DisplayItem />,
   submitText = "Submit",
   style = {},
   closesOnSubmit = true,
