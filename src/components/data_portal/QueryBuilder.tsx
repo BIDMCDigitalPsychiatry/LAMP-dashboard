@@ -24,6 +24,8 @@ import {
   tags_object,
   generate_participant_tag_info,
 } from "./DataPortalShared"
+import { useTranslation } from "react-i18next"
+
 import { useDrop } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
@@ -207,10 +209,12 @@ export default function QueryBuilder(props) {
   //data for the entities that can be tagged
   //(Researchers, Studies, and Users)
   const DisplayTags = (props) => {
+    const { t } = useTranslation()
+
     if (!props.tagObject || !Object.keys(props.tagObject).length) {
       return (
         <Typography>
-          No tags are available for this{" "}
+          {`${t("No tags are available for this")}`}
           {props.currentQuery.id_string[props.currentQuery.id_string.length - 2].toLowerCase()}
         </Typography>
       )
@@ -279,12 +283,14 @@ export default function QueryBuilder(props) {
     ) {
       return (
         <Typography>
-          There are no shared tags set for this {currentQuery.id_string[currentQuery.id_string.length - 2]}. To display
-          data on tags shared between participants, set "lamp.dashboard.
+          {`${t("There are no shared tags set for this")}`} {currentQuery.id_string[currentQuery.id_string.length - 2]}.
+          {`${t(" To display data on tags shared between participants, set")}`} "lamp.dashboard.
           {currentQuery.id_string[currentQuery.id_string.length - 2].slice(0, 1).toLowerCase() +
             currentQuery.id_string[currentQuery.id_string.length - 2].slice(1)}
-          _tags" to an array of strings, where each string is a tag you would like to see. Please contact your study
-          administrator for more info.
+          _tags"{" "}
+          {`${t(
+            "to an array of strings, where each string is a tag you would like to see. Please contact your study administrator for more info."
+          )}`}
         </Typography>
       )
     }
@@ -426,8 +432,8 @@ export default function QueryBuilder(props) {
 
     return (
       <span>
-        <Button onClick={checkAllTags}>Select all shared tags</Button>
-        <Button onClick={uncheckAllTags}>Deselect all shared tags</Button>
+        <Button onClick={checkAllTags}>{`${t("Select all shared tags")}`}</Button>
+        <Button onClick={uncheckAllTags}>{`${t("Deselect all shared tags")}`}</Button>
         <br />
         <Box className={classes.tagsBox}>
           {returnSortedTags(props.availableSharedTags).map((name) => {
@@ -458,6 +464,7 @@ export default function QueryBuilder(props) {
     )
   }
 
+  const { t } = useTranslation()
   return (
     <Container
       ref={drop}
@@ -476,7 +483,7 @@ export default function QueryBuilder(props) {
             action={
               analyzeShared && (
                 <SelectionWindow
-                  openButtonText={`Adjust Toggleable Shared Tags`}
+                  openButtonText={`${t("Adjust Toggleable Shared Tags")}`}
                   customButton={
                     <IconButton>
                       <Icon>add_box</Icon>
@@ -495,16 +502,17 @@ export default function QueryBuilder(props) {
                   }}
                   closesOnSubmit={false}
                   exposeButton={true}
-                  submitText={`Set Tags`}
+                  submitText={`${t("Set Tags")}`}
                   children={
                     <Box className={classes.tagsBox}>
                       <Box className={classes.selectionBoxHeader}>
-                        All Participant Tags
+                        {`${t("All Participant Tags")}`}
                         <br />
-                        This is a list of all tags present on at least one participant in this
+                        {`${t("This is a list of all tags present on at least one participant in this")}`}
                         {" " + currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase()}. <br />
-                        Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then
-                        press the 'Set Tags' button.
+                        {`${t(
+                          "Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button."
+                        )}`}
                       </Box>
                       <Box style={{ width: "100%", display: "flex", flexDirection: "row" }}>
                         <Button
@@ -512,14 +520,14 @@ export default function QueryBuilder(props) {
                             setSharedTagsUpdateList(Object.keys(participantTagInfo))
                           }}
                         >
-                          Select all tags
+                          {`${t("Select all tags")}`}
                         </Button>
                         <Button
                           onClick={() => {
                             setSharedTagsUpdateList([])
                           }}
                         >
-                          Deselect all tags
+                          {`${t("Deselect all tags")}`}
                         </Button>
                       </Box>
                       <Box className={classes.tagsBox}>
@@ -530,7 +538,7 @@ export default function QueryBuilder(props) {
                                 return (
                                   <Tooltip
                                     key={tag}
-                                    title={`${participantTagInfo[tag].length} participants have this tag`}
+                                    title={`${participantTagInfo[tag].length} ${t("participants have this tag")}`}
                                   >
                                     <Card className={classes.tagCard}>
                                       <CardHeader
@@ -557,7 +565,7 @@ export default function QueryBuilder(props) {
                                   </Tooltip>
                                 )
                               })
-                          : "Loading Tags"}
+                          : `${t("Loading Tags")}`}
                       </Box>
                     </Box>
                   }
@@ -573,8 +581,8 @@ export default function QueryBuilder(props) {
                 }
                 label={
                   analyzeShared
-                    ? "Analyze Participant Data"
-                    : `Analyze ${currentQuery.id_string[currentQuery.id_string.length - 2]} Data`
+                    ? `${t("Analyze Participant Data")}`
+                    : `${t("Analyze")} ${currentQuery.id_string[currentQuery.id_string.length - 2]} ${t("Data")}`
                 }
               />
             </FormGroup>
@@ -615,21 +623,21 @@ export default function QueryBuilder(props) {
             )}
 
           {
-            tagsLoading && sharedTagsLoading && <Typography>Please wait, data is loading...</Typography> //insert additional loads here
+            tagsLoading && sharedTagsLoading && <Typography>{`${t("Please wait, data is loading...")}`}</Typography> //insert additional loads here
           }
           <br />
         </Card>
       ) : (
         <Card style={{ margin: "0% 5%" }}>
           <Typography>
-            To start building a query:
+            {`${t("To start building a query:")}`}
             <br />
-            1. Navigate to the level of your target on the left.
+            {`${t("1. Navigate to the level of your target on the left.")}`}
             <br />
-            2. Click on <Icon>arrow_forward</Icon>
+            {`${t("2. Click on")}`} <Icon>arrow_forward</Icon>
             <br />
             <br />
-            Alternatively, drag and drop a researcher, study, or participant into this box.
+            {`${t("Alternatively, drag and drop a researcher, study, or participant into this box.")}`}
           </Typography>
         </Card>
       )}

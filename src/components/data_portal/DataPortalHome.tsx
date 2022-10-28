@@ -150,11 +150,14 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                   />
                   {viewModeSwitch ? (
                     <Typography>
-                      While in Terminal mode, you can directly write JSONata style queries to pull data directly from
-                      your database. <br />
+                      {`${t(
+                        "While in Terminal mode, you can directly write JSONata style queries to pull data directly from your database."
+                      )}`}
                       <br />
-                      For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
-                      with a user's id to get a list of the last 10,000 activities completed through LAMP.
+                      <br />
+                      {`${t("For example, try:")}`} `LAMP.ActivityEvent.list(<b>participant_id</b>)`,{" "}
+                      {`${t("replacing")}`} `participant_id`
+                      {`${t("with a user's id to get a list of the last 10,000 activities completed through LAMP.")}`}
                       <br />
                       <br />
                       {`${t("Want to learn more about JSONata queries or what special data you can pull from LAMP?")}`}
@@ -239,7 +242,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
       {!isGUIEditor && (
         <Fab color="primary" variant="extended" className={classes.fab} onClick={runQuery}>
           <Icon className={classes.extendedIcon}>get_app</Icon>
-          Run Query
+          {`${t("Run Query")}`}
         </Fab>
       )}
     </Box>

@@ -22,12 +22,14 @@ import vegaEmbed from "vega-embed"
 import Vega from "./Vega"
 import Editor from "./Editor"
 import SelectionWindow from "./SelectionWindow"
+import { useTranslation } from "react-i18next"
 
 export default function QueryRender({ height = 0, ...props }) {
+  const { t } = useTranslation()
   if (!("queryResult" in props) || !props.queryResult) {
     return (
       <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
-        <Typography>Your data will appear here</Typography>
+        <Typography>{`${t("Your data will appear here")}`}</Typography>
       </Box>
     )
   }
@@ -36,7 +38,7 @@ export default function QueryRender({ height = 0, ...props }) {
     return (
       <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
         <LinearProgress />
-        <Typography>Please wait, your data is loading</Typography>
+        <Typography>{`${t("Please wait, your data is loading")}`}</Typography>
       </Box>
     )
   }
@@ -113,18 +115,18 @@ export default function QueryRender({ height = 0, ...props }) {
     let day = dateObj.getDate()
     let year = dateObj.getFullYear()
     const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      `${t("January")}`,
+      `${t("February")}`,
+      `${t("March")}`,
+      `${t("April")}`,
+      `${t("May")}`,
+      `${t("June")}`,
+      `${t("July")}`,
+      `${t("August")}`,
+      `${t("September")}`,
+      `${t("October")}`,
+      `${t("November")}`,
+      `${t("December")}`,
     ]
 
     function numberSuffix(num) {
@@ -369,7 +371,7 @@ export default function QueryRender({ height = 0, ...props }) {
             </Typography>
 
             <SelectionWindow
-              openButtonText={`Download PDF`}
+              openButtonText={`${t("Download PDF")}`}
               customButton={
                 <IconButton className={classes.treeButton}>
                   <Icon>get_app</Icon>
@@ -384,17 +386,18 @@ export default function QueryRender({ height = 0, ...props }) {
               handleResult={() => saveIndividualToPDF(PDFGraphSize, PDFGroupMethod)}
               closesOnSubmit={false}
               style={{ float: "right" }}
-              submitText={`Download`}
+              submitText={`${t("Download")}`}
               children={
                 <React.Fragment>
                   <Typography>
                     <Box component={"span"} fontWeight={600}>
-                      Download a PDF of Graphs
+                      {`${t("Download a PDF of Graphs")}`}
                     </Box>
                   </Typography>
                   <Typography>
-                    Number of Graphs per row. Bigger numbers give more visually compact PDF files, while smaller numbers
-                    may improve readability.
+                    {`${t(
+                      "Number of Graphs per row. Bigger numbers give more visually compact PDF files, while smaller numbers may improve readability."
+                    )}`}
                   </Typography>
                   <RadioGroup
                     row
@@ -409,8 +412,9 @@ export default function QueryRender({ height = 0, ...props }) {
                     <FormControlLabel value="1" control={<Radio color="primary" />} label="1" labelPlacement="top" />
                   </RadioGroup>
                   <Typography>
-                    How to arrange graphs. 'Height' will group graphs of similar height, while 'width' will do the same
-                    for graphs of similar width. 'Default' will use the order seen here.{" "}
+                    {`${t(
+                      "How to arrange graphs. 'Height' will group graphs of similar height, while 'width' will do the same for graphs of similar width. 'Default' will use the order seen here."
+                    )}`}
                   </Typography>
                   <RadioGroup
                     row
@@ -422,19 +426,19 @@ export default function QueryRender({ height = 0, ...props }) {
                     <FormControlLabel
                       value="height"
                       control={<Radio color="primary" />}
-                      label="Height"
+                      label={`${t("Height")}`}
                       labelPlacement="top"
                     />
                     <FormControlLabel
                       value="width"
                       control={<Radio color="primary" />}
-                      label="Width"
+                      label={`${t("Width")}`}
                       labelPlacement="top"
                     />
                     <FormControlLabel
                       value="default"
                       control={<Radio color="primary" />}
-                      label="Default"
+                      label={`${t("Default")}`}
                       labelPlacement="top"
                     />
                   </RadioGroup>
@@ -542,7 +546,7 @@ export default function QueryRender({ height = 0, ...props }) {
         return (
           <Container ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%", maxHeight: "100%" }}>
             <SelectionWindow
-              openButtonText={`Adjust Graph Display`}
+              openButtonText={`${t("Adjust Graph Display")}`}
               displaySubmitButton={true}
               handleResult={setFilter}
               closesOnSubmit={true}
@@ -552,17 +556,19 @@ export default function QueryRender({ height = 0, ...props }) {
                     control={
                       <Switch name={"groupByID"} checked={groupByID} onClick={() => toggleGroupByID(!groupByID)} />
                     }
-                    label={groupByID ? "Group By ID" : "Group By Tag Name"}
+                    label={groupByID ? `${t("Group By ID")}` : `${t("Group By Tag Name")}`}
                   />
                   {groupByID ? (
                     <Typography>
-                      While grouping by ID, your data will be grouped by participant - use this to examine individual
-                      participants.
+                      {`${t(
+                        "While grouping by ID, your data will be grouped by participant - use this to examine individual participants."
+                      )}`}
                     </Typography>
                   ) : (
                     <Typography>
-                      While grouping by Tag Name, your data will be grouped by graph/chart - use this to examine study
-                      trends.
+                      {`${t(
+                        "While grouping by Tag Name, your data will be grouped by graph/chart - use this to examine study trends."
+                      )}`}
                     </Typography>
                   )}
                   <br />
@@ -574,11 +580,11 @@ export default function QueryRender({ height = 0, ...props }) {
                         onClick={() => setDisplayMissingData(!displayMissingData)}
                       />
                     }
-                    label={"Display Missing Data"}
+                    label={`${t("Display Missing Data")}`}
                   />
                   <Typography>
-                    If no data is found for a particular tag,
-                    {displayMissingData ? " a box will still display" : " no box will display"}
+                    {`${t("If no data is found for a particular tag,")}`}
+                    {displayMissingData ? `${t(" a box will still display")}` : `${t(" no box will display")}`}
                   </Typography>
                   <br />
                   <FormControlLabel
@@ -592,14 +598,15 @@ export default function QueryRender({ height = 0, ...props }) {
                       />
                     }
                     labelPlacement="top"
-                    label={"Filter by a participant's name or LAMP id (case-sensitive)"}
+                    label={`${t("Filter by a participant's name or LAMP id (case-sensitive)")}`}
                   />
 
                   <br />
                   <br />
 
                   <Typography>
-                    Chart Size: {boxDimensions.width < 700 ? "Some dimensions unavailble at smaller screen sizes" : ""}
+                    Chart Size:{" "}
+                    {boxDimensions.width < 700 ? `${t("Some dimensions unavailble at smaller screen sizes")}` : ""}
                   </Typography>
                   <FormControl component="fieldset">
                     <RadioGroup aria-label="scale" name="scale" value={scale} onChange={handleChange} row>
@@ -628,7 +635,7 @@ export default function QueryRender({ height = 0, ...props }) {
     //@ts-ignore. Intentional fallthrough - see above
     case "object":
       if (props.queryResult === null)
-        return <Typography style={props.style ? props.style : {}}>No data found</Typography>
+        return <Typography style={props.style ? props.style : {}}>`${t("No data found")}`</Typography>
 
       if ("config" in props.queryResult)
         return (
