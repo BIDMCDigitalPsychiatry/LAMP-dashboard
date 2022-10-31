@@ -146,7 +146,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                         onChange={() => setViewModeSwitch(!viewModeSwitch)}
                       />
                     }
-                    label={viewModeSwitch ? "Terminal Mode" : "GUI Mode"}
+                    label={viewModeSwitch ? `${t("Terminal Mode")}` : `${t("GUI Mode")}`}
                   />
                   {viewModeSwitch ? (
                     <Typography>

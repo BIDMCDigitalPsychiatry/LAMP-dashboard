@@ -63,12 +63,12 @@ export default function SignIn({ onSubmit, ...props }) {
           break
         case 1:
           setError(
-            `${t("These credentials are valid but don't currently have data portal access. Please check again later")}`
+            `${t("These credentials are valid but don't currently have data portal access. Please check again later.")}`
           )
           break
         case 2:
           setError(
-            `${t("These credentials are valid but don't currently have data portal access. Please check again later")}`
+            `${t("These credentials are valid but don't currently have data portal access. Please check again later.")}`
           )
           break
       }
