@@ -161,6 +161,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         )
         ;(async () => {
           await Service.deleteDB()
+          await Service.deleteUserDB()
         })()
         setLoginClick(false)
         onComplete()
