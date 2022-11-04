@@ -610,11 +610,14 @@ function AppRouter({ ...props }) {
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
                   onParticipantSelect={(id) => {
-                    setState((state) => ({
-                      ...state,
-                      activeTab: 3,
-                    }))
-                    props.history.push(`/participant/${id}/portal`)
+                    ;(async () => {
+                      await Service.deleteUserDB()
+                      setState((state) => ({
+                        ...state,
+                        activeTab: 3,
+                      }))
+                      props.history.push(`/participant/${id}/portal`)
+                    })()
                   }}
                   mode={state.researcherType}
                   tab={props.match.params.tab}
