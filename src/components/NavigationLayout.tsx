@@ -509,7 +509,7 @@ export default function NavigationLayout({
                     onClose={() => setShowCustomizeMenu(undefined)}
                   >
                     <MenuItem disabled divider>
-                      <b>{`${t(title.replace("/Patient/g", "User"))}`}</b>
+                      <b>{`${t(title)}`}</b>
                     </MenuItem>
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
