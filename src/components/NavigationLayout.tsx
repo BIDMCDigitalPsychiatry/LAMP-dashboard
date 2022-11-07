@@ -449,7 +449,7 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {typeof activeTab === "string" ? `${t(activeTab)}jhh` : ""}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
                 </Container>
               )}
