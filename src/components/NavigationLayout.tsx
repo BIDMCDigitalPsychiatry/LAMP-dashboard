@@ -463,7 +463,7 @@ export default function NavigationLayout({
                         supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                     }}
                   >
-                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
+                    {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
                   </Typography>
                 </Container>
               )}

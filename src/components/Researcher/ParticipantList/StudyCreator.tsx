@@ -163,7 +163,7 @@ export default function StudyCreator({
         <CircularProgress color="inherit" />
       </Backdrop>
       <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{`${t("Add a new group.")}`}</Typography>
+        <Typography variant="h6">{`${t("Add a new group")}`}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}

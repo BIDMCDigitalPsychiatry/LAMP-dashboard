@@ -295,7 +295,7 @@ export default function SensorDialog({
             }}
             helperText={
               typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
-                ? `${t("Please select the Group.")}`
+                ? `${t("Please select the group.")}`
                 : ""
             }
             variant="filled"
