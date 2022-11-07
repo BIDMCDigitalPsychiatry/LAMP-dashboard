@@ -449,7 +449,7 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
+                    {typeof activeTab === "string" ? `${t(activeTab)}jhh` : ""}
                   </Typography>
                 </Container>
               )}
@@ -463,7 +463,7 @@ export default function NavigationLayout({
                         supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                     }}
                   >
-                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
+                    {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
                   </Typography>
                 </Container>
               )}
@@ -509,7 +509,7 @@ export default function NavigationLayout({
                     onClose={() => setShowCustomizeMenu(undefined)}
                   >
                     <MenuItem disabled divider>
-                      <b>{`${t(title)}`}</b>
+                      <b>{`${t(title.replace("/Patient/g", "User"))}`}</b>
                     </MenuItem>
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}

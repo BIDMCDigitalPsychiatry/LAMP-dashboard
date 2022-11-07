@@ -183,7 +183,7 @@ export default function AddUser({
         classes={{ paper: classes.addNewDialog }}
       >
         <DialogTitle id="alert-dialog-slide-title" disableTypography>
-          <Typography variant="h6">{`${t("Create a new user.")}`}</Typography>
+          <Typography variant="h6">{`${t("Create a new user")}`}</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -206,7 +206,7 @@ export default function AddUser({
             label={`${t("Group")}`}
             value={selectedStudy}
             onChange={handleChangeStudy}
-            helperText={!validate() ? `${t("Please select the Group")}` : ""}
+            helperText={!validate() ? `${t("Please select the group")}` : ""}
           >
             {(studies || []).map((study) => (
               <MenuItem key={study.id} value={study.id}>
