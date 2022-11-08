@@ -54,7 +54,7 @@ const ObjectFieldTemplate = ({
                 onClick={onAddClick(schema)}
                 disabled={disabled || readonly}
               >
-                <Icon>add</Icon> Add Item
+                <Icon>add</Icon> {t("ADD ITEM")}
               </Button>
             </Grid>
           </Grid>

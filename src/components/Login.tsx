@@ -291,7 +291,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       value={state.serverAddress || ""}
                       onChange={(event) => handleServerInput(event.target.value)}
                       InputProps={{ ...params.InputProps, disableUnderline: true }}
-                      label={"Server Address"}
+                      label={t("Server Address")}
                       helperText={t("Don't enter a domain if you're not sure what this option does.")}
                     />
                   )}

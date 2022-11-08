@@ -603,7 +603,6 @@ export const SchemaList = () => {
           title: i18n.t("Survey Questions"),
           description: i18n.t("Configure questions, parameters, and options."),
           type: "array",
-
           items: {
             required: ["text", "type"],
 
@@ -661,7 +660,7 @@ export const SchemaList = () => {
                           type: "object",
                           properties: {
                             value: {
-                              title: "Time pattern",
+                              title: i18n.t("Time pattern"),
                               type: "string",
                               enum: ["standard", "military"],
                               enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
