@@ -6,6 +6,20 @@ import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
 import { createTheme } from "@material-ui/core/styles"
+import locale_lang from "../../locale_map.json"
+import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES } from "@mui/material/locale"
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+const languageObjects = {
+  "en-US": enUS,
+  "es-ES": esES,
+  "hi-IN": hiIN,
+  "de-DE": deDE,
+  "da-DK": daDK,
+  "fr-FR": frFR,
+  "ko-KR": koKR,
+  "it-IT": itIT,
+  "zh-CN": zhCN,
+}
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
 // Supported container props: alignContent, alignItems, direction, justify, spacing, wrap
@@ -65,39 +79,6 @@ const ObjectFieldTemplate = ({
 }
 
 // By default, the React-JSONSchema-Form does not link correctly to the main UI theme, so declare it here.
-const formTheme = createTheme({
-  props: {
-    MuiTextField: {
-      variant: "filled",
-    },
-    MuiPaper: {
-      variant: "outlined",
-    },
-  },
-
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-        "& textarea": {
-          resize: "vertical",
-        },
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTypography: {
-      h5: { fontSize: 16, fontWeight: 600, marginBottom: 10 },
-    },
-  },
-})
 // This function recursively extracts all "ui:"-prefixed properties within the JSONSchema.
 // These are passed to the JSONSchemaForm as a single nested uiSchema object.
 // TODO: Does not resolve dependencies, oneOf, allOf, anyOf, etc. internal props.
@@ -132,6 +113,51 @@ function AutocompleteTextWidget(props) {
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
+  const { t, i18n } = useTranslation()
+
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
+
+  const formTheme = createTheme(
+    {
+      props: {
+        MuiTextField: {
+          variant: "filled",
+        },
+        MuiPaper: {
+          variant: "outlined",
+        },
+      },
+
+      overrides: {
+        MuiFilledInput: {
+          root: {
+            border: 0,
+            backgroundColor: "#f4f4f4",
+            "& textarea": {
+              resize: "vertical",
+            },
+          },
+          underline: {
+            "&&&:before": {
+              borderBottom: "none",
+            },
+            "&&:after": {
+              borderBottom: "none",
+            },
+          },
+        },
+        MuiTypography: {
+          h5: { fontSize: 16, fontWeight: 600, marginBottom: 10 },
+        },
+      },
+    },
+    languageObjects[getSelectedLanguage()]
+  )
+
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form

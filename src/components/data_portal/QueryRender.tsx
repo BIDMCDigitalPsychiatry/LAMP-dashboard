@@ -593,7 +593,7 @@ export default function QueryRender({ height = 0, ...props }) {
                         id="outlined-basic"
                         inputRef={filterRef}
                         defaultValue=""
-                        label="Filter by ID/Name"
+                        label={`${t("Filter by ID/Name")}`}
                         variant="outlined"
                       />
                     }
