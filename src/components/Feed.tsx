@@ -252,6 +252,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& div.MuiPickersCalendarHeader-switchHeader": { marginBottom: 35, padding: "0 5px" },
       "& div.MuiPickersCalendar-transitionContainer": { minHeight: 300 },
       "& div": { maxWidth: "inherit !important" },
+      "& p.MuiTypography-alignCenter": { textTransform: "capitalize" },
       "& button": {
         width: 40,
         height: 40,
@@ -311,11 +312,24 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+import locale_lang from "../locale_map.json"
+import frLocale from "date-fns/locale/fr"
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
+const localeMap = {
+  "fr-FR": frLocale,
+}
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
+  const { t, i18n } = useTranslation()
+
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
   return (
-    <MuiPickersUtilsProvider utils={LocalizedUtils}>
+    <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={LocalizedUtils}>
       <DatePicker
         autoOk
         disableToolbar

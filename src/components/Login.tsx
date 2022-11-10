@@ -76,7 +76,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [loginClick, setLoginClick] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-CA", "ko-KR", "it-IT", "zh-CN"]
+  const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
