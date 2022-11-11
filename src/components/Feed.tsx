@@ -314,10 +314,27 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 import locale_lang from "../locale_map.json"
 import frLocale from "date-fns/locale/fr"
+import koLocale from "date-fns/locale/ko"
+import daLocale from "date-fns/locale/da"
+import deLocale from "date-fns/locale/de"
+import itLocale from "date-fns/locale/it"
+import zhLocale from "date-fns/locale/zh-CN"
+import esLocale from "date-fns/locale/es"
+import enLocale from "date-fns/locale/en-US"
+import hiLocale from "date-fns/locale/hi"
+
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
 const localeMap = {
+  "en-US": enLocale,
+  "es-ES": esLocale,
+  "hi-IN": hiLocale,
+  "de-DE": deLocale,
+  "da-DK": daLocale,
   "fr-FR": frLocale,
+  "ko-KR": koLocale,
+  "it-IT": itLocale,
+  "zh-CN": zhLocale,
 }
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
