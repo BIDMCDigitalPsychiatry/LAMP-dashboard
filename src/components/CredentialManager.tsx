@@ -311,7 +311,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             value={_qrLink()}
             onChange={(event) => {}}
           />
-          <Tooltip title={`${t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}`}>
+          <Tooltip title={`${t("Scan this QR code on a mobile device to automatically open a user dashboard.")}`}>
             <Grid container justifyContent="center" style={{ padding: 16 }}>
               <QRCode size={256} level="H" value={_qrLink()} />
             </Grid>

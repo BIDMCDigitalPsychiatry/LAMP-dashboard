@@ -179,7 +179,7 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
             }}
           >
             <Typography variant="h6">{`${t("Add a new user and group")}`}</Typography>
-            <Typography variant="body2">{`${t("Create a patient under their own group.")}`}</Typography>
+            <Typography variant="body2">{`${t("Create a user under their own group.")}`}</Typography>
           </MenuItem>
         </React.Fragment>
       </Popover>
