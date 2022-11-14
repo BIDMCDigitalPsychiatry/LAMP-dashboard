@@ -237,7 +237,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
               !accepted
                 ? `${t("Password is not complex enough and does not comply with organization password requirement.")}`
                 : `${t(
-                    "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+                    "Enter the new password here, then press the 'Done' button on the right of the box. Tap elsewhere if you do not want to change the password."
                   )}`
             }
             value={password}

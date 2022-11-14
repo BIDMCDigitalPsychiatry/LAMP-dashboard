@@ -1,6 +1,6 @@
 {	
 	"Welcome to React": "Welcome to React - Spanish",
-	"Don't enter a domain if you're not sure what this option does.": "No ingrese un dominio si no está seguro de lo que hace esta opción. ",
+	"Don't enter a domain if you're not sure what this option does.": "No ingreses ningún dominio si no estás seguro/a de lo que hace esta opción",
 	"Login": "Ingresa a su cuenta",
 	"Try it": "Intentalo",
 	"Try mindLAMP out as a...": "Prueba MindLamp como un",
@@ -8,7 +8,8 @@
 	"Clinician": "Terapeuta",
 	"Participant": "Partícipe",
 	"Patient": "Paciente",
-	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": "Ha iniciado sesión en una cuenta de demostración. Cualquier cambio que realice se restablecerá cuando reinicie la aplicación.",
+	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": 
+    "Ha iniciado sesión en una cuenta de demostración. Cualquier cambio que realice se restablecerá cuando reinicie la aplicación.",
 	"Dismiss" : "Despedir",
 	"Assess": "Evaluar",
 	"Welcome to the Assess section" : "Bienvenida/Bienvenido a la sección de evaluación",
@@ -57,7 +58,8 @@
 	"Breathe": "Respirar",
 	"Begin": "Empezar",
 	"Breathing exercise (__ mins)": "Ejercicio de respiración ({{ mins }}) minutos",
-	"Follow the motion of the lotus flower opening and closing to control your breaths in and out.": "Siga el movimiento de la flor de loto abriéndose y cerrándose para controlar su inhalación y exhalación.",
+	"Follow the motion of the lotus flower opening and closing to control your breaths in and out.": 
+    "Siga el movimiento de la flor de loto abriéndose y cerrándose para controlar su inhalación y exhalación.",
 	"Get ready": "Prepararse",
 	"Get yourself comfortable and when you’re ready tap the start button.": "Ponte cómodo y cuando estés listo, toca el botón de inicio",
 	"Start": "Empezar",
@@ -112,13 +114,15 @@
 	"Games": "Juegos",
 	"Test description for the manage section": "Descripción de la prueba para la sección de administración",
 	"Save images and quotes that bring joy and hope to your life.": "Guarda imágenes y citas que traen alegría y esperanza a tu vida.",
-	"Hope Box content will show up in your feed from time to time to inspire and uplift you.": "El contenido de la caja de esperanza aparecerá en tu feed de vez en cuando para inspirarte y animarte.",
+	"Hope Box content will show up in your feed from time to time to inspire and uplift you.": 
+    "El contenido de la caja de esperanza aparecerá en tu feed de vez en cuando para inspirarte y animarte.",
 	"Add an image": "Agregar una imagen",
 	"Add a quote": "Agregar una cotización",
 	"View my Hope Box": "Ver mi caja de esperanza",
 	"Scratch card": "tarjeta de rascar",
 	"Meditation exercises": "Ejercicios de meditacion",	
-	"Swipe your finger around the screen to reveal the image hidden underneath": "Deslice el dedo por la pantalla para revelar la imagen oculta debajo",
+	"Swipe your finger around the screen to reveal the image hidden underneath": 
+    "Deslice el dedo por la pantalla para revelar la imagen oculta debajo",
 	"Swipe around the screen to reveal the hidden image": "Desliza el dedo por la pantalla para revelar la imagen oculta",
 	"Well done": "Bien hecho",
 	"Close": "Cerrar",
@@ -142,14 +146,16 @@
 	"Please remember the sequence": "Por favor recuerda la secuencia",
 	"Go": "Vamos",
 	"Time out": "Se acabó el tiempo",
-	"Remember the highlighted boxes in the order you see them. Now tap on the boxes in the order they were highlighted.": "Recuerde las cajas resaltados en el orden en que los ve. Ahora toque las cajas en el orden en que fueron resaltadas",
+	"Remember the highlighted boxes in the order you see them. Now tap on the boxes in the order they were highlighted.": 
+    "Recuerde las cajas resaltados en el orden en que los ve. Ahora toque las cajas en el orden en que fueron resaltadas",
 	"Congrats": "Felicidades",
 	"Cats n Dogs": "Gatos y Perros",
 	"Tap the boxes that have a dog behind them.": "Toque las cajas que tienen un perro detrás de ellas/ellos",
 	"Ok":"Okay",
 	"Continue to tap the boxes that have a dog behind them.": "Continúa tocando las cajas que tienen un perro detrás de ellas/ ellos",
 	"Don't tap the boxes with a cat behind them": "Don't tap the boxes with a cat behind them",
-	"Now tap the boxes that have a cat behin them. Don't tap the boxes with a dog behind them": "No toque las cajas con un gato detrás de ellas. No toque las cajas con un perro detrás de ellas",
+	"Now tap the boxes that have a cat behin them. Don't tap the boxes with a dog behind them": 
+    "No toque las cajas con un gato detrás de ellas. No toque las cajas con un perro detrás de ellas",
 	"Game Over": "Juego Terminado",
 	"Dot Touch": "Toque de punto",
 	"Tap’1’ to start the test": "Toca’1’ para iniciar la prueba",
@@ -177,14 +183,17 @@
 	"Manage Credentials": "Administrar credenciales",
 	"Enter the family member or clinician's name here.": "Ingrese el nombre del miembro de la familia o del terapeuta aquí",
 	"Role": "Papel",
-	"Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.": "Ingrese aquí el papel del miembro de la familia o del médico. Para que esta credencial aparezca como miembro del equipo de atención, se DEBE guardar una foto o un papel.",
+	"Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.": 
+    "Ingrese aquí el papel del miembro de la familia o del médico. Para que esta credencial aparezca como miembro del equipo de atención, se DEBE guardar una foto o un papel.",
 	"Email Address": "Dirección de correo electrónico",
 	"Enter the email address here.": "Ingrese su dirección de correo electrónico aquí",
 	"Password": "Contraseña",
-	"Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.": "Ingrese la nueva contraseña aquí y presione el botón listo a la derecha del cuadro. Toque fuera si no desea cambiar la contraseña",
+	"Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.": 
+    "Ingrese la nueva contraseña aquí y presione el botón listo a la derecha del cuadro. Toque fuera si no desea cambiar la contraseña",
 	"Logout": "Cerrar Sesión",
 	"Are you sure you want to log out of LAMP right now?": "¿Estás segura/seguro de que quieres salir de LAMP en este momento?",
-	"If you've made some changes, make sure they're saved before you continue to log out.": "Si ha realizado algunos cambios, asegúrese de que se guarden antes de continuar cerrando la sesión.",
+	"If you've made some changes, make sure they're saved before you continue to log out.": 
+    "Si ha realizado algunos cambios, asegúrese de que se guarden antes de continuar cerrando la sesión.",
 	"Go Back": "Regresa",
 	"Help & Support": "Ayuda y apoyo",
 	"LAMP Community": "LAMP Comunidad",
@@ -235,7 +244,8 @@
 	"Duplicate": "Duplicado",
 	"Save this survey instrument": "Guardar este instrumento de encuesta",
 	"Hours": "Horas",
-	"Only survey description content was modified to prevent irrecoverable data loss. (error message)": "Solo se modificó el contenido de la descripción de la encuesta para evitar una pérdida de datos irrecuperable. (mensaje de error)",
+	"Only survey description content was modified to prevent irrecoverable data loss. (error message)": 
+    "Solo se modificó el contenido de la descripción de la encuesta para evitar una pérdida de datos irrecuperable. (mensaje de error)",
 	"Cats and Dogs": "Gatos y Perros",
 	"Research studies using mindLAMP": "Estudios de investigación utilizando mindLAMP",
 	"Incorrect username, password, or server address.": "Nombre de usuario, contraseña o dirección de servidor incorrectos.",
@@ -271,9 +281,11 @@
 	"Transit": "Tránsito",
 	"Sensor": "Sensor",
 	"Automations": "Automatizaciones",
-	"An experimental visualization generated by an automation you or your clinician have installed.": "Una visualización experimental generada por una automatización que usted o su teraputa hayan instalado.",
+	"An experimental visualization generated by an automation you or your clinician have installed.": 
+    "Una visualización experimental generada por una automatización que usted o su teraputa hayan instalado.",
 	"No Data": "Sin datos",
-	"No Activities are selected. Please select an Activity above to begin.": "No se han seleccionado actividades. Seleccione una de las actividades de arriba para comenzar.",
+	"No Activities are selected. Please select an Activity above to begin.": 
+    "No se han seleccionado actividades. Seleccione una de las actividades de arriba para comenzar.",
 	"Environmental Context": "Conext ambiental",
 	"Step Count": "Recuento de pasos",
 	"Steps Taken": "Pasos tomados",
@@ -281,7 +293,8 @@
 	"Couldn't import the Activities.": "No se pudieron importar las actividades",
 	"Choose the Group you want to import activities.": "Elija el estudio que desea importar actividades.",
 	"Select a Group to import activities.": "Seleccione un estudio para importar actividades.",
-	"Couldn't import the Activities because some Activities are misconfigured or missing.": "No se pudieron importar las actividades porque algunas actividades están mal configuradas o faltan.",
+	"Couldn't import the Activities because some Activities are misconfigured or missing.": 
+    "No se pudieron importar las actividades porque algunas actividades están mal configuradas o faltan.",
 	"Couldn't import one of the selected survey Activities.": "No se pudo importar una de las actividades de la encuesta seleccionadas.",
 	"Couldn't import one of the selected Activities.": "No se pudo importar una de las actividades seleccionadas.",
 	"Couldn't import one of the selected Activity groups.": "No se pudo importar uno de los grupos de actividades seleccionados.",
@@ -335,7 +348,8 @@
 	"Not supported audio type.": "Tipo de audio no admitido.",
 	"The audio size should not exceed 2 MB.": "El tamaño del audio no debe exceder los 2 MB.",
 	"Drag a photo or tap to select a photo.": "Arrastre una foto o toque para seleccionar una foto.",
-	"Drag a photo to replace the existing photo or tap to delete the photo.": "Arrastre una foto para reemplazar la foto existente o toque para eliminar la foto.",
+	"Drag a photo to replace the existing photo or tap to delete the photo.": 
+    "Arrastre una foto para reemplazar la foto existente o toque para eliminar la foto.",
 	"Select": "Seleccione",
 	"Please select the Group": "Seleccione el estudio",
 	"Activity Title": "Título de la actividad",
@@ -347,13 +361,16 @@
 	"Duplicate this survey instrument and save it with a new title.": "Duplique este instrumento de encuesta y guárdelo con un nuevo título.",
 	"Save this activity.": "Guardar esta actividad",
 	"Save Role & Photo": "Guardar rol y foto",
-	"Copy one-time access link that can be used to log in without entering credentials.": "Copie el enlace de acceso único que se puede usar para iniciar sesión sin ingresar credenciales.",
+	"Copy one-time access link that can be used to log in without entering credentials.": 
+    "Copie el enlace de acceso único que se puede usar para iniciar sesión sin ingresar credenciales.",
 	"Save Credential": "Guardar credencial",
-	"Scan this QR code on a mobile device to automatically open a patient dashboard.": "Escanee este código QR en un dispositivo móvil para abrir automáticamente un panel del paciente.",
+	"Scan this QR code on a mobile device to automatically open a patient dashboard.": 
+    "Escanee este código QR en un dispositivo móvil para abrir automáticamente un panel del paciente.",
 	"Could not change password.": "No se pudo cambiar la contraseña.",
 	"Could not create credential.": "No se pudo crear la credencial.",
 	"Could not perform operation for an unknown reason.": "No se pudo realizar la operación por un motivo desconocido.",
-	"Credential management failed. The email address could be in use already.": "La gestión de credenciales falló. La dirección de correo electrónico ya podría estar en uso.",
+	"Credential management failed. The email address could be in use already.": 
+    "La gestión de credenciales falló. La dirección de correo electrónico ya podría estar en uso.",
 	"Could not delete.": "No se pudo borrar",  
 	"Credential management failed.": "La gestión de credenciales falló.",
 	"Add a new member of your care team.": "Agregue un nuevo miembro de su equipo de atención.",
@@ -372,7 +389,8 @@
 	"Removed participantId's alias.": "Se eliminó {{ participantId }}'s alias.",	
 	"Set participantId's alias to participantName": "Establecer {{ participantId }}'s alias a {{ participantName }}",
 	"Failed to change participantId's alias: errorMessage": "No se pudo cambiar {{ participantId }}'s alias: {{ errorMessage }}",
-	"Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.": "Cree o edite el alias para este ID de participante. Guardar un cuadro de texto vacío restablecerá este valor.",
+	"Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.": 
+    "Cree o edite el alias para este ID de participante. Guardar un cuadro de texto vacío restablecerá este valor.",
 	"Failed to load participantId's alias: errorMessage": "Failed to load {{ participantId }}'s alias: {{ errorMessage }}",
     "This activity is not yet available in mindLAMP 2": "Esta actividad aún no está disponible en mindLAMP 2",
 	"This is a demo only. Entries will not be saved.": "Esta es solo una demostración. Las entradas no se guardarán.",
@@ -380,7 +398,8 @@
 	"Set reminder?" : "¿Establecer recordatorio?",
 	"Edit": "Editar",
 	"text": "texto",
-	"Some responses are missing. Please complete all questions before submitting.": "Faltan algunas respuestas. Complete todas las preguntas antes de enviar.",
+	"Some responses are missing. Please complete all questions before submitting.": 
+    "Faltan algunas respuestas. Complete todas las preguntas antes de enviar.",
 	"Goal: ": "Objectivo",
 	"The goal has been saved successfully.": "El gol se ha guardado con éxito.",
 	"Please select duration.": "Seleccione la duración.",
@@ -394,7 +413,8 @@
 	"This activity is not yet available in mindLAMP 2.": "Esta actividad aún no está disponible en mindLAMP 2.",
 	"Unique name required": "Se requiere un nombre único",
 	"Could not create credential for id.": "No se pudo crear la credencial para {{ id }}.",
-	"Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": "{{ id }} de participante creada correctamente. Toque el icono de expansión a la derecha para ver las credenciales y los detalles.",
+	"Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": 
+    "{{ id }} de participante creada correctamente. Toque el icono de expansión a la derecha para ver las credenciales y los detalles.",
     "Temporary email address": "Dirección de correo electrónico temporal",
 	"Temporary password": "Contraseña temporal",
 	"One-time login link": "Enlace de inicio de sesión único",
@@ -413,7 +433,7 @@
 	"New patient": "Nuevo paciente",
 	"Create a new entry in this group.": "Crea una nueva entrada en este grupo.",
 	"Add a new group": "Agregar un nuevo estudio",
-	"Create a new group.": "Crea un nuevo estudio.",
+	"Create a new group": "Crea un nuevo estudio",
 	"Are you sure you want to delete these participants?": "¿Está seguro de que desea eliminar estos participantes?",
 	"Choose the Group you want to save this participant.": "Elija el Estudio que desea guardar a este/esta participante.",
 	"Select a Group to create a participant.": "Seleccione un estudio para crear un/una participante.",
@@ -432,7 +452,8 @@
 	"Failed to update the Researcher.": "No se pudo actualizar el Investigador/ la Investigadora.",
 	"Successfully deleted the Researcher.": "Se eliminó correctamente el investigador/ la investigadora.",
 	"Failed to delete the Researcher.": "No se pudo eliminar el investigador/ la investigadora.",
-	"No Researchers. Add Researchers by clicking the [+] button above.": "Sin investigadores. Agregue investigadores haciendo clic en el botón [+] de arriba.",
+	"No Researchers. Add Researchers by clicking the [+] button above.": 
+    "Sin investigadores. Agregue investigadores haciendo clic en el botón [+] de arriba.",
 	"Are you sure you want to delete this Researcher?": "¿Está seguro de que desea eliminar este investigador?",
 	"Well done!": "¡Bien hecho!",
 	"Swipe around the": "Desliza el dedo por",
@@ -450,7 +471,8 @@
 	"Patient Notes": "Notas del paciente",
 	"Modify an existing group.": "Modificar un grupo existente.",
 	"Create a new group.": "Crea un nuevo grupo",
-	"Drag the handle on the left to change the order in which this Activity appears in the group.": "Arrastre el controlador de la izquierda para cambiar el orden en el que esta actividad aparece en el grupo.",
+	"Drag the handle on the left to change the order in which this Activity appears in the group.": 
+    "Arrastre el controlador de la izquierda para cambiar el orden en el que esta actividad aparece en el grupo.",
 	"No selection": "Sin selección",
 	"Group Title": "Título del grupo",
 	"Configure activities and options.": "Configure actividades y opciones.",
@@ -469,7 +491,8 @@
 	"Save this survey instrument.": "Guarde este instrumento de encuesta.",
 	"N/A": "N/A",
 	"An error occured while uploading. Please try again.": "Ocurrió un error durante la carga. Inténtalo de nuevo.",
-	"Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.": "Las imágenes deben estar en formato jpeg / png / bmp / ​​gif / svg y el tamaño no debe exceder los 4 MB.",
+	"Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.": 
+    "Las imágenes deben estar en formato jpeg / png / bmp / ​​gif / svg y el tamaño no debe exceder los 4 MB.",
 	"You are not allowed to delete all the details from the tip.": "No se le permite eliminar todos los detalles de la sugerencia.",
 	"Tap to select a photo.": "Toque para seleccionar una foto.",
 	"Tap to delete the photo.": "Toque para eliminar la foto.",
@@ -485,8 +508,10 @@
 	"Duplicate this activity.": "Duplica esta actividad.",
 	"Are you sure you want to delete this?": "¿Estás seguro de que quieres eliminar esto?",	
 	"Welcome to mindLAMP!": "¡Bienvenido a mindLAMP!",
-	"With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": "Con la aplicación mindLAMP, puede recopilar información sobre su salud. Puede aprender sobre los síntomas, la salud del cerebro y controlar su pensamiento. También puede aprender sobre sus pasos y su sueño y cómo pueden relacionarse con cómo se siente. Puede usar mindLAMP como parte de un estudio de investigación, como parte de su atención si un médico le pide que lo pruebe o por su cuenta.",
-	"Here are all the activities you'll receive notifications for when you use mindLAMP.": "Aquí están todas las actividades para las que recibirá notificaciones cuando use mindLAMP.",
+	"With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": 
+    "Con la aplicación mindLAMP, puede recopilar información sobre su salud. Puede aprender sobre los síntomas, la salud del cerebro y controlar su pensamiento. También puede aprender sobre sus pasos y su sueño y cómo pueden relacionarse con cómo se siente. Puede usar mindLAMP como parte de un estudio de investigación, como parte de su atención si un médico le pide que lo pruebe o por su cuenta.",
+	"Here are all the activities you'll receive notifications for when you use mindLAMP.": 
+    "Aquí están todas las actividades para las que recibirá notificaciones cuando use mindLAMP.",
 	"Let's go!": "¡Vamonos!",
 	"You're ready to start using mindLAMP.": "Estás listo para empezar a usar mindLAMP.",
 	"You're using the src server to log into mindLAMP.": "Estás usando el servidor {{src}} para iniciar sesión en mindLAMP.",
@@ -523,7 +548,8 @@
 	"Y changes in level count": "Y cambios en el recuento de niveles",
 	"Y shape count": "Recuento de forma de Y",
 	"Spatial Span": "Espacio espacial",
-	"Daily log of events and related feelings. Track target behaviors and use of skills.": "Registro diario de eventos y sentimientos relacionados. rastrear comportamientos/ conducta problema y uso de habilidades",
+	"Daily log of events and related feelings. Track target behaviors and use of skills.": 
+    "Registro diario de eventos y sentimientos relacionados. rastrear comportamientos/ conducta problema y uso de habilidades",
 	"Balloon Count": "Conteo de globos",
 	"Breakpoint Mean": "Media del punto de ruptura",
 	"Breakpoint Standard Deviation": "Desviación Estándar del punto de ruptura",
@@ -555,7 +581,8 @@
 	"Please enter Bubble Duration.": "Ingrese la duración de la burbuja.",
 	"Please enter Bubble Speed with comma seperated.": "Por favor ingrese Bubble Speed con coma separada/o.",
 	"Atleast one tip details required": "Atleast one tip details required",
-	"Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
+	"Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": 
+    "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
 	"There are no Learn activities available.": "There are no Learn activities available.",
 	"Voice Recording": "Voice Recording",
 	"Voice Recorded has been submitted Successfully.": "Voice Recorded has been submitted Successfully.",
@@ -646,15 +673,19 @@
 	"Scratch Image": "Scratch Image",
 	"Anchor yourself with this ambient meditation exercise": "Anchor yourself with this ambient meditation exercise",
 	"Learn deep breathing exercises that help you calm down": "Learn deep breathing exercises that help you calm down",
-	"A longer breathing exercise that helps you calm down and ground yourself": "A longer breathing exercise that helps you calm down and ground yourself",
+	"A longer breathing exercise that helps you calm down and ground yourself": 
+    "A longer breathing exercise that helps you calm down and ground yourself",
 	"Calm yourself down with a deep breathing exercise": "Calm yourself down with a deep breathing exercise",
 	"Experience nature as you immerse yourself walking through a forest": "Experience nature as you immerse yourself walking through a forest",
 	"Ground yourself and learn from your inner teacher as you meditate": "Ground yourself and learn from your inner teacher as you meditate",
 	"Learn about kindness as you meditate": "Learn about kindness as you meditate",
-	"Learn to love yourself and be kind to others as you meditate and calm yourself": "Learn to love yourself and be kind to others as you meditate and calm yourself",
-	"Experience the immersion of walking through a mountain pass as you meditate": "Experience the immersion of walking through a mountain pass as you meditate",
+	"Learn to love yourself and be kind to others as you meditate and calm yourself": 
+    "Learn to love yourself and be kind to others as you meditate and calm yourself",
+	"Experience the immersion of walking through a mountain pass as you meditate": 
+    "Experience the immersion of walking through a mountain pass as you meditate",
 	"Learn how to change your thinking and habits for the better": "Learn how to change your thinking and habits for the better",
-	"Relax with the calming sounds of nature while you perform deep breathing exercises": "Relax with the calming sounds of nature while you perform deep breathing exercises",
+	"Relax with the calming sounds of nature while you perform deep breathing exercises": 
+    "Relax with the calming sounds of nature while you perform deep breathing exercises",
 	"Spend some time scratching off an image to relax yourself": "Spend some time scratching off an image to relax yourself",
 	"Cortex data": "Cortex data",
 	"Studies": "Studies",
@@ -662,18 +693,21 @@
 	"Please enter Option": "Please enter Option",
 	"Whether taps are going forwards or backwards.": "Whether taps are going forwards or backwards.",
 	"The number diamonds in Jewels game": "The number diamonds in Jewels game",
-	"This activity will be deleted for all the participants under this group. Are you sure you want to proceed?": "This activity will be deleted for all the participants under this group. Are you sure you want to proceed?",
+	"This activity will be deleted for all the participants under this group. Are you sure you want to proceed?": 
+    "This activity will be deleted for all the participants under this group. Are you sure you want to proceed?",
 	"Are you sure you want to delete this sensor" : "Are you sure you want to delete this sensor",
 	"The duration between bubbles.": "The duration between bubbles.",
 	"Bubble Count": "Bubble Count",
 	"Add Item": "Add Item",
 	"Select the Repeat interval.": "Select the Repeat interval.",
-	"This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?",
+	"This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?": 
+    "This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?",
 	"The audio size should not exceed 10 MB.": "El tamaño del audio no debe exceder los 10 MB.",
 	"Select All": "Select All",
 	"Deselect All": "Deselect All",
 	"The maximum allowed file size is 25 MB." : "El tamaño de archivo máximo permitido es de 25 MB.",
-	"The Activities having same name under the selected group will be duplicated into new name.": "The Activities having same name under the selected group will be duplicated into new name.",
+	"The Activities having same name under the selected group will be duplicated into new name.": 
+    "The Activities having same name under the selected group will be duplicated into new name.",
 	"Mindfulness": "Habilidades de conciencia plena",
 	"Wise Mind": "Mente Sabia",
 	"Observe: Just notice (Urge Surfing)": "Observar: Simplemente notar (surfear la urgencia)",
@@ -724,12 +758,353 @@
 	"Dialectical Abstinence": "Dialectical Abstinence",
 	"Alternate Rebellion / Adaptive Denial":
 		"rebellión alternativa",
-	"Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?.":"Los cambios realizados en esta actividad se reflejarán para todos los participantes del estudio. ¿Está seguro de que desea continuar?",
+	"Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?.":
+	"Los cambios realizados en esta actividad se reflejarán para todos los participantes del estudio. ¿Está seguro de que desea continuar?",
 	"Customize which Tab this Activity appears in":	"Personalizar en qué pestaña aparece esta actividad",
-	"This Activity will only appear in the Feed tab if a schedule is configured." : "Esta actividad solo aparecerá en la pestaña Feed si se configura un horario.",
+	"This Activity will only appear in the Feed tab if a schedule is configured." : 
+	"Esta actividad solo aparecerá en la pestaña Feed si se configura un horario.",
 	"Does not match the password you entered above.": "No coincide con la contraseña que ingresó anteriormente",
-	"Password is not complex enough and does not comply with organization password requirement.": "La contraseña no es lo suficientemente compleja y no cumple con el requisito de contraseña de la organización.",
+	"Password is not complex enough and does not comply with organization password requirement.": 
+	"La contraseña no es lo suficientemente compleja y no cumple con el requisito de contraseña de la organización.",
 	"Urge to Die by suicide": "Impulso a morir por suicidio",
 	"Urge to Quit Therapy": "Impulso a abandonar la terapia",
-	"Welcome to the Portal section": "Bienvenidos a la Secci\u00f3n Portal", "Track progress and make connections.": "Hacer seguimiento del progreso y realizar las conexiones", "Log feelings, behavior, and activity.": "Registrar sentimientos, comportamiento y actividad", "Find useful information and practice healthy habits.": "Encontrar informaci\u00f3n \u00fatil y practicar h\u00e1bitos saludables", "Review today's activities.": "Repasar las actividades de hoy", "There are no Assess/Manage/Learn/scheduled activities available.": "No hay actividades disponibles para evaluar/administrar/aprender/programar", "Portal": "Portal", "Cortex": "Cortex", "No Records found": "No se han encontrado registros", "Rows per page": "Filas por p\u00e1gina", "Update": "Actualizar", "Nickname(optional)": "Apodo (opcional)", "Advanced Mode": "Modo Avanzado", "Simple Mode": "Modo simple", "Users": "Usuario", "Add a user": "A\u00f1adir un usuario", "Add a new group": "a\u00f1adir un nuevo grupo", "Add a new user and group": "Crear un nuevo usuario en su propio grupo", "Create a new user under their own group.": "Crear un nuevo usuario en su propio grupo", "Duplicate from": "Duplicado de", "Last passive": "\u00faltima pasiva", "User view": "Vista del usuario", "Spatial scan": "escaneo especial", "screen_state": "estado de la pantalla", "accelerometer.motion": "acelerometro.movimiento", "analytics": "analisis", "blood_pressure": "presi\u00f3n sanguinea", "bluetooth": "Bluetooth", "calls": "llamadas", "distance": "distancia", "flights": "vuelos", "gps.contextual": "gps.contextual", "heart_rate": "frecuencia cardiaca", "height": "altura", "magnetometer": "magnet\u00f3metro", "respiratory_rate": "tasa respiratoria", "segment": "segmento", "sms": "sms", "steps": "pasos", "weight": "peso", "wifi": "Wifi", "Currently Viewing Mode (Currently GUI)": "Modo de visualizaci\u00f3n actual (actualmente GUI)", "To start building a query: 1. Navigate to the level of your target on the left. 2. Click on \u2192": "Para empezar a crear una consulta: 1. Navegue hasta el nivel de su objetivo en la izquierda. 2. Haga clic en \u2192", "Alternatively, drag and drop a researcher, group, or participant into this box": "Alternativamente, arrastre y pegue  investigador,  estudio o  participante,  en este cuadro", "Copy Researcher ID to Clipboard": "Copiar el ID del investigador en el portapapeles", "Download Researcher Data": "descagar los datos del investigador", "Analyze researcher": "\u201cAnalizar al investigador", "Select all shared tags": "Seleccionar todas las etiquetas compartidas", "Deselect all shared tags": "Anular la selecci\u00f3n de todas las etiquetas compartidas", "Please wait, your data is loading": "por favor espere, sus datos se est\u00e1n cargando", "There are no shared tags set for this researcher.To display data on tags shared between participants, set \u201clamp.dashboard.researcher_tags\u201d to an array of strings, where each string is a tag you would like to see.Please contact your group administrator for more info.": "No hay etiquetas compartidas establecidas para este investigador.Para mostrar los datos de las etiquetas compartidas entre los participantes, configure 'lamp.dashboard.researcher_tags' en una matriz de cadenas, donde cada cadena es una etiqueta que le gustar\u00eda ver.P\u00f3ngase en contacto con el administrador del estudio para obtener m\u00e1s informaci\u00f3n", "graphs.data_quality.": "gr\u00e1ficos.calidad_de_datos", "Activity counts": "Recuentos de actividad", "Passive Features": "Caracter\u00edsticas pasivas", "Quality Tags": "Etiquetas de calidad", "Activities in the last 7 day (updated: date)": "Actividades en los \u00faltimos 7 d\u00edas (actualizado: fecha)", "Data quality (updated: date)": "Calidad de los datos (actualizado: fecha)", "missing": "falta dato", "bad": "malo", "okay": "ok", "good": "bueno", "bad_missing": "falta dato_malo", "okay_missing": "falta dato_ok", "good_missing": "falta dato_bueno", "lamp.dashboard": "lamp.dashboard.", "Expand": "ampliar", "Collapse": "colapso", "ActivitySpec": "ActivitySpec", "SensorSpec": "SensorSpec", "Sort by date of creation": "ordenar por fecha de creacci\u00f3n", "Filter": "Filtro", "Filter studies": "Filtrar estudios", "Search group list": "Buscar lista de estudios", "Copy Group ID to Clipboard": "Copiar el ID del estudio al portapapeles", "Download Group Data": "Descargar los datos del estudio", "Analyze Group": "analizar estudio", "There are no shared tags set for this Group.To display data on tags shared between participants, set \u201clamp.dashboard.group_tags\u201d to an array of strings, where each string is a tag you would like to see.Please contact your group administrator for more info.": "No hay etiquetas compartidas establecidas para este estudio.Para mostrar los datos de las etiquetas compartidas entre los participantes, configure 'lamp.dashboard.researcher_tags' en una matriz de cadenas, donde cada cadena es una etiqueta que le gustar\u00eda ver.P\u00f3ngase en contacto con el administrador del estudio para obtener m\u00e1s informaci\u00f3n", "Don't enter a domain if you're not sure what this option does.": "No ingreses ning\u00fan dominio si no est\u00e1s seguro/a de lo que hace esta opci\u00f3n", "Login": "Ingresar", "Try it": "Probar la aplicaci\u00f3n", "Try mindLAMP out as a...": "Probar mindLAMP como...", "Researcher": "Investigador/a", "Clinician": "Profesional Cl\u00ednico ", "Participant": "Participante", "Patient": "Paciente", "You're logged into a demo account. Any changes you make will be reset when you restart the app.": "Esta es una cuenta demo. Ning\u00fan cambio quedar\u00e1 registrado al reiniciar la aplicaci\u00f3n.", "Dismiss": "Ignorar", "Assess": "Evaluaci\u00f3n", "Welcome to the Assess section": "Bienvenido a la secci\u00f3n de evaluaci\u00f3n ", "Here you can take steps to refocus, reflect, and recover": "Aqu\u00ed podr\u00e1s tomar medidas que te ayudar\u00e1n a enfocarte, reflexionar y recuperar energ\u00eda", "Survey": "Cuestionario", "questions": "preguntas", "mins": "mins", "The following survey will assess your sleep and social behavior.": "Este cuestionario te permitir\u00e1 evaluar tus h\u00e1bitos de sue\u00f1o y tu comportamiento social", "For each of the statements, rate which is true for you.": "Para cada una de las afirmaciones, marca la opci\u00f3n que describa acertadamente tu situaci\u00f3n", "Start survey": "Iniciar el cuestionario", "Question": "Pregunta", "Question number of total": "Pregunta n\u00famero de total", "Next": "Siguiente", "Submit": "Enviar", "Nice work!": "\u00a1Excelente!", "You\u2019re on a streak, keep it going": "Vas por buen camino. Sigue adelante", "days": "d\u00edas", "day": "d\u00eda", "Sleep and Social": "Sue\u00f1o y Vida Social", "Anxiety": "Ansiedad", "Psychosis and Social": "Psicosis y Vida Social", "App Usability": "Usabilidad de la Aplicaci\u00f3n", "Water and Nutrition": "Agua y Nutrici\u00f3n", "Feed": "Actividades", "Welcome to the Feed section": "Bienvenido/a a la secci\u00f3n de actividades", "Here you can see recent activities": "Aqu\u00ed encontrar\u00e1s actividades recientes", "Learn": "Informaci\u00f3n", "Welcome to the Learn section": "Bienvenido/a a la Secci\u00f3n de Informaci\u00f3n", "Mood Tips": "Tips para el Estado de \u00c1nimo", "Quick Tips to Improve Your": "Tips r\u00e1pidos para mejorar tu", "Read": "Leer", "Hope": "Esperanza", "Tip": "Tip", "Was this helpful today?": "\u00bfTe ha servido esta informaci\u00f3n?", "Yes": "S\u00ed", "No": "No", "Mark complete": "Se\u00f1alar que has finalizado", "Social": "Vida Social", "Mental Health Resources": "Recursos para la Salud Mental", "Physical Wellness": "Bienestar F\u00edsico", "Suggested Reading": "Lecturas Recomendadas", "Motivation": "Motivaci\u00f3n", "Stress Tips": "Tips sobre el Estr\u00e9s", "Manage": "Gesti\u00f3n ", "Welcome to the Manage section": "Bienvenido/a a la Secci\u00f3n de Gesti\u00f3n", "Breathe": "Respiraci\u00f3n", "Begin": "Iniciar", "Breathing exercise (__ mins)": "Ejercicio de respiraci\u00f3n (__ mins)", "Follow the motion of the lotus flower opening and closing to control your breaths in and out.": "Sigue el movimiento de la flor de loto, cuando abre y cierra sus p\u00e9talos, para controlar la inhalaci\u00f3n y la exhalaci\u00f3n", "Get ready": "Prep\u00e1rate", "Get yourself comfortable and when you\u2019re ready tap the start button.": "Ponte c\u00f3modo/a y cuando est\u00e9s listo/a presiona el bot\u00f3n de inicio", "Start": "Iniciar", "Inhale": "Inhala", "Exhale": "Exhala", "Nicely done!": "\u00a1Muy bien!", "Done": "\u00a1Listo!", "Journal": "Diario", "Test description for the manage section.": "Descripci\u00f3n de la prueba para la secci\u00f3n de gesti\u00f3n", "New journal entry": "Nueva entrada en el diario", "How do you feel today?": "\u00bfC\u00f3mo te sientes hoy?", "Good": "Bien", "Bad": "Mal", "New Goal": "Nueva Meta", "Goals": "Metas", "Create goal": "Crear meta", "What type of goal?": "\u00bfQu\u00e9 tipo de meta?", "Choose a category": "Escoger una categor\u00eda", "Exercise": "Ejercicio", "Weight": "Peso", "Nutrition": "Nutrici\u00f3n", "Sleep": "Sue\u00f1o", "Medication": " Medicamentos", "Reading": "Lectura", "Finances": "Finanzas", "Meditation": "Meditaci\u00f3n", "Mood": "Estado de \u00c1nimo", "Custom": "Personalizar", "Goal Name": "Nombre de la Meta", "Goal details": "Detalles de la Meta", "Daily": "Cada D\u00eda", "hourly": "Cada Hora", "weekly": "Cada Semana", "monthly": "Cada Mes", "Ounces": "Onzas", "mg": "mg", "g": "g", "Kg": "Kg", "hours": "horas", "minutes": "minutos", "$": "$", "Start date": "Fecha de inicio", "Duration": "Duraci\u00f3n", "Reminders": "Recordatorios", "Save": "Guardar", "Cancel": "Cancelar", "Leaving so soon?": "\u00bfYa te quieres salir?", "If you leave without submitting, your entry will be lost.": "Si te sales sin enviar, perder\u00e1s lo que ha hecho hasta ahora", "No, don\u2019t leave yet": "No, no me quiero salir todav\u00eda ", "Yes, leave": "Si, ya me quiero salir", "Hope box": "Caja de Esperanzas", "Games": "Juegos", "Test description for the manage section": "Descripci\u00f3n de la prueba para la secci\u00f3n de gesti\u00f3n", "Save images and quotes that bring joy and hope to your life.": "Guarda im\u00e1genes y citas que llenen tu vida de alegr\u00eda y esperanza", "Hope Box content will show up in your feed from time to time to inspire and uplift you.": "El contenido de la Caja de Esperanzas aparecer\u00e1 en tu lista de actividades de vez en cuando para inspirarte y animarte", "Add an image": "A\u00f1adir imagen", "Add a quote": "A\u00f1adir cita", "View my Hope Box": "Ver mi Caja de Esperanzas", "Scratch card": "Tarjeta de raspado", "Meditation exercises": "Ejercicios de meditaci\u00f3n", "Swipe your finger around the screen to reveal the image hidden underneath": "Desliza el dedo por la pantalla para revelar la imagen que se esconde detr\u00e1s", "Swipe around the screen to reveal the hidden image": "Desliza el dedo por la pantalla para revelar la imagen oculta", "Well done": "Excelente!", "Close": "Cerrar", "Do another one": "Raspar otra imagen", "Medication tracker": " Registro de medicamentos", "Add medication": "A\u00f1adir medicamento", "Medication name": "Nombre del medicamento", "Add dosage": "A\u00f1adir dosis", "Name": "Nombre", "Dose": "Dosis", "Balloon Risk": "Globos Riesgosos", "Balloon Risk Game": "Juego de los Globos Riesgosos", "Current Points": "Puntos", "Total Points": "Total de Puntos", "PUMP UP BALLOON": "INFLAR EL GLOBO", "COLLECT POINTS": "RECOLECTAR PUNTOS", "Balloon Bursted": "\u00a1Reventaste el Globo!", "Box Game": "Juego de Casillas", "Please wait and watch": "Espera y observa", "Level": "Nivel", "Please remember the sequence": "Memoriza la secuencia", "Go": "Tu turno", "Time out": "Se te acab\u00f3 el tiempo", "Remember the highlighted boxes in the order you see them. Now tap on the boxes in the order they were highlighted.": "Recuerda las casillas resaltadas en el orden en que van apareciendo. Ahora toca las casillas en el mismo orden en que se resaltaron", "Congrats": "Enhorabuena", "Cats n Dogs": "Perros y Gatos", "Tap the boxes that have a dog behind them.": "Toca las casillas que tienen un perro detr\u00e1s", "Ok": "Ok", "Continue to tap the boxes that have a dog behind them.": "Contin\u00faa tocando las casillas que tienen un perro detr\u00e1s", "Don't tap the boxes with a cat behind them": "No toques las casillas que tienen un gato detr\u00e1s", "Now tap the boxes that have a cat behin them. Don't tap the boxes with a dog behind them": "Ahora toca las casillas que tienen un gato detr\u00e1s. No toques las casillas que tienen un perro detr\u00e1s", "Game Over": "Fin del Juego", "Dot Touch": "Toque de Puntos", "Tap\u20191\u2019 to start the test": "Toca el '1' para iniciar el juego", "Pick the matching alphabet": "Selecciona el abecedario correspondiente", "Timeout": "Se te acab\u00f3 el tiempo", "Restart": "Reiniciar", "Jewels": "Joyas", "Pop the bubbles": "Revienta las burbujas", "Tap to continue": "Pulsar para continuar", "TAP TO POP ALL PINK, BLUE AND YELLOW BUBBLES ONLY": "REVIENTA SOLAMENTE LAS BURBUJAS ROSADAS, AZULES Y AMARILLAS ", "POPPING CORRECT BALOONS WILL EARN YOU POINTS": "SI REVIENTAS LOS GLOBOS CORRECTOS, GANAR\u00c1S PUNTOS", "Level __ Completed": "Nivel __ Terminado", "You got _ %": "Alcanzaste el _ %", "Prevent": "Prevenci\u00f3n", "Activity": "Actividad", "Activity data": "Datos de actividad", "Choose the data you want to see in your dashboard.": "Elige los datos que quieres ver en el panel", "entries this month": "entradas del mes", "Sensors": "Sensores", "Sensor Data": "Datos de los Sensores", "Summary": "Resumen", "Notifications": "Notificaciones", "Conversations": "Conversaciones", "Profile & Settings": "Perfil y Ajustes", "Manage Credentials": "Administrar Credenciales", "Enter the family member or clinician's name here.": "Introduce aqu\u00ed el nombre del familiar o del profesional cl\u00ednico", "Role": "Rol", "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.": "Introduce aqu\u00ed el rol del familiar o del profesional cl\u00ednico. Para que esta credencial aparezca como un miembro del equipo de atenci\u00f3n m\u00e9dica, DEBE guardarse una foto o el rol de la persona", "Email Address": "Direcci\u00f3n de e-mail", "Enter the email address here.": "Ingresa la direcci\u00f3n de e-mail aqu\u00ed", "Password": "Contrase\u00f1a", "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.": "Ingresa la nueva contrase\u00f1a aqu\u00ed, y pulsa el bot\u00f3n '\u00a1Listo!' a la derecha de la casilla. Pulsa por fuera si no quieres cambiar la contrase\u00f1a", "Logout": "Salir", "Are you sure you want to log out of LAMP right now?": " \u00bfEst\u00e1s seguro/a de que quieres cerrar la sesi\u00f3n de LAMP ya mismo? ", "If you've made some changes, make sure they're saved before you continue to log out.": "Si has realizado alg\u00fan cambio, aseg\u00farate de guardarlos antes de salir de la sesi\u00f3n", "Go Back": "Atr\u00e1s", "Help & Support": "Ayuda y Soporte", "LAMP Community": "Comunidad LAMP", "Contact Us": "Cont\u00e1ctanos", "Researcher Login": "Acceso para Investigadores", "Show Unscheduled Activities": "Mostrar actividades no programadas", "Patients": "Pacientes", "Demo": "Demo", "Search": "Buscar", "Create": "Crear", "Number of participants to add:": "N\u00famero de participantes que quieres a\u00f1adir:", "Last Active": "\u00daltima sesi\u00f3n activa", "Indicators": "Indicadores", "_ years ago on Android": "Desde hace ___ a\u00f1os en Android", "_ row(s) selected": "_ l\u00ednea(s) seleccionada(s)", "Data Quality": "Calidad de Datos", "Data is optimal": "Los datos son \u00f3ptimos", "Reset Password": "Restablecer contrase\u00f1a", "View Patient Data": "Ver los datos del paciente", "__ rows [in pagination]": "__ l\u00edneas [en la paginaci\u00f3n]", "First Page": "Primera P\u00e1gina", "Previous Page": "P\u00e1gina anterior", "Next Page": "Siguiente P\u00e1gina", "Last Page [in pagination]": "\u00daltima P\u00e1gina [en la paginaci\u00f3n]", "Activities": "Actividades", "Type": "Tipo", "Import": "Importar", "Drag files here, or click to select files.": "Arrastra los archivos aqu\u00ed, o haz clic para seleccionarlos", "Create a new...": "Crear un/a nuevo/a...", "Activity Group": "Grupo de Actividades", "Survey Instrument": "Herramienta de Sondeo", "Smartphone Cognitive Tests": "Prueba cognitiva para tel\u00e9fono inteligente", "Successfully created a new cognitive test Activity.": "Ha creado exitosamente una nueva actividad de prueba cognitiva", "Activity Schedule": "Programa de Actividades", "Time": "Hora", "Repeat Interval": "Intervalo de repetici\u00f3n", "Custom Times": "Personalizaci\u00f3n de horarios", "Actions": "Acciones", "No schedule.": "Sin horario", "Modify an existing survey instrument.": "Modificar una herramienta de cuestionario existente", "Survey Title": "Nombre del cuestionario", "Survey Description": "Descripci\u00f3n del cuestionario", "Configure questions, parameters, and options.": "Configurar preguntas, par\u00e1metros y opciones", "Question Title": "T\u00edtulo de la pregunta", "Question Description": "Descripci\u00f3n de la pregunta", "Question Type": "Tipo de pregunta", "Add Question": "A\u00f1adir pregunta", "Duplicate": "Duplicar", "Save this survey instrument": "Guardar este cuestionario", "Hours": "Horas", "Only survey description content was modified to prevent irrecoverable data loss. (error message)": "S\u00f3lo se ha modificado el contenido de la descripci\u00f3n del cuestionario para evitar la p\u00e9rdida irrecuperable de datos. (mensaje de error)", "Cats and Dogs": "Perros y Gatos", "Research studies using mindLAMP": "Estudios de investigaci\u00f3n con mindLAMP", "Incorrect username, password, or server address.": "Nombre del usuario, contrase\u00f1a o direcci\u00f3n del servidor incorrectos", "Are you sure you're logging into the right mindLAMP server?": "\u00bfEst\u00e1 seguro de que est\u00e1 tratando de entrar al servidor de mindLAMP correcto?", "Select Language": "Seleccionar idioma", "Add mindLAMP to your home screen?": "A\u00f1adir mindLAMP a la pantalla de inicio?", "Proceed with caution: you are logged in as the administrator.": "Proceder con precauci\u00f3n: est\u00e1s conectado como administrador", "Invalid id or password.": "Identificaci\u00f3n o contrase\u00f1a inv\u00e1lida", "mindLAMP will be installed on your device.": "mindLAMP se instalar\u00e1 en tu dispositivo", "mindLAMP will not be installed on your device.": "mindLAMP no se instalar\u00e1 en tu dispositivo", "Messages": "Mensajes", "Administrator": "Administrador", "Community": "Comunidad", "Switch Views": "Cambiar Vistas", "Activity Type": "Tipo de actividad", "Show App Screenshot": "Mostrar captura de pantalla de la aplicaci\u00f3n", "Delete Entry": "Borrar entrada", "Copy Entry": "Copiar entrada", "Edit Entry": "Editar entrada", "No detail view available.": "No hay vista detallada disponible", "Score": "Dar un puntaje", "Alone": "Solo/a", "Friends": "Amigos", "Family": "Familia", "Peers": "Compa\u00f1eros", "Crowd": "Multitud", "Home": "Hogar", "School": "Escuela", "Work": "Trabajo", "Hospital": "Hospital", "Outside": "Afuera", "Shopping": "Compras", "Transit": "Tr\u00e1nsito", "Sensor": "Sensor", "Automations": "Automatizaciones", "An experimental visualization generated by an automation you or your clinician have installed.": "Visualizaci\u00f3n experimental generada por una automatizaci\u00f3n que tu o tu profesional cl\u00ednico han instalado", "No Data": "No hay datos", "No Activities are selected. Please select an Activity above to begin.": "No has seleccionado ninguna actividad. Selecciona alguna de las actividades anteriores para comenzar", "Environmental Context": "Contexto ambiental", "Step Count": "Conteo de pasos", "Steps Taken": "Pasos dados", "visualization": "visualizaci\u00f3n", "Couldn't import the Activities.": "No se han podido importar las actividades", "Choose the Group you want to import activities.": "Elige el Estudio en el que quieres importar las actividades", "Select a Group to import activities.": "Selecciona un Estudio para importar actividades", "Couldn't import the Activities because some Activities are misconfigured or missing.": "No se han podido importar las Actividades porque algunas Actividades est\u00e1n mal configuradas o no existen", "Couldn't import one of the selected survey Activities.": "No se ha podido importar una de las actividades de cuestionario seleccionadas", "Couldn't import one of the selected Activities.": "No se pudo importar una de las actividades seleccionadas", "Couldn't import one of the selected Activity groups.": "No se ha podido importar uno de los grupos de actividades seleccionados", "The selected Activities were successfully imported.": "Las actividades seleccionadas se han importado con \u00e9xito", "The selected Activities were successfully exported.": "Las actividades seleccionadas se han exportado con \u00e9xito", "Encountered an error: ": "Se ha encontrado un error: ", "Successfully created a new tip Activity.": "Se ha creado con \u00e9xito una nueva actividad de tips", "Successfully updated the Activity.": "Se ha actualizado con \u00e9xito la actividad", "Successfully created a new survey Activity.": "Se ha creado con \u00e9xito una nueva actividad de cuestionario", "Failed to create a new group Activity.": "No se ha podido crear un nuevo grupo de actividades", "Successfully created a new group Activity.": "Se ha creado con \u00e9xito un nuevo grupo de actividades", "Successfully created a new Activity.": "Se ha creado con \u00e9xito una nueva actividad", "Successfully deleted the selected Activities.": "Se han eliminado con \u00e9xito las actividades seleccionadas", "Successfully duplicated the Activity under a new name.": "Se ha duplicado con \u00e9xito la actividad con un nuevo nombre", "Group": "Grupo", "Tips": "Tips", "DBT diary card": "Ficha de diario TDC", "Cognitive Test": "Prueba cognitiva", "Group": "Estudio", "Export": "Exportar", "Delete": "Borrar", "Are you sure you want to delete this Activity?": "\u00bfEst\u00e1s seguro/a de que quieres borrar esta actividad?", "Filter results": "Filtrar resultados", "Add": "A\u00f1adir", "Import activities": "Importar actividades", "Create a new activity": "Crear una nueva actividad", "Modify an existing activity": "Modificar una actividad existente", "No custom times": "Sin horarios personalizados", "Delete this time from the list.": "Borrar esta hora de la lista", "Add a new custom time.": "A\u00f1adir una nueva hora personalizada", "Add this time to the list.": "A\u00f1adir esta hora a la lista", "Select the start date.": "Seleccionar la fecha de inicio", "Select the start time.": "Seleccionar la hora de inicio", "Every hour": "Cada hora", "Every number hours": "Cada n\u00famero de horas", "Every day": "Todos los d\u00edas", "Two times every week (Tue, Thurs)": "Dos veces a la semana (martes, jueves)", "Three times every week (Mon, Wed, Fri)": "Tres veces por semana (lunes, mi\u00e9rcoles y viernes)", "Every week": "Cada semana", "Two times every month": "Dos veces al mes", "Every month": "Cada mes", "Use custom times instead": "Usar horarios personalizados en su lugar", "Do not repeat": "No repetir", "Are you sure you want to delete this schedule item?": " \u00bfEst\u00e1s seguro de que quieres borrar este \u00edtem del horario?", "Install": "Instalar", "Welcome to the Prevent section": "Bienvenido a la secci\u00f3n de Prevenci\u00f3n", "Prepare yourself": "Prep\u00e1rate", "Image size should not exceed 5 MB.": "El tama\u00f1o de la imagen no debe superar los 5 MB", "Not supported image type.": "Tipo de imagen no compatible", "Activity with same name already exist.": "Ya existe otra actividad con el mismo nombre", "Not supported audio type.": "Tipo de audio no compatible", "The audio size should not exceed 2 MB.": "El tama\u00f1o del audio no debe superar las 2 MB", "Drag a photo or tap to select a photo.": "Arrastra la foto o pulsa para seleccionar una", "Drag a photo to replace the existing photo or tap to delete the photo.": "Arrastra una foto para reemplazar la foto existente o pulsa para eliminarla", "Select": "Seleccionar", "Please select the Group": "Seleccionar el estudio", "Activity Title": " Nombre de la actividad", "Activity Description": "Descripci\u00f3n de la actividad", "Upload audio": "Subir audio", "Your browser does not support the": "Tu navegador no acepta el", "audio": "audio", "element.": "elemento", "Duplicate this survey instrument and save it with a new title.": "Duplicar esta herramienta de cuestionario y guardarla con un nuevo t\u00edtulo", "Save this activity.": "Guardar esta actividad", "Save Role & Photo": "Guardar rol y foto", "Copy one-time access link that can be used to log in without entering credentials.": "Copiar el enlace de acceso \u00fanico que puede usarse para iniciar la sesi\u00f3n sin introducir las credenciales", "Save Credential": "Guardar credencial", "Scan this QR code on a mobile device to automatically open a patient dashboard.": "Escanear este c\u00f3digo QR con un dispositivo m\u00f3vil para abrir autom\u00e1ticamente el panel de control del paciente", "Could not change password.": "No se pudo cambiar la contrase\u00f1a", "Could not create credential.": "No se pudo crear la credencial", "Could not perform operation for an unknown reason.": "No se pudo realizar la operaci\u00f3n por alguna raz\u00f3n desconocida", "Credential management failed. The email address could be in use already.": "Fall\u00f3 la gesti\u00f3n de credenciales. Es posible que este email ya est\u00e9 en uso", "Could not delete.": "No se pudo borrar", "Credential management failed.": "La gesti\u00f3n de credenciales ha fallado", "Add a new member of your care team.": "A\u00f1adir un nuevo miembro a tu equipo de atenci\u00f3n m\u00e9dica", "Update Photo & Role": "Actualizar foto y rol", "Target behaviors": "Conductas meta", "effective": "efectivo", "Times": "Horarios", "Add item": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", "Emotions": "Emociones", "Add a target behavior": "A\u00f1adir conducta meta", "Behavior name": "Nombre de la conducta", "Measure of action:": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", "Removed participant Id's alias.": "Se ha eliminado el alias del Id del participante", "Set participant Id's alias to participant Name": "Establecer el alias del participante en el nombre del participante", "Failed to change participant Id's alias: error Message": "No se pudo cambiar el alias del Id del participante: Mensaje de error", "Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.": "Crear o editar el alias del ID de este participante. Si se guarda una casilla de texto vac\u00eda, este dato se reestablecer\u00e1", "Failed to load participantI d's alias: error Message": "No se pudo cargar el alias del ID del participante: mensaje de error", "This activity is not yet available in mindLAMP 2": "Esta actividad a\u00fan no est\u00e1 disponible en mindLAMP 2", "This is a demo only. Entries will not be saved.": "Esto es s\u00f3lo un demo. No se guardar\u00e1n las entradas", "My Medications": "Mis medicamentos", "Set reminder?": "\u00bfConfigurar recordatorio?", "Edit": "Editar", "text": "texto", "Some responses are missing. Please complete all questions before submitting.": "Faltan algunas respuestas. Por favor completa todas las preguntas antes de enviar.", "Goal: ": "Meta: ", "The goal has been saved successfully.": "La meta se ha guardado con \u00e9xito", "Please select duration.": "Seleccionar la duraci\u00f3n", "Please enter goal value.": "Introducir el valor de la meta", "Please enter goal name.": "Introducir el nombre de la meta", "Medication: ": "Medicamento: ", "The medication has been saved successfully.": "El medicamento se ha guardado con \u00e9xito", "Please select medication name.": "Seleccionar el nombre del medicamento", "Please enter dose.": "Introducir la dosis", "Please enter name.": "Introducir el nombre", "This activity is not yet available in mindLAMP 2.": "Esta actividad a\u00fan no est\u00e1 disponible en mindLAMP 2", "Unique name required": "Se requiere un nombre \u00fanico", "Could not create credential for id.": "No se pudo crear la credencial para el id", "Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": "Se ha creado con \u00e9xito el ID de participante. Pulsa el icono de expansi\u00f3n de la derecha para ver las credenciales y los detalles", "Temporary email address": "Direcci\u00f3n de e-mail temporal", "Temporary password": "Contrase\u00f1a temporal", "One-time login link": "Enlace \u00fanico de inicio de sesi\u00f3n", "an unknown device": "un dispositivo desconocido", "unknown device model": "modelo de dispositivo desconocido", "App Version:": "Versi\u00f3n de la aplicaci\u00f3n:", "OS Version:": "Versi\u00f3n del sistema operativo:", "Device Name:": "Nombre del dispositivo:", "Model:": "Modelo:", "Successfully created new group \u2013 group Name.": "Se ha creado con \u00e9xito un nuevo estudio - Nombre del estudio", "Are you sure you want to delete this Participant?": "\u00bfEst\u00e1s seguro/a de que quieres borrar este Participante?", "Rename": "Renombrar", "Edit password": "Editar contrase\u00f1a", "CSV": "CSV", "JSON": "JSON", "New patient": "Nuevo paciente", "Create a new entry in this group.": "Crear una nueva entrada en este grupo", "Add a new group": "A\u00f1adir un nuevo estudio", "Create a new group.": "Crear un nuevo estudio", "Are you sure you want to delete these participants?": "\u00bfEst\u00e1s seguro/a de que quieres borrar estos participantes?", "Choose the Group you want to save this participant.": "Seleccionar el Estudio en el que quiere guardar este participante", "Select a Group to create a participant.": "Seleccionar el estudio en donde quieres crear un participante", "entries": "entradas", "Social Context": "Contexto social", "Edit goal": "Editar la meta", "Current streak:": "Trayectoria actual:", "Goal History": "Historial de las metas", "Department of Mental Health (DMH)": "Department of Mental Health (DMH)", "Departamento de Salud Mental (DMH)": "Departamento de Salud Mental (DMH)", "National Alliance on Mental Illness (NAMI)": "Alianza Nacional de Enfermedades Mentales (NAMI)", "NAMI Massachussetts": "NAMI Massachussetts", "Researchers": "Investigadores", "Successfully created a new Researcher.": "Se ha creado con \u00e9xito un nuevo Investigador", "Failed to create a new Researcher.": "No se pudo crear un nuevo Investigador", "Successfully updated the Researcher.": "Se ha actualizado con \u00e9xito el Investigador", "Failed to update the Researcher.": "No se pudo actualizar el Investigador", "Successfully deleted the Researcher.": " Se ha borrado con \u00e9xito el Investigador", "Failed to delete the Researcher.": " No se pudo borrar el Investigador", "No Researchers. Add Researchers by clicking the [+] button above.": "No hay investigadores. A\u00f1ada investigadores haciendo clic en el bot\u00f3n [+] de arriba", "Are you sure you want to delete this Researcher?": "\u00bfEst\u00e1s seguro/a de que quieres borrar este Investigador?", "Well done!": "\u00a1Excelente!", "Swipe around the": "Recorre el", "screen to reveal": "pantalla para revelar", "the hidden image": "la imagen oculta", "am": "am", "pm": "pm", "Your response:": "Tu respuesta:", "Nearly All the Time": "Casi todo el tiempo", "More than Half the Time": "M\u00e1s de la mitad del tiempo", "Several Times": "Varias veces", "Not at all": "Nunca/Nada", "(Select one)": "(Seleccione uno)", "(0 being terrible, 10 being excellent)": "(0 es terrible, 10 es excelente)", "Patient Notes": "Notas del Paciente", "Modify an existing group.": "Modificar un grupo existente", "Create a new group.": "Crear un nuevo grupo", "Drag the handle on the left to change the order in which this Activity appears in the group.": "Arrastra el indicador de la izquierda para cambiar el orden de aparici\u00f3n de esta actividad en el grupo", "No selection": "No hay selecci\u00f3n", "Group Title": "T\u00edtulo del grupo", "Configure activities and options.": "Configurar actividades y opciones", "Add Activity": "A\u00f1adir actividad", "Save this activity group.": "Guardar este grupo de actividades.", "Question Option": "Opci\u00f3n de pregunta", "Delete this option from the question's list of options.": "Eliminar esta opci\u00f3n de la lista de opciones de la pregunta", "Option Description": "Descripci\u00f3n de la opci\u00f3n", "Add Option": "A\u00f1adir opci\u00f3n", "Delete question from survey instrument.": "Eliminar la pregunta de la herramienta de cuestionarios", "boolean": "booleano", "likert": "likert", "list": "lista", "multi-select": "multiselecci\u00f3n", "Slider": "Deslizador", "Save this survey instrument.": "Guardar esta herramienta de cuestionario", "N/A": "N/A", "An error occured while uploading. Please try again.": "Se ha producido un error durante el proceso. Por favor intentar de nuevo", "Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.": "Las im\u00e1genes deben estar en formato jpeg/png/bmp/gif/svg y el tama\u00f1o no debe superar los 4 MB", "You are not allowed to delete all the details from the tip.": "No est\u00e1 permitido borrar todos los datos del tip", "Tap to select a photo.": "Pulsa para seleccionar una foto", "Tap to delete the photo.": "Pulsa para borrar la foto", "Tips Title": "T\u00edtulo de los tips", "Please enter Tips Title": "Introducir el t\u00edtulo de los tips", "Tips Description": "Descripci\u00f3n de los tips", "Please enter Tips Description": "Introduce la descripci\u00f3n del tip", "Please select the tip": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip": "A\u00f1adir un nuevo tip", "Tip Details": "Detalles del Tip", "Duplicate this activity.": "Duplicar esta actividad", "Are you sure you want to delete this?": " \u00bfEst\u00e1s seguro/a de que quieres borrar esto?", "Welcome to mindLAMP!": "\u00a1Bienvenido/a a mindLAMP!", "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": "La aplicaci\u00f3n mindLAMP para tel\u00e9fonos inteligentes te permite recopilar informaci\u00f3n sobre tu salud y te ofrece informaci\u00f3n sobre s\u00edntomas y la salud del cerebro. Te ayuda a entender tu forma de pensar y te brinda herramientas para conocer m\u00e1s sobre tus pasos y patrones de sue\u00f1o, y c\u00f3mo pueden estar relacionados con tu estado de \u00e1nimo. Puedes utilizar mindLAMP para un estudio de investigaci\u00f3n o como parte de tus cuidados m\u00e9dicos, si el especialista lo solicita, o por tu propia cuenta", "Here are all the activities you'll receive notifications for when you use mindLAMP.": "Estas son las actividades para las que recibir\u00e1s notificaciones cuando uses mindLAMP", "Let's go!": "\u00a1Vamos!", "You're ready to start using mindLAMP.": "Ya est\u00e1s listo/a para empezar a usar mindLAMP", "You're using the src server to log into mindLAMP.": "Est\u00e1s usando el servidor src para entrar a mindLAMP", "GPS": "GPS", "Accelerometer": "Aceler\u00f3metro", "Never": "Nunca"
+	"Welcome to the Portal section": "Bienvenidos a la Secci\u00f3n Portal", 
+	"Track progress and make connections.": "Hacer seguimiento del progreso y realizar las conexiones", 
+	"Log feelings, behavior, and activity.": "Registrar sentimientos, comportamiento y actividad", 
+	"Find useful information and practice healthy habits.": "Encontrar informaci\u00f3n \u00fatil y practicar h\u00e1bitos saludables", 
+	"Review today's activities.": "Repasar las actividades de hoy", 
+	"There are no Assess/Manage/Learn/scheduled activities available.": 
+	"No hay actividades disponibles para evaluar/administrar/aprender/programar", "Portal": "Portal", "Cortex": "Cortex", 
+	"No Records found": "No se han encontrado registros", "Rows per page": "Filas por p\u00e1gina", "Update": "Actualizar", 
+	"Nickname(optional)": "Apodo (opcional)", "Advanced Mode": "Modo Avanzado", "Simple Mode": "Modo simple", "Users": "Usuario", 
+	"Add a user": "A\u00f1adir un usuario", "Add a new group": "a\u00f1adir un nuevo grupo", 
+	"Add a new user and group": "Crear un nuevo usuario en su propio grupo", 
+	"Create a new user under their own group.": "Crear un nuevo usuario en su propio grupo", "Duplicate from": "Duplicado de", 
+	"Last passive": "\u00faltima pasiva", "User view": "Vista del usuario", "Spatial scan": "escaneo especial", 
+	"screen_state": "estado de la pantalla", "accelerometer.motion": "acelerometro.movimiento", "analytics": "analisis", 
+	"blood_pressure": "presi\u00f3n sanguinea", "bluetooth": "Bluetooth", "calls": "llamadas", "distance": "distancia", 
+	"flights": "vuelos", "gps.contextual": "gps.contextual", "heart_rate": "frecuencia cardiaca", "height": "altura", 
+	"magnetometer": "magnet\u00f3metro", "respiratory_rate": "tasa respiratoria", "segment": "segmento", "sms": "sms", 
+	"steps": "pasos", "weight": "peso", "wifi": "Wifi", 
+	"Currently Viewing Mode (Currently GUI)": "Modo de visualizaci\u00f3n actual (actualmente GUI)", 
+	"To start building a query:": "Para empezar a crear una consulta:", "1. Navigate to the level of your target on the left.": 
+	"1. Navegue hasta el nivel de su objetivo en la izquierda.", "2. Click on": "2. Haga clic en", 
+	"Alternatively, drag and drop a researcher, group, or participant into this box": 
+	"Alternativamente, arrastre y pegue  investigador,  estudio o  participante,  en este cuadro", 
+	"Copy Researcher ID to Clipboard": "Copiar el ID del investigador en el portapapeles", 
+	"Download Researcher Data": "descagar los datos del investigador", "Analyze researcher": "\u201cAnalizar al investigador", 
+	"Select all shared tags": "Seleccionar todas las etiquetas compartidas", 
+	"Deselect all shared tags": "Anular la selecci\u00f3n de todas las etiquetas compartidas", 
+	"Please wait, your data is loading": "por favor espere, sus datos se est\u00e1n cargando", 
+	"There are no shared tags set for this researcher.To display data on tags shared between participants, set \u201clamp.dashboard.researcher_tags\u201d to an array of strings, where each string is a tag you would like to see.Please contact your group administrator for more info.": 
+	"No hay etiquetas compartidas establecidas para este investigador.Para mostrar los datos de las etiquetas compartidas entre los participantes, configure 'lamp.dashboard.researcher_tags' en una matriz de cadenas, donde cada cadena es una etiqueta que le gustar\u00eda ver.P\u00f3ngase en contacto con el administrador del estudio para obtener m\u00e1s informaci\u00f3n", 
+	"graphs.data_quality.": "gr\u00e1ficos.calidad_de_datos", "Activity counts": "Recuentos de actividad", "Passive Features": 
+	"Caracter\u00edsticas pasivas", "Quality Tags": "Etiquetas de calidad", "Activities in the last 7 day (updated: date)": 
+	"Actividades en los \u00faltimos 7 d\u00edas (actualizado: fecha)", "Data quality (updated: date)": "Calidad de los datos (actualizado: fecha)", 
+	"missing": "falta dato", "bad": "malo", "okay": "ok", "good": "bueno", "bad_missing": "falta dato_malo", "okay_missing": "falta dato_ok", 
+	"good_missing": "falta dato_bueno", "lamp.dashboard": "lamp.dashboard.", "Expand": "ampliar", "Collapse": "colapso", 
+	"ActivitySpec": "ActivitySpec", "SensorSpec": "SensorSpec", "Sort by date of creation": "ordenar por fecha de creacci\u00f3n", 
+	"Filter": "Filtro", "Filter studies": "Filtrar estudios", "Search group list": "Buscar lista de estudios", "Copy Group ID to Clipboard": 
+	"Copiar el ID del estudio al portapapeles", "Download Group Data": "Descargar los datos del estudio", "Analyze Group": "analizar estudio", 
+	"There are no shared tags set for this Group.To display data on tags shared between participants, set \u201clamp.dashboard.group_tags\u201d to an array of strings, where each string is a tag you would like to see.Please contact your group administrator for more info.": 
+	"No hay etiquetas compartidas establecidas para este estudio.Para mostrar los datos de las etiquetas compartidas entre los participantes, configure 'lamp.dashboard.researcher_tags' en una matriz de cadenas, donde cada cadena es una etiqueta que le gustar\u00eda ver.P\u00f3ngase en contacto con el administrador del estudio para obtener m\u00e1s informaci\u00f3n", 
+	"Don't enter a domain if you're not sure what this option does.": "No ingreses ning\u00fan dominio si no est\u00e1s seguro/a de lo que hace esta opci\u00f3n", 
+	"Login": "Ingresar", "Try it": "Probar la aplicaci\u00f3n", "Try mindLAMP out as a...": "Probar mindLAMP como...", "Researcher": 
+	"Investigador/a", "Clinician": "Profesional Cl\u00ednico ", "Participant": "Participante", "Patient": "Paciente", 
+	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": 
+	"Esta es una cuenta demo. Ning\u00fan cambio quedar\u00e1 registrado al reiniciar la aplicaci\u00f3n.", "Dismiss": "Ignorar", 
+	"Assess": "Evaluaci\u00f3n", "Welcome to the Assess section": "Bienvenido a la secci\u00f3n de evaluaci\u00f3n ", 
+	"Here you can take steps to refocus, reflect, and recover": "Aqu\u00ed podr\u00e1s tomar medidas que te ayudar\u00e1n a enfocarte, reflexionar y recuperar energ\u00eda", 
+	"Survey": "Cuestionario", "questions": "preguntas", "mins": "mins", "The following survey will assess your sleep and social behavior.": 
+	"Este cuestionario te permitir\u00e1 evaluar tus h\u00e1bitos de sue\u00f1o y tu comportamiento social", 
+	"For each of the statements, rate which is true for you.": 
+	"Para cada una de las afirmaciones, marca la opci\u00f3n que describa acertadamente tu situaci\u00f3n", 
+	"Start survey": "Iniciar el cuestionario", "Question": "Pregunta", "Question number of total": "Pregunta n\u00famero de total", 
+	"Next": "Siguiente", "Submit": "Enviar", "Nice work!": "\u00a1Excelente!", "You\u2019re on a streak, keep it going": 
+	"Vas por buen camino. Sigue adelante", "days": "d\u00edas", "day": "d\u00eda", "Sleep and Social": "Sue\u00f1o y Vida Social", 
+	"Anxiety": "Ansiedad", "Psychosis and Social": "Psicosis y Vida Social", "App Usability": "Usabilidad de la Aplicaci\u00f3n", 
+	"Water and Nutrition": "Agua y Nutrici\u00f3n", "Feed": "Actividades", "Welcome to the Feed section": 
+	"Bienvenido/a a la secci\u00f3n de actividades", "Here you can see recent activities": "Aqu\u00ed encontrar\u00e1s actividades recientes", 
+	"Learn": "Informaci\u00f3n", "Welcome to the Learn section": "Bienvenido/a a la Secci\u00f3n de Informaci\u00f3n", 
+	"Mood Tips": "Tips para el Estado de \u00c1nimo", "Quick Tips to Improve Your": "Tips r\u00e1pidos para mejorar tu", "Read": "Leer", 
+	"Hope": "Esperanza", "Tip": "Tip", "Was this helpful today?": "\u00bfTe ha servido esta informaci\u00f3n?", "Yes": "S\u00ed", "No": "No", 
+	"Mark complete": "Se\u00f1alar que has finalizado", "Social": "Vida Social", "Mental Health Resources": "Recursos para la Salud Mental", 
+	"Physical Wellness": "Bienestar F\u00edsico", "Suggested Reading": "Lecturas Recomendadas", "Motivation": "Motivaci\u00f3n", 
+	"Stress Tips": "Tips sobre el Estr\u00e9s", "Manage": "Gesti\u00f3n ", "Welcome to the Manage section": 
+	"Bienvenido/a a la Secci\u00f3n de Gesti\u00f3n", "Breathe": "Respiraci\u00f3n", "Begin": "Iniciar", "Breathing exercise (__ mins)": 
+	"Ejercicio de respiraci\u00f3n (__ mins)", "Follow the motion of the lotus flower opening and closing to control your breaths in and out.": 
+	"Sigue el movimiento de la flor de loto, cuando abre y cierra sus p\u00e9talos, para controlar la inhalaci\u00f3n y la exhalaci\u00f3n", 
+	"Get ready": "Prep\u00e1rate", "Get yourself comfortable and when you\u2019re ready tap the start button.": 
+	"Ponte c\u00f3modo/a y cuando est\u00e9s listo/a presiona el bot\u00f3n de inicio", "Start": "Iniciar", "Inhale": "Inhala", 
+	"Exhale": "Exhala", "Nicely done!": "\u00a1Muy bien!", "Done": "\u00a1Listo!", "Journal": "Diario", "Test description for the manage section.": 
+	"Descripci\u00f3n de la prueba para la secci\u00f3n de gesti\u00f3n", "New journal entry": "Nueva entrada en el diario", 
+	"How do you feel today?": "\u00bfC\u00f3mo te sientes hoy?", "Good": "Bien", "Bad": "Mal", "New Goal": "Nueva Meta", "Goals": "Metas", 
+	"Create goal": "Crear meta", "What type of goal?": "\u00bfQu\u00e9 tipo de meta?", "Choose a category": "Escoger una categor\u00eda", 
+	"Exercise": "Ejercicio", "Weight": "Peso", "Nutrition": "Nutrici\u00f3n", "Sleep": "Sue\u00f1o", "Medication": " Medicamentos", 
+	"Reading": "Lectura", "Finances": "Finanzas", "Meditation": "Meditaci\u00f3n", "Mood": "Estado de \u00c1nimo", "Custom": "Personalizar", 
+	"Goal Name": "Nombre de la Meta", "Goal details": "Detalles de la Meta", "Daily": "Cada D\u00eda", "hourly": "Cada Hora", 
+	"weekly": "Cada Semana", "monthly": "Cada Mes", "Ounces": "Onzas", "mg": "mg", "g": "g", "Kg": "Kg", "hours": "horas", "minutes": "minutos", 
+	"$": "$", "Start date": "Fecha de inicio", "Duration": "Duraci\u00f3n", "Reminders": "Recordatorios", "Save": "Guardar", "Cancel": "Cancelar", 
+	"Leaving so soon?": "\u00bfYa te quieres salir?", "If you leave without submitting, your entry will be lost.": 
+	"Si te sales sin enviar, perder\u00e1s lo que ha hecho hasta ahora", "No, don\u2019t leave yet": "No, no me quiero salir todav\u00eda ", 
+	"Yes, leave": "Si, ya me quiero salir", "Hope box": "Caja de Esperanzas", "Games": "Juegos", "Test description for the manage section": 
+	"Descripci\u00f3n de la prueba para la secci\u00f3n de gesti\u00f3n", "Save images and quotes that bring joy and hope to your life.": 
+	"Guarda im\u00e1genes y citas que llenen tu vida de alegr\u00eda y esperanza", 
+	"Hope Box content will show up in your feed from time to time to inspire and uplift you.": 
+	"El contenido de la Caja de Esperanzas aparecer\u00e1 en tu lista de actividades de vez en cuando para inspirarte y animarte", 
+	"Add an image": "A\u00f1adir imagen", "Add a quote": "A\u00f1adir cita", "View my Hope Box": "Ver mi Caja de Esperanzas", 
+	"Scratch card": "Tarjeta de raspado", "Meditation exercises": "Ejercicios de meditaci\u00f3n", 
+	"Swipe your finger around the screen to reveal the image hidden underneath": 
+	"Desliza el dedo por la pantalla para revelar la imagen que se esconde detr\u00e1s", 
+	"Swipe around the screen to reveal the hidden image": "Desliza el dedo por la pantalla para revelar la imagen oculta", 
+	"Well done": "Excelente!", "Close": "Cerrar", "Do another one": "Raspar otra imagen", "Medication tracker": " Registro de medicamentos", 
+	"Add medication": "A\u00f1adir medicamento", "Medication name": "Nombre del medicamento", "Add dosage": "A\u00f1adir dosis", "Name": "Nombre", 
+	"Dose": "Dosis", "Balloon Risk": "Globos Riesgosos", "Balloon Risk Game": "Juego de los Globos Riesgosos", "Current Points": "Puntos", 
+	"Total Points": "Total de Puntos", "PUMP UP BALLOON": "INFLAR EL GLOBO", "COLLECT POINTS": "RECOLECTAR PUNTOS", "Balloon Bursted": 
+	"\u00a1Reventaste el Globo!", "Box Game": "Juego de Casillas", "Please wait and watch": "Espera y observa", "Level": "Nivel", 
+	"Please remember the sequence": "Memoriza la secuencia", "Go": "Tu turno", "Time out": "Se te acab\u00f3 el tiempo", 
+	"Remember the highlighted boxes in the order you see them. Now tap on the boxes in the order they were highlighted.": 
+	"Recuerda las casillas resaltadas en el orden en que van apareciendo. Ahora toca las casillas en el mismo orden en que se resaltaron", 
+	"Congrats": "Enhorabuena", "Cats n Dogs": "Perros y Gatos", "Tap the boxes that have a dog behind them.": 
+	"Toca las casillas que tienen un perro detr\u00e1s", "Ok": "Ok", "Continue to tap the boxes that have a dog behind them.": 
+	"Contin\u00faa tocando las casillas que tienen un perro detr\u00e1s", "Don't tap the boxes with a cat behind them": 
+	"No toques las casillas que tienen un gato detr\u00e1s", 
+	"Now tap the boxes that have a cat behin them. Don't tap the boxes with a dog behind them": 
+	"Ahora toca las casillas que tienen un gato detr\u00e1s. No toques las casillas que tienen un perro detr\u00e1s", 
+	"Game Over": "Fin del Juego", "Dot Touch": "Toque de Puntos", "Tap\u20191\u2019 to start the test": "Toca el '1' para iniciar el juego", 
+	"Pick the matching alphabet": "Selecciona el abecedario correspondiente", "Timeout": "Se te acab\u00f3 el tiempo", "Restart": "Reiniciar", 
+	"Jewels": "Joyas", "Pop the bubbles": "Revienta las burbujas", "Tap to continue": "Pulsar para continuar", 
+	"TAP TO POP ALL PINK, BLUE AND YELLOW BUBBLES ONLY": "REVIENTA SOLAMENTE LAS BURBUJAS ROSADAS, AZULES Y AMARILLAS ", 
+	"POPPING CORRECT BALOONS WILL EARN YOU POINTS": "SI REVIENTAS LOS GLOBOS CORRECTOS, GANAR\u00c1S PUNTOS", 
+	"Level __ Completed": "Nivel __ Terminado", "You got _ %": "Alcanzaste el _ %", "Prevent": "Prevenci\u00f3n", 
+	"Activity": "Actividad", "Activity data": "Datos de actividad", "Choose the data you want to see in your dashboard.": 
+	"Elige los datos que quieres ver en el panel", "entries this month": "entradas del mes", "Sensors": "Sensores", 
+	"Sensor Data": "Datos de los Sensores", "Summary": "Resumen", "Notifications": "Notificaciones", "Conversations": "Conversaciones", 
+	"Profile & Settings": "Perfil y Ajustes", "Manage Credentials": "Administrar Credenciales", 
+	"Enter the family member or clinician's name here.": "Introduce aqu\u00ed el nombre del familiar o del profesional cl\u00ednico", 
+	"Role": "Rol", "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.": 
+	"Introduce aqu\u00ed el rol del familiar o del profesional cl\u00ednico. Para que esta credencial aparezca como un miembro del equipo de atenci\u00f3n m\u00e9dica, DEBE guardarse una foto o el rol de la persona", 
+	"Email Address": "Direcci\u00f3n de e-mail", "Enter the email address here.": "Ingresa la direcci\u00f3n de e-mail aqu\u00ed", 
+	"Password": "Contrase\u00f1a", "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.": 
+	"Ingresa la nueva contrase\u00f1a aqu\u00ed, y pulsa el bot\u00f3n '\u00a1Listo!' a la derecha de la casilla. Pulsa por fuera si no quieres cambiar la contrase\u00f1a", 
+	"Logout": "Salir", "Are you sure you want to log out of LAMP right now?": 
+	" \u00bfEst\u00e1s seguro/a de que quieres cerrar la sesi\u00f3n de LAMP ya mismo? ", 
+	"If you've made some changes, make sure they're saved before you continue to log out.": 
+	"Si has realizado alg\u00fan cambio, aseg\u00farate de guardarlos antes de salir de la sesi\u00f3n", "Go Back": "Atr\u00e1s", 
+	"Help & Support": "Ayuda y Soporte", "LAMP Community": "Comunidad LAMP", "Contact Us": "Cont\u00e1ctanos", "Researcher Login": 
+	"Acceso para Investigadores", "Show Unscheduled Activities": "Mostrar actividades no programadas", "Patients": "Pacientes", "Demo": "Demo", 
+	"Search": "Buscar", "Create": "Crear", "Number of participants to add:": "N\u00famero de participantes que quieres a\u00f1adir:", 
+	"Last Active": "\u00daltima sesi\u00f3n activa", "Indicators": "Indicadores", "_ years ago on Android": "Desde hace ___ a\u00f1os en Android", 
+	"_ row(s) selected": "_ l\u00ednea(s) seleccionada(s)", "Data Quality": "Calidad de Datos", "Data is optimal": "Los datos son \u00f3ptimos", 
+	"Reset Password": "Restablecer contrase\u00f1a", "View Patient Data": "Ver los datos del paciente", "__ rows [in pagination]": 
+	"__ l\u00edneas [en la paginaci\u00f3n]", "First Page": "Primera P\u00e1gina", "Previous Page": "P\u00e1gina anterior", 
+	"Next Page": "Siguiente P\u00e1gina", "Last Page [in pagination]": "\u00daltima P\u00e1gina [en la paginaci\u00f3n]", 
+	"Activities": "Actividades", "Type": "Tipo", "Import": "Importar", "Drag files here, or click to select files.": 
+	"Arrastra los archivos aqu\u00ed, o haz clic para seleccionarlos", "Create a new...": "Crear un/a nuevo/a...", "Activity Group": 
+	"Grupo de Actividades", "Survey Instrument": "Herramienta de Sondeo", "Smartphone Cognitive Tests": 
+	"Prueba cognitiva para tel\u00e9fono inteligente", "Successfully created a new cognitive test Activity.": 
+	"Ha creado exitosamente una nueva actividad de prueba cognitiva", "Activity Schedule": "Programa de Actividades", "Time": "Hora", 
+	"Repeat Interval": "Intervalo de repetici\u00f3n", "Custom Times": "Personalizaci\u00f3n de horarios", "Actions": "Acciones", 
+	"No schedule.": "Sin horario", "Modify an existing survey instrument.": "Modificar una herramienta de cuestionario existente", 
+	"Survey Title": "Nombre del cuestionario", "Survey Description": "Descripci\u00f3n del cuestionario", 
+	"Configure questions, parameters, and options.": "Configurar preguntas, par\u00e1metros y opciones", 
+	"Question Title": "T\u00edtulo de la pregunta", "Question Description": "Descripci\u00f3n de la pregunta", 
+	"Question Type": "Tipo de pregunta", "Add Question": "A\u00f1adir pregunta", "Duplicate": "Duplicar", "Save this survey instrument": 
+	"Guardar este cuestionario", "Hours": "Horas", "Only survey description content was modified to prevent irrecoverable data loss. (error message)": 
+	"S\u00f3lo se ha modificado el contenido de la descripci\u00f3n del cuestionario para evitar la p\u00e9rdida irrecuperable de datos. (mensaje de error)", 
+	"Cats and Dogs": "Perros y Gatos", "Research studies using mindLAMP": "Estudios de investigaci\u00f3n con mindLAMP", 
+	"Incorrect username, password, or server address.": "Nombre del usuario, contrase\u00f1a o direcci\u00f3n del servidor incorrectos", 
+	"Are you sure you're logging into the right mindLAMP server?": "\u00bfEst\u00e1 seguro de que est\u00e1 tratando de entrar al servidor de mindLAMP correcto?", 
+	"Select Language": "Seleccionar idioma", "Add mindLAMP to your home screen?": "A\u00f1adir mindLAMP a la pantalla de inicio?", 
+	"Proceed with caution: you are logged in as the administrator.": "Proceder con precauci\u00f3n: est\u00e1s conectado como administrador", 
+	"Invalid id or password.": "Identificaci\u00f3n o contrase\u00f1a inv\u00e1lida", "mindLAMP will be installed on your device.": 
+	"mindLAMP se instalar\u00e1 en tu dispositivo", "mindLAMP will not be installed on your device.": 
+	"mindLAMP no se instalar\u00e1 en tu dispositivo", "Messages": "Mensajes", "Administrator": "Administrador", "Community": "Comunidad", 
+	"Switch Views": "Cambiar Vistas", "Activity Type": "Tipo de actividad", "Show App Screenshot": 
+	"Mostrar captura de pantalla de la aplicaci\u00f3n", "Delete Entry": "Borrar entrada", "Copy Entry": "Copiar entrada", "Edit Entry": 
+	"Editar entrada", "No detail view available.": "No hay vista detallada disponible", "Score": "Dar un puntaje", "Alone": "Solo/a", 
+	"Friends": "Amigos", "Family": "Familia", "Peers": "Compa\u00f1eros", "Crowd": "Multitud", "Home": "Hogar", "School": "Escuela", 
+	"Work": "Trabajo", "Hospital": "Hospital", "Outside": "Afuera", "Shopping": "Compras", "Transit": "Tr\u00e1nsito", "Sensor": "Sensor", 
+	"Automations": "Automatizaciones", "An experimental visualization generated by an automation you or your clinician have installed.": 
+	"Visualizaci\u00f3n experimental generada por una automatizaci\u00f3n que tu o tu profesional cl\u00ednico han instalado", "No Data": 
+	"No hay datos", "No Activities are selected. Please select an Activity above to begin.": "No has seleccionado ninguna actividad. Selecciona alguna de las actividades anteriores para comenzar", 
+	"Environmental Context": "Contexto ambiental", "Step Count": "Conteo de pasos", "Steps Taken": "Pasos dados", 
+	"visualization": "visualizaci\u00f3n", "Couldn't import the Activities.": "No se han podido importar las actividades", 
+	"Choose the Group you want to import activities.": "Elige el Estudio en el que quieres importar las actividades", 
+	"Select a Group to import activities.": "Selecciona un Estudio para importar actividades", 
+	"Couldn't import the Activities because some Activities are misconfigured or missing.": 
+	"No se han podido importar las Actividades porque algunas Actividades est\u00e1n mal configuradas o no existen", 
+	"Couldn't import one of the selected survey Activities.": "No se ha podido importar una de las actividades de cuestionario seleccionadas", 
+	"Couldn't import one of the selected Activities.": "No se pudo importar una de las actividades seleccionadas", 
+	"Couldn't import one of the selected Activity groups.": "No se ha podido importar uno de los grupos de actividades seleccionados", 
+	"The selected Activities were successfully imported.": "Las actividades seleccionadas se han importado con \u00e9xito", 
+	"The selected Activities were successfully exported.": "Las actividades seleccionadas se han exportado con \u00e9xito", 
+	"Encountered an error: ": "Se ha encontrado un error: ", "Successfully created a new tip Activity.": 
+	"Se ha creado con \u00e9xito una nueva actividad de tips", "Successfully updated the Activity.": 
+	"Se ha actualizado con \u00e9xito la actividad", "Successfully created a new survey Activity.": 
+	"Se ha creado con \u00e9xito una nueva actividad de cuestionario", "Failed to create a new group Activity.": 
+	"No se ha podido crear un nuevo grupo de actividades", "Successfully created a new group Activity.": 
+	"Se ha creado con \u00e9xito un nuevo grupo de actividades", "Successfully created a new Activity.": 
+	"Se ha creado con \u00e9xito una nueva actividad", "Successfully deleted the selected Activities.": 
+	"Se han eliminado con \u00e9xito las actividades seleccionadas", "Successfully duplicated the Activity under a new name.": 
+	"Se ha duplicado con \u00e9xito la actividad con un nuevo nombre", "Group": "Grupo", "Tips": "Tips", "DBT diary card": "Ficha de diario TDC", 
+	"Cognitive Test": "Prueba cognitiva", "Group": "Estudio", "Export": "Exportar", "Delete": "Borrar", 
+	"Are you sure you want to delete this Activity?": "\u00bfEst\u00e1s seguro/a de que quieres borrar esta actividad?", 
+	"Filter results": "Filtrar resultados", "Add": "A\u00f1adir", "Import activities": "Importar actividades", "Create a new activity": 
+	"Crear una nueva actividad", "Modify an existing activity": "Modificar una actividad existente", "No custom times": 
+	"Sin horarios personalizados", "Delete this time from the list.": "Borrar esta hora de la lista", 
+	"Add a new custom time.": "A\u00f1adir una nueva hora personalizada", "Add this time to the list.": "A\u00f1adir esta hora a la lista", 
+	"Select the start date.": "Seleccionar la fecha de inicio", "Select the start time.": "Seleccionar la hora de inicio", 
+	"Every hour": "Cada hora", "Every number hours": "Cada n\u00famero de horas", "Every day": "Todos los d\u00edas", 
+	"Two times every week (Tue, Thurs)": "Dos veces a la semana (martes, jueves)", "Three times every week (Mon, Wed, Fri)": 
+	"Tres veces por semana (lunes, mi\u00e9rcoles y viernes)", "Every week": "Cada semana", "Two times every month": "Dos veces al mes", 
+	"Every month": "Cada mes", "Use custom times instead": "Usar horarios personalizados en su lugar", "Do not repeat": "No repetir", 
+	"Are you sure you want to delete this schedule item?": " \u00bfEst\u00e1s seguro de que quieres borrar este \u00edtem del horario?", 
+	"Install": "Instalar", "Welcome to the Prevent section": "Bienvenido a la secci\u00f3n de Prevenci\u00f3n", "Prepare yourself": 
+	"Prep\u00e1rate", "Image size should not exceed 5 MB.": "El tama\u00f1o de la imagen no debe superar los 5 MB", "Not supported image type.": 
+	"Tipo de imagen no compatible", "Activity with same name already exist.": "Ya existe otra actividad con el mismo nombre", 
+	"Not supported audio type.": "Tipo de audio no compatible", "The audio size should not exceed 2 MB.": 
+	"El tama\u00f1o del audio no debe superar las 2 MB", "Drag a photo or tap to select a photo.": "Arrastra la foto o pulsa para seleccionar una", 
+	"Drag a photo to replace the existing photo or tap to delete the photo.": 
+	"Arrastra una foto para reemplazar la foto existente o pulsa para eliminarla", "Select": "Seleccionar", "Please select the Group": 
+	"Seleccionar el estudio", "Activity Title": " Nombre de la actividad", "Activity Description": "Descripci\u00f3n de la actividad", 
+	"Upload audio": "Subir audio", "Your browser does not support the": "Tu navegador no acepta el", "audio": "audio", "element.": "elemento", 
+	"Duplicate this survey instrument and save it with a new title.": 
+	"Duplicar esta herramienta de cuestionario y guardarla con un nuevo t\u00edtulo", "Save this activity.": "Guardar esta actividad", 
+	"Save Role & Photo": "Guardar rol y foto", "Copy one-time access link that can be used to log in without entering credentials.": 
+	"Copiar el enlace de acceso \u00fanico que puede usarse para iniciar la sesi\u00f3n sin introducir las credenciales", "Save Credential": 
+	"Guardar credencial", "Scan this QR code on a mobile device to automatically open a patient dashboard.": 
+	"Escanear este c\u00f3digo QR con un dispositivo m\u00f3vil para abrir autom\u00e1ticamente el panel de control del paciente", 
+	"Could not change password.": "No se pudo cambiar la contrase\u00f1a", "Could not create credential.": "No se pudo crear la credencial", 
+	"Could not perform operation for an unknown reason.": "No se pudo realizar la operaci\u00f3n por alguna raz\u00f3n desconocida", 
+	"Credential management failed. The email address could be in use already.": 
+	"Fall\u00f3 la gesti\u00f3n de credenciales. Es posible que este email ya est\u00e9 en uso", "Could not delete.": "No se pudo borrar", 
+	"Credential management failed.": "La gesti\u00f3n de credenciales ha fallado", "Add a new member of your care team.": 
+	"A\u00f1adir un nuevo miembro a tu equipo de atenci\u00f3n m\u00e9dica", "Update Photo & Role": "Actualizar foto y rol", "Target behaviors": 
+	"Conductas meta", "effective": "efectivo", "Times": "Horarios", "Add item": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", 
+	"Emotions": "Emociones", "Add a target behavior": "A\u00f1adir conducta meta", "Behavior name": "Nombre de la conducta", 
+	"Measure of action:": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", 
+	"Removed participant Id's alias.": "Se ha eliminado el alias del Id del participante", "Set participant Id's alias to participant Name": 
+	"Establecer el alias del participante en el nombre del participante", "Failed to change participant Id's alias: error Message": 
+	"No se pudo cambiar el alias del Id del participante: Mensaje de error", 
+	"Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.": 
+	"Crear o editar el alias del ID de este participante. Si se guarda una casilla de texto vac\u00eda, este dato se reestablecer\u00e1", 
+	"Failed to load participantI d's alias: error Message": "No se pudo cargar el alias del ID del participante: mensaje de error", 
+	"This activity is not yet available in mindLAMP 2": "Esta actividad a\u00fan no est\u00e1 disponible en mindLAMP 2", 
+	"This is a demo only. Entries will not be saved.": "Esto es s\u00f3lo un demo. No se guardar\u00e1n las entradas", "My Medications": 
+	"Mis medicamentos", "Set reminder?": "\u00bfConfigurar recordatorio?", "Edit": "Editar", "text": "texto", 
+	"Some responses are missing. Please complete all questions before submitting.": 
+	"Faltan algunas respuestas. Por favor completa todas las preguntas antes de enviar.", "Goal: ": "Meta: ", 
+	"The goal has been saved successfully.": "La meta se ha guardado con \u00e9xito", "Please select duration.": "Seleccionar la duraci\u00f3n", 
+	"Please enter goal value.": "Introducir el valor de la meta", "Please enter goal name.": "Introducir el nombre de la meta", 
+	"Medication: ": "Medicamento: ", "The medication has been saved successfully.": "El medicamento se ha guardado con \u00e9xito", 
+	"Please select medication name.": "Seleccionar el nombre del medicamento", "Please enter dose.": "Introducir la dosis", 
+	"Please enter name.": "Introducir el nombre", "This activity is not yet available in mindLAMP 2.": 
+	"Esta actividad a\u00fan no est\u00e1 disponible en mindLAMP 2", "Unique name required": "Se requiere un nombre \u00fanico", 
+	"Could not create credential for id.": "No se pudo crear la credencial para el id", 
+	"Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": 
+	"Se ha creado con \u00e9xito el ID de participante. Pulsa el icono de expansi\u00f3n de la derecha para ver las credenciales y los detalles", 
+	"Temporary email address": "Direcci\u00f3n de e-mail temporal", "Temporary password": "Contrase\u00f1a temporal", 
+	"One-time login link": "Enlace \u00fanico de inicio de sesi\u00f3n", "an unknown device": "un dispositivo desconocido", 
+	"unknown device model": "modelo de dispositivo desconocido", "App Version:": "Versi\u00f3n de la aplicaci\u00f3n:", "OS Version:": 
+	"Versi\u00f3n del sistema operativo:", "Device Name:": "Nombre del dispositivo:", "Model:": "Modelo:", 
+	"Successfully created new group \u2013 group Name.": "Se ha creado con \u00e9xito un nuevo estudio - Nombre del estudio", 
+	"Are you sure you want to delete this Participant?": "\u00bfEst\u00e1s seguro/a de que quieres borrar este Participante?", "Rename": 
+	"Renombrar", "Edit password": "Editar contrase\u00f1a", "CSV": "CSV", "JSON": "JSON", "New patient": "Nuevo paciente", 
+	"Create a new entry in this group.": "Crear una nueva entrada en este grupo", "Add a new group": "A\u00f1adir un nuevo estudio", 
+	"Create a new group.": "Crear un nuevo estudio", "Are you sure you want to delete these participants?": 
+	"\u00bfEst\u00e1s seguro/a de que quieres borrar estos participantes?", "Choose the Group you want to save this participant.": 
+	"Seleccionar el Estudio en el que quiere guardar este participante", "Select a Group to create a participant.": 
+	"Seleccionar el estudio en donde quieres crear un participante", "entries": "entradas", "Social Context": "Contexto social", 
+	"Edit goal": "Editar la meta", "Current streak:": "Trayectoria actual:", "Goal History": "Historial de las metas", 
+	"Department of Mental Health (DMH)": "Department of Mental Health (DMH)", "Departamento de Salud Mental (DMH)": 
+	"Departamento de Salud Mental (DMH)", "National Alliance on Mental Illness (NAMI)": "Alianza Nacional de Enfermedades Mentales (NAMI)", 
+	"NAMI Massachussetts": "NAMI Massachussetts", "Researchers": "Investigadores", "Successfully created a new Researcher.": 
+	"Se ha creado con \u00e9xito un nuevo Investigador", "Failed to create a new Researcher.": "No se pudo crear un nuevo Investigador", 
+	"Successfully updated the Researcher.": "Se ha actualizado con \u00e9xito el Investigador", "Failed to update the Researcher.": 
+	"No se pudo actualizar el Investigador", "Successfully deleted the Researcher.": " Se ha borrado con \u00e9xito el Investigador", 
+	"Failed to delete the Researcher.": " No se pudo borrar el Investigador", "No Researchers. Add Researchers by clicking the [+] button above.": 
+	"No hay investigadores. A\u00f1ada investigadores haciendo clic en el bot\u00f3n [+] de arriba", 
+	"Are you sure you want to delete this Researcher?": "\u00bfEst\u00e1s seguro/a de que quieres borrar este Investigador?", 
+	"Well done!": "\u00a1Excelente!", "Swipe around the": "Recorre el", "screen to reveal": "pantalla para revelar", "the hidden image": 
+	"la imagen oculta", "am": "am", "pm": "pm", "Your response:": "Tu respuesta:", "Nearly All the Time": "Casi todo el tiempo", 
+	"More than Half the Time": "M\u00e1s de la mitad del tiempo", "Several Times": "Varias veces", "Not at all": "Nunca/Nada", "(Select one)": 
+	"(Seleccione uno)", "(0 being terrible, 10 being excellent)": "(0 es terrible, 10 es excelente)", "Patient Notes": "Notas del Paciente", 
+	"Modify an existing group.": "Modificar un grupo existente", "Create a new group.": "Crear un nuevo grupo", 
+	"Drag the handle on the left to change the order in which this Activity appears in the group.": 
+	"Arrastra el indicador de la izquierda para cambiar el orden de aparici\u00f3n de esta actividad en el grupo", "No selection": 
+	"No hay selecci\u00f3n", "Group Title": "T\u00edtulo del grupo", "Configure activities and options.": "Configurar actividades y opciones", 
+	"Add Activity": "A\u00f1adir actividad", "Save this activity group.": "Guardar este grupo de actividades.", "Question Option": 
+	"Opci\u00f3n de pregunta", "Delete this option from the question's list of options.": 
+	"Eliminar esta opci\u00f3n de la lista de opciones de la pregunta", "Option Description": "Descripci\u00f3n de la opci\u00f3n", 
+	"Add Option": "A\u00f1adir opci\u00f3n", "Delete question from survey instrument.": "Eliminar la pregunta de la herramienta de cuestionarios", 
+	"boolean": "booleano", "likert": "likert", "list": "lista", "multi-select": "multiselecci\u00f3n", "Slider": "Deslizador", 
+    "Save this survey instrument.": "Guardar esta herramienta de cuestionario", "N/A": "N/A", 
+    "An error occured while uploading. Please try again.": "Se ha producido un error durante el proceso. Por favor intentar de nuevo", 
+    "Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.": 
+    "Las im\u00e1genes deben estar en formato jpeg/png/bmp/gif/svg y el tama\u00f1o no debe superar los 4 MB", 
+    "You are not allowed to delete all the details from the tip.": "No est\u00e1 permitido borrar todos los datos del tip", 
+    "Tap to select a photo.": "Pulsa para seleccionar una foto", "Tap to delete the photo.": "Pulsa para borrar la foto", 
+    "Tips Title": "T\u00edtulo de los tips", "Please enter Tips Title": "Introducir el t\u00edtulo de los tips", 
+    "Tips Description": "Descripci\u00f3n de los tips", "Please enter Tips Description": "Introduce la descripci\u00f3n del tip", 
+    "Please select the tip": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip": 
+    "A\u00f1adir un nuevo tip", "Tip Details": "Detalles del Tip", "Duplicate this activity.": "Duplicar esta actividad", 
+    "Are you sure you want to delete this?": " \u00bfEst\u00e1s seguro/a de que quieres borrar esto?", "Welcome to mindLAMP!": 
+    "\u00a1Bienvenido/a a mindLAMP!", "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": 
+    "La aplicaci\u00f3n mindLAMP para tel\u00e9fonos inteligentes te permite recopilar informaci\u00f3n sobre tu salud y te ofrece informaci\u00f3n sobre s\u00edntomas y la salud del cerebro. Te ayuda a entender tu forma de pensar y te brinda herramientas para conocer m\u00e1s sobre tus pasos y patrones de sue\u00f1o, y c\u00f3mo pueden estar relacionados con tu estado de \u00e1nimo. Puedes utilizar mindLAMP para un estudio de investigaci\u00f3n o como parte de tus cuidados m\u00e9dicos, si el especialista lo solicita, o por tu propia cuenta", 
+    "Here are all the activities you'll receive notifications for when you use mindLAMP.": 
+    "Estas son las actividades para las que recibir\u00e1s notificaciones cuando uses mindLAMP", "Let's go!": "\u00a1Vamos!", 
+    "You're ready to start using mindLAMP.": "Ya est\u00e1s listo/a para empezar a usar mindLAMP", 
+    "You're using the src server to log into mindLAMP.": "Est\u00e1s usando el servidor src para entrar a mindLAMP", "GPS": "GPS", 
+    "Accelerometer": "Aceler\u00f3metro", "Never": "Nunca",
+	"This vega graph failed to render.": "This vega graph failed to render.",
+	"Rendering graph...": "Rendering graph...", "Sign In": "Sign In", "Loading...": "Loading...", "Username": "Username",
+	"These credentials are valid but don't currently have data portal access. Please check again later.": 
+	"These credentials are valid but don't currently have data portal access. Please check again later.",
+	"Set the 'children' prop to display elements": "Set the 'children' prop to display elements",
+	"No data found": "No hay datos", "Some dimensions unavailble at smaller screen sizes": "Some dimensions unavailble at smaller screen sizes",
+	"Filter by a participant's name or LAMP id (case-sensitive)": "Filter by a participant's name or LAMP id (case-sensitive)",
+	"If no data is found for a particular tag,": "If no data is found for a particular tag,", " a box will still display": 
+	" a box will still display", " no box will display": " no box will display", "Display Missing Data": "Display Missing Data",
+	"While grouping by Tag Name, your data will be grouped by graph/chart - use this to examine study trends.":
+	"While grouping by Tag Name, your data will be grouped by graph/chart - use this to examine study trends.",
+	"While grouping by ID, your data will be grouped by participant - use this to examine individual participants.":
+	"While grouping by ID, your data will be grouped by participant - use this to examine individual participants.",
+	"Group By ID": "Group By ID", "Group By Tag Name": "Group By Tag Name", "Adjust Graph Display": "Adjust Graph Display",
+	"Height": "Height", "Width": "Width", "Default": "Default", 
+	"How to arrange graphs. 'Height' will group graphs of similar height, while 'width' will do the same for graphs of similar width. 'Default' will use the order seen here.":
+	"How to arrange graphs. 'Height' will group graphs of similar height, while 'width' will do the same for graphs of similar width. 'Default' will use the order seen here.",
+	"Number of Graphs per row. Bigger numbers give more visually compact PDF files, while smaller numbers may improve readability.":
+	"Number of Graphs per row. Bigger numbers give more visually compact PDF files, while smaller numbers may improve readability.",
+	"Download a PDF of Graphs": "Download a PDF of Graphs", "Download": "Descargar", "Download PDF": "Download PDF",
+	"January": "enero", "      February": "febrer", "      March": "marzo", "      April": "abril", "      May": "mayo", "      June": "junio",
+	"      July": "julio", "      August": "agosto", "      September": "septiembre", "      October": "octubre", "      November": "noviembre",
+	"      December": "diciembre", "Your data will appear here": "Sus datos aparecerán aquí", "No tags are available for this": 
+	"No tags are available for this", "There are no shared tags set for this": "No hay etiquetas compartidas establecidas para este investigador",
+	" To display data on tags shared between participants, set": "Para mostrar los datos de las etiquetas compartidas entre los participantes, configure ",
+	"to an array of strings, where each string is a tag you would like to see. Please contact your study administrator for more info.":
+	"en una matriz de cadenas, donde cada cadena es una etiqueta que le gustaría ver.Póngase en contacto con el administrador del estudio para obtener más información",
+	"Adjust Toggleable Shared Tags": "Ajustar etiquetas compartidas conmutables", "All Participant Tags": "All Participant Tags",
+	"This is a list of all tags present on at least one participant in this": "This is a list of all tags present on at least one participant in this",
+	"Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button.": 
+	"Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button.",
+	"Select all tags": "Anular la selección de todas las etiquetas", "Set Tags": "Seleccionar todas las etiquetas",
+	"Deselect all tags": "Deselect all tags", "participants have this tag": "participants have this tag", "Loading Tags": "Loading Tags",
+	"Analyze Participant Data": "Analyze Participant Data", "Analyze": "Analyze", "Data": "Data", "Please wait, data is loading...": 
+	"por favor espere, sus datos se están cargando", "Alternatively, drag and drop a researcher, study, or participant into this box.":
+	"Alternativamente, arrastre y pegue investigador, estudio o participante, en este cuadro", "Change Viewing Mode (Currently GUI)":
+	"Change Viewing Mode (Currently GUI)", "Change Viewing Mode (Currently Terminal)": "Change Viewing Mode (Currently Terminal)",
+	"Set Viewing Mode to GUI": "Set Viewing Mode to GUI", "Set Viewing Mode to Terminal": "Establecer el modo de visualización en Terminal",
+	"Terminal Mode": "Modo terminal", "GUI Mode": "GUI Mode", 
+	"While in Terminal mode, you can directly write JSONata style queries to pull data directly from your database.":
+	"Mientras está en modo Terminal, puede escribir directamente consultas de estilo JSONata para extraer datos directamente de su base de datos,",
+	"For example, try:": "Por ejemplo, pruebe:", "replacing": "reemplazando ", 
+	"with a user's id to get a list of the last 10,000 activities completed through LAMP.": 
+	"con el id de un usuario para obtener una lista de las últimas 10,000 actividades completadas a través de LAMP,",
+	"Want to learn more about JSONata queries or what special data you can pull from LAMP?":
+	"Desea obtener más información sobre las consultas de JSONata o qué datos especiales puede extraer de LAMP?",
+	"Click here!": "Haga clic aquí!", 
+	"While in GUI mode, you can directly pull graphs you have already generated from the LAMP database, easily view information across an entire study or researcher, or quickly view tags that give info about things like survey scoring. If this is your first time using the LAMP data_portal, or if you need to get data quickly, this is the mode we recommend!!": 
+	"Mientras está en modo GUI, puede extraer directamente los gráficos que ya ha generado en la base de datos LAMP, ver fácilmente la información de todo un estudio o investigador, o ver rápidamente las etiquetas que ofrecen información sobre cosas, como la puntuación de la encuesta, Si es la primera vez que usa el portal de datos LAMP, o si necesita obtener datos rápidamente, ¡este es el modo que recomendamos!",
+	"Run Query": "Run Query"
 }

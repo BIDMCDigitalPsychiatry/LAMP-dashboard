@@ -391,7 +391,7 @@ export default function PatientStudyCreator({
               classes={{ checked: classes.checkboxActive }}
               inputProps={{ "aria-label": "primary checkbox" }}
             />
-            {`${t("Create a new patient under this group")}`}
+            {`${t("Create a new user under this group")}`}
           </Box>
           {!!createPatient && (
             <Typography variant="caption">{`${t("Group name and user name will be same.")}`}</Typography>

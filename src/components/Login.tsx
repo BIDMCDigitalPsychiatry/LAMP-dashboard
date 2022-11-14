@@ -415,7 +415,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         handleLogin(event, "patient")
                       }}
                     >
-                      {`${t("Patient")}`}
+                      {`${t("User")}`}
                     </MenuItem>
                   </Menu>
                 </Box>
