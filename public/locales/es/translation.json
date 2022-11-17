@@ -351,7 +351,7 @@
 	"Drag a photo to replace the existing photo or tap to delete the photo.": 
     "Arrastre una foto para reemplazar la foto existente o toque para eliminar la foto.",
 	"Select": "Seleccione",
-	"Please select the Group": "Seleccione el estudio",
+	"Please select the Group.": "Seleccione el estudio",
 	"Activity Title": "Título de la actividad",
 	"Activity Description": "Descripción de la actividad",
 	"Upload audio": "Subir audio",
@@ -521,7 +521,7 @@
 	"Jewels A": "Joyas A",
 	"Jewels B": "Joyas B",
 	"Duplicate this activity and save it with a new title.": "Duplica esta actividad y guárdala con un nuevo título.",
-	"300 max characters": "300 caracteres como máximo",
+	"300 max characters.": "300 caracteres como máximo",
 	"Life worth living goal": "Vida digna de Ser Vivida",
 	"Social Tips": "Consejos Sociales",
 	"Sleep Tips": "Consejos para Dormir",
@@ -790,7 +790,7 @@
 	"1. Navegue hasta el nivel de su objetivo en la izquierda.", "2. Click on": "2. Haga clic en", 
 	"Alternatively, drag and drop a researcher, group, or participant into this box": 
 	"Alternativamente, arrastre y pegue  investigador,  estudio o  participante,  en este cuadro", 
-	"Copy Researcher ID to Clipboard": "Copiar el ID del investigador en el portapapeles", 
+	"Copy Researcher ID to clipboard": "Copiar el ID del investigador en el portapapeles", 
 	"Download Researcher Data": "descagar los datos del investigador", "Analyze researcher": "\u201cAnalizar al investigador", 
 	"Select all shared tags": "Seleccionar todas las etiquetas compartidas", 
 	"Deselect all shared tags": "Anular la selecci\u00f3n de todas las etiquetas compartidas", 
@@ -803,7 +803,7 @@
 	"missing": "falta dato", "bad": "malo", "okay": "ok", "good": "bueno", "bad_missing": "falta dato_malo", "okay_missing": "falta dato_ok", 
 	"good_missing": "falta dato_bueno", "lamp.dashboard": "lamp.dashboard.", "Expand": "ampliar", "Collapse": "colapso", 
 	"ActivitySpec": "ActivitySpec", "SensorSpec": "SensorSpec", "Sort by date of creation": "ordenar por fecha de creacci\u00f3n", 
-	"Filter": "Filtro", "Filter studies": "Filtrar estudios", "Search group list": "Buscar lista de estudios", "Copy Group ID to Clipboard": 
+	"Filter": "Filtro", "Filter studies": "Filtrar estudios", "Search group list": "Buscar lista de estudios", "Copy Group ID to clipboard": 
 	"Copiar el ID del estudio al portapapeles", "Download Group Data": "Descargar los datos del estudio", "Analyze Group": "analizar estudio", 
 	"There are no shared tags set for this Group.To display data on tags shared between participants, set \u201clamp.dashboard.group_tags\u201d to an array of strings, where each string is a tag you would like to see.Please contact your group administrator for more info.": 
 	"No hay etiquetas compartidas establecidas para este estudio.Para mostrar los datos de las etiquetas compartidas entre los participantes, configure 'lamp.dashboard.researcher_tags' en una matriz de cadenas, donde cada cadena es una etiqueta que le gustar\u00eda ver.P\u00f3ngase en contacto con el administrador del estudio para obtener m\u00e1s informaci\u00f3n", 
@@ -1040,13 +1040,13 @@
 	"boolean": "booleano", "likert": "likert", "list": "lista", "multi-select": "multiselecci\u00f3n", "Slider": "Deslizador", 
     "Save this survey instrument.": "Guardar esta herramienta de cuestionario", "N/A": "N/A", 
     "An error occured while uploading. Please try again.": "Se ha producido un error durante el proceso. Por favor intentar de nuevo", 
-    "Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.": 
+    "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": 
     "Las im\u00e1genes deben estar en formato jpeg/png/bmp/gif/svg y el tama\u00f1o no debe superar los 4 MB", 
     "You are not allowed to delete all the details from the tip.": "No est\u00e1 permitido borrar todos los datos del tip", 
     "Tap to select a photo.": "Pulsa para seleccionar una foto", "Tap to delete the photo.": "Pulsa para borrar la foto", 
     "Tips Title": "T\u00edtulo de los tips", "Please enter Tips Title": "Introducir el t\u00edtulo de los tips", 
     "Tips Description": "Descripci\u00f3n de los tips", "Please enter Tips Description": "Introduce la descripci\u00f3n del tip", 
-    "Please select the tip": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip": 
+    "Please select the tip.": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip": 
     "A\u00f1adir un nuevo tip", "Tip Details": "Detalles del Tip", "Duplicate this activity.": "Duplicar esta actividad", 
     "Are you sure you want to delete this?": " \u00bfEst\u00e1s seguro/a de que quieres borrar esto?", "Welcome to mindLAMP!": 
     "\u00a1Bienvenido/a a mindLAMP!", "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": 
@@ -1105,5 +1105,8 @@
 	"Click here!": "Haga clic aquí!", 
 	"While in GUI mode, you can directly pull graphs you have already generated from the LAMP database, easily view information across an entire study or researcher, or quickly view tags that give info about things like survey scoring. If this is your first time using the LAMP data_portal, or if you need to get data quickly, this is the mode we recommend!!": 
 	"Mientras está en modo GUI, puede extraer directamente los gráficos que ya ha generado en la base de datos LAMP, ver fácilmente la información de todo un estudio o investigador, o ver rápidamente las etiquetas que ofrecen información sobre cosas, como la puntuación de la encuesta, Si es la primera vez que usa el portal de datos LAMP, o si necesita obtener datos rápidamente, ¡este es el modo que recomendamos!",
-	"Run Query": "Run Query"
+	"Run Query": "Run Query", "There are no Assess activities available.": "Es sind keine Beurteilungs-aktivitäten verfügbar.",
+	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
+	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
+	"Please select the group": "Seleccionar el estudio"                                                              
 }
