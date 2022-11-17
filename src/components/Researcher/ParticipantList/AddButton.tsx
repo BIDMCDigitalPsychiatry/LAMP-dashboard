@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
-      maxWidth: 380,
+      maxWidth: 450,
       maxHeight: 600,
       marginTop: 75,
       marginLeft: 100,

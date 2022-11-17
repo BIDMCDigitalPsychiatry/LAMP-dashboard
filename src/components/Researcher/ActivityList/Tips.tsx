@@ -587,7 +587,7 @@ export default function Tips({
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? `${t("Please select the Group.")}`
+                        ? `${t("Please select the Group")}`
                         : ""
                     }
                     variant="filled"
@@ -614,7 +614,7 @@ export default function Tips({
                     }}
                     helperText={
                       typeof category == "undefined" || category === null || category === ""
-                        ? `${t("Please select the tip.")}`
+                        ? `${t("Please select the tip")}`
                         : ""
                     }
                     variant="filled"
