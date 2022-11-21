@@ -82,7 +82,7 @@
 	"Weight": "Peso",
 	"Nutrition": "Nutrición",
 	"Sleep": "Dormir",
-	"Medication": "Medicamento",
+	"Medications": "Medicamento",
 	"Reading": "Leyendo",
 	"Finances": "Finanzas",
 	"Meditation": "Meditación",
@@ -99,7 +99,7 @@
 	"g": "g",
 	"Kg": "Kg",
 	"hours": "horas",
-	"minutes": "minutos",
+	"Minutes": "minutos",
 	"$": "$",
 	"Start date": "Fecha de inicio",
 	"Duration": "Duración",
@@ -411,7 +411,7 @@
 	"Please enter dose.": "Por favor ingrese la dosis",
 	"Please enter name.": "Por favor ingrese el nombre",
 	"This activity is not yet available in mindLAMP 2.": "Esta actividad aún no está disponible en mindLAMP 2.",
-	"Unique name required": "Se requiere un nombre único",
+	"Unique name required.": "Se requiere un nombre único",
 	"Could not create credential for id.": "No se pudo crear la credencial para {{ id }}.",
 	"Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": 
     "{{ id }} de participante creada correctamente. Toque el icono de expansión a la derecha para ver las credenciales y los detalles.",
@@ -485,7 +485,7 @@
 	"Delete question from survey instrument.": "Eliminar pregunta del instrumento de encuesta.",
 	"boolean": "booleano",
 	"likert": "likert",
-	"list": "lista",
+	"List": "lista",
 	"multi-select": "selección múltiple",
 	"Slider": "Deslizador",
 	"Save this survey instrument.": "Guarde este instrumento de encuesta.",
@@ -694,7 +694,7 @@
 	"The number diamonds in Jewels game": "The number diamonds in Jewels game",
 	"This activity will be deleted for all the participants under this group. Are you sure you want to proceed?": 
     "This activity will be deleted for all the participants under this group. Are you sure you want to proceed?",
-	"Are you sure you want to delete this sensor" : "Are you sure you want to delete this sensor",
+	"Are you sure you want to delete this sensor?" : "Are you sure you want to delete this sensor",
 	"The duration between bubbles.": "The duration between bubbles.",
 	"Bubble Count": "Bubble Count",
 	"Add Item": "Add Item",
@@ -982,7 +982,7 @@
 	"A\u00f1adir un nuevo miembro a tu equipo de atenci\u00f3n m\u00e9dica", "Update Photo & Role": "Actualizar foto y rol", "Target behaviors": 
 	"Conductas meta", "effective": "efectivo", "Times": "Horarios", "ADD ITEM": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", 
 	"Emotions": "Emociones", "Add a target behavior": "A\u00f1adir conducta meta", "Behavior name": "Nombre de la conducta", 
-	"Measure of action:": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", 
+	"Measure of action": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", 
 	"Removed participant Id's alias.": "Se ha eliminado el alias del Id del participante", "Set participant Id's alias to participant Name": 
 	"Establecer el alias del participante en el nombre del participante", "Failed to change participant Id's alias: error Message": 
 	"No se pudo cambiar el alias del Id del participante: Mensaje de error", 
@@ -991,7 +991,7 @@
 	"Failed to load participantI d's alias: error Message": "No se pudo cargar el alias del ID del participante: mensaje de error", 
 	"This activity is not yet available in mindLAMP 2": "Esta actividad a\u00fan no est\u00e1 disponible en mindLAMP 2", 
 	"This is a demo only. Entries will not be saved.": "Esto es s\u00f3lo un demo. No se guardar\u00e1n las entradas", "My Medications": 
-	"Mis medicamentos", "Set reminder?": "\u00bfConfigurar recordatorio?", "Edit": "Editar", "text": "texto", 
+	"Mis medicamentos", "Set reminder?": "\u00bfConfigurar recordatorio?", "Edit": "Editar", "Text": "texto", 
 	"Some responses are missing. Please complete all questions before submitting.": 
 	"Faltan algunas respuestas. Por favor completa todas las preguntas antes de enviar.", "Goal: ": "Meta: ", 
 	"The goal has been saved successfully.": "La meta se ha guardado con \u00e9xito", "Please select duration.": "Seleccionar la duraci\u00f3n", 
@@ -1011,7 +1011,7 @@
 	"Are you sure you want to delete this Participant?": "\u00bfEst\u00e1s seguro/a de que quieres borrar este Participante?", "Rename": 
 	"Renombrar", "Edit password": "Editar contrase\u00f1a", "CSV": "CSV", "JSON": "JSON", "New patient": "Nuevo paciente", 
 	"Create a new entry in this group.": "Crear una nueva entrada en este grupo", "Add a new group": "A\u00f1adir un nuevo estudio", 
-	"Create a new group": "Crear un nuevo estudio", "Are you sure you want to delete these participants?": 
+	"Create a new group.": "Crear un nuevo estudio", "Are you sure you want to delete these participants?": 
 	"\u00bfEst\u00e1s seguro/a de que quieres borrar estos participantes?", "Choose the Group you want to save this participant.": 
 	"Seleccionar el Estudio en el que quiere guardar este participante", "Select a Group to create a participant.": 
 	"Seleccionar el estudio en donde quieres crear un participante", "entries": "entradas", "Social Context": "Contexto social", 
@@ -1037,7 +1037,7 @@
 	"Opci\u00f3n de pregunta", "Delete this option from the question's list of options.": 
 	"Eliminar esta opci\u00f3n de la lista de opciones de la pregunta", "Option Description": "Descripci\u00f3n de la opci\u00f3n", 
 	"Add Option": "A\u00f1adir opci\u00f3n", "Delete question from survey instrument.": "Eliminar la pregunta de la herramienta de cuestionarios", 
-	"boolean": "booleano", "likert": "likert", "list": "lista", "multi-select": "multiselecci\u00f3n", "Slider": "Deslizador", 
+	"Boolean": "booleano", "Likert": "likert", "list": "lista", "Multi-Select": "multiselecci\u00f3n", "Slider": "Deslizador", 
     "Save this survey instrument.": "Guardar esta herramienta de cuestionario", "N/A": "N/A", 
     "An error occured while uploading. Please try again.": "Se ha producido un error durante el proceso. Por favor intentar de nuevo", 
     "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": 
@@ -1046,7 +1046,7 @@
     "Tap to select a photo.": "Pulsa para seleccionar una foto", "Tap to delete the photo.": "Pulsa para borrar la foto", 
     "Tips Title": "T\u00edtulo de los tips", "Please enter Tips Title": "Introducir el t\u00edtulo de los tips", 
     "Tips Description": "Descripci\u00f3n de los tips", "Please enter Tips Description": "Introduce la descripci\u00f3n del tip", 
-    "Please select the tip.": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip": 
+    "Please select the tip.": "Seleccionar el tip", "Add New": "A\u00f1adir nuevo", "New Tip": "Nuevo tip", "Please add new tip.": 
     "A\u00f1adir un nuevo tip", "Tip Details": "Detalles del Tip", "Duplicate this activity.": "Duplicar esta actividad", 
     "Are you sure you want to delete this?": " \u00bfEst\u00e1s seguro/a de que quieres borrar esto?", "Welcome to mindLAMP!": 
     "\u00a1Bienvenido/a a mindLAMP!", "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.": 
@@ -1108,5 +1108,5 @@
 	"Run Query": "Run Query", "There are no Assess activities available.": "Es sind keine Beurteilungs-aktivitäten verfügbar.",
 	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
 	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
-	"Please select the group": "Seleccionar el estudio"                                                              
+	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"                                                              
 }
