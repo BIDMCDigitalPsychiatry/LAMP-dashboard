@@ -481,7 +481,7 @@
 	"Please select the tip": "कृपया सुझाव चुनें",
 	"Add New": "नया जोड़ें",
 	"New Tip": "नया सुझाव",
-	"Please add new tip": "कृपया नया सुझाव को जोड़े ",
+	"Please add new tip.": "कृपया नया सुझाव को जोड़े ",
 	"Tip Details": "सुझाव का विवरण",
 	"Duplicate this activity.": "इस गतिविधि की प्रति बनाए।",
 	"Are you sure you want to delete this?": "क्या आप वाकई मे इसे हटाना चाहते हैं?",
@@ -497,7 +497,7 @@
 	"Jewels A": "जवाहरात A",
 	"Jewels B": "जवाहरात B",
 	"Duplicate this activity and save it with a new title.": "इस गतिविधि की नई प्रती बनाए और नए नाम से सुरक्षित करें l",
-	"300 max characters": "अधिक्तम 300 शब्द",
+	"300 max characters.": "अधिक्तम 300 शब्द",
 	"Life worth living goal": "जीवन के लिए उपयोगी लक्ष्य",
 	"Social Tips": "सामाजिक सुझाव",
 	"Sleep Tips": "नींद सम्बन्धी सुझाव",
@@ -531,7 +531,7 @@
 	"Please enter balloon count.": "कृपया गुब्बारो की संख्या दर्ज करें |",
 	"Please enter breakpoint mean.": "कृपया ब्रेकपॉइंट मध्यमान दर्ज करें |",
 	"Game Settings": "खेल सेटिंग्स",
-	"Add a new user and group.": "एक नया रोगी और अध्ययन जोड़ें l",
+	"Add a new user and group": "एक नया रोगी और अध्ययन जोड़ें l",
 	"Create a user under their own group.": "रोगी से सबंधित अध्ययन के अंतर्गत एक नया रोगी बनाएं",
 	"Group Name": "अध्ययन का नाम",
 	"Duplicate Group": "डुप्लीकेट अध्ययन",
@@ -628,7 +628,7 @@
 	"There are no Manage activities available.": "कोई  सँभालने वाली गतिविधियाँ उपलब्ध नहीं हैं |",
 	"Last Passive": "अंतिम पेस्सिव (अपने आप आने वाला डाटा)",
 	"Cortex": "कोर्टेक्स", 
-	"Rows per page:": "प्रति पेज पंक्तियाँ:",
+	"Rows per page": "प्रति पेज पंक्तियाँ:",
 	"Success": "सफलता",
 	"Take steps to refocus, reflect, and recover.": "पुनः ध्यान केंद्रित करने, चिंतन करने और अच्छे होने के लिए कदम उठाएं |",
 	"Track progress and make connections.": "प्रगति को ट्रैक करें और कनेक्शन बनाएं |",
@@ -730,5 +730,6 @@
 	"Does not match the password you entered above.": "आपके द्वारा ऊपर दर्ज किए गए पासवर्ड से मेल नहीं खाता.",
 	"Password is not complex enough and does not comply with organization password requirement.":"पासवर्ड पर्याप्त जटिल नहीं है और संगठन पासवर्ड आवश्यकता का अनुपालन नहीं करता है"   ,
 	"Urge to Die by suicide": "आत्महत्या से मरने का आग्रह" ,
-	"Urge to Quit Therapy": "चिकित्सा छोड़ने का आग्रह"
+	"Urge to Quit Therapy": "चिकित्सा छोड़ने का आग्रह",
+	"Please select the group": "कृपया अध्ययन का चयन करें"
 }

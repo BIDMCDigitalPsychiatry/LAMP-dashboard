@@ -1080,7 +1080,7 @@
 	"      July": "julio", "      August": "agosto", "      September": "septiembre", "      October": "octubre", "      November": "noviembre",
 	"      December": "diciembre", "Your data will appear here": "Sus datos aparecerán aquí", "No tags are available for this": 
 	"No tags are available for this", "There are no shared tags set for this": "No hay etiquetas compartidas establecidas para este investigador",
-	" To display data on tags shared between participants, set": "Para mostrar los datos de las etiquetas compartidas entre los participantes, configure ",
+	" To display data on tags shared between participants, set": "Para mostrar los datos de las etiquetas compartidas entre los participantes, configure ",
 	"to an array of strings, where each string is a tag you would like to see. Please contact your study administrator for more info.":
 	"en una matriz de cadenas, donde cada cadena es una etiqueta que le gustaría ver.Póngase en contacto con el administrador del estudio para obtener más información",
 	"Adjust Toggleable Shared Tags": "Ajustar etiquetas compartidas conmutables", "All Participant Tags": "All Participant Tags",
