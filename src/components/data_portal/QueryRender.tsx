@@ -26,23 +26,6 @@ import { useTranslation } from "react-i18next"
 
 export default function QueryRender({ height = 0, ...props }) {
   const { t } = useTranslation()
-  if (!("queryResult" in props) || !props.queryResult) {
-    return (
-      <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
-        <Typography>{`${t("Your data will appear here")}`}</Typography>
-      </Box>
-    )
-  }
-
-  if (props.loading && props.loading === true) {
-    return (
-      <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
-        <LinearProgress />
-        <Typography>{`${t("Please wait, your data is loading")}`}</Typography>
-      </Box>
-    )
-  }
-
   const useStyles = makeStyles((theme) => ({
     treeButton: {
       background: "#fff",
@@ -524,6 +507,23 @@ export default function QueryRender({ height = 0, ...props }) {
       })
     )
   }, [groupByID, displayMissingData, scale, props.queryResult, stringFilter])
+
+  if (!("queryResult" in props) || !props.queryResult) {
+    return (
+      <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
+        <Typography>{`${t("Your data will appear here")}`}</Typography>
+      </Box>
+    )
+  }
+
+  if (props.loading && props.loading === true) {
+    return (
+      <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
+        <LinearProgress />
+        <Typography>{`${t("Please wait, your data is loading")}`}</Typography>
+      </Box>
+    )
+  }
 
   const setFilter = () => {
     let filterValue = filterRef.current.value
