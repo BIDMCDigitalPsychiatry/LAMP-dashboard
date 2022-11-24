@@ -391,7 +391,7 @@
 	"Please enter dose.": "Please enter dose.",
 	"Please enter name.": "Please enter name.",
 	"This activity is not yet available in mindLAMP 2.": "This activity is not yet available in mindLAMP 2.",
-	"Unique name required": "Unique name required",
+	"Unique name required.": "Unique name required.",
 	"Could not create credential for id.": "Could not create credential for {{ id }}.",
 	"Successfully created Participant id. Tap the expand icon on the right to see credentials and details.": "Successfully created Participant {{ id }} . Tap the expand icon on the right to see credentials and details.",
 	"Temporary email address": "Temporary email address",

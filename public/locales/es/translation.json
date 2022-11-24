@@ -1055,7 +1055,7 @@
     "Estas son las actividades para las que recibir\u00e1s notificaciones cuando uses mindLAMP", "Let's go!": "\u00a1Vamos!", 
     "You're ready to start using mindLAMP.": "Ya est\u00e1s listo/a para empezar a usar mindLAMP", 
     "You're using the src server to log into mindLAMP.": "Est\u00e1s usando el servidor src para entrar a mindLAMP", "GPS": "GPS", 
-    "Accelerometer": "Aceler\u00f3metro", "Never": "Nunca",
+    "Accelerometer.": "Aceler\u00f3metro", "Never": "Nunca",
 	"This vega graph failed to render.": "This vega graph failed to render.",
 	"Rendering graph...": "Rendering graph...", "Sign In": "Sign In", "Loading...": "Loading...", "Username": "Username",
 	"These credentials are valid but don't currently have data portal access. Please check again later.": 
