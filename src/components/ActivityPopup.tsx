@@ -253,7 +253,7 @@ export default function ActivityPopup({
           )}
           {(activity?.spec === "lamp.survey" || activity?.spec === "lamp.dbt_diary_card") && (
             <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? `${t(" questions")}` : `${t(" question")}`} {/* (10 mins) */}
+              {questionCount} {questionCount > 1 ? `${t("questions")}` : `${t("question")}`} {/* (10 mins) */}
             </Typography>
           )}
           <Typography variant="body2" component="p">
