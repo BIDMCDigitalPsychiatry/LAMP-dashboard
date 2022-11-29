@@ -78,8 +78,8 @@
 	"Choose a category": "कोई श्रेणी चुनें",
 	"Exercise": "शारीरिक व्यायाम",
 	"Weight": "वजन",
-	"Nutrition": "पोषण",
-	"Sleep": "नींद",
+	"nutrition": "पोषण",
+	"sleep": "नींद",
 	"Medication": "दवा",
 	"Reading": "पढ़ना",
 	"Finances": "वित्त",
@@ -731,5 +731,7 @@
 	"Password is not complex enough and does not comply with organization password requirement.":"पासवर्ड पर्याप्त जटिल नहीं है और संगठन पासवर्ड आवश्यकता का अनुपालन नहीं करता है"   ,
 	"Urge to Die by suicide": "आत्महत्या से मरने का आग्रह" ,
 	"Urge to Quit Therapy": "चिकित्सा छोड़ने का आग्रह",
-	"Please select the group": "कृपया अध्ययन का चयन करें"
+	"Please select the group": "कृपया अध्ययन का चयन करें",
+	"accelerometer": "शारीर में हलचल मापने वाला यंत्र",
+	"Please select the Group.": "कृपया अध्ययन का चयन करें"
 }
