@@ -12,6 +12,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  createTheme,
+  MuiThemeProvider,
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
@@ -21,12 +23,33 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
       "& div": { paddingRight: 0, maxWidth: 175 },
+      "& p.MuiTypography-alignCenter": { textTransform: "capitalize" },
+      "& h4.MuiTypography-h4 ": { textTransform: "capitalize" },
+      "& span": { textTransform: "capitalize" },
+    },
+    datePickerDiv: {
+      "& h4.MuiTypography-h4": { textTransform: "capitalize" },
+      "& span.MuiPickersCalendarHeader-dayLabel": { textTransform: "capitalize" },
+    },
+    root: {
+      "& h4.MuiTypography-h4": { textTransform: "capitalize" },
+      "& span": { textTransform: "capitalize" },
     },
     error: {
       color: "red",
     },
   })
-)
+) //MuiTypography-root MuiPickersCalendarHeader-dayLabel MuiTypography-caption
+const formTheme = createTheme({
+  overrides: {
+    MuiTypography: {
+      h4: { textTransform: "capitalize" },
+    },
+    MuiPaper: {
+      root: { textTransform: "capitalize" },
+    },
+  },
+})
 
 export const getDate = (val) => {
   if ((val || "").length > 0) {
@@ -74,6 +97,38 @@ export const dateInUTCformat = (val) => {
   return dateVal
 }
 
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import locale_lang from "../../../locale_map.json"
+import frLocale from "date-fns/locale/fr"
+import koLocale from "date-fns/locale/ko"
+import daLocale from "date-fns/locale/da"
+import deLocale from "date-fns/locale/de"
+import itLocale from "date-fns/locale/it"
+import zhLocale from "date-fns/locale/zh-CN"
+import esLocale from "date-fns/locale/es"
+import enLocale from "date-fns/locale/en-US"
+import hiLocale from "date-fns/locale/hi"
+
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+
+const localeMap = {
+  "en-US": enLocale,
+  "es-ES": esLocale,
+  "hi-IN": hiLocale,
+  "de-DE": deLocale,
+  "da-DK": daLocale,
+  "fr-FR": frLocale,
+  "ko-KR": koLocale,
+  "it-IT": itLocale,
+  "zh-CN": zhLocale,
+}
+import DateFnsUtils from "@date-io/date-fns"
+
+class LocalizedUtils extends DateFnsUtils {
+  getWeekdays() {
+    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  }
+}
 export default function ScheduleRow({
   scheduleRow,
   index,
@@ -86,7 +141,7 @@ export default function ScheduleRow({
 }) {
   const classes = useStyles()
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [data, setData] = useState(scheduleRow)
   const intervals = [
     { key: "hourly", value: `${t("Every hour")}` },
@@ -116,6 +171,11 @@ export default function ScheduleRow({
       data.repeat_interval === null
     )
   }
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
 
   return (
     <TableRow key={index} style={{ verticalAlign: !isEdit ? "middle" : "top" }}>
@@ -123,42 +183,46 @@ export default function ScheduleRow({
         {!isEdit ? (
           <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
         ) : (
-          <KeyboardDatePicker
-            clearable
-            value={data?.start_date ? getDate(data.start_date ?? "") : ""}
-            onBlur={(event) => {
-              const date = new Date(event.target.value)
-              if (!!date) {
-                date.setHours(1)
-                date.setMinutes(0)
-                date.setSeconds(0)
-              }
-              setData({
-                ...data,
-                start_date: date?.isValid() ? dateInUTCformat(date) : null,
-                time: date?.isValid() ? dateInUTCformat(date) : null,
-              })
-            }}
-            onChange={(date) => {
-              if (!!date) {
-                date.setHours(1)
-                date.setMinutes(0)
-                date.setSeconds(0)
-              }
-              setData({
-                ...data,
-                start_date: date?.isValid() ? dateInUTCformat(date) : null,
-                time: date?.isValid() ? dateInUTCformat(date) : null,
-              })
-            }}
-            format="MM/dd/yyyy"
-            animateYearScrolling
-            variant="inline"
-            inputVariant="outlined"
-            className={classes.datePicker}
-            helperText={`${t("Select the start date.")}`}
-            size="small"
-          />
+          <MuiThemeProvider theme={formTheme}>
+            <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                clearable
+                value={data?.start_date ? getDate(data.start_date ?? "") : ""}
+                onBlur={(event) => {
+                  const date = new Date(event.target.value)
+                  if (!!date) {
+                    date.setHours(1)
+                    date.setMinutes(0)
+                    date.setSeconds(0)
+                  }
+                  setData({
+                    ...data,
+                    start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                    time: date?.isValid() ? dateInUTCformat(date) : null,
+                  })
+                }}
+                onChange={(date) => {
+                  if (!!date) {
+                    date.setHours(1)
+                    date.setMinutes(0)
+                    date.setSeconds(0)
+                  }
+                  setData({
+                    ...data,
+                    start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                    time: date?.isValid() ? dateInUTCformat(date) : null,
+                  })
+                }}
+                format="MM/dd/yyyy"
+                animateYearScrolling
+                variant="inline"
+                inputVariant="outlined"
+                className={classes.datePicker}
+                helperText={`${t("Select the start date.")}`}
+                size="small"
+              />
+            </MuiPickersUtilsProvider>
+          </MuiThemeProvider>
         )}
       </TableCell>
       <TableCell>
