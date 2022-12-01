@@ -8,6 +8,7 @@
 	"Clinician": "Terapeuta",
 	"Participant": "Partícipe",
 	"Patient": "Paciente",
+	"User number": "Usuario {{number}}",
 	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": 
     "Ha iniciado sesión en una cuenta de demostración. Cualquier cambio que realice se restablecerá cuando reinicie la aplicación.",
 	"Dismiss" : "Despedir",

@@ -8,6 +8,7 @@
 	"Clinician": "Clinician",
 	"Participant": "Participant",
 	"Patient": "User",
+	"User number": "User {{number}}",
 	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
 	"Dismiss" : "Dismiss",
 	"Assess": "Assess",

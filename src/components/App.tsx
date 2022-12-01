@@ -681,11 +681,11 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
                 id={props.match.params.id}
-                title={`${t("User")}` + " " + getParticipant(props.match.params.id).id}
+                title={`User ${getParticipant(props.match.params.id).id}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
@@ -723,7 +723,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <PreventPage
                 type="activity"
                 activityId={props.match.params.activityId}
@@ -751,7 +751,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <PreventPage type="sensor" activityId={props.match.params.spec} participantId={props.match.params.id} />
             </React.Fragment>
           )
