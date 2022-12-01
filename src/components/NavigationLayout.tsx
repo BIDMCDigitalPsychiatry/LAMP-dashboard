@@ -228,12 +228,12 @@ export default function NavigationLayout({
   const [researcherId, setResId] = useState(null)
   useEffect(() => {
     let isMounted = true
-    console.log(title, changeResearcherType)
     if (isMounted) {
       if (
         (authType === "researcher" || authType === "admin") &&
         typeof title != "undefined" &&
-        title.startsWith("Patient")
+        title.startsWith("User") &&
+        title !== "User Administrator"
       ) {
         Service.getAll("researcher").then((researcher) => {
           setResId(researcher[0]["id"])
@@ -335,7 +335,7 @@ export default function NavigationLayout({
         <AppBar classes={{ root: classes.appbarResearcher }}>
           {(authType === "researcher" || authType === "admin") && (
             <Toolbar className={classes.logResearcherToolbar}>
-              {typeof title != "undefined" && title.startsWith("Patient") ? (
+              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" ? (
                 <Box>
                   <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
@@ -354,7 +354,12 @@ export default function NavigationLayout({
                       aria-label="Menu"
                       style={{
                         marginLeft:
-                          supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                          supportsSidebar &&
+                          typeof title != "undefined" &&
+                          title.startsWith("User") &&
+                          title !== "User Administrator"
+                            ? 0
+                            : undefined,
                       }}
                     >
                       <Icon>arrow_back</Icon>
@@ -367,7 +372,9 @@ export default function NavigationLayout({
                     onClick={handleClick}
                   >
                     <Icon>account_circle</Icon>
-                    {`${t("User number", { number: title.split(" ")[1] })}`}
+                    {title.startsWith("User") && title !== "User Administrator"
+                      ? `${t("User number", { number: title.split(" ")[1] })}`
+                      : title}
                     <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
@@ -425,7 +432,7 @@ export default function NavigationLayout({
                 title !== "Administrator" &&
                 title !== "User Administrator" &&
                 title !== "Practice Lead" &&
-                !title.startsWith("Patient") &&
+                !title.startsWith("User") &&
                 !!changeResearcherType && (
                   <Box>
                     <ModeToggleButton changeResearcherType={changeResearcherType} />
@@ -434,7 +441,9 @@ export default function NavigationLayout({
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
-            ((authType === "researcher" || authType === "admin") && title.startsWith("Patient"))) && (
+            ((authType === "researcher" || authType === "admin") &&
+              title.startsWith("User") &&
+              title !== "User Administrator")) && (
             <Toolbar
               classes={{
                 root:
@@ -442,7 +451,8 @@ export default function NavigationLayout({
                   (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
               }}
             >
-              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
+              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) ||
+                (title.startsWith("User") && title !== "User Administrator")) && (
                 <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"
@@ -455,14 +465,20 @@ export default function NavigationLayout({
                   </Typography>
                 </Container>
               )}
-              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
+              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") ||
+                (title.startsWith("User") && title !== "User Administrator")) && (
                 <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"
                     style={{
                       textTransform: "capitalize",
                       marginLeft:
-                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                        supportsSidebar &&
+                        typeof title != "undefined" &&
+                        title.startsWith("User") &&
+                        title !== "User Administrator"
+                          ? 0
+                          : undefined,
                     }}
                   >
                     {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
@@ -573,7 +589,8 @@ export default function NavigationLayout({
               classes.scroll +
               ((authType === "researcher" || authType === "admin") &&
               typeof title != "undefined" &&
-              title.startsWith("Patient")
+              title.startsWith("User") &&
+              title !== "User Administrator"
                 ? " " + classes.logParticipantBorder
                 : authType === "researcher" || authType === "admin"
                 ? " " + classes.logResearcherBorder
