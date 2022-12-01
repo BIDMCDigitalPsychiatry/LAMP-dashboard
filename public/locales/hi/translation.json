@@ -8,6 +8,8 @@
 	"Clinician": "चिकित्सक",
 	"Participant": "प्रतिभागी",
 	"Patient": "मरीज़",
+	"User": "उपयोगकर्ताओं",
+	"User number": "उपयोगकर्ताओं {{number}}",
 	"You're logged into a demo account. Any changes you make will be reset when you restart the app.": "आपने एक डेमो अकाउंट में लॉग इन किया हैं l आप जो भी बदलाव करेगें वह ऐप रिस्टार्ट करने पर रिसेट हो जाएंगे l",
 	"Dismiss" : "ख़ारिज",
 	"Assess": "आंकलन",
