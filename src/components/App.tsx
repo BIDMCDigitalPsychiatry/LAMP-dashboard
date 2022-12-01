@@ -23,6 +23,7 @@ import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
+import { it } from "date-fns/locale"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -680,11 +681,11 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
                 id={props.match.params.id}
-                title={"Patient" + " " + getParticipant(props.match.params.id).id}
+                title={`${t("User")}` + " " + getParticipant(props.match.params.id).id}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
@@ -722,7 +723,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <PreventPage
                 type="activity"
                 activityId={props.match.params.activityId}
@@ -750,7 +751,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <PreventPage type="sensor" activityId={props.match.params.spec} participantId={props.match.params.id} />
             </React.Fragment>
           )

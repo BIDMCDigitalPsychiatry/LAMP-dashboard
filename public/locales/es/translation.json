@@ -564,7 +564,7 @@
 	"Existing Group Name": "Existing Group Name",
 	"Add a new group.": "Add a new group.",
 	"Group name and user name will be same.": "Group name and user name will be same.",
-	"Patient View": "User View",
+	"Patient View": "Vista del usuario",
 	"Create a new patient under this group": "Create a new user under this group",
 	"An error occured while deleting. Please try again.": "An error occured while deleting. Please try again.",
 	"No Records Found": "No Records Found",
@@ -1110,5 +1110,5 @@
 	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
 	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
-	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"                                                      
+	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario"                                                    
 }
