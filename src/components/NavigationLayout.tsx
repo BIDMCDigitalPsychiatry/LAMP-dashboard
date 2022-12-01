@@ -232,7 +232,7 @@ export default function NavigationLayout({
       if (
         (authType === "researcher" || authType === "admin") &&
         typeof title != "undefined" &&
-        title.startsWith("Patient")
+        title.startsWith("User")
       ) {
         Service.getAll("researcher").then((researcher) => {
           setResId(researcher[0]["id"])
@@ -334,7 +334,7 @@ export default function NavigationLayout({
         <AppBar classes={{ root: classes.appbarResearcher }}>
           {(authType === "researcher" || authType === "admin") && (
             <Toolbar className={classes.logResearcherToolbar}>
-              {typeof title != "undefined" && title.startsWith("Patient") ? (
+              {typeof title != "undefined" && title.startsWith("User") ? (
                 <Box>
                   <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
@@ -353,7 +353,7 @@ export default function NavigationLayout({
                       aria-label="Menu"
                       style={{
                         marginLeft:
-                          supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                          supportsSidebar && typeof title != "undefined" && title.startsWith("User") ? 0 : undefined,
                       }}
                     >
                       <Icon>arrow_back</Icon>
@@ -424,7 +424,7 @@ export default function NavigationLayout({
                 title !== "Administrator" &&
                 title !== "User Administrator" &&
                 title !== "Practice Lead" &&
-                !title.startsWith("Patient") && (
+                !title.startsWith("User") && (
                   <Box>
                     <ModeToggleButton changeResearcherType={changeResearcherType} />
                   </Box>
@@ -432,7 +432,7 @@ export default function NavigationLayout({
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
-            ((authType === "researcher" || authType === "admin") && title.startsWith("Patient"))) && (
+            ((authType === "researcher" || authType === "admin") && title.startsWith("User"))) && (
             <Toolbar
               classes={{
                 root:
@@ -440,7 +440,7 @@ export default function NavigationLayout({
                   (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
               }}
             >
-              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
+              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("User")) && (
                 <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"
@@ -453,14 +453,14 @@ export default function NavigationLayout({
                   </Typography>
                 </Container>
               )}
-              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
+              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("User")) && (
                 <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"
                     style={{
                       textTransform: "capitalize",
                       marginLeft:
-                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                        supportsSidebar && typeof title != "undefined" && title.startsWith("User") ? 0 : undefined,
                     }}
                   >
                     {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
@@ -469,7 +469,7 @@ export default function NavigationLayout({
               )}
               <Box flexGrow={1} />
               {typeof title != "undefined" &&
-                title.startsWith("Patient") &&
+                title.startsWith("User") &&
                 (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
                   <Box className={classes.headerRight}>
                     {hideNotifications.indexOf(activeTab) < 0 ? (
@@ -490,7 +490,7 @@ export default function NavigationLayout({
                     )}
                   </Box>
                 )}
-              {typeof title != "undefined" && title.startsWith("Patient") && (
+              {typeof title != "undefined" && title.startsWith("User") && (
                 <Box>
                   <Tooltip title={`${t("Profile & Settings")}`}>
                     <IconButton
@@ -570,7 +570,7 @@ export default function NavigationLayout({
               classes.scroll +
               ((authType === "researcher" || authType === "admin") &&
               typeof title != "undefined" &&
-              title.startsWith("Patient")
+              title.startsWith("User")
                 ? " " + classes.logParticipantBorder
                 : authType === "researcher" || authType === "admin"
                 ? " " + classes.logResearcherBorder

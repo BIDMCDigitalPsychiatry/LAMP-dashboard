@@ -203,7 +203,7 @@ export default function Root({ updateStore, adminType, ...props }) {
                   <ListItemIcon className={classes.menuIcon}>
                     <DataPortalIcon />
                   </ListItemIcon>
-                  <ListItemText primary={"Data Portal"} />
+                  <ListItemText primary={`${t("Data Portal")}`} />
                 </ListItem>
               )}
             </List>
