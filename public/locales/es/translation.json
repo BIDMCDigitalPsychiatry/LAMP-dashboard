@@ -1109,5 +1109,6 @@
 	"Run Query": "Run Query", "There are no Assess activities available.": "Es sind keine Beurteilungs-aktivitäten verfügbar.",
 	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
 	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
-	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"                                                              
+	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
+	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos"                                                       
 }

@@ -785,7 +785,7 @@ export const SchemaList = () => {
                     minLength: 1,
                   },
                   measure: {
-                    title: "Measure of Action",
+                    title: i18n.t("Measure of Action"),
                     type: "string",
                     minLength: 1,
                     examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],

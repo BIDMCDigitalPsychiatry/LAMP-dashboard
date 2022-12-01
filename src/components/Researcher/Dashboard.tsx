@@ -350,7 +350,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemIcon className={classes.menuIcon}>
                       <DataPortalIcon />
                     </ListItemIcon>
-                    <ListItemText primary={"Data Portal"} />
+                    <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
               </List>
