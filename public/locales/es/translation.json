@@ -982,7 +982,7 @@
 	"Fall\u00f3 la gesti\u00f3n de credenciales. Es posible que este email ya est\u00e9 en uso", "Could not delete.": "No se pudo borrar", 
 	"Credential management failed.": "La gesti\u00f3n de credenciales ha fallado", "Add a new member of your care team.": 
 	"A\u00f1adir un nuevo miembro a tu equipo de atenci\u00f3n m\u00e9dica", "Update Photo & Role": "Actualizar foto y rol", "Target behaviors": 
-	"Conductas meta", "effective": "efectivo", "Times": "Horarios", "ADD ITEM": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", 
+	"Conductas meta", "effective": "efectivo", "Times": "Horarios", " Add Item": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", 
 	"Emotions": "Emociones", "Add a target behavior": "A\u00f1adir conducta meta", "Behavior name": "Nombre de la conducta", 
 	"Measure of action:": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", 
 	"Removed participant Id's alias.": "Se ha eliminado el alias del Id del participante", "Set participant Id's alias to participant Name": 
@@ -1111,5 +1111,6 @@
 	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
 	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
-	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario"                                                    
+	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario", "Confirm Password": "Confirmar contraseña", 
+	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo"                                             
 }

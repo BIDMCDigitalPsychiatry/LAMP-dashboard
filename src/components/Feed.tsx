@@ -19,6 +19,8 @@ import {
   DialogContent,
   Button,
   Icon,
+  MuiThemeProvider,
+  createTheme,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
@@ -249,6 +251,12 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "block",
         margin: 0,
       },
+      "& span.MuiPickersCalendarHeader-dayLabel": {
+        textTransform: "capitalize",
+        color: "#fff !important",
+        paddingLeft: "15px",
+      },
+      "& span.MuiPickersCalendarHeader-dayLabel:first-letter": { color: "rgba(0, 0, 0, 0.75) !important" },
       "& div.MuiPickersCalendarHeader-switchHeader": { marginBottom: 35, padding: "0 5px" },
       "& div.MuiPickersCalendar-transitionContainer": { minHeight: 300 },
       "& div": { maxWidth: "inherit !important" },
@@ -336,6 +344,24 @@ const localeMap = {
   "it-IT": itLocale,
   "zh-CN": zhLocale,
 }
+
+//MuiTypography-root MuiPickersCalendarHeader-dayLabel MuiTypography-caption
+const formTheme = createTheme({
+  overrides: {
+    MuiTypography: {
+      root: { textTransform: "capitalize" },
+      caption: {
+        color: "#fff !important",
+        paddingLeft: "15px",
+        "&::first-letter": { color: "rgba(0, 0, 0, 0.75) !important" },
+      },
+    },
+    MuiPaper: {
+      root: { textTransform: "capitalize" },
+    },
+  },
+})
+
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -346,7 +372,9 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   return (
-    <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={LocalizedUtils}>
+    // <MuiThemeProvider theme={formTheme}>
+
+    <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={DateFnsUtils}>
       <DatePicker
         autoOk
         disableToolbar
@@ -380,6 +408,7 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
         rightArrowIcon={<Icon>arrow_forward_ios</Icon>}
       />
     </MuiPickersUtilsProvider>
+    // </MuiThemeProvider>
   )
 }
 export default function Feed({

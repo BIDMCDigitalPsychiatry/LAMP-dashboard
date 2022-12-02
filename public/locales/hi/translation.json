@@ -737,5 +737,9 @@
 	"accelerometer": "शारीर में हलचल मापने वाला यंत्र",
 	"Please select the Group.": "कृपया अध्ययन का चयन करें",
 	"Measure of action": "क्रियाविधि का मापन:",
-	"Measure of Action": "क्रियाविधि का मापन:", "Medications": "दवाई"
+	"Measure of Action": "क्रियाविधि का मापन:", "Medications": "दवाई", "Confirmation": "पुष्टीकरण",
+	"Confirm Password": "पासवर्ड की पुष्टि कीजिये",
+	"Server Address": "सर्वर का पता",
+	"NAME": "नाम",
+	"TYPE": "प्रकार"
 }
