@@ -30,6 +30,7 @@ import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
+import { useTranslation } from "react-i18next"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -43,7 +44,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     let res = array.slice().sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
     return res
   }
-
+  const { t } = useTranslation()
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TARGETINFO",
     item: { target: id[id.length - 1], type, name, id_string: id },
@@ -606,11 +607,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               </Tooltip>
             ) : null
           ) : expanded ? (
-            <Tooltip title={"Collapse"}>
+            <Tooltip title={`${t("Collapse")}`}>
               <Icon>expand_less</Icon>
             </Tooltip>
           ) : (
-            <Tooltip title={"Expand"}>
+            <Tooltip title={`${t("Expand")}`}>
               <Icon>expand_more</Icon>
             </Tooltip>
           )}
