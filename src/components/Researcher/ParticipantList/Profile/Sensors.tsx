@@ -121,12 +121,12 @@ export default function Sensors({ participant, studies, ...props }: { participan
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    NAME
+                    {`${t("NAME")}`}
                   </Typography>
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    TYPE
+                    {`${t("TYPE")}`}
                   </Typography>
                 </Grid>
                 <Grid item className={classes.w120}></Grid>
