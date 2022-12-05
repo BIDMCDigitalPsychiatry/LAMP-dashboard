@@ -27,7 +27,7 @@ export default function ConfirmationDialog({
         <DialogContentText id="alert-dialog-description">
           {confirmationDialog === 1
             ? `${t(
-                "Changes done to this activity will reflect for all the participants under the group. Are you sure you want proceed?"
+                "Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?"
               )}`
             : confirmationDialog === 2
             ? `${t(

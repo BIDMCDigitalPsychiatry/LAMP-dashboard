@@ -77,7 +77,7 @@ export default function UpdateActivity({
         confirmationMsg={
           !!profile && participantCount > 1
             ? t(
-                "Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?."
+                "Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?"
               )
             : ""
         }
