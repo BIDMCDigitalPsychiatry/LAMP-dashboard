@@ -392,7 +392,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       )}
       <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={isAlphabetized ? `${t("Sort by date of creation")}` : `Alphabetize List`}>
+          <Tooltip title={isAlphabetized ? `${t("Sort by date of creation")}` : `${t("Alphabetize List")}`}>
             <IconButton
               className={isAlphabetized ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => toggleAlphabetized(!isAlphabetized)}
@@ -403,7 +403,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )}
 
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
+          <Tooltip title={`Filter${currentFilter.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
             <IconButton
               className={currentFilter.length ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => {
