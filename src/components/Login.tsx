@@ -303,7 +303,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   margin="normal"
                   variant="outlined"
                   style={{ width: "100%", height: 50 }}
-                  placeholder="my.email@address.com"
+                  placeholder={`${t("my.email@address.com")}`}
                   value={state.id || ""}
                   onChange={handleChange}
                   InputLabelProps={{ shrink: true }}
