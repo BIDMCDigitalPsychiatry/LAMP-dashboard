@@ -150,6 +150,7 @@ export default function AddActivity({
     "lamp.recording": `${t("Voice Recording")}`,
     "lamp.survey": `${t("Survey Instrument")}`,
     "lamp.group": `${t("Activity Group")}`,
+    "lamp.memory_game": `${t("Memory Game")}`,
   }
 
   const getActivitySpec = async (id) => {

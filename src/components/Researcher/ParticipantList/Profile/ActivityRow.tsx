@@ -55,6 +55,7 @@ export default function ActivityRow({
     "lamp.breathe": `${t("Breathe")}`,
     "lamp.dbt_diary_card": `${t("DBT Diary Card")}`,
     "lamp.scratch_image": `${t("Scratch image")}`,
+    "lamp.memory_game": `${t("Memory Game")}`,
   }
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

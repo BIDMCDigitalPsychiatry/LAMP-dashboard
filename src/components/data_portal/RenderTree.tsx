@@ -403,7 +403,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )}
 
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={`Filter${currentFilter.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
+          <Tooltip title={`${t("Filter")}${currentFilter.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
             <IconButton
               className={currentFilter.length ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => {
@@ -586,7 +586,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         {isGUIEditor &&
           !Object.keys(tags_object).includes(id[id.length - 1]) &&
           Object.keys(tags_object).includes(id[id.length - 2]) && (
-            <Tooltip title={`Analyze ${id[id.length - 2]}`}>
+            <Tooltip title={`${t("Analyze")} ${id[id.length - 2]}`}>
               <IconButton
                 className={classes.treeButton}
                 onClick={() =>
