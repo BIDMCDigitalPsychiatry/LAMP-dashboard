@@ -150,6 +150,7 @@ export default function AddActivity({
     "lamp.recording": `${t("Voice Recording")}`,
     "lamp.survey": `${t("Survey Instrument")}`,
     "lamp.group": `${t("Activity Group")}`,
+    "lamp.memory_game": `${t("Memory Game")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -169,6 +170,7 @@ export default function AddActivity({
       const allSpecs = await LAMP.ActivitySpec.all()
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
+      console.log(availableSpecs, otherSpecs)
       let i = 0
       if (otherSpecs.length > 0) {
         await otherSpecs.map(async (x: any, index: number) => {
