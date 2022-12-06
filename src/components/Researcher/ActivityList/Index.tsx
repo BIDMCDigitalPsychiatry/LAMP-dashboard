@@ -64,7 +64,6 @@ export const games = [
   "lamp.cats_and_dogs",
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
-  "lamp.memory_game",
 ]
 export default function ActivityList({
   researcherId,
