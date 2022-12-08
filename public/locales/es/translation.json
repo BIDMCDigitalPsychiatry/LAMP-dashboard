@@ -1089,8 +1089,8 @@
 	"This is a list of all tags present on at least one participant in this": "This is a list of all tags present on at least one participant in this",
 	"Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button.": 
 	"Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button.",
-	"SELECT ALL TAGS": "Anular la selección de todas las etiquetas", "Set Tags": "Seleccionar todas las etiquetas",
-	"DESELECT ALL TAGS": "Deselect all tags", "participants have this tag": "participants have this tag", "Loading Tags": "Loading Tags",
+	"Select all tags": "Anular la selección de todas las etiquetas", "Set Tags": "Seleccionar todas las etiquetas",
+	"Deselect all tags": "Deselect all tags", "participants have this tag": "participants have this tag", "Loading Tags": "Loading Tags",
 	"Analyze Participant Data": "Analyze Participant Data", "Analyze": "Analyze", "Data": "Data", "Please wait, data is loading...": 
 	"por favor espere, sus datos se están cargando", "Alternatively, drag and drop a researcher, study, or participant into this box.":
 	"Alternativamente, arrastre y pegue investigador, estudio o participante, en este cuadro", "Change Viewing Mode (Currently GUI)":
@@ -1113,5 +1113,5 @@
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
 	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario", "Confirm Password": "Confirmar contraseña", 
 	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo", "Choose File": "Elija el archivo"  , "Copy": "Copiar", "ID to clipboard": "ID al portapapeles" ,
-	"File Name": "Nombre de archivo"                                       
+	"File Name": "Nombre de archivo" , "Memory Game": "juego de memoria"                                      
 }
