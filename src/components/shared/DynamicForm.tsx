@@ -1,13 +1,16 @@
 import React from "react"
-import { Grid, Button, Icon, MuiThemeProvider } from "@material-ui/core"
+import { Grid, Button, Icon, MuiThemeProvider, Box, Paper, makeStyles, createStyles, Theme } from "@material-ui/core"
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
+import { IconButtonProps, RJSFSchema } from "@rjsf/utils"
+
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
 import { createTheme } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES } from "@mui/material/locale"
+import classNames from "classnames"
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 const languageObjects = {
   "en-US": enUS,
@@ -75,6 +78,117 @@ const ObjectFieldTemplate = ({
         )}
       </Grid>
     </>
+  )
+}
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    toolbardashboard: {
+      border: "1px solid rgba(0, 0, 0, 0.12)",
+      borderRadius: 4,
+      padding: 16,
+    },
+    addbtn: {
+      color: "#f50057",
+    },
+    btnarrange: {
+      background: "transparent",
+      border: "none",
+      "& span": {
+        fontSize: "1.25rem",
+      },
+    },
+  })
+)
+function ArrayFieldTemplate(props) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+
+  return (
+    <Grid container={true} alignItems="center" className={classes.toolbardashboard}>
+      <Box width={1}>
+        {props.schema.title && <props.TitleField title={t(props.schema.title)} required={props.required} />}
+        {props.schema.description && <props.DescriptionField description={t(props.schema.description)} />}
+      </Box>
+      {props.items.map((element, index) => (
+        <Grid container={true} alignItems="center">
+          <Grid item={true} xs style={{ overflow: "auto" }}>
+            <Box mb={2}>
+              <Paper elevation={2}>
+                <Box p={2}>{element.children}</Box>
+              </Paper>
+            </Box>
+          </Grid>
+
+          {element.hasToolbar && (
+            <Grid item={true}>
+              {(element.hasMoveUp || element.hasMoveDown) && (
+                <MoveUpButton
+                  disabled={element.disabled || element.readonly || !element.hasMoveUp}
+                  onClick={element.onReorderClick(index, index - 1)}
+                  uiSchema={element.uiSchema}
+                />
+              )}
+              {(element.hasMoveUp || element.hasMoveDown) && (
+                <MoveDownButton
+                  disabled={element.disabled || element.readonly || !element.hasMoveDown}
+                  onClick={element.onReorderClick(index, index + 1)}
+                  uiSchema={element.uiSchema}
+                />
+              )}
+              {element.hasRemove && (
+                <RemoveButton
+                  disabled={element.disabled || element.readonly}
+                  onClick={element.onDropIndexClick(index)}
+                  uiSchema={element.uiSchema}
+                />
+              )}
+            </Grid>
+          )}
+        </Grid>
+      ))}
+      {props.canAdd && (
+        <Box display="flex" justifyContent="flex-end" width={1}>
+          <Button type="button" onClick={props.onAddClick} className={classes.addbtn}>
+            <Icon>add</Icon>
+            {`${t("Add Item")}`}
+          </Button>
+        </Box>
+      )}
+    </Grid>
+  )
+}
+
+function MoveDownButton(props: IconButtonProps) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+  const { icon, iconType, ...btnProps } = props
+  return (
+    <button {...btnProps} className={classes.btnarrange}>
+      <Icon>arrow_downward</Icon>
+    </button>
+  )
+}
+
+function MoveUpButton(props: IconButtonProps) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+  const { icon, iconType, ...btnProps } = props
+  return (
+    <button {...btnProps} className={classes.btnarrange}>
+      <Icon>arrow_upward</Icon>
+    </button>
+  )
+}
+
+function RemoveButton(props: IconButtonProps) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+  const { icon, iconType, ...btnProps } = props
+  return (
+    <button {...btnProps} className={classes.btnarrange}>
+      <Icon>remove</Icon>
+    </button>
   )
 }
 
@@ -169,6 +283,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         onChange={(x) => {
           onChange(x.formData)
         }}
+        ArrayFieldTemplate={ArrayFieldTemplate}
         ObjectFieldTemplate={ObjectFieldTemplate}
         widgets={{ TextWidget: AutocompleteTextWidget, FileWidget: CustomFileWidget }}
       />

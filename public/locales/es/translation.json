@@ -380,7 +380,7 @@
 	"Target behaviors": "Conductas objetivo",
 	"effective": "efectivo",
 	"Times": "Veces",
-	"Add item": "añadir artículo",
+	"Add Item": "añadir artículo",
 	"ineffective": "ineficaz",
 	"Emotions": "emociones",
 	"Add a target behavior": "Agregar un comportamiento objetivo",
@@ -699,7 +699,7 @@
 	"Are you sure you want to delete this sensor?" : "Are you sure you want to delete this sensor",
 	"The duration between bubbles.": "The duration between bubbles.",
 	"Bubble Count": "Bubble Count",
-	"Add Item": "Add Item",
+	
 	"Select the Repeat interval.": "Select the Repeat interval.",
 	"This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?": 
     "This sensor will be deleted for all the participants under this group. Are you sure you want to proceed?",
@@ -982,7 +982,7 @@
 	"Fall\u00f3 la gesti\u00f3n de credenciales. Es posible que este email ya est\u00e9 en uso", "Could not delete.": "No se pudo borrar", 
 	"Credential management failed.": "La gesti\u00f3n de credenciales ha fallado", "Add a new member of your care team.": 
 	"A\u00f1adir un nuevo miembro a tu equipo de atenci\u00f3n m\u00e9dica", "Update Photo & Role": "Actualizar foto y rol", "Target behaviors": 
-	"Conductas meta", "effective": "efectivo", "Times": "Horarios", " Add Item": "A\u00f1adir \u00edtem", "ineffective": "ineficaz", 
+	"Conductas meta", "effective": "efectivo", "Times": "Horarios", "ineffective": "ineficaz", 
 	"Emotions": "Emociones", "Add a target behavior": "A\u00f1adir conducta meta", "Behavior name": "Nombre de la conducta", 
 	"Measure of action:": "Medida de la acci\u00f3n:", "Add a emotion": "A\u00f1adir emoci\u00f3n", "Emotion name": "Nombre de la emoci\u00f3n", 
 	"Removed participant Id's alias.": "Se ha eliminado el alias del Id del participante", "Set participant Id's alias to participant Name": 
@@ -1112,5 +1112,6 @@
 	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
 	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario", "Confirm Password": "Confirmar contraseña", 
-	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo", "Choose File": "Elija el archivo"  , "Copy": "Copiar", "ID to clipboard": "ID al portapapeles"                                        
+	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo", "Choose File": "Elija el archivo"  , "Copy": "Copiar", "ID to clipboard": "ID al portapapeles" ,
+	"File Name": "Nombre de archivo"                                       
 }

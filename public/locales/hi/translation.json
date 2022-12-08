@@ -363,7 +363,6 @@
 	"Target behaviors": "लक्षित व्यवहार",
 	"effective": "प्रभावी",
 	"Times": "समय",
-	"Add item": "सामान जोडें",
 	"ineffective": "अप्रभावी",
 	"Emotions": "भावनाएँ",
 	"Add a target behavior": "लक्षित व्यवहार को जोड़ें",
@@ -742,5 +741,6 @@
 	"Server Address": "सर्वर का पता",
 	"NAME": "नाम",
 	"TYPE": "प्रकार",
-	"Choose File": "फाइलें चुनें"
+	"Choose File": "फाइलें चुनें",
+	"File Name": "फ़ाइल नाम"
 }
