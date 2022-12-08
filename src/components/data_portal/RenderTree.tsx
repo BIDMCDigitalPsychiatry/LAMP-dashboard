@@ -466,7 +466,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   }
                   label={
                     <Box component="span" fontWeight={600}>
-                      File Name
+                      {`${t("File Name")}`}
                     </Box>
                   }
                 />
@@ -477,7 +477,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   control={<Checkbox checked={explodeParticipant} />}
                   label={
                     <Box component="span" fontWeight={600}>
-                      Separate participant data into multiple lines for each activity
+                      {`${t("Separate participant data into multiple lines for each activity")}`}
                     </Box>
                   }
                 />
@@ -488,7 +488,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     control={<Checkbox checked={explodeTemporalSlices} />}
                     label={
                       <Box component="span" fontWeight={600}>
-                        Separate activity data into multiple lines for each response
+                        {`${t("Separate activity data into multiple lines for each response")}`}
                       </Box>
                     }
                   />
@@ -499,7 +499,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   control={<Checkbox checked={downloadAllActivities} />}
                   label={
                     <Box component="span" fontWeight={600}>
-                      Download data for all activities for this {id[id.length - 2]}
+                      {`${t("Download data for all activities for this")}`} {id[id.length - 2]}
                     </Box>
                   }
                 />

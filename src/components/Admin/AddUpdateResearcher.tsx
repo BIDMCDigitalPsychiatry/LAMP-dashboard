@@ -58,6 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "capitalize",
       fontSize: "16px",
       color: "#fff",
+      whiteSpace: "nowrap",
       "& svg": { marginRight: 8 },
       "&:hover": { background: "#5680f9" },
       [theme.breakpoints.up("md")]: {
