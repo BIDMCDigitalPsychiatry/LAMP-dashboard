@@ -203,6 +203,8 @@ export default function Participant({
           setLoading(false)
         }
       })
+    } else {
+      setLoading(false)
     }
   }, [activities])
 
