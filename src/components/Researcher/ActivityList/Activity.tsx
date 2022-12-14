@@ -25,22 +25,7 @@ export const games = [
   "lamp.cats_and_dogs",
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
-]
-
-const lampActivities = [
-  "spatial_span",
-  "cats_and_dogs",
-  "jewels_a",
-  "jewels_b",
-  "dbt_diary_card",
-  "balloon_risk",
-  "pop_the_bubbles",
-  "journal",
-  "breathe",
-  "recording",
-  "survey",
-  "scratch_image",
-  "tips",
+  "lamp.spin_wheel",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>

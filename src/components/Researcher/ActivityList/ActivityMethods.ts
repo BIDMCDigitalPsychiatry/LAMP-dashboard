@@ -1,10 +1,184 @@
 import LAMP from "lamp-core"
-import { zero } from "vega"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 export const SchemaList = () => {
   return {
+    "lamp.spin_wheel": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["low_risk", "high_risk", "spins_per_game"],
+          properties: {
+            low_risk: {
+              title: i18n.t("Low Risk"),
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                required: ["win", "loose", "zero"],
+                properties: {
+                  win: {
+                    title: i18n.t("Win"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                  loose: {
+                    title: i18n.t("Loose"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                  zero: {
+                    title: i18n.t("Zero"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 0,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 0,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                },
+              },
+              "ui:options": {
+                addable: false,
+                removable: false,
+                orderable: false,
+              },
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            high_risk: {
+              title: i18n.t("High Risk"),
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                required: ["win", "loose", "zero"],
+                properties: {
+                  win: {
+                    title: i18n.t("Win"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 100,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                  loose: {
+                    title: i18n.t("Loose"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 250,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                  zero: {
+                    type: "object",
+                    title: i18n.t("Zero"),
+
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 0,
+                        enum: [0, 50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 0,
+                        enum: [0, 50],
+                      },
+                    },
+                  },
+                },
+              },
+              "ui:options": {
+                addable: false,
+                removable: false,
+                orderable: false,
+              },
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            spins_per_game: {
+              title: i18n.t("Spins per game"),
+              type: "number",
+              minimum: 1,
+              maximum: 100,
+              default: 20,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.balloon_risk": {
       type: "object",
       properties: {

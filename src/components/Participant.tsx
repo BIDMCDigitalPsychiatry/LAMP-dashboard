@@ -175,6 +175,7 @@ export default function Participant({
   }, [])
 
   useEffect(() => {
+    console.log(activities)
     if (activities !== null) {
       Service.getAllTags("activitytags").then((result) => {
         if ((result || []).length == 0) {
