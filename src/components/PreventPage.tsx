@@ -20,6 +20,7 @@ import Journal from "./Journal"
 import PreventDBT from "./PreventDBT"
 import PreventData from "./PreventData"
 import PreventGoalData from "./PreventGoalData"
+import VoiceRecoding from "./VoiceRecoding"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -245,11 +246,7 @@ export default function PreventPage({ activityId, type, participantId, ...props 
       {!!activity && type === "activity" && !!activityEvents && (
         <Box>
           {activity?.spec === "lamp.journal" ? (
-            <Journal
-              selectedEvents={activityEvents}
-            /> /* : selectedSpec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
-          <VoiceRecoding participant={participant} selectedEvents={selectedActivity} />
-        ) */
+            <Journal selectedEvents={activityEvents} />
           ) : activity?.spec === "lamp.goals" || activity?.spec === "lamp.medications" ? (
             <PreventGoalData
               selectedEvents={activityEvents}
@@ -258,6 +255,8 @@ export default function PreventPage({ activityId, type, participantId, ...props 
             />
           ) : activity?.spec === "lamp.dbt_diary_card" ? (
             <PreventDBT selectedEvents={activityEvents} />
+          ) : activity?.spec === "lamp.recording" ? (
+            <VoiceRecoding selectedEvents={activityEvents} />
           ) : (
             <PreventData
               activity={activity}

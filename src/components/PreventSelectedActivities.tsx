@@ -5,6 +5,7 @@ import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import { ReactComponent as PreventMeditation } from "../icons/PreventMeditation.svg"
+import { ReactComponent as PreventRecording } from "../icons/PreventRecording.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 
 import ReactMarkdown from "react-markdown"
@@ -243,7 +244,8 @@ export default function PreventSelectedActivities({
         .map((
           activity // Uncomment if you want to view the Voice Recording Details on Prevent
         ) =>
-          /*activity.spec === "lamp.recording" ||*/ activity.spec === "lamp.journal" ||
+          activity.spec === "lamp.recording" ||
+          activity.spec === "lamp.journal" ||
           activity.spec === "lamp.dbt_diary_card" ||
           activity.spec === "lamp.goals" ||
           activity.spec === "lamp.medications" ? (
@@ -260,19 +262,17 @@ export default function PreventSelectedActivities({
                       <Typography className={classes.preventlabel}>{`${t(activity.name)}`}</Typography>
                     </Box>
                     <Box mr={1} className={classes.preventRightSVG}>
-                      {
-                        activity.spec === "lamp.goals" ? (
-                          <PreventCustom />
-                        ) : activity.spec === "lamp.medications" ? (
-                          <PreventMeditation />
-                        ) : activity.spec === "lamp.journal" ? (
-                          <JournalBlue />
-                        ) : (
-                          <AssessDbt width="50" height="50" />
-                        ) /*: activity.spec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
+                      {activity.spec === "lamp.goals" ? (
+                        <PreventCustom />
+                      ) : activity.spec === "lamp.medications" ? (
+                        <PreventMeditation />
+                      ) : activity.spec === "lamp.journal" ? (
+                        <JournalBlue />
+                      ) : activity.spec === "lamp.recording" ? (
                         <PreventRecording />
-                      )*/
-                      }
+                      ) : (
+                        <AssessDbt width="50" height="50" />
+                      )}
                     </Box>
                   </Box>
                   <Box className={classes.preventGraph}>

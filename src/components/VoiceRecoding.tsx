@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
   recordingStyle: {
     background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
     borderRadius: "10px",
-    padding: "5px 20px 30px 20px",
+    padding: "5px 20px 5px 20px",
     textAlign: "justify",
     marginBottom: 20,
     "& span": {
@@ -128,7 +128,7 @@ const getJournals = async (journals: any) => {
   return data
 }
 
-export default function VoiceRecoding({ participant, selectedEvents, ...props }) {
+export default function VoiceRecoding({ selectedEvents, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [journals, setJournals] = useState([])
@@ -214,9 +214,6 @@ export default function VoiceRecoding({ participant, selectedEvents, ...props })
                           <Typography variant="caption" gutterBottom>
                             {getDateString(new Date(journal.timestamp))}
                           </Typography>
-                          <Typography variant="body2" component="p">
-                            <audio src={text[index] ?? journal.static_data.url} autoPlay={false} controls></audio>
-                          </Typography>
                         </Box>
                       </Grid>
                     </Box>
@@ -239,9 +236,6 @@ export default function VoiceRecoding({ participant, selectedEvents, ...props })
                               <Box className={classes.recordingStyle} onClick={() => handleOpen(index, journal)}>
                                 <Typography variant="caption" gutterBottom>
                                   {getDateString(new Date(journal.timestamp))}
-                                </Typography>
-                                <Typography variant="body2" component="p">
-                                  <audio src={text[index] ?? journal.static_data.url} autoPlay={false} controls></audio>
                                 </Typography>
                               </Box>
                             </Grid>
