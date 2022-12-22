@@ -234,7 +234,6 @@ export default function Prevent({
   const { t, i18n } = useTranslation()
   const [savedActivities, setSavedActivities] = React.useState([])
   const [tag, setTag] = React.useState([])
-  const [disabled, setDisabled] = React.useState(true)
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
   const [activityCounts, setActivityCounts] = React.useState({})
@@ -279,13 +278,9 @@ export default function Prevent({
       getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
-      setDisabled(disabled)
-      if (!disabled) {
-        await loadActivityEvents()
-        loadVisualizations()
-      } else {
-        loadVisualizations()
-      }
+      if (!disabled) await loadActivityEvents()
+
+      loadVisualizations()
     })()
   }
 
@@ -302,9 +297,7 @@ export default function Prevent({
   }
 
   const loadActivityEvents = () => {
-    let activities = !disabled
-      ? allActivities.filter((activity) => activity.spec !== "lamp.recording")
-      : allActivities.filter((activity) => activity.spec === "lamp.journal" || activity.spec !== "lamp.recording")
+    let activities = allActivities
     getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
       setActivityEvents(activityEvents)
