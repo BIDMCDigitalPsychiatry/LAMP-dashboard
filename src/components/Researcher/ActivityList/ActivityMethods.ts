@@ -29,7 +29,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 50,
-                        enum: [0, 50, 100, 250],
+                        enum: [50, 100, 250],
                       },
                       probability: {
                         title: i18n.t("Probability"),
@@ -48,7 +48,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 50,
-                        enum: [0, 50, 100, 250],
+                        enum: [50, 100, 250],
                       },
                       probability: {
                         title: i18n.t("Probability"),
@@ -67,7 +67,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 0,
-                        enum: [0, 50, 100, 250],
+                        enum: [0],
                       },
                       probability: {
                         title: i18n.t("Probability"),
@@ -105,7 +105,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 100,
-                        enum: [0, 50, 100, 250],
+                        enum: [50, 100, 250],
                       },
                       probability: {
                         title: i18n.t("Probability"),
@@ -124,7 +124,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 250,
-                        enum: [0, 50, 100, 250],
+                        enum: [50, 100, 250],
                       },
                       probability: {
                         title: i18n.t("Probability"),
@@ -144,7 +144,7 @@ export const SchemaList = () => {
                         title: i18n.t("Sum"),
                         type: "number",
                         default: 0,
-                        enum: [0, 50, 100, 250],
+                        enum: [0],
                       },
                       probability: {
                         title: i18n.t("Probability"),

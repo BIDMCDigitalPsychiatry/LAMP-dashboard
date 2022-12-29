@@ -126,10 +126,29 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
               setTag(tags[0])
               const tag = tags[0]
-              data =
-                data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
-              setActivity(data)
-              setLoading(false)
+              if (data.spec == "lamp.spin_wheel") {
+                ;(async () => {
+                  const events = await LAMP.ActivityEvent.allByParticipant(participant)
+                  let event = events.filter((event) => event.activity === activityId)[0] ?? {}
+                  const balance = !!event["temporal_slices"]
+                    ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
+                    : 2000
+                  data["settings"]["balance"] = balance
+                  data =
+                    data.spec === "lamp.survey"
+                      ? spliceActivity({ raw: data, tag })
+                      : spliceCTActivity({ raw: data, tag })
+                  setActivity(data)
+                  setLoading(false)
+                })()
+              } else {
+                data =
+                  data.spec === "lamp.survey"
+                    ? spliceActivity({ raw: data, tag })
+                    : spliceCTActivity({ raw: data, tag })
+                setActivity(data)
+                setLoading(false)
+              }
             })
           } else {
             setOpenNotFound(true)
