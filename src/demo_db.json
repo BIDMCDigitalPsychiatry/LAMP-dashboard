@@ -720,7 +720,7 @@
     {
       "#type": "Activity",
       "#parent": "study1",
-      "id": "activity43",
+      "id": "activity50",
       "spec": "lamp.tips",
       "name": "Physical Wellness",
       "settings": [
@@ -989,13 +989,76 @@
         }
       ]
     },
+
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity91",
+      "spec": "lamp.balloon_risk",
+      "name": "Balloon Risk",
+      "settings": {
+        "balloon_count": 15,
+        "breakpoint_mean": 64.5,
+        "breakpoint_std": 37
+      },
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity90",
+      "spec": "lamp.pop_the_bubbles",
+      "name": "Pop the bubbles",
+      "settings": {
+        "bubble_count": [80, 80, 80],
+        "bubble_speed": [80, 80, 80],
+        "intertrial_duration": 0.5,
+        "bubble_duration": 1
+      },
+      "schedule": []
+    },
     {
       "#type": "Activity",
       "#parent": "study1",
       "id": "activity24",
       "spec": "lamp.spin_wheel",
       "name": "Spin Wheel",
-      "settings": {},
+      "settings": {
+        "low_risk": [
+          {
+            "win": {
+              "sum": 50,
+              "probability": 50
+            },
+            "loose": {
+              "sum": 50,
+              "probability": 50
+            },
+            "zero": {
+              "sum": 0,
+              "probability": 0
+            }
+          }
+        ],
+        "high_risk": [
+          {
+            "win": {
+              "sum": 100,
+              "probability": 50
+            },
+            "loose": {
+              "sum": 250,
+              "probability": 50
+            },
+            "zero": {
+              "sum": 0,
+              "probability": 0
+            }
+          }
+        ],
+        "spins_per_game": 20,
+        "balance": 2000
+      },
       "schedule": []
     },
     {
