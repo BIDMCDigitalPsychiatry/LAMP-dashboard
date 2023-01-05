@@ -153,6 +153,7 @@ export default function AddActivity({
     "lamp.memory_game": `${t("Memory Game")}`,
     "lamp.goals": `${t("Goals")}`,
     "lamp.medications": `${t("Medications")}`,
+    "lamp.spin_wheel": `${t("Spin The Wheel")}`,
   }
 
   const getActivitySpec = async (id) => {

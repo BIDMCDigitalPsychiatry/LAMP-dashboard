@@ -40,6 +40,7 @@ const demoActivities = {
   "lamp.goals": "goals",
   "lamp.medications": "medicationtracker",
   "lamp.memory_game": "memorygame",
+  "lamp.spin_wheel": "spin_wheel",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
