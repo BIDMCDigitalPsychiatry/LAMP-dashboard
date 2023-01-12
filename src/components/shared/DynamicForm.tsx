@@ -3,14 +3,11 @@ import { Grid, Button, Icon, MuiThemeProvider, Box, Paper, makeStyles, createSty
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
-import { IconButtonProps, RJSFSchema } from "@rjsf/utils"
-
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
 import { createTheme } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES } from "@mui/material/locale"
-import classNames from "classnames"
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 const languageObjects = {
   "en-US": enUS,
@@ -123,25 +120,31 @@ function ArrayFieldTemplate(props) {
           {element.hasToolbar && (
             <Grid item={true}>
               {(element.hasMoveUp || element.hasMoveDown) && (
-                <MoveUpButton
-                  disabled={element.disabled || element.readonly || !element.hasMoveUp}
+                <button
+                  disabled={element.disabled || element.readonly}
                   onClick={element.onReorderClick(index, index - 1)}
-                  uiSchema={element.uiSchema}
-                />
+                  className={classes.btnarrange}
+                >
+                  <Icon>arrow_upward</Icon>
+                </button>
               )}
               {(element.hasMoveUp || element.hasMoveDown) && (
-                <MoveDownButton
-                  disabled={element.disabled || element.readonly || !element.hasMoveDown}
+                <button
+                  disabled={element.disabled || element.readonly}
                   onClick={element.onReorderClick(index, index + 1)}
-                  uiSchema={element.uiSchema}
-                />
+                  className={classes.btnarrange}
+                >
+                  <Icon>arrow_downward</Icon>
+                </button>
               )}
               {element.hasRemove && (
-                <RemoveButton
-                  disabled={element.disabled || element.readonly}
+                <button
                   onClick={element.onDropIndexClick(index)}
-                  uiSchema={element.uiSchema}
-                />
+                  disabled={element.disabled || element.readonly}
+                  className={classes.btnarrange}
+                >
+                  <Icon>remove</Icon>
+                </button>
               )}
             </Grid>
           )}
@@ -156,39 +159,6 @@ function ArrayFieldTemplate(props) {
         </Box>
       )}
     </Grid>
-  )
-}
-
-function MoveDownButton(props: IconButtonProps) {
-  const { t } = useTranslation()
-  const classes = useStyles()
-  const { icon, iconType, ...btnProps } = props
-  return (
-    <button {...btnProps} className={classes.btnarrange}>
-      <Icon>arrow_downward</Icon>
-    </button>
-  )
-}
-
-function MoveUpButton(props: IconButtonProps) {
-  const { t } = useTranslation()
-  const classes = useStyles()
-  const { icon, iconType, ...btnProps } = props
-  return (
-    <button {...btnProps} className={classes.btnarrange}>
-      <Icon>arrow_upward</Icon>
-    </button>
-  )
-}
-
-function RemoveButton(props: IconButtonProps) {
-  const { t } = useTranslation()
-  const classes = useStyles()
-  const { icon, iconType, ...btnProps } = props
-  return (
-    <button {...btnProps} className={classes.btnarrange}>
-      <Icon>remove</Icon>
-    </button>
   )
 }
 
