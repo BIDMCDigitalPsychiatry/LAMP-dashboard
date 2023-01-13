@@ -923,6 +923,29 @@ export const SchemaList = () => {
                 ],
                 default: "text",
               },
+              warnings: {
+                type: "array",
+                title: i18n.t("Warnings"),
+                description: i18n.t(
+                  "Set warnings that will be shown in a dialog to participants when the corresponding answers are submitted."
+                ),
+                items: {
+                  type: "object",
+                  properties: {
+                    answer: {
+                      title: i18n.t("Answer"),
+                      description: i18n.t("The answer for which the warning will be shown."),
+                      type: "string",
+                    },
+                    warningText: {
+                      title: i18n.t("Warning Text"),
+                      description: i18n.t("The message that will be shown to participants."),
+                      type: "string",
+                    },
+                  },
+                  required: ["answer", "warningText"],
+                },
+              },
             },
           },
         },
@@ -1202,6 +1225,7 @@ export function spliceActivity({ raw, tag }) {
                   description: tag?.questions?.[idx]?.options?.[idx2],
                 }))
               : question.options,
+          warnings: question.warnings,
         })),
   }
 }
@@ -1241,6 +1265,7 @@ export function unspliceActivity(x) {
             ? y?.options?.map((z) => z?.value ?? z)
             : y?.options,
         required: y?.required ?? false,
+        warnings: y?.warnings,
       })),
     },
     tag: {

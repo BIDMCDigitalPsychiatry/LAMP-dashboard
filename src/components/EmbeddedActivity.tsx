@@ -56,6 +56,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [activityTimestamp, setActivityTimestamp] = useState(0)
   const [timestamp, setTimestamp] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
+  const [warningsDialogState, setWarningsDialogState] = useState(null)
 
   useEffect(() => {
     setCurrentActivity(activity)
@@ -72,6 +73,32 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
+
+  const handleSubmit = (e) => {
+    let warnings = []
+    if (e.data !== null) {
+      try {
+        const data = JSON.parse(e.data)
+        for (const [index, response] of data["temporal_slices"].entries()) {
+          for (const warning of currentActivity.settings[index].warnings) {
+            if (warning.answer === response.value) {
+              warnings.push(warning)
+            }
+          }
+        }
+      } catch {}
+    }
+
+    if (warnings.length > 0) {
+      setWarningsDialogState({
+        warnings,
+        activitySubmitEvent: e,
+      })
+    } else {
+      setWarningsDialogState(null)
+      handleSaveData(e)
+    }
+  }
 
   const handleSaveData = (e) => {
     if (currentActivity !== null && !saved) {
@@ -109,7 +136,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       var eventer = window[eventMethod]
       var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
       // Listen to message from child window
-      eventer(messageEvent, handleSaveData, false)
+      eventer(messageEvent, handleSubmit, false)
       return () => window.removeEventListener(messageEvent, handleSaveData)
     }
   }, [iFrame])
@@ -191,6 +218,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }
 
+  const getUniqueWarningTexts = (warnings: any[]): any[] => {
+    const warningTexts = warnings?.map((warning) => warning.warningText)
+    const warningTextSet = new Set(warningTexts)
+    return Array.from(warningTextSet)
+  }
+
   return (
     <div style={{ display: "flex", width: "100%", height: "100vh", flexDirection: "column", overflow: "hidden" }}>
       {embeddedActivity !== "" && (
@@ -224,6 +257,20 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             color="primary"
           >
             {`${t("Ok")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={warningsDialogState !== null}>
+        {getUniqueWarningTexts(warningsDialogState?.warnings).map((warningText) => (
+          <DialogContent>{t(warningText)}</DialogContent>
+        ))}
+        <DialogActions>
+          <Button
+            onClick={() => {
+              handleSaveData(warningsDialogState.activitySubmitEvent)
+            }}
+          >
+            {t("OK")}
           </Button>
         </DialogActions>
       </Dialog>
