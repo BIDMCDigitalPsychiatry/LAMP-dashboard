@@ -72,7 +72,7 @@ export const SchemaList = () => {
                       probability: {
                         title: i18n.t("Probability"),
                         type: "number",
-                        default: 0,
+                        default: 50,
                         enum: [0, 25, 50, 75],
                       },
                     },
@@ -149,7 +149,7 @@ export const SchemaList = () => {
                       probability: {
                         title: i18n.t("Probability"),
                         type: "number",
-                        default: 0,
+                        default: 50,
                         enum: [0, 25, 50, 75],
                       },
                     },
