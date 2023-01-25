@@ -29,6 +29,7 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
+
   events.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
     events
@@ -46,6 +47,8 @@ export default function ActivityCard({
                   ? Number(t.value.replace(/\"/g, ""))
                   : t.value
                 : t.value
+              : activity.spec === "lamp.spin_wheel"
+              ? t.type
               : !!t.type
               ? 1
               : 0,
@@ -181,6 +184,8 @@ export default function ActivityCard({
                           ? Number(t.value.replace(/\"/g, ""))
                           : t.value
                         : t.value
+                      : activity.spec === "lamp.spin_wheel"
+                      ? t.type
                       : !!t.type
                       ? 1
                       : 0,
@@ -204,7 +209,9 @@ export default function ActivityCard({
             x: new Date(d.timestamp),
             y: strategies[activity.spec]
               ? strategies[activity.spec](
-                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                  activity.spec === "lamp.survey" ||
+                    activity.spec === "lamp.spin_wheel" ||
+                    activity.spec === "lamp.pop_the_bubbles"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
