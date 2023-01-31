@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { Box, Typography, Icon, IconButton, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
-import { Service } from "../../../DBService/DBService"
+import { useTranslation } from "react-i18next"
 import UpdateSensor from "../../SensorsList/UpdateSensor"
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -222,6 +222,8 @@ export default function SensorRow({
   setSensors?: Function
 }) {
   const classes = useStyles()
+  const { t } = useTranslation()
+
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
@@ -246,7 +248,7 @@ export default function SensorRow({
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {sensor.spec?.replace("lamp.", "")}
+            {t(sensor.spec?.replace("lamp.", ""))}
           </Typography>
         </Grid>
         <Grid item className={classes.w120}>
