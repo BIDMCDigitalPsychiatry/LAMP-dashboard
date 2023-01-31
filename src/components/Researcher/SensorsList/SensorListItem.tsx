@@ -11,6 +11,7 @@ import {
   Checkbox,
 } from "@material-ui/core"
 import UpdateSensor from "./UpdateSensor"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,6 +46,8 @@ export default function SensorListItem({
   selectedSensors?: any
   setSensors?: Function
 }) {
+  const { t } = useTranslation()
+
   const classes = useStyles()
   const [checked, setChecked] = React.useState(
     selectedSensors.filter((d) => d.id === sensor.id).length > 0 ? true : false
@@ -69,10 +72,10 @@ export default function SensorListItem({
         <Box flexGrow={1}>
           <CardHeader
             className={classes.activityHeader}
-            title={sensor.name}
+            title={t(sensor.name)}
             subheader={
               <Box>
-                <Typography variant="subtitle1">{sensor.spec?.replace("lamp.", "")}</Typography>
+                <Typography variant="subtitle1">{t(sensor.spec?.replace("lamp.", ""))}</Typography>
                 <Typography variant="body2">{sensor.study_name}</Typography>
               </Box>
             }

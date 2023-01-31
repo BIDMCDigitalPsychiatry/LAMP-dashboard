@@ -2,8 +2,14 @@ import React, { useState, useEffect, useMemo } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
-import hi from "javascript-time-ago/locale/hi"
+import da from "javascript-time-ago/locale/da"
+import de from "javascript-time-ago/locale/de"
+import zh from "javascript-time-ago/locale/zh"
+import ko from "javascript-time-ago/locale/ko"
 import es from "javascript-time-ago/locale/es"
+import it from "javascript-time-ago/locale/it"
+import hi from "javascript-time-ago/locale/hi"
+import fr from "javascript-time-ago/locale/fr"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
 import { Service } from "../../DBService/DBService"
@@ -57,6 +63,21 @@ function getCurrentLanguage(language) {
     case "es_ES":
       lang = "es-ES"
       break
+    case "it_IT":
+      lang = "it-IT"
+      break
+    case "de_DE":
+      lang = "de-DE"
+      break
+    case "da_DK":
+      lang = "da-DK"
+      break
+    case "fr_FR":
+      lang = "fr-FR"
+      break
+    case "zh_CN":
+      lang = "zh-CN"
+      break
     default:
       lang = "en-US"
       break
@@ -75,6 +96,21 @@ function getCurrentLanguageCode(language) {
       break
     case "es_ES":
       langCode = es
+      break
+    case "it_IT":
+      langCode = it
+      break
+    case "de_DE":
+      langCode = de
+      break
+    case "da_DK":
+      langCode = da
+      break
+    case "fr_FR":
+      langCode = fr
+      break
+    case "zh_CN":
+      langCode = zh
       break
     default:
       langCode = en

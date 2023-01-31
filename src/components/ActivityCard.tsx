@@ -29,7 +29,6 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
-
   events.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
     events

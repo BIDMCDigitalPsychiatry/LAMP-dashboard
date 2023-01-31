@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
@@ -7,17 +7,37 @@ import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import { ReactComponent as PreventMeditation } from "../icons/PreventMeditation.svg"
 import { ReactComponent as PreventRecording } from "../icons/PreventRecording.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
+import locale_lang from "../locale_map.json"
 
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
+import da from "javascript-time-ago/locale/da"
+import de from "javascript-time-ago/locale/de"
+import zh from "javascript-time-ago/locale/zh"
+import ko from "javascript-time-ago/locale/ko"
+import es from "javascript-time-ago/locale/es"
+import it from "javascript-time-ago/locale/it"
+import hi from "javascript-time-ago/locale/hi"
+import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
+const localeMap = {
+  "en-US": en,
+  "es-ES": es,
+  "hi-IN": hi,
+  "de-DE": de,
+  "da-DK": da,
+  "fr-FR": fr,
+  "ko-KR": ko,
+  "it-IT": it,
+  "zh-CN": zh,
+}
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     inlineHeader: {
@@ -237,6 +257,19 @@ export default function PreventSelectedActivities({
 }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
+  const [timeAgo, setLang] = useState(new TimeAgo("en-US"))
+  const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
+
+  useEffect(() => {
+    TimeAgo.addLocale(localeMap[getSelectedLanguage()])
+    setLang(new TimeAgo(getSelectedLanguage()))
+  }, [])
 
   return (
     <React.Fragment>
