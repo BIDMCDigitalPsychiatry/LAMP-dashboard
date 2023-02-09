@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: jerray/publish-docker-action@v1.0.3
+      - uses: jerray/publish-docker-action@v1.0.5
         with:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -16,7 +16,7 @@ jobs:
           repository: 'bidmcdigitalpsychiatry/lamp-dashboard'
           auto_tag: true
   build_pages:
-    if: github.event_name == 'tags'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
