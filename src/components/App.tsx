@@ -93,7 +93,8 @@ export const changeCase = (text) => {
 }
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const search = useLocation().search
+  const location = useLocation()
+  const search = location.search
   const history = useHistory()
 
   // To set page titile for active tab for menu
@@ -145,7 +146,10 @@ function AppRouter({ ...props }) {
         return
       }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      if (a === undefined) window.location.href = "/#/"
+      if (a === undefined) {
+        window.location.href = "/#/"
+        return
+      }
       let x = atob(a).split(":")
       //
       reset({
@@ -405,10 +409,9 @@ function AppRouter({ ...props }) {
   return (
     <Switch>
       <Route
-        path="/*code=*"
+        path="/oauth"
         render={(props) => {
-          const paramsString = window.location.hash.replace("#/", "")
-
+          const paramsString = window.location.hash.replace("#/oauth", "")
           return (
             <OAuthLogin
               searchParameters={() => new URLSearchParams(paramsString)}
@@ -805,6 +808,16 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
+  useEffect(() => {
+    if (
+      window.location.href.includes("code") &&
+      window.location.href.includes("oauth") &&
+      window.location.href.includes("#/")
+    ) {
+      const newPath = window.location.href.replace(/(\/oauth\?)(code=.*)#\/(.*)/, "/#$1$3$2")
+      window.location.href = newPath
+    }
+  }, [])
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider

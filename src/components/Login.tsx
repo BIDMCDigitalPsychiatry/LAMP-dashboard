@@ -450,7 +450,6 @@ function LegacyLoginInput({ values, onChange, onSubmit, onSuccess, onError }) {
       <TextField
         required
         name="id"
-        type="email"
         margin="normal"
         variant="outlined"
         style={{ width: "100%", height: 50 }}
