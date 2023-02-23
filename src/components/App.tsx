@@ -23,8 +23,7 @@ import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
-import { it } from "date-fns/locale"
-
+import TwoFA from "./TwoFA"
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -87,6 +86,7 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
+  const [verified, setVerified] = useState(false)
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
@@ -229,6 +229,9 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
+    if (!!state.identity && state.authType !== "participant" && !verified) {
+      window.location.href = "/#/2fa"
+    }
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar(`${t("Proceed with caution: you are logged in as the administrator.")}`, {
         key: "admin",
@@ -260,6 +263,7 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    setVerified(false)
     Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
@@ -404,6 +408,36 @@ function AppRouter({ ...props }) {
                 refresh={true}
                 participantOnly
                 participant={getParticipant(props.match.params.id)?.id ?? null}
+              />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/2fa"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  setVerified(true)
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           )
