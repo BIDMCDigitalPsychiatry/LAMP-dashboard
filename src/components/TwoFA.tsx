@@ -40,15 +40,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       "& svg": { width: "100%", height: 41, marginBottom: 10 },
     },
-    textfieldStyle: {
-      "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
-      "& fieldset": { border: 0 },
-    },
     buttonNav: {
       marginTop: 30,
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
     loginDisabled: {
