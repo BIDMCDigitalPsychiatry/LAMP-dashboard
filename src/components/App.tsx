@@ -24,7 +24,7 @@ import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
-import { identity } from "vega"
+
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -274,7 +274,6 @@ function AppRouter({ ...props }) {
     setVerified(false)
     Service.deleteUserDB()
     Service.deleteDB()
-    console.log(identity, state.auth.serverAddress)
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
       await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
