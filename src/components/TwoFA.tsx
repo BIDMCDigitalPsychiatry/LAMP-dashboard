@@ -104,6 +104,9 @@ export default function TwoFA({ ...props }) {
                 variant="filled"
                 onChange={(event) => setEmail(event.target.value)}
                 margin="normal"
+                error={
+                  typeof email === "undefined" || (typeof email !== "undefined" && email?.trim() === "") ? true : false
+                }
               />
               <TextField
                 required
@@ -114,6 +117,11 @@ export default function TwoFA({ ...props }) {
                 onChange={(event) => setPasscode(event.target.value)}
                 variant="filled"
                 margin="normal"
+                error={
+                  typeof passcode === "undefined" || (typeof passcode !== "undefined" && passcode?.trim() === "")
+                    ? true
+                    : false
+                }
               />
               <Box className={classes.buttonNav} width={1} textAlign="center">
                 <Fab
@@ -136,7 +144,13 @@ export default function TwoFA({ ...props }) {
                       width: "100%",
                       opacity: 0,
                     }}
-                    disabled={loginClick}
+                    disabled={
+                      typeof passcode === "undefined" ||
+                      (typeof passcode !== "undefined" && passcode?.trim() === "") ||
+                      typeof email === "undefined" ||
+                      (typeof email !== "undefined" && email?.trim() === "") ||
+                      loginClick
+                    }
                   />
                 </Fab>
               </Box>
