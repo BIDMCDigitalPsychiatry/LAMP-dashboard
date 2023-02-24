@@ -49,8 +49,14 @@ const useStyles = makeStyles((theme: Theme) =>
     loginDisabled: {
       opacity: 0.5,
     },
+    errorMessage: { color: "red" },
   })
 )
+
+export function validateEmail(email) {
+  const result = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  return result.test(String(email).toLowerCase())
+}
 
 export default function TwoFA({ ...props }) {
   const { t, i18n } = useTranslation()
@@ -62,15 +68,18 @@ export default function TwoFA({ ...props }) {
   const [showDialog, setShowDialog] = useState(false)
 
   const handle2FA = (e) => {
-    setLoginClick(true)
-    let pattern = /^(\d?){6}$/
-    let result = passcode.match(pattern)
-    if (email.endsWith("@bidmc.harvard.edu")) {
-      setVerified(!!result)
-      setShowDialog(true)
-    } else {
-      props.onComplete()
+    if (!!validateEmail(email)) {
+      setLoginClick(true)
+      let pattern = /^(\d?){6}$/
+      let result = passcode.match(pattern)
+      if (email.endsWith("@bidmc.harvard.edu")) {
+        setVerified(!!result)
+        setShowDialog(true)
+      } else {
+        props.onComplete()
+      }
     }
+    setLoginClick(false)
   }
 
   return (
@@ -94,12 +103,12 @@ export default function TwoFA({ ...props }) {
                 />
               </Box>
               <Typography variant="subtitle1" gutterBottom align="center">
-                Please enter your email address to finish multi-factor authentication:
+                {`${t("Please enter your email address to finish multi-factor authentication:")}`}
               </Typography>
               <TextField
                 required
                 id="filled-required"
-                label="BIDMC Email Address"
+                label={`${t("BIDMC Email Address")}`}
                 value={email}
                 variant="filled"
                 onChange={(event) => setEmail(event.target.value)}
@@ -108,10 +117,13 @@ export default function TwoFA({ ...props }) {
                   typeof email === "undefined" || (typeof email !== "undefined" && email?.trim() === "") ? true : false
                 }
               />
+              {typeof email !== "undefined" && email?.trim() !== "" && !validateEmail(email) && (
+                <small className={classes.errorMessage}>{`${t("Please enter a valid email.")}`}</small>
+              )}
               <TextField
                 required
                 id="filled-required"
-                label="Email Passcode"
+                label={`${t("Email Passcode")}`}
                 type="password"
                 value={passcode}
                 onChange={(event) => setPasscode(event.target.value)}
