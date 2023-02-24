@@ -65,8 +65,12 @@ export default function TwoFA({ ...props }) {
     setLoginClick(true)
     let pattern = /^(\d?){6}$/
     let result = passcode.match(pattern)
-    setVerified(email.endsWith("@bidmc.harvard.edu") && !!result)
-    setShowDialog(true)
+    if (email.endsWith("@bidmc.harvard.edu")) {
+      setVerified(!!result)
+      setShowDialog(true)
+    } else {
+      props.onComplete()
+    }
   }
 
   return (
