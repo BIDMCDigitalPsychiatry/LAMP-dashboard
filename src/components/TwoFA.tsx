@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Fab,
   Box,
@@ -64,22 +64,27 @@ export default function TwoFA({ ...props }) {
   const [loginClick, setLoginClick] = useState(false)
   const [email, setEmail] = useState("")
   const [passcode, setPasscode] = useState("")
-  const [verified, setVerified] = useState(false)
   const [showDialog, setShowDialog] = useState(false)
+  const [showPasscode, setShowPasscode] = useState(false)
 
   const handle2FA = (e) => {
-    if (!!validateEmail(email)) {
-      setLoginClick(true)
-      let pattern = /^(\d?){6}$/
-      let result = passcode.match(pattern)
-      if (email.endsWith("@bidmc.harvard.edu")) {
-        setVerified(!!result)
-        setShowDialog(true)
-      } else {
-        props.onComplete()
-      }
+    setLoginClick(true)
+    let pattern = /^(\d?){6}$/
+    let result = passcode.match(pattern)
+    if (!!result) {
+      props.onComplete()
     }
     setLoginClick(false)
+  }
+
+  const emailToCheck = () => {
+    if (typeof email !== "undefined" && email?.trim() !== "" && validateEmail(email)) {
+      if (email.endsWith("@bidmc.harvard.edu")) {
+        setShowPasscode(true)
+      } else {
+        setShowDialog(true)
+      }
+    }
   }
 
   return (
@@ -111,7 +116,9 @@ export default function TwoFA({ ...props }) {
                 label={`${t("BIDMC Email Address")}`}
                 value={email}
                 variant="filled"
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value)
+                }}
                 margin="normal"
                 error={
                   typeof email === "undefined" || (typeof email !== "undefined" && email?.trim() === "") ? true : false
@@ -120,30 +127,35 @@ export default function TwoFA({ ...props }) {
               {typeof email !== "undefined" && email?.trim() !== "" && !validateEmail(email) && (
                 <small className={classes.errorMessage}>{`${t("Please enter a valid email.")}`}</small>
               )}
-              <TextField
-                required
-                id="filled-required"
-                label={`${t("Email Passcode")}`}
-                type="password"
-                value={passcode}
-                onChange={(event) => setPasscode(event.target.value)}
-                variant="filled"
-                margin="normal"
-                error={
-                  typeof passcode === "undefined" || (typeof passcode !== "undefined" && passcode?.trim() === "")
-                    ? true
-                    : false
-                }
-              />
+              {!!showPasscode && (
+                <TextField
+                  required
+                  id="filled-required"
+                  label={`${t("Email Passcode")}`}
+                  type="password"
+                  value={passcode}
+                  onChange={(event) => setPasscode(event.target.value)}
+                  variant="filled"
+                  margin="normal"
+                  error={
+                    typeof passcode === "undefined" || (typeof passcode !== "undefined" && passcode?.trim() === "")
+                      ? true
+                      : false
+                  }
+                />
+              )}
               <Box className={classes.buttonNav} width={1} textAlign="center">
                 <Fab
                   variant="extended"
                   type="button"
                   style={{ background: "#7599FF", color: "White" }}
-                  onClick={handle2FA}
+                  onClick={(e) => {
+                    console.log(showPasscode)
+                    !showPasscode ? emailToCheck() : handle2FA(e)
+                  }}
                   className={loginClick ? classes.loginDisabled : ""}
                 >
-                  {`${t("Verify")}`}
+                  {!!showPasscode ? `${t("Verify")}` : `${t("Send Passcode")}`}
                   <input
                     type="button"
                     style={{
@@ -156,13 +168,7 @@ export default function TwoFA({ ...props }) {
                       width: "100%",
                       opacity: 0,
                     }}
-                    disabled={
-                      typeof passcode === "undefined" ||
-                      (typeof passcode !== "undefined" && passcode?.trim() === "") ||
-                      typeof email === "undefined" ||
-                      (typeof email !== "undefined" && email?.trim() === "") ||
-                      loginClick
-                    }
+                    disabled={loginClick}
                   />
                 </Fab>
               </Box>
@@ -170,24 +176,17 @@ export default function TwoFA({ ...props }) {
           </form>
         </Grid>
       </Grid>
-      <Dialog
-        open={!!showDialog}
-        onClose={() => setVerified(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={!!showDialog} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {!!verified
-              ? `${t("Multi-factor authentication succeeded.")}`
-              : `${t("Multi-factor authentication failed. Please login again.")}`}
+            {`${t("Multi-factor authentication failed. Please login again.")}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
               setShowDialog(false)
-              !!verified ? props.onComplete() : props.onLogout()
+              props.onLogout()
             }}
             color="primary"
             autoFocus

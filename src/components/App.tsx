@@ -271,7 +271,6 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    setVerified(false)
     Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
