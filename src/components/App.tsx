@@ -231,7 +231,6 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
-    console.log(verified)
     if (
       !!state.identity &&
       !!state.auth?.serverAddress &&
