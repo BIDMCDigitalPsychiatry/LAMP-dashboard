@@ -231,6 +231,7 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
+    console.log(verified)
     if (
       !!state.identity &&
       !!state.auth?.serverAddress &&
@@ -271,7 +272,6 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    setVerified(false)
     Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
