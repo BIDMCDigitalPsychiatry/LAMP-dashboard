@@ -19,6 +19,7 @@ import {
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,24 +67,58 @@ export default function TwoFA({ ...props }) {
   const [passcode, setPasscode] = useState("")
   const [showDialog, setShowDialog] = useState(false)
   const [showPasscode, setShowPasscode] = useState(false)
+  const [code, setCode] = useState("")
 
   const handle2FA = (e) => {
     setLoginClick(true)
-    let pattern = /^(\d?){6}$/
-    let result = passcode.match(pattern)
-    if (!!result) {
+    if (passcode === code) {
       props.onComplete()
     }
     setLoginClick(false)
   }
 
+  const generatePasscode = () => {
+    const passcode = Math.floor(Math.random() * 90000) + 10000
+    setCode(passcode.toString())
+    console.log(passcode)
+    return sendEmail(passcode)
+  }
+
   const emailToCheck = () => {
     if (typeof email !== "undefined" && email?.trim() !== "" && validateEmail(email)) {
       if (email.endsWith("@bidmc.harvard.edu")) {
-        setShowPasscode(true)
+        generatePasscode().then(() => {
+          setShowPasscode(true)
+        })
       } else {
         setShowDialog(true)
       }
+    }
+  }
+
+  const sendEmail = async (passcode) => {
+    const request = {
+      push_type: "mailto",
+      device_token: "sarithapillai8@gmail.com", //email,
+      from: "noreply@lamp.com",
+      cc: "",
+      subject: "mindLAMP multi-factor authentication code",
+      body: `Your multi-factor authentication code is: ${passcode}`,
+    }
+    try {
+      let result = await (
+        await fetch(`https://app-gateway.lamp.digital/push`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": "n1WHtGTpRByGjeOP",
+          },
+          body: JSON.stringify(request),
+        })
+      ).json()
+      return result
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -137,11 +172,7 @@ export default function TwoFA({ ...props }) {
                   onChange={(event) => setPasscode(event.target.value)}
                   variant="filled"
                   margin="normal"
-                  error={
-                    typeof passcode === "undefined" || (typeof passcode !== "undefined" && passcode?.trim() === "")
-                      ? true
-                      : false
-                  }
+                  error={typeof passcode === "undefined" || typeof passcode !== "undefined" ? true : false}
                 />
               )}
               <Box className={classes.buttonNav} width={1} textAlign="center">
