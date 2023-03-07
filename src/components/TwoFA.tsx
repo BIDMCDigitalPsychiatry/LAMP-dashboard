@@ -109,7 +109,10 @@ export default function TwoFA({ ...props }) {
       LAMP.Type.getAttachment("*", "lamp.app_gateway_info").then((res: any) => {
         if (!res.error) {
           const data = res.data
-          if (["api.lamp.digital", "api-staging.lamp.digital"].includes(data.address)) {
+          if (
+            ["api.lamp.digital", "api-staging.lamp.digital"].includes(data.address) &&
+            LAMP.Auth._auth.serverAddress === data.address
+          ) {
             const apiKey = data.api_key
             ;(async () => {
               await fetch(`https://app-gateway.lamp.digital/push`, {
