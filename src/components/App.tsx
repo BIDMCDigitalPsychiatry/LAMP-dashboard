@@ -87,7 +87,6 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
-  const [verified, setVerified] = useState(false)
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
@@ -231,12 +230,16 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
+    let status = false
+    if (typeof localStorage.getItem("verified") !== undefined) {
+      status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
+    }
     if (
       !!state.identity &&
       !!state.auth?.serverAddress &&
       serverAddressFro2FA.includes(state.auth?.serverAddress) &&
       state.authType !== "participant" &&
-      !verified
+      !status
     ) {
       window.location.href = "/#/2fa"
     }
@@ -311,6 +314,7 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
+      localStorage.setItem("verified", JSON.stringify({ value: false }))
       window.location.href = "/#/"
     }
   }
@@ -440,7 +444,7 @@ function AppRouter({ ...props }) {
               <TwoFA
                 onLogout={() => reset()}
                 onComplete={() => {
-                  setVerified(true)
+                  localStorage.setItem("verified", JSON.stringify({ value: true }))
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
                     : props.history.replace("/researcher/me/users")
