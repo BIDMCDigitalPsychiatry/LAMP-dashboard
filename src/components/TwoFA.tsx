@@ -80,7 +80,6 @@ export default function TwoFA({ ...props }) {
   const generatePasscode = () => {
     const passcode = Math.floor(Math.random() * 90000) + 10000
     setCode(passcode.toString())
-    console.log(passcode)
     return sendEmail(passcode)
   }
 
@@ -126,7 +125,7 @@ export default function TwoFA({ ...props }) {
         }
       })
     } catch (e) {
-      console.log(e)
+      console.dir(e)
     }
   }
 
@@ -189,7 +188,6 @@ export default function TwoFA({ ...props }) {
                   type="button"
                   style={{ background: "#7599FF", color: "White" }}
                   onClick={(e) => {
-                    console.log(showPasscode)
                     !showPasscode ? emailToCheck() : handle2FA(e)
                   }}
                   className={loginClick ? classes.loginDisabled : ""}
