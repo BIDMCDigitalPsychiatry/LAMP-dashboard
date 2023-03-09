@@ -96,14 +96,6 @@ export default function TwoFA({ ...props }) {
   }
 
   const sendEmail = async (passcode) => {
-    const request = {
-      push_type: "mailto",
-      device_token: email,
-      from: "noreply@lamp.com",
-      cc: "",
-      subject: "mindLAMP multi-factor authentication code",
-      body: `Your multi-factor authentication code is: ${passcode}`,
-    }
     try {
       LAMP.Type.getAttachment(
         LAMP.Auth._type === "admin" ? null : (LAMP.Auth._me as any)?.id,
@@ -112,12 +104,20 @@ export default function TwoFA({ ...props }) {
         if (!res.error) {
           const data = res.data
           const apiKey = data.api_key
+          const request = {
+            push_type: "mailto",
+            device_token: email,
+            "api-key": apiKey,
+            from: "noreply@lamp.com",
+            cc: "",
+            subject: "mindLAMP multi-factor authentication code",
+            body: `Your multi-factor authentication code is: ${passcode}`,
+          }
           ;(async () => {
             await fetch(`https://app-gateway.lamp.digital/push`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "api-key": apiKey,
               },
               body: JSON.stringify(request),
             })
