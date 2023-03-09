@@ -23,7 +23,7 @@ import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
-import { it } from "date-fns/locale"
+import TwoFA from "./TwoFA"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -123,6 +123,7 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital"]
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -229,6 +230,19 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
+    let status = false
+    if (typeof localStorage.getItem("verified") !== undefined) {
+      status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
+    }
+    if (
+      !!state.identity &&
+      !!state.auth?.serverAddress &&
+      serverAddressFro2FA.includes(state.auth?.serverAddress) &&
+      state.authType !== "participant" &&
+      !status
+    ) {
+      window.location.href = "/#/2fa"
+    }
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar(`${t("Proceed with caution: you are logged in as the administrator.")}`, {
         key: "admin",
@@ -300,6 +314,7 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
+      localStorage.setItem("verified", JSON.stringify({ value: false }))
       window.location.href = "/#/"
     }
   }
@@ -404,6 +419,36 @@ function AppRouter({ ...props }) {
                 refresh={true}
                 participantOnly
                 participant={getParticipant(props.match.params.id)?.id ?? null}
+              />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/2fa"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  localStorage.setItem("verified", JSON.stringify({ value: true }))
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           )
