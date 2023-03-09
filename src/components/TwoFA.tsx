@@ -107,11 +107,12 @@ export default function TwoFA({ ...props }) {
           const request = {
             push_type: "mailto",
             device_token: email,
-            "api-key": apiKey,
-            from: "noreply@lamp.com",
-            cc: "",
-            subject: "mindLAMP multi-factor authentication code",
-            body: `Your multi-factor authentication code is: ${passcode}`,
+            api_key: apiKey,
+            payload: {
+              from: "noreply@lamp.com",
+              subject: "mindLAMP multi-factor authentication code",
+              body: `Your multi-factor authentication code is: ${passcode}`,
+            },
           }
           ;(async () => {
             await fetch(`https://app-gateway.lamp.digital/push`, {
