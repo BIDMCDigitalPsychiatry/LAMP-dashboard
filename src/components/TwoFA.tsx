@@ -62,7 +62,7 @@ export function validateEmail(email) {
 export default function TwoFA({ ...props }) {
   const { t, i18n } = useTranslation()
   const classes = useStyles()
-  const [loginClick, setLoginClick] = useState(false)
+  const [verifyCllicked, setVerifyCllicked] = useState(false)
   const [email, setEmail] = useState("")
   const [passcode, setPasscode] = useState("")
   const [showDialog, setShowDialog] = useState(false)
@@ -70,11 +70,11 @@ export default function TwoFA({ ...props }) {
   const [code, setCode] = useState("")
 
   const handle2FA = (e) => {
-    setLoginClick(true)
+    setVerifyCllicked(true)
     if (passcode === code) {
+      localStorage.setItem("verified", JSON.stringify({ value: true }))
       props.onComplete()
     }
-    setLoginClick(false)
   }
 
   const generatePasscode = () => {
@@ -90,7 +90,8 @@ export default function TwoFA({ ...props }) {
           setShowPasscode(true)
         })
       } else {
-        setShowDialog(true)
+        localStorage.setItem("verified", JSON.stringify({ value: true }))
+        props.onComplete()
       }
     }
   }
@@ -129,6 +130,10 @@ export default function TwoFA({ ...props }) {
       console.dir(e)
     }
   }
+
+  useEffect(() => {
+    setVerifyCllicked(false)
+  }, [passcode])
 
   return (
     <Box>
@@ -183,6 +188,14 @@ export default function TwoFA({ ...props }) {
                   error={typeof passcode === "undefined" || typeof passcode !== "undefined" ? true : false}
                 />
               )}
+              {!!showPasscode && (typeof passcode === "undefined" || passcode?.trim() === "") && (
+                <small className={classes.errorMessage}>{`${t("Please enter the passcode.")}`}</small>
+              )}
+              {!!verifyCllicked && passcode !== "" && passcode !== code && (
+                <small className={classes.errorMessage}>{`${t(
+                  "The entered passcode is incorrect. Please check and retry."
+                )}`}</small>
+              )}
               <Box className={classes.buttonNav} width={1} textAlign="center">
                 <Fab
                   variant="extended"
@@ -191,7 +204,7 @@ export default function TwoFA({ ...props }) {
                   onClick={(e) => {
                     !showPasscode ? emailToCheck() : handle2FA(e)
                   }}
-                  className={loginClick ? classes.loginDisabled : ""}
+                  className={verifyCllicked ? classes.loginDisabled : ""}
                 >
                   {!!showPasscode ? `${t("Verify")}` : `${t("Send Passcode")}`}
                   <input
@@ -206,7 +219,7 @@ export default function TwoFA({ ...props }) {
                       width: "100%",
                       opacity: 0,
                     }}
-                    disabled={loginClick}
+                    disabled={verifyCllicked}
                   />
                 </Fab>
               </Box>
