@@ -236,8 +236,7 @@ function AppRouter({ ...props }) {
     }
     if (
       !!state.identity &&
-      !!state.auth?.serverAddress &&
-      serverAddressFro2FA.includes(state.auth?.serverAddress) &&
+      (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
       !status
     ) {
@@ -440,11 +439,10 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
                 onLogout={() => reset()}
                 onComplete={() => {
-                  localStorage.setItem("verified", JSON.stringify({ value: true }))
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
                     : props.history.replace("/researcher/me/users")
@@ -494,6 +492,18 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
           ) : (
             <React.Fragment>
               <ImportActivity />
@@ -512,6 +522,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -535,6 +557,18 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
           ) : (
             <React.Fragment>
               <PatientProfile researcherId={props.match.params.rid} participantId={props.match.params.id} />
@@ -553,6 +587,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -575,6 +621,18 @@ function AppRouter({ ...props }) {
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
+                />
+              </React.Fragment>
+            ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+              <React.Fragment>
+                <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+                <TwoFA
+                  onLogout={() => reset()}
+                  onComplete={() => {
+                    state.authType === "admin"
+                      ? props.history.replace("/researcher")
+                      : props.history.replace("/researcher/me/users")
+                  }}
                 />
               </React.Fragment>
             ) : state.authType === "admin" ? (
@@ -602,6 +660,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -636,6 +706,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : !getResearcher(props.match.params.id) ? (
@@ -685,6 +767,19 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  localStorage.setItem("verified", JSON.stringify({ value: true }))
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
