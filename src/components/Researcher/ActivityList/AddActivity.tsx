@@ -154,6 +154,7 @@ export default function AddActivity({
     "lamp.goals": `${t("Goals")}`,
     "lamp.medications": `${t("Medications")}`,
     "lamp.spin_wheel": `${t("Spin The Wheel")}`,
+    "lamp.maze_game": `${t("Maze Game")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -171,6 +172,7 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
+      console.log(allSpecs)
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
