@@ -29,7 +29,7 @@ import { useTranslation } from "react-i18next"
 import { Autocomplete } from "@mui/material"
 
 type SuggestedUrlOption = {
-  url: string
+  label: string
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,8 +108,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
-    if (!options.find((item) => item.url == state.serverAddress)) {
-      options.push({ url: state.serverAddress })
+    if (!options.find((item) => item.label == state.serverAddress)) {
+      options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
     setLoginClick(true)
@@ -185,13 +185,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   let options: SuggestedUrlOption[]
   if (!cachedOptions) {
     options = [
-      { url: "api.lamp.digital" },
-      { url: "mindlamp-api.pronet.med.yale.edu" },
-      { url: "mindlamp.orygen.org.au" },
-      { url: "mindlamp-qa.dmh.lacounty.gov" },
+      { label: "api.lamp.digital" },
+      { label: "mindlamp-api.pronet.med.yale.edu" },
+      { label: "mindlamp.orygen.org.au" },
+      { label: "mindlamp-qa.dmh.lacounty.gov" },
     ]
   } else {
-    options = JSON.parse(cachedOptions).filter((o) => typeof o.url !== "undefined")
+    options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
   }
 
   return (
@@ -279,7 +279,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 <Autocomplete
                   freeSolo={true}
                   id="serever-selector"
-                  options={options.map((item) => item.url)}
+                  options={options}
                   sx={{ width: "100%", marginTop: "12px" }}
                   value={state.serverAddress || ""}
                   onChange={(event, value) => handleServerInput(value)}
