@@ -437,6 +437,8 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : state.authType === "participant" ? (
+            <Redirect to="/participant/me/assess" />
           ) : (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
@@ -623,7 +625,7 @@ function AppRouter({ ...props }) {
                   onComplete={() => props.history.replace("/")}
                 />
               </React.Fragment>
-            ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            ) : JSON.parse(localStorage.getItem("verified"))?.value === false && state.authType !== "participant" ? (
               <React.Fragment>
                 <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
                 <TwoFA
