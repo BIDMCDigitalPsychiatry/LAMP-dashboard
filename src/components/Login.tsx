@@ -113,7 +113,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }, [selectedLanguage])
 
   let handleServerInput = (value) => {
-    setState({ ...state, serverAddress: value })
+    setState({ ...state, serverAddress: value?.label ?? value })
   }
 
   let handleChange = (event) =>
