@@ -74,6 +74,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const [loginClick, setLoginClick] = useState(false)
+  const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
@@ -85,6 +86,19 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
   useEffect(() => {
+    const cachedOptions = localStorage.getItem("cachedOptions")
+    let options: SuggestedUrlOption[]
+    if (!cachedOptions) {
+      options = [
+        { label: "api.lamp.digital" },
+        { label: "mindlamp-api.pronet.med.yale.edu" },
+        { label: "mindlamp.orygen.org.au" },
+        { label: "mindlamp-qa.dmh.lacounty.gov" },
+      ]
+    } else {
+      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
+    }
+    setOptions(options)
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -98,7 +112,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
 
-  let handleServerInput = (value) => setState({ ...state, serverAddress: value })
+  let handleServerInput = (value) => {
+    setState({ ...state, serverAddress: value })
+  }
 
   let handleChange = (event) =>
     setState({
@@ -112,6 +128,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
+    setOptions(options)
     setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -179,19 +196,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
-  }
-
-  const cachedOptions = localStorage.getItem("cachedOptions")
-  let options: SuggestedUrlOption[]
-  if (!cachedOptions) {
-    options = [
-      { label: "api.lamp.digital" },
-      { label: "mindlamp-api.pronet.med.yale.edu" },
-      { label: "mindlamp.orygen.org.au" },
-      { label: "mindlamp-qa.dmh.lacounty.gov" },
-    ]
-  } else {
-    options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
   }
 
   return (
