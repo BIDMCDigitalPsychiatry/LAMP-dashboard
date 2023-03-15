@@ -234,12 +234,14 @@ function AppRouter({ ...props }) {
     if (typeof localStorage.getItem("verified") !== undefined) {
       status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
     }
+    console.log(state)
     if (
       !!state.identity &&
       (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
       !status
     ) {
+      console.log(state.authType)
       window.location.href = "/#/2fa"
     }
     if (!!state.identity && state.authType === "admin") {
@@ -437,6 +439,8 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : state.authType === "participant" ? (
+            <Redirect to="/participant/me/assess" />
           ) : (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
@@ -623,7 +627,7 @@ function AppRouter({ ...props }) {
                   onComplete={() => props.history.replace("/")}
                 />
               </React.Fragment>
-            ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            ) : JSON.parse(localStorage.getItem("verified"))?.value === false && state.authType !== "participant" ? (
               <React.Fragment>
                 <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
                 <TwoFA
