@@ -26,6 +26,9 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
+import ConfirmationDialog from "./ConfirmationDialog"
+import { DatePicker } from "@material-ui/pickers"
+import { TokenManager } from "./TokenManager"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -66,6 +69,7 @@ const checkPasswordRule = async (value: string) => {
     return true
   }
 }
+
 export function CredentialEditor({ credential, auxData, mode, onSubmit, title, permissions }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
@@ -76,6 +80,7 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
   const [confirmPassword, setConfirmPassword] = useState("")
   const [accepted, setAccepted] = useState(true)
   const [showLink, setShowLink] = useState(false)
+
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -577,6 +582,17 @@ export const CredentialManager: React.FunctionComponent<{
             setSelected((selected) => ({
               anchorEl: undefined,
               credential: selected.credential,
+              mode: "manage-tokens",
+            }))
+          }
+        >
+          {`${t("Manage Access Tokens")}`}
+        </MenuItem>
+        <MenuItem
+          onClick={() =>
+            setSelected((selected) => ({
+              anchorEl: undefined,
+              credential: selected.credential,
               mode: "reset-password",
             }))
           }
@@ -598,7 +614,8 @@ export const CredentialManager: React.FunctionComponent<{
         </MenuItem>
       </Menu>
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}
-      {!!selected.mode && (
+      {!!selected.mode && selected.mode === "manage-tokens" && <TokenManager credential={selected.credential} />}
+      {!!selected.mode && ["create-new", "change-role", "reset-password", "update-profile"].includes(selected.mode) && (
         <CredentialEditor
           credential={selected.credential}
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
