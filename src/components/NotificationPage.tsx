@@ -126,18 +126,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
               setTag(tags[0])
               const tag = tags[0]
-              if (data.spec == "lamp.spin_wheel" || data.spec == "lamp.maze_game") {
+              if (data.spec == "lamp.spin_wheel") {
                 ;(async () => {
                   const events = await LAMP.ActivityEvent.allByParticipant(participant)
                   let event = events.filter((event) => event.activity === activityId)[0] ?? {}
                   const balance = !!event["temporal_slices"]
-                    ? data.spec !== "lamp.maze_game"
-                      ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
-                      : event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.level
-                    : data.spec !== "lamp.maze_game"
-                    ? 2000
-                    : 1
-                  data["settings"][data.spec !== "lamp.maze_game" ? "balance" : "level"] = balance
+                    ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
+                    : 2000
+                  data["settings"]["balance"] = balance
                   data = spliceCTActivity({ raw: data, tag })
                   setActivity(data)
                   setLoading(false)
