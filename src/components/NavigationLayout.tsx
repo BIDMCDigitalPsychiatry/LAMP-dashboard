@@ -37,6 +37,7 @@ import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
+import { TokenManager } from "./TokenManager"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -213,6 +214,7 @@ export default function NavigationLayout({
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
+  const [manageTokens, setManageTokens] = useState(false)
   const [openMessages, setOpenMessages] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
@@ -380,6 +382,11 @@ export default function NavigationLayout({
                   >
                     {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{`${t("Manage Credentials")}`}</MenuItem>
+                    )}
+                    {authType === "researcher" && (
+                      <MenuItem onClick={() => setManageTokens(true)}>{`${t(
+                        "Manage Personal Access Tokens"
+                      )}`}</MenuItem>
                     )}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
@@ -608,6 +615,11 @@ export default function NavigationLayout({
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!manageTokens} onClose={() => setManageTokens(false)}>
+        <DialogContent style={{ marginBottom: 12 }}>
+          <TokenManager id={!!id ? id : LAMP.Auth._auth.id} />
         </DialogContent>
       </Dialog>
     </Box>
