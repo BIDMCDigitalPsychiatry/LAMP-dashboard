@@ -1107,9 +1107,9 @@
 	"Click here!": "Haga clic aquí!", 
 	"While in GUI mode, you can directly pull graphs you have already generated from the LAMP database, easily view information across an entire study or researcher, or quickly view tags that give info about things like survey scoring. If this is your first time using the LAMP data_portal, or if you need to get data quickly, this is the mode we recommend!!": 
 	"Mientras está en modo GUI, puede extraer directamente los gráficos que ya ha generado en la base de datos LAMP, ver fácilmente la información de todo un estudio o investigador, o ver rápidamente las etiquetas que ofrecen información sobre cosas, como la puntuación de la encuesta, Si es la primera vez que usa el portal de datos LAMP, o si necesita obtener datos rápidamente, ¡este es el modo que recomendamos!",
-	"Run Query": "Run Query", "There are no Assess activities available.": "Es sind keine Beurteilungs-aktivitäten verfügbar.",
-	"There are no Manage activities available.": "Es sind keine Management-aktivitäten verfügbar.", "There are no Learn activities available.":
-	"Es sind keine Lern-aktivitäten verfügbar.", "There are no scheduled activities available.": "Es sind keine Planungsaktivitäten verfügbar." ,
+	"Run Query": "Run Query", "There are no Assess activities available.": "No hay actividades disponibles para evaluar.",
+	"There are no Manage activities available.": "No hay actividades disponibles para administrar.", "There are no Learn activities available.":
+	"No hay actividades disponibles para aprender.", "There are no scheduled activities available.": "No hay actividades disponibles para programar." ,
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
 	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario", "Confirm Password": "Confirmar contraseña", 
 	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo", "Choose File": "Elija el archivo"  , "Copy": "Copiar", "ID to clipboard": "ID al portapapeles" ,
