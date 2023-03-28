@@ -96,7 +96,7 @@ export default function GameCreator({
     description: "",
     photo: details?.photo ?? null,
     streak: details?.streak ?? null,
-    hideFeed: details?.hideFeed ?? null,
+    showFeed: details?.showFeed ?? null,
     settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? null,
@@ -422,7 +422,7 @@ export default function GameCreator({
       description: details.description,
       photo: details.photo,
       streak: details.streak,
-      hideFeed: details.hideFeed,
+      showFeed: details.showFeed,
       studyID: details.studyId,
       category: data?.category ?? [],
     })

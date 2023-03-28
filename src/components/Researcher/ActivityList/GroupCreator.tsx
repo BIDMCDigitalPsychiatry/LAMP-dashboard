@@ -132,7 +132,7 @@ export default function GroupCreator({
     description: !!details ? details?.description : undefined,
     photo: !!details ? details?.photo : null,
     streak: !!details ? details?.streak : null,
-    hideFeed: !!details ? details?.hideFeed : null,
+    showFeed: !!details ? details?.showFeed : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
@@ -159,7 +159,7 @@ export default function GroupCreator({
       description: details.description,
       photo: details.photo,
       streak: details.streak,
-      hideFeed: details.hideFeed,
+      showFeed: details.showFeed,
       studyID: details.studyId,
       category: data?.category ?? [],
     })

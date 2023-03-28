@@ -1,11 +1,12 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles, FormControlLabel, Checkbox } from "@material-ui/core"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
 import { useTranslation } from "react-i18next"
 import SearchBox from "../../SearchBox"
+import ToggleFeed from "./ToggeFeed"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -90,6 +91,7 @@ export default function Header({
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
+            <ToggleFeed participants={selectedParticipants} setParticipants={setParticipants} />
           </Box>
         </Box>
       )}

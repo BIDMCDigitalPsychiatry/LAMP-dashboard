@@ -63,7 +63,9 @@ export default function ActivityHeader({
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [streak, setStreak] = useState(details?.streak ? details?.streak : null)
-  const [hideFeed, setHideFeed] = useState(details?.hideFeed ? details?.hideFeed : null)
+  const [showFeed, setShowFeed] = useState(
+    typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
+  )
 
   useEffect(() => {
     onChange({
@@ -72,13 +74,9 @@ export default function ActivityHeader({
       description,
       studyId,
       streak,
-      hideFeed,
+      showFeed,
     })
-  }, [text, description, photo, studyId, streak, hideFeed])
-
-  useEffect(() => {
-    //
-  }, [])
+  }, [text, description, photo, studyId, streak, showFeed])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -181,11 +179,11 @@ export default function ActivityHeader({
         <FormControlLabel
           control={
             <Checkbox
-              checked={hideFeed}
+              checked={showFeed}
               onChange={() => {
-                setHideFeed(!hideFeed)
+                setShowFeed(!showFeed)
               }}
-              name="HideFeed"
+              name="showFeed"
               color="primary"
             />
           }
