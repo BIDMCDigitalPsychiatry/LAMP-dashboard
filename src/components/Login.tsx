@@ -91,22 +91,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
-  const [options, setOptions] = useState([])
 
   useEffect(() => {
-    const cachedOptions = localStorage.getItem("cachedOptions")
-    let options: SuggestedUrlOption[]
-    if (!cachedOptions) {
-      options = [
-        { label: "api.lamp.digital" },
-        { label: "mindlamp-api.pronet.med.yale.edu" },
-        { label: "mindlamp.orygen.org.au" },
-        { label: "mindlamp-qa.dmh.lacounty.gov" },
-      ]
-    } else {
-      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
-    }
-    setOptions(options)
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -136,7 +122,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             value={serverAddress}
             defaultValue={defaultServerAddress}
             locked={srcLocked}
-            options={options}
             onChange={(event: any) => setServerAddress(event.target.value)}
             onComplete={(urls: StartFlowResponse) => {
               if (urls.logoutURL) {
@@ -360,11 +345,31 @@ function LanguageSelector() {
   )
 }
 
-function ServerAddressInput({ value, defaultValue, options, locked, onChange, onComplete, onError }) {
+function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete, onError }) {
   const { t } = useTranslation()
   const classes = useStyles()
 
   const [disabled, setDisabled] = useState(false)
+  const [options, setOptions] = useState([])
+
+  useEffect(() => {
+    const cachedOptions = localStorage.getItem("cachedOptions")
+    let options: SuggestedUrlOption[]
+
+    if (cachedOptions) {
+      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
+      console.log(options)
+    }
+    if (!options || options.length === 0) {
+      options = [
+        { label: "api.lamp.digital" },
+        { label: "mindlamp-api.pronet.med.yale.edu" },
+        { label: "mindlamp.orygen.org.au" },
+        { label: "mindlamp-qa.dmh.lacounty.gov" },
+      ]
+    }
+    setOptions(options)
+  }, [])
 
   let handleSubmit = async (event: any) => {
     event.preventDefault()
