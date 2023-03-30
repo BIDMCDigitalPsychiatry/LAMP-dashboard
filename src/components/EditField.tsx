@@ -8,6 +8,7 @@ import LAMP from "lamp-core"
 
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized
+import { useTranslation } from "react-i18next"
 
 export default function EditField({ participant, onUpdate, ...props }: { participant?: any; onUpdate?: any }) {
   const inputRef = useRef<any>()
@@ -15,6 +16,7 @@ export default function EditField({ participant, onUpdate, ...props }: { partici
   const [editing, setEditing] = useState(false)
   const [alias, setAlias] = useState<string>()
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
 
   // Load the current alias only upon initialization.
   useEffect(() => {
@@ -77,7 +79,11 @@ export default function EditField({ participant, onUpdate, ...props }: { partici
         style: { color: "#000" },
         endAdornment: (
           <InputAdornment position="end">
-            <Tooltip title="Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.">
+            <Tooltip
+              title={`${t(
+                "Create or edit the alias for this Participant ID. Saving an empty text box will reset this value."
+              )}`}
+            >
               <IconButton
                 edge="end"
                 aria-label="save edit"

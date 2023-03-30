@@ -18,7 +18,7 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import { getImage } from "./Manage"
+import { Service } from "./DBService/DBService"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -234,7 +234,6 @@ export default function Prevent({
   const { t, i18n } = useTranslation()
   const [savedActivities, setSavedActivities] = React.useState([])
   const [tag, setTag] = React.useState([])
-  const [disabled, setDisabled] = React.useState(true)
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
   const [activityCounts, setActivityCounts] = React.useState({})
@@ -253,16 +252,9 @@ export default function Prevent({
     let gActivities = allActivities.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
-      let tags = []
-      let count = 0
-      gActivities.map((activity, index) => {
-        getImage(activity.id, activity.spec).then((img) => {
-          tags[activity.id] = img
-          if (count === gActivities.length - 1) {
-            setTag(tags)
-          }
-          count++
-        })
+      Service.getAllTags("activitytags").then((data) => {
+        setTag((data || []).filter((x: any) => !!x?.category && x?.category.includes("prevent")))
+        setLoading(false)
       })
     }
   }
@@ -286,13 +278,9 @@ export default function Prevent({
       getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
-      setDisabled(disabled)
-      if (!disabled) {
-        await loadActivityEvents()
-        loadVisualizations()
-      } else {
-        loadVisualizations()
-      }
+      if (!disabled) await loadActivityEvents()
+
+      loadVisualizations()
     })()
   }
 
@@ -309,9 +297,7 @@ export default function Prevent({
   }
 
   const loadActivityEvents = () => {
-    let activities = !disabled
-      ? allActivities.filter((activity) => activity.spec !== "lamp.recording")
-      : allActivities.filter((activity) => activity.spec === "lamp.journal" || activity.spec !== "lamp.recording")
+    let activities = allActivities
     getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
       setActivityEvents(activityEvents)

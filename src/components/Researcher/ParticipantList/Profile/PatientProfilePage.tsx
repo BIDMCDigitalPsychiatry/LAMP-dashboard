@@ -90,10 +90,11 @@ const useStyles = makeStyles((theme) =>
     },
     headerButton: {
       position: "absolute",
-      width: 105,
+      width: "auto",
       height: 50,
       right: 60,
       top: 25,
+      padding: "0 10px 0 10px",
       background: "#7599FF",
       boxShadow: "0px 10px 15px rgba(96, 131, 231, 0.2)",
       borderRadius: 25,

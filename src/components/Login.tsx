@@ -30,6 +30,9 @@ import pkceChallenge from "pkce-challenge"
 import { OAuthParams, StartFlowResponse } from "lamp-core/dist/service/OAuth.service"
 import { Autocomplete } from "@mui/material"
 
+type SuggestedUrlOption = {
+  label: string
+}
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
@@ -88,8 +91,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
+  const [options, setOptions] = useState([])
 
   useEffect(() => {
+    const cachedOptions = localStorage.getItem("cachedOptions")
+    let options: SuggestedUrlOption[]
+    if (!cachedOptions) {
+      options = [
+        { label: "api.lamp.digital" },
+        { label: "mindlamp-api.pronet.med.yale.edu" },
+        { label: "mindlamp.orygen.org.au" },
+        { label: "mindlamp-qa.dmh.lacounty.gov" },
+      ]
+    } else {
+      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
+    }
+    setOptions(options)
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -119,6 +136,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             value={serverAddress}
             defaultValue={defaultServerAddress}
             locked={srcLocked}
+            options={options}
             onChange={(event: any) => setServerAddress(event.target.value)}
             onComplete={(urls: StartFlowResponse) => {
               if (urls.logoutURL) {
@@ -342,7 +360,7 @@ function LanguageSelector() {
   )
 }
 
-function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete, onError }) {
+function ServerAddressInput({ value, defaultValue, options, locked, onChange, onComplete, onError }) {
   const { t } = useTranslation()
   const classes = useStyles()
 
@@ -374,12 +392,7 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     <form onSubmit={handleSubmit}>
       <Autocomplete
         id="serever-selector"
-        options={[
-          "api.lamp.digital",
-          "mindlamp.pronet.med.yale.edu",
-          "mindlamp.orygen.org.au",
-          "mindlamp-qa.dmh.lacounty.gov",
-        ]}
+        options={options}
         sx={{ width: "100%", marginTop: "12px" }}
         onSelect={onChange}
         renderInput={(params) => (

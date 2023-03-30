@@ -11,6 +11,8 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
+import { useTranslation } from "react-i18next"
+import DisplayItem from "./DisplayItem"
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -75,7 +77,7 @@ export default function SelectionWindow({
   customButton = null,
   exposeButton = false,
   handleResult = console.log,
-  children = <Typography>Set the 'children' prop to display elements</Typography>,
+  children = <DisplayItem />,
   submitText = "Submit",
   style = {},
   closesOnSubmit = true,

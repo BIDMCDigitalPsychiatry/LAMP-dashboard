@@ -24,6 +24,7 @@ import {
 import { useTranslation } from "react-i18next"
 import { getDates, getDateVal } from "./PreventDBT"
 import { getDateString } from "./PreventDBT"
+import { SettingsApplicationsRounded } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,19 +52,19 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    titleContainer: {
-      display: "flex",
-      width: 540,
-      marginBottom: 40,
-      justifyContent: "space-between",
-    },
     separator: {
       border: "2px solid rgba(0, 0, 0, 0.1)",
       width: "100%",
       marginTop: 50,
       marginBottom: 50,
       height: 0,
-      maxWidth: 540,
+      maxWidth: 500,
+    },
+    titleContainer: {
+      display: "flex",
+      width: 540,
+      marginBottom: 40,
+      justifyContent: "space-between",
     },
     rangeButton: {
       display: "flex",
@@ -170,7 +171,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "contents",
     },
     tableOuter: {
-      maxWidth: 570,
+      maxWidth: 540,
       paddingTop: 10,
       [theme.breakpoints.up("md")]: {
         minWidth: "540px",
@@ -184,7 +185,7 @@ const useStyles = makeStyles((theme: Theme) =>
     skillWidth: { maxWidth: "100px" },
     skillsContainer: {
       width: "100%",
-      maxWidth: 570,
+      maxWidth: 500,
       "& h5": {
         fontWeight: 600,
       },
@@ -193,7 +194,7 @@ const useStyles = makeStyles((theme: Theme) =>
     greentxt: { color: "#21a521" },
     colCheck: { borderLeft: "0.5px solid #f4f4f4" },
     colDate: { borderLeft: "0.5px solid #c4c4c4" },
-    marginTop10: { marginTop: "10px" },
+    marginTop10: { marginTop: "10px", maxWidth: "540px" },
     checkboxLabel: {
       "& span.MuiFormControlLabel-label": { fontSize: "13.5px" },
     },
@@ -212,7 +213,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...props }) {
+export default function PreventSkills({ selectedEvents, dateArray, dbtRange, setStorageData, storageData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [skillData, setSkillData] = useState(null)
@@ -220,8 +221,8 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
   const [expandedSkills, setExpandedSkills] = useState([])
   const [selectedDates, setSelectedDates] = useState(null)
   const [filterChecked, setFilterChecked] = useState(false)
-  const [skillRange, setSkillRange] = useState(dateArray[0]?.timestamp ?? null)
-  const [reasons, setReasons] = useState(null)
+  const [skillRange, setSkillRange] = useState(storageData?.skill ?? dateArray[0]?.timestamp ?? null)
+
   const data = [
     {
       title: `${t("Mindfulness")}`,
@@ -230,7 +231,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
         `${t("Observe: Just notice (Urge Surfing)")}`,
         `${t("Describe: Put words on")}`,
         `${t("Participate: Enter into the experience")}`,
-        `${t("Nonjudgmental stance")}`,
+        `${t("Non-judgmental stance")}`,
         `${t("One-Mindfully: In-the-moment")}`,
         `${t("Effectiveness: Focus on what works")}`,
         `${t("Loving Kindness: Build compassion")}`,
@@ -244,7 +245,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
         `${t("Self-respect effectiveness: FAST")}`,
         `${t("Validating Others")}`,
         `${t("Self-Validation")}`,
-        `${t("Behavior change: reinforce/extinguish")}`,
+        `${t("Behavior change: reinforce/ extinguish")}`,
         `${t("Mindfulness of others")}`,
         `${t("Find others and get them to like you")}`,
         `${t("End relationships")}`,
@@ -269,7 +270,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
         `${t("Pros and Cons of acting on urges")}`,
         `${t("TIP: Change body chemistry")}`,
         `${t("Paired Muscle Relaxation")}`,
-        `${t("Effective Rethinking/Paired Relax")}`,
+        `${t("Effective Rethinking/ Paired Relax")}`,
         `${t("Distracting: Wise Mind ACCEPTS")}`,
         `${t("Self-Soothing")}`,
         `${t("Body Scan Meditation")}`,
@@ -280,16 +281,16 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
         `${t("Replace Willfulness with Willingness")}`,
         `${t("Half-Smiling and Willing Hands")}`,
         `${t("Dialectical Abstinence")}`,
-        `${t("Alternate Rebellion / Adaptive Denial")}`,
+        `${t("Alternate Rebellion/ Adaptive Denial")}`,
       ],
     },
   ]
 
   useEffect(() => {
     if (!!skillRange) {
+      setStorageData({ ...storageData, skill: skillRange })
       let skillData = []
       let timeStamp = skillRange.split("-")
-      let reasonData = []
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
@@ -305,15 +306,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
               : (skillData[slice.item] = [curr_month + "/" + curr_date])
           }
         })
-        if (
-          event.static_data.reason?.trim().length > 0 &&
-          event.timestamp <= parseInt(timeStamp[0]) &&
-          event.timestamp >= parseInt(timeStamp[1])
-        ) {
-          reasonData.push({ reason: event.static_data.reason, date: getDateString(new Date(event.timestamp)) })
-        }
       })
-      setReasons(reasonData)
 
       let dates = getDates(timeStamp[1], timeStamp[0])
       let selDates = []
@@ -329,6 +322,14 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
     }
   }, [skillRange])
 
+  useEffect(() => {
+    setSkillRange(dbtRange)
+  }, [dbtRange])
+
+  useEffect(() => {
+    setSkillRange(storageData?.skill ?? dateArray[0]?.timestamp ?? null)
+  }, [storageData])
+
   const handleExpansion = (key) => {
     let data = expandedSkills
     let index = data.indexOf(key)
@@ -341,219 +342,188 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
     setExpandedSkills([...data])
   }
 
-  useEffect(() => {
-    setSkillRange(dbtRange)
-  }, [dbtRange])
-
   return (
-    <Box>
-      {skillData !== null && (
-        <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-          <div className={classes.separator} />
-          <div style={{ width: "100%" }} className={classes.skillsContainer}>
-            <Box sx={{ display: "flex" }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h5">Skills used:</Typography>
-              </Box>
-              <Box>
-                <NativeSelect
-                  value={skillRange}
-                  onChange={(event) => {
-                    setSkillRange(event.target.value)
-                  }}
-                >
-                  {dateArray.map((dateString) => (
-                    <option value={dateString.timestamp}>{dateString.date}</option>
-                  ))}
-                </NativeSelect>
-              </Box>
-            </Box>
-          </div>
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            className={classes.marginTop10}
-          >
-            <Grid>
-              <Chip
-                label={expanded ? "Collapse All" : "Expand All"}
-                onClick={(evt) => {
-                  setExpanded(!expanded)
-                  setExpandedSkills([0, 1, 2, 3])
+    <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+      <div className={classes.separator} />
+      <div style={{ width: "100%" }} className={classes.skillsContainer}>
+        <Box sx={{ display: "flex" }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="h5">Skills used:</Typography>
+          </Box>
+          <Box>
+            <NativeSelect
+              value={skillRange}
+              onChange={(event) => {
+                setSkillRange(event.target.value)
+              }}
+            >
+              {dateArray.map((dateString) => (
+                <option value={dateString.timestamp}>{dateString.date}</option>
+              ))}
+            </NativeSelect>
+          </Box>
+        </Box>
+      </div>
+      <Grid
+        container
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        className={classes.marginTop10}
+      >
+        <Grid>
+          <Chip
+            label={expanded ? "Collapse All" : "Expand All"}
+            onClick={(evt) => {
+              setExpanded(!expanded)
+              setExpandedSkills([0, 1, 2, 3])
+            }}
+            icon={expanded ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid>
+          <FormControlLabel
+            className={classes.checkboxLabel}
+            control={
+              <Checkbox checked={filterChecked} onChange={(evt) => setFilterChecked(!filterChecked)} name="skillset" />
+            }
+            label="Show Only Skills Used"
+          />
+        </Grid>
+      </Grid>
+      <TableContainer className={classes.tableOuter}>
+        {data.map((v, kv) => {
+          return (
+            <div className={classes.tableDiv}>
+              <Accordion
+                expanded={expanded && expandedSkills.includes(kv)}
+                onChange={(evt, exp) => {
+                  handleExpansion(kv)
                 }}
-                icon={expanded ? <Icon>expand_less</Icon> : <Icon>expand_more</Icon>}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid>
-              <FormControlLabel
-                className={classes.checkboxLabel}
-                control={
-                  <Checkbox
-                    checked={filterChecked}
-                    onChange={(evt) => setFilterChecked(!filterChecked)}
-                    name="skillset"
-                  />
-                }
-                label="Show Only Skills Used"
-              />
-            </Grid>
-          </Grid>
-          <TableContainer className={classes.tableOuter}>
-            {data.map((v, kv) => {
-              return (
-                <div className={classes.tableDiv}>
-                  <Accordion
-                    expanded={expanded && expandedSkills.includes(kv)}
-                    onChange={(evt, exp) => {
-                      handleExpansion(kv)
-                    }}
-                  >
-                    <AccordionSummary
-                      expandIcon={<Icon>expand_more</Icon>}
-                      aria-controls="panel1a-content"
-                      id="panael1a-header"
-                      className={
-                        classes.categoryTitle +
-                        " " +
-                        (kv === 0
-                          ? classes.mindfulness
-                          : kv === 1
-                          ? classes.Interpersonal
-                          : kv === 2
-                          ? classes.emotion
-                          : classes.distress)
-                      }
-                    >
-                      <TableRow>
-                        <TableCell colSpan={9}>{v.title}</TableCell>
-                      </TableRow>
-                    </AccordionSummary>
-                    <AccordionDetails className={classes.accSummary}>
-                      <div className={classes.tableResponsive}>
-                        <Table>
-                          <TableHead>
-                            {(v.data.filter((each) => !!skillData[each]).length > 0 && filterChecked) ||
-                            !filterChecked ? (
-                              <TableRow>
-                                <TableCell className={classes.skillWidth}>Skills</TableCell>
-                                {selectedDates.map((date) => (
-                                  <TableCell className={classes.colDate}>{date}</TableCell>
-                                ))}
-                              </TableRow>
-                            ) : (
-                              <TableRow>
-                                <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
-                                  No records found
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </TableHead>
-                          <TableBody>
-                            {((!!skillData[v.data[0]] && filterChecked) || !filterChecked) && (
-                              <TableRow>
-                                <TableCell
-                                  className={
-                                    classes.skillWidth +
-                                    " " +
-                                    (!!skillData[v.data[0]]
-                                      ? kv === 0
-                                        ? classes.mindfulness
-                                        : kv === 1
-                                        ? classes.Interpersonal
-                                        : kv === 2
-                                        ? classes.emotion
-                                        : classes.distress
-                                      : classes.noData)
-                                  }
-                                >
-                                  {v.data[0]}
-                                </TableCell>
-                                {selectedDates.map((d) => (
-                                  <TableCell
-                                    className={
-                                      classes.colCheck +
-                                      " " +
-                                      (!!skillData[v.data[0]]
-                                        ? kv === 0
-                                          ? classes.mindfulness
-                                          : kv === 1
-                                          ? classes.Interpersonal
-                                          : kv === 2
-                                          ? classes.emotion
-                                          : classes.distress
-                                        : classes.noData)
-                                    }
-                                  >
-                                    {skillData[v.data[0]]?.includes(d) ? (
+              >
+                <AccordionSummary
+                  expandIcon={<Icon>expand_more</Icon>}
+                  aria-controls="panel1a-content"
+                  id="panael1a-header"
+                  className={
+                    classes.categoryTitle +
+                    " " +
+                    (kv === 0
+                      ? classes.mindfulness
+                      : kv === 1
+                      ? classes.Interpersonal
+                      : kv === 2
+                      ? classes.emotion
+                      : classes.distress)
+                  }
+                >
+                  <TableRow>
+                    <TableCell colSpan={9}>{v.title}</TableCell>
+                  </TableRow>
+                </AccordionSummary>
+                <AccordionDetails className={classes.accSummary}>
+                  <div className={classes.tableResponsive}>
+                    <Table>
+                      <TableHead>
+                        {(!!skillData &&
+                          (v?.data || []).filter((each) => !!skillData[each]).length > 0 &&
+                          filterChecked) ||
+                        !filterChecked ? (
+                          <TableRow>
+                            <TableCell className={classes.skillWidth}>Skills</TableCell>
+                            {(selectedDates || []).map((date) => (
+                              <TableCell className={classes.colDate}>{date}</TableCell>
+                            ))}
+                          </TableRow>
+                        ) : (
+                          <TableRow>
+                            <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
+                              No records found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableHead>
+                      <TableBody>
+                        {((!!skillData && !!skillData[v.data[0]] && filterChecked) || !filterChecked) && (
+                          <TableRow>
+                            <TableCell
+                              className={
+                                classes.skillWidth +
+                                " " +
+                                (!!skillData && !!skillData[v.data[0]]
+                                  ? kv === 0
+                                    ? classes.mindfulness
+                                    : kv === 1
+                                    ? classes.Interpersonal
+                                    : kv === 2
+                                    ? classes.emotion
+                                    : classes.distress
+                                  : classes.noData)
+                              }
+                            >
+                              {v.data[0]}
+                            </TableCell>
+                            {(selectedDates || []).map((d) => (
+                              <TableCell
+                                className={
+                                  classes.colCheck +
+                                  " " +
+                                  (!!skillData && !!skillData[v.data[0]]
+                                    ? kv === 0
+                                      ? classes.mindfulness
+                                      : kv === 1
+                                      ? classes.Interpersonal
+                                      : kv === 2
+                                      ? classes.emotion
+                                      : classes.distress
+                                    : classes.noData)
+                                }
+                              >
+                                {!!skillData && skillData[v.data[0]]?.includes(d) ? (
+                                  <Icon className={classes.greentxt}>check</Icon>
+                                ) : null}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        )}
+                        {v.data.map(
+                          (k, key) =>
+                            ((!!skillData && !!skillData[k] && filterChecked) || !filterChecked) &&
+                            key !== 0 && (
+                              <TableRow
+                                className={
+                                  !!skillData && !!skillData[k]
+                                    ? kv === 0
+                                      ? classes.mindfulness
+                                      : kv === 1
+                                      ? classes.Interpersonal
+                                      : kv === 2
+                                      ? classes.emotion
+                                      : classes.distress
+                                    : classes.noData
+                                }
+                              >
+                                <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                {(selectedDates || []).map((d) => (
+                                  <TableCell className={classes.colCheck}>
+                                    {!!skillData && skillData[k]?.includes(d) ? (
                                       <Icon className={classes.greentxt}>check</Icon>
                                     ) : null}
                                   </TableCell>
                                 ))}
                               </TableRow>
-                            )}
-                            {v.data.map(
-                              (k, key) =>
-                                ((!!skillData[k] && filterChecked) || !filterChecked) &&
-                                key !== 0 && (
-                                  <TableRow
-                                    className={
-                                      !!skillData[k]
-                                        ? kv === 0
-                                          ? classes.mindfulness
-                                          : kv === 1
-                                          ? classes.Interpersonal
-                                          : kv === 2
-                                          ? classes.emotion
-                                          : classes.distress
-                                        : classes.noData
-                                    }
-                                  >
-                                    <TableCell className={classes.skillWidth}>{k}</TableCell>
-                                    {selectedDates.map((d) => (
-                                      <TableCell className={classes.colCheck}>
-                                        {skillData[k]?.includes(d) ? (
-                                          <Icon className={classes.greentxt}>check</Icon>
-                                        ) : null}
-                                      </TableCell>
-                                    ))}
-                                  </TableRow>
-                                )
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </AccordionDetails>
-                  </Accordion>
-                </div>
-              )
-            })}
-          </TableContainer>
-        </Box>
-      )}
-      {!!reasons && (reasons || []).length > 0 && (
-        <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-          <div className={classes.separator} />
-          <Box width={1} className={classes.graphSubContainer}>
-            <Typography variant="h5">Didn't use skills because...</Typography>
-            {(reasons || []).map(
-              (data) =>
-                !!data.reason && (
-                  <Box className={classes.blueBoxStyle}>
-                    <Typography variant="caption" gutterBottom>
-                      {data.date}
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      {data.reason}
-                    </Typography>
-                  </Box>
-                )
-            )}
-          </Box>
-        </Box>
-      )}
+                            )
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+          )
+        })}
+      </TableContainer>
     </Box>
   )
 }

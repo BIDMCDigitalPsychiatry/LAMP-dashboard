@@ -25,12 +25,14 @@ import DataPortal from "./data_portal/DataPortal"
 import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
+import { Service } from "./DBService/DBService"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import { makeStyles } from "@material-ui/core/styles"
+import TwoFA from "./TwoFA"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -132,6 +134,7 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital"]
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -249,6 +252,18 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
+    let status = false
+    if (typeof localStorage.getItem("verified") !== undefined) {
+      status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
+    }
+    if (
+      !!state.identity &&
+      (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
+      state.authType !== "participant" &&
+      !status
+    ) {
+      window.location.href = "/#/2fa"
+    }
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar(`${t("Proceed with caution: you are logged in as the administrator.")}`, {
         key: "admin",
@@ -280,6 +295,8 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    Service.deleteUserDB()
+    Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
       await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
@@ -307,6 +324,19 @@ function AppRouter({ ...props }) {
       }
       setState((state) => ({ ...state, ...type }))
       return type
+    } else {
+      setState((state) => ({
+        ...state,
+        identity: null,
+        auth: null,
+        authType: null,
+        activeTab: null,
+        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
+          ? undefined
+          : state.auth.serverAddress,
+      }))
+      localStorage.setItem("verified", JSON.stringify({ value: false }))
+      window.location.href = "/#/"
     }
 
     let logoutURL = sessionStorage.getItem("logout_url")
@@ -461,6 +491,37 @@ function AppRouter({ ...props }) {
 
       <Route
         exact
+        path="/2fa"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : state.authType === "participant" ? (
+            <Redirect to="/participant/me/assess" />
+          ) : (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
         path="/participant/:id/activity/:activityId"
         render={(props) =>
           !state.identity ? (
@@ -498,6 +559,18 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
           ) : (
             <React.Fragment>
               <ImportActivity />
@@ -516,6 +589,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -539,6 +624,18 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
           ) : (
             <React.Fragment>
               <PatientProfile researcherId={props.match.params.rid} participantId={props.match.params.id} />
@@ -557,6 +654,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -579,6 +688,18 @@ function AppRouter({ ...props }) {
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
+                />
+              </React.Fragment>
+            ) : JSON.parse(localStorage.getItem("verified"))?.value === false && state.authType !== "participant" ? (
+              <React.Fragment>
+                <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+                <TwoFA
+                  onLogout={() => reset()}
+                  onComplete={() => {
+                    state.authType === "admin"
+                      ? props.history.replace("/researcher")
+                      : props.history.replace("/researcher/me/users")
+                  }}
                 />
               </React.Fragment>
             ) : state.authType === "admin" ? (
@@ -606,6 +727,18 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -642,6 +775,18 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
+              />
+            </React.Fragment>
           ) : !getResearcher(props.match.params.id) ? (
             <React.Fragment />
           ) : (
@@ -660,11 +805,14 @@ function AppRouter({ ...props }) {
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
                   onParticipantSelect={(id) => {
-                    setState((state) => ({
-                      ...state,
-                      activeTab: 3,
-                    }))
-                    props.history.push(`/participant/${id}/portal`)
+                    ;(async () => {
+                      await Service.deleteUserDB()
+                      setState((state) => ({
+                        ...state,
+                        activeTab: 3,
+                      }))
+                      props.history.push(`/participant/${id}/portal`)
+                    })()
                   }}
                   mode={state.researcherType}
                   tab={props.match.params.tab}
@@ -686,6 +834,19 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
+              />
+            </React.Fragment>
+          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+              <TwoFA
+                onLogout={() => reset()}
+                onComplete={() => {
+                  localStorage.setItem("verified", JSON.stringify({ value: true }))
+                  state.authType === "admin"
+                    ? props.history.replace("/researcher")
+                    : props.history.replace("/researcher/me/users")
+                }}
               />
             </React.Fragment>
           ) : (
@@ -727,11 +888,11 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
                 id={props.match.params.id}
-                title={"Patient" + " " + getParticipant(props.match.params.id).id}
+                title={`User ${getParticipant(props.match.params.id).id}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
@@ -769,7 +930,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <PreventPage
                 type="activity"
                 activityId={props.match.params.activityId}
@@ -797,7 +958,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
               <PreventPage type="sensor" activityId={props.match.params.spec} participantId={props.match.params.id} />
             </React.Fragment>
           )

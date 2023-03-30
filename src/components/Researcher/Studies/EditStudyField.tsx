@@ -49,7 +49,7 @@ export default function EditStudyField({
       })
       .catch((err) =>
         enqueueSnackbar(
-          `${t("Failed to load study's alias: errorMessage", {
+          `${t("Failed to load group's alias: errorMessage", {
             alias: study,
             errorMessage: err.message,
           })}`,
@@ -79,14 +79,14 @@ export default function EditStudyField({
         selectedStudies[index] = aliasStudyName
         localStorage.setItem("studies_" + researcherId, JSON.stringify(selectedStudies))
         updateName(aliasStudyName === "" ? studyName : aliasStudyName)
-        enqueueSnackbar(`${t("Study name updated")}`, {
+        enqueueSnackbar(`${t("Group name updated")}`, {
           variant: "success",
         })
         callbackModal()
       })
       .catch((err) =>
         enqueueSnackbar(
-          `${t("Failed to change study name : errorMessage", {
+          `${t("Failed to change group name : errorMessage", {
             errorMessage: err.message,
           })}`,
           { variant: "error" }
@@ -139,7 +139,7 @@ export default function EditStudyField({
     let status = true
     if (studyDuplicateCount > 0) {
       enqueueSnackbar(
-        `${t("Failed to change participantId's alias: Study name already exist", {
+        `${t("Failed to change participantId's alias: Group name already exist", {
           participantId: study,
         })}`,
         { variant: "error" }
@@ -147,7 +147,7 @@ export default function EditStudyField({
       status = false
     } else if (val?.trim().length === 0) {
       enqueueSnackbar(
-        `${t("Failed to change participantId's alias: Study name required", {
+        `${t("Failed to change participantId's alias: Group name required", {
           participantId: study,
         })}`,
         { variant: "error" }
@@ -179,7 +179,7 @@ export default function EditStudyField({
             style: { color: "#000" },
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title={`${t("Update Study name. Saving an empty text box will reset this value.")}`}>
+                <Tooltip title={`${t("Update Group name. Saving an empty text box will reset this value.")}`}>
                   <IconButton
                     edge="end"
                     aria-label="save edit"

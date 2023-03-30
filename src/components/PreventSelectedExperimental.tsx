@@ -53,34 +53,35 @@ export default function PreventSelectedExperimental({
   visualizations: any
 }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
 
   return (
     <React.Fragment>
-      {(selectedExperimental || []).map((x) => (
-        <Grid item xs={12} sm={12} md={12} lg={12}>
-          <Card key={x} className={classes.automation}>
-            <Typography component="h6" variant="h6">
-              {x}
-            </Typography>
-            <Grid container justifyContent="center">
-              {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
-              visualizations["lamp.dashboard.experimental." + x] !== null ? (
-                <Box className={classes.vega}>
-                  <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
-                </Box>
-              ) : (
-                <img
-                  alt="visualization"
-                  src={visualizations["lamp.dashboard.experimental." + x]}
-                  height="100%"
-                  width="100%"
-                />
-              )}
+      {(selectedExperimental || []).map((experimentalKey) => {
+        let visualizationKey = experimentalKey
+        if (!visualizationKey.startsWith("lamp.dashboard.experimental.")) {
+          visualizationKey = "lamp.dashboard.experimental." + visualizationKey
+        }
+
+        const visualization = visualizations[visualizationKey]
+        if (typeof visualization === "object" && visualization !== null) {
+          return (
+            <Grid item xs={12} sm={12} md={12} lg={12}>
+              <Card key={experimentalKey} className={classes.automation}>
+                <Typography component="h6" variant="h6">
+                  {experimentalKey}
+                </Typography>
+                <Grid container justifyContent="center">
+                  <Box className={classes.vega}>
+                    <Vega spec={visualization} />
+                  </Box>
+                </Grid>
+              </Card>
             </Grid>
-          </Card>
-        </Grid>
-      ))}
+          )
+        }
+
+        return <></>
+      })}
     </React.Fragment>
   )
 }

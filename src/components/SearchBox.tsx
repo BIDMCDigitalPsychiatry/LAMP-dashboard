@@ -61,7 +61,7 @@ export default function Header({ searchData, ...props }: { searchData: Function 
           <Icon>search</Icon>
         </div>
         <InputBase
-          placeholder={`${t("Search.")}` + "…"}
+          placeholder={`${t("Search")}` + "…"}
           classes={{
             root: classes.inputRoot,
             input: classes.inputInput,

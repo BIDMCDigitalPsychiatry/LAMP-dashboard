@@ -5,6 +5,7 @@ import ConfirmationDialog from "../../ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
 import { Service } from "../../DBService/DBService"
 import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,12 +46,15 @@ export default function UpdateSensor({
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = React.useState(0)
   const [sensorDialog, setSensorDialog] = useState(false)
-  const { t, i18n } = useTranslation()
-  const { enqueueSnackbar } = useSnackbar()
-
   const [allSensors, setAllSensors] = useState<Array<Object>>([])
+  const [participantCount, setParticipantCount] = useState(0)
 
   useEffect(() => {
+    if (!!profile) {
+      LAMP.Participant.allByStudy(studyId).then((result) => {
+        setParticipantCount(result.length)
+      })
+    }
     getAllStudies()
   }, [])
 
@@ -85,7 +89,7 @@ export default function UpdateSensor({
         color="primary"
         classes={{ root: classes.btnWhite }}
         onClick={() => {
-          !!profile ? setConfirmationDialog(1) : setSensorDialog(true)
+          !!profile && participantCount > 1 ? setConfirmationDialog(1) : setSensorDialog(true)
         }}
       >
         <Icon>mode_edit</Icon>
@@ -97,7 +101,7 @@ export default function UpdateSensor({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? "Changes done to this sensor will reflect for all the participants under the study. Are you sure you want proceed?."
+            ? "Changes done to this sensor will reflect for all the participants under the group. Are you sure you want proceed?."
             : null
         }
       />

@@ -23,7 +23,16 @@ import Welcome from "./Welcome"
 import Learn from "./Learn"
 import Feed from "./Feed"
 import Streak from "./Streak"
-import { getImage } from "./Manage"
+import { Service } from "./DBService/DBService"
+
+export async function getImage(activityId: string, spec: string) {
+  return [
+    await LAMP.Type.getAttachment(
+      activityId,
+      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
+    ),
+  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -132,6 +141,7 @@ export default function Participant({
   const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
+
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -143,12 +153,45 @@ export default function Participant({
         setActivities(activities)
         props.activeTab(tab, participant.id)
         //  getShowWelcome(participant).then(setOpen)
-        setLoading(false)
       }
     )
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
+
+  useEffect(() => {
+    if (activities !== null) {
+      Service.getAllTags("activitytags").then((result) => {
+        if ((result || []).length == 0) {
+          let data = []
+          let count = 0
+          ;(activities || []).map((activity) => {
+            getImage(activity.id, activity.spec).then((img) => {
+              data.push({
+                id: activity.id,
+                category: activity.category,
+                spec: activity.spec,
+                description: img?.description ?? "",
+                photo: img?.photo ?? null,
+                streak: img?.streak ?? null,
+                questions: img?.questions ?? null,
+              })
+              if (count === activities.length - 1) {
+                Service.addUserData("activitytags", data, true).then(() => {
+                  setLoading(false)
+                })
+              }
+              count++
+            })
+          })
+        } else {
+          setLoading(false)
+        }
+      })
+    } else {
+      setLoading(false)
+    }
+  }, [activities])
 
   const activeTab = (newTab) => {
     props.activeTab(newTab, participant.id)
@@ -168,7 +211,8 @@ export default function Participant({
   }
 
   const showStreak = (participant, activity) => {
-    getImage(activity?.id, activity?.spec).then((tag) => {
+    Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
+      const tag = tags[0]
       setStreakActivity(tag?.streak ?? null)
       if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
         getEvents(participant, activity.id).then((streak) => {
@@ -187,7 +231,7 @@ export default function Participant({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {activities !== null && (
+      {activities !== null && !loading && (
         <Box>
           <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>

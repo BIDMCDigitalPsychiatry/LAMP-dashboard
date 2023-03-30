@@ -405,7 +405,7 @@ export default function Tips({
           },
           false
         )
-    setLoading(true)
+    setLoading(false)
   }
 
   const handleSaveTipsData = () => {
@@ -578,7 +578,7 @@ export default function Tips({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label={`${t("Study")}`}
+                    label={`${t("Group")}`}
                     value={studyId || ""}
                     onChange={(e) => {
                       setStudyId(e.target.value)
@@ -587,7 +587,7 @@ export default function Tips({
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? `${t("Please select the Study.")}`
+                        ? `${t("Please select the Group")}`
                         : ""
                     }
                     variant="filled"
@@ -614,7 +614,7 @@ export default function Tips({
                     }}
                     helperText={
                       typeof category == "undefined" || category === null || category === ""
-                        ? `${t("Please select the tip.")}`
+                        ? `${t("Please select the tip")}`
                         : ""
                     }
                     variant="filled"

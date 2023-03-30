@@ -96,6 +96,7 @@ export default function SensorsList({
       searchFilterSensors()
     } else {
       setSensors([])
+      setLoading(false)
     }
   }, [selected])
 

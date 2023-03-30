@@ -1,8 +1,8 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Icon, Fab, makeStyles, Theme, createStyles, Link } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../../ConfirmationDialog"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,6 +32,15 @@ export default function UpdateActivity({
   const classes = useStyles()
   const { t } = useTranslation()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
+  const [participantCount, setParticipantCount] = useState(0)
+
+  useEffect(() => {
+    if (!!profile) {
+      LAMP.Participant.allByStudy(activity.study_id).then((result) => {
+        setParticipantCount(result.length)
+      })
+    }
+  }, [])
 
   const confirmAction = (status: string) => {
     if (status === "Yes") {
@@ -48,7 +57,9 @@ export default function UpdateActivity({
           color="primary"
           classes={{ root: classes.btnWhite }}
           onClick={(event) => {
-            setConfirmationDialog(3)
+            participantCount > 1
+              ? setConfirmationDialog(3)
+              : (window.location.href = `/#/researcher/${researcherId}/activity/${activity.id}`)
           }}
         >
           <Icon>mode_edit</Icon>
@@ -64,9 +75,9 @@ export default function UpdateActivity({
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
         confirmationMsg={
-          !!profile
+          !!profile && participantCount > 1
             ? t(
-                "Changes done to this activity will reflect for all the participants under the study. Are you sure you want to proceed?."
+                "Changes done to this activity will reflect for all the participants under the group. Are you sure you want to proceed?"
               )
             : ""
         }

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
@@ -43,6 +43,16 @@ export default function DeleteActivity({
   const { t } = useTranslation()
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
+  const [participantCount, setParticipantCount] = useState(0)
+
+  useEffect(() => {
+    if (!!profile) {
+      LAMP.Participant.allByStudy(activities[0].study_id).then((result) => {
+        setParticipantCount(result.length)
+      })
+    }
+  }, [])
+
   const confirmAction = async (status) => {
     if (status === "Yes") {
       let activityIds = activities.map((a) => {
@@ -84,9 +94,9 @@ export default function DeleteActivity({
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
         confirmationMsg={
-          !!profile
+          !!profile && participantCount > 1
             ? `${t(
-                "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?"
+                "This activity will be deleted for all the participants under this group. Are you sure you want to proceed?"
               )}`
             : `${t("Are you sure you want to delete this Activity?.")}`
         }

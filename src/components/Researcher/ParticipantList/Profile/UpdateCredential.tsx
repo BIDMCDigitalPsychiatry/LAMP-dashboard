@@ -1,11 +1,17 @@
 import React, { useState } from "react"
 import { Link, Icon, Box, Dialog, DialogContent, makeStyles, createStyles } from "@material-ui/core"
-import { CredentialManager, CredentialEditor, updateDetails } from "../../../CredentialManager"
+import { CredentialManager } from "../../../CredentialManager"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
-    linkBtn: { color: "#6083E7", fontSize: 14, fontWeight: 500, "& svg": { marginRight: 15 } },
+    linkBtn: {
+      color: "#6083E7",
+      fontSize: 14,
+      fontWeight: 500,
+      "& svg": { marginRight: 15 },
+      "& span": { lineHeight: "1.5", marginRight: "2px" },
+    },
   })
 )
 

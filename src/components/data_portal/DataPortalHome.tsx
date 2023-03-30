@@ -20,6 +20,7 @@ import SelectionWindow from "./SelectionWindow"
 import Editor from "./Editor"
 import jsonata from "jsonata"
 import { useDrop } from "react-dnd"
+import { useTranslation } from "react-i18next"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -31,6 +32,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const [treeCollapsed, setTreeCollapsed] = React.useState(false)
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
+  const { t } = useTranslation()
 
   const [isGUIEditor, toggleEditorStyle] = useLocalStorage("_editor_style", true)
   const [GUIQuery, setGUIQuery] = React.useState({
@@ -126,13 +128,13 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
             <SelectionWindow
-              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
+              openButtonText={`${t(`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`)}`}
               displaySubmitButton={true}
               handleResult={() => {
                 toggleEditorStyle(!viewModeSwitch)
               }}
               closesOnSubmit={true}
-              submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
+              submitText={`${t(`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`)}`}
               style={{ minHeight: "10%" }}
               children={
                 <React.Fragment>
@@ -148,24 +150,27 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                   />
                   {viewModeSwitch ? (
                     <Typography>
-                      While in Terminal mode, you can directly write JSONata style queries to pull data directly from
-                      your database. <br />
-                      <br />
-                      For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
-                      with a user's id to get a list of the last 10,000 activities completed through LAMP.
+                      {`${t(
+                        "While in Terminal mode, you can directly write JSONata style queries to pull data directly from your database."
+                      )}`}
                       <br />
                       <br />
-                      Want to learn more about JSONata queries or what special data you can pull from LAMP?
+                      {`${t("For example, try:")}`} `LAMP.ActivityEvent.list(<b>participant_id</b>)`,{" "}
+                      {`${t("replacing")}`} `participant_id`
+                      {`${t("with a user's id to get a list of the last 10,000 activities completed through LAMP.")}`}
+                      <br />
+                      <br />
+                      {`${t("Want to learn more about JSONata queries or what special data you can pull from LAMP?")}`}
                       <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
-                        Click here!
+                        {`${t("Click here!")}`}
                       </a>
                     </Typography>
                   ) : (
                     <Typography>
-                      While in GUI mode, you can directly pull graphs you have already generated from the LAMP database,
-                      easily view information across an entire study or researcher, or quickly view tags that give info
-                      about things like survey scoring. If this is your first time using the LAMP data_portal, or you
-                      need to get data quckly, this is the mode we recommend!
+                      {`${t(
+                        "While in GUI mode, you can directly pull graphs you have already generated from the LAMP database, easily view information across an entire study or researcher, or quickly view tags that give info about things like survey scoring. If this is your first time using the LAMP data_portal, or if you need to get data quickly, this is the mode we recommend!!"
+                      )}`}
+                      `
                     </Typography>
                   )}
                 </React.Fragment>
@@ -237,7 +242,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
       {!isGUIEditor && (
         <Fab color="primary" variant="extended" className={classes.fab} onClick={runQuery}>
           <Icon className={classes.extendedIcon}>get_app</Icon>
-          Run Query
+          {`${t("Run Query")}`}
         </Fab>
       )}
     </Box>

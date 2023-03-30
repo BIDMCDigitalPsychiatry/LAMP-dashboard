@@ -45,10 +45,10 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   const [customize, setCustomize] = useState(false)
   const [defaultTab, setDefaultTab] = useState(null)
   const tabs = {
-    assess: "Assess",
-    learn: "Learn",
-    manage: "Manage",
-    prevent: "Portal",
+    assess: t("Assess"),
+    learn: t("Learn"),
+    manage: t("Manage"),
+    prevent: t("Portal"),
   }
 
   useEffect(() => {

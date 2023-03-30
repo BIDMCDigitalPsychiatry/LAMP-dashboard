@@ -17,15 +17,22 @@ export default function Sparkline({ ...props }) {
     }
   }, [])
 
-  if ((props.data || []).length === 1) {
-    let propsDate = new Date(props.data[0].x)
-    let timeString = propsDate.toLocaleTimeString()
-    let curreDate = propsDate.getDate().toString().padStart(2, "0")
-    var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-    var curreYear = propsDate.getFullYear()
-    let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
-    props.data[0].x = dateTimeString
-  }
+  let details = []
+  ;(props.data || []).map((data) => {
+    if (typeof data?.x === "string") {
+      let propsDate = new Date(data?.x?.replace("at ", ""))
+      let timeString = propsDate.toLocaleTimeString()
+      let curreDate = propsDate.getDate().toString().padStart(2, "0")
+      var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+      var curreYear = propsDate.getFullYear()
+      let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
+      data.x = dateTimeString
+      details.push(data)
+    } else {
+      details.push(data)
+    }
+  })
+
   const handleClick = (...args) => {
     // console.log(args)
   }
@@ -96,21 +103,21 @@ export default function Sparkline({ ...props }) {
             },
           },
           encoding: {
-            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+            x: { field: "x", type: "ordinal", timeUnit: "yearmonthdate" },
             y: { field: "y", type: "quantitative" },
             strokeWidth: { value: 2 },
             tooltip: [
               {
                 field: "x",
                 type: "ordinal",
-                timeUnit: "utcyearmonthdatehoursminutes",
+                timeUnit: "yearmonthdatehoursminutes",
                 title: "DATE",
               },
               { field: "y", type: "nominal", title: "SCORE" },
             ],
           },
           data: {
-            values: props.values ?? props.data,
+            values: props.values ?? details,
           },
         }}
       />

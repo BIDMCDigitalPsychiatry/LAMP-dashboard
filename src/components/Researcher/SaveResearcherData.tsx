@@ -82,7 +82,6 @@ const saveSettings = (newVal, key) => {
 }
 
 export const saveDemoData = () => {
-  Service.deleteDB()
   Service.addData("researcher", [{ id: "researcher1" }])
   Service.addData("participants", demo_db.Participant)
   Service.addData("studies", demo_db.Study)
@@ -103,16 +102,16 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
-  Service.deleteDB()
   Service.addData("researcher", [{ id: id }])
 
   LAMP.API.query(
     "($studyList := $LAMP.Study.list('" +
-      id +
-      "');" +
-      "$unitySettings := $LAMP.Tag.get('" +
-      id +
-      "','to.unityhealth.psychiatry.enabled');" +
+    id +
+    "');" +
+    "$unitySettings := $LAMP.Tag.get('" +
+    id +
+    "','to.unityhealth.psychiatry.enabled');" +
+    " $filterAudioOut := function() { $ ~> |$|{}, ['audio']| };" + // `settings` field has been masked out from activities in this query to avoid responses that are too heavy to handle by the server. This can happen when many of the activities that are being queried contain some kind of heavy content (such as audio files).
       " $list :={'unity_settings': $LAMP.Tag.get('" +
       id +
       "','to.unityhealth.psychiatry.enabled')," +
@@ -121,7 +120,7 @@ export const saveDataToCache = (authString, id) => {
       "$LAMP.Tag.get($id,'lamp.name'), 'unity_settings' : $unitySettings ? " +
       "$LAMP.Tag.get($id,'to.unityhealth.psychiatry.settings') : null,'id':$id, 'study_id' : $study.id, 'study_name': $study.name }})]," +
       "'activities':[$map($LAMP.Activity.list($study.id),function($activity){{'name': " +
-      " $activity.name, 'spec': $activity.spec, 'category': $activity.category, 'schedule': $activity.schedule, 'settings': $activity.settings,  'id':$activity.id, 'study_id' " +
+      " $activity.name, 'spec': $activity.spec, 'category': $activity.category, 'schedule': $activity.schedule, 'settings': $filterAudioOut($activity.settings),  'id':$activity.id, 'study_id' " +
       ": $study.id, 'study_name': $study.name}})]," +
       "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
       " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"

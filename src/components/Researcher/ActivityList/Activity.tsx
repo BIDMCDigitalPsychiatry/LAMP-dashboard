@@ -25,22 +25,7 @@ export const games = [
   "lamp.cats_and_dogs",
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
-]
-
-const lampActivities = [
-  "spatial_span",
-  "cats_and_dogs",
-  "jewels_a",
-  "jewels_b",
-  "dbt_diary_card",
-  "balloon_risk",
-  "pop_the_bubbles",
-  "journal",
-  "breathe",
-  "recording",
-  "survey",
-  "scratch_image",
-  "tips",
+  "lamp.spin_wheel",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -119,8 +104,12 @@ export default function Activity({
   useEffect(() => {
     if (!!activity && details === null) {
       ;(async () => {
-        let data = await LAMP.Activity.view(activity.id)
-        activity.settings = data.settings
+        let lampAuthId = LAMP.Auth._auth.id
+
+        if (!(lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")) {
+          let data = await LAMP.Activity.view(activity.id)
+          activity.settings = data.settings
+        }
         if (activity.spec === "lamp.survey") {
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
             !!y.error ? undefined : y.data
@@ -142,8 +131,8 @@ export default function Activity({
           setActivity(activity)
           setDetails(tag ?? [])
         } else {
-          if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
-            delete activity.settings.audio
+          if (activity.spec === "lamp.breathe" && activity.settings?.audio === null) {
+            delete activity.settings?.audio
           }
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
             !!y.error ? undefined : y.data
@@ -163,13 +152,15 @@ export default function Activity({
         : x.spec === "lamp.tips"
         ? await saveTipActivity(x)
         : await saveCTestActivity(x)
-    if (!!newItem.error)
+    if (!!newItem.error) {
+      setLoading(false)
       enqueueSnackbar(`${t("Failed to create a new Activity.")}`, {
         variant: "error",
       })
-    else {
+    } else {
       x["id"] = newItem["data"]
       updateDb(x)
+      setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
       })

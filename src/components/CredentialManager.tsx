@@ -210,6 +210,7 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
               ))}
           </TextField>
         )}
+
         {["create-new", "update-profile"].includes(mode) && (
           <TextField
             fullWidth

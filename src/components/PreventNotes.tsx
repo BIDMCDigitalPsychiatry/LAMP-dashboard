@@ -55,10 +55,6 @@ const useStyles = makeStyles((theme: Theme) =>
         lineHeight: "40px",
       },
     },
-    graphSubContainer: {
-      maxWidth: 500,
-      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30, float: "left" },
-    },
     heading: {
       fontSize: 17,
       fontWeight: 600,
@@ -81,14 +77,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...props }) {
+export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setStorageData, storageData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [notesRange, setNotesRange] = useState(dbtRange ?? dateArray[0]?.timestamp ?? null)
+  const [notesRange, setNotesRange] = useState(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
   const [notes, setNotes] = useState(null)
 
   useEffect(() => {
     if (!!notesRange) {
+      setStorageData({ ...storageData, notes: notesRange })
       let timeStamp = notesRange.split("-")
       let notesData = []
       selectedEvents.map((event) => {
@@ -108,6 +105,10 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...p
     setNotesRange(dbtRange)
   }, [dbtRange])
 
+  useEffect(() => {
+    setNotesRange(storageData?.notes ?? dateArray[0]?.timestamp ?? null)
+  }, [storageData])
+
   return (
     <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
       <div className={classes.separator} />
@@ -118,7 +119,6 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...p
           </Box>
           <Box>
             <Typography variant="h5"></Typography>
-
             <NativeSelect
               className={classes.selector}
               value={notesRange}

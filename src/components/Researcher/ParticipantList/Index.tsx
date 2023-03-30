@@ -2,8 +2,14 @@ import React, { useState, useEffect, useMemo } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
-import hi from "javascript-time-ago/locale/hi"
+import da from "javascript-time-ago/locale/da"
+import de from "javascript-time-ago/locale/de"
+import zh from "javascript-time-ago/locale/zh"
+import ko from "javascript-time-ago/locale/ko"
 import es from "javascript-time-ago/locale/es"
+import it from "javascript-time-ago/locale/it"
+import hi from "javascript-time-ago/locale/hi"
+import fr from "javascript-time-ago/locale/fr"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
 import { Service } from "../../DBService/DBService"
@@ -57,6 +63,21 @@ function getCurrentLanguage(language) {
     case "es_ES":
       lang = "es-ES"
       break
+    case "it_IT":
+      lang = "it-IT"
+      break
+    case "de_DE":
+      lang = "de-DE"
+      break
+    case "da_DK":
+      lang = "da-DK"
+      break
+    case "fr_FR":
+      lang = "fr-FR"
+      break
+    case "zh_CN":
+      lang = "zh-CN"
+      break
     default:
       lang = "en-US"
       break
@@ -76,6 +97,21 @@ function getCurrentLanguageCode(language) {
     case "es_ES":
       langCode = es
       break
+    case "it_IT":
+      langCode = it
+      break
+    case "de_DE":
+      langCode = de
+      break
+    case "da_DK":
+      langCode = da
+      break
+    case "fr_FR":
+      langCode = fr
+      break
+    case "zh_CN":
+      langCode = zh
+      break
     default:
       langCode = en
       break
@@ -90,34 +126,6 @@ export function getTimeAgo(language) {
   return new TimeAgo(currentLanguage)
 }
 
-const daysSinceLast = (passive, timeAgo, t) => ({
-  gpsString: passive?.gps?.timestamp
-    ? timeAgo.format(new Date(((passive || {}).gps || {}).timestamp))
-    : `${t("Never")}`,
-  accelString: passive?.accel?.timestamp
-    ? timeAgo.format(new Date(((passive || {}).accel || {}).timestamp))
-    : `${t("Never")}`,
-  gps:
-    (new Date().getTime() - new Date(parseInt(((passive || {}).gps || {}).timestamp)).getTime()) / (1000 * 3600 * 24),
-  accel:
-    (new Date().getTime() - new Date(parseInt(((passive || {}).accel || {}).timestamp)).getTime()) / (1000 * 3600 * 24),
-})
-
-export const dataQuality = (passive, timeAgo, t, classes) => ({
-  title:
-    `${t("GPS.")}` +
-    `: ${daysSinceLast(passive, timeAgo, t).gpsString}, ` +
-    `${t("Accelerometer.")}` +
-    `: ${daysSinceLast(passive, timeAgo, t).accelString}`,
-  class:
-    daysSinceLast(passive, timeAgo, t).gps <= 2 && daysSinceLast(passive, timeAgo, t).accel <= 2
-      ? classes.dataGreen
-      : daysSinceLast(passive, timeAgo, t).gps <= 7 || daysSinceLast(passive, timeAgo, t).accel <= 7
-      ? classes.dataYellow
-      : daysSinceLast(passive, timeAgo, t).gps <= 30 || daysSinceLast(passive, timeAgo, t).accel <= 30
-      ? classes.dataRed
-      : classes.dataGrey,
-})
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 export default function ParticipantList({
   studies,
@@ -169,6 +177,7 @@ export default function ParticipantList({
       searchParticipants()
     } else {
       setParticipants([])
+      setLoading(false)
     }
   }, [selected])
 

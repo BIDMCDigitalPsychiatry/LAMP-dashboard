@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { Service } from "../../DBService/DBService"
-import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import ActivityItem from "./ActivityItem"
 import Header from "./Header"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
-import classNames from "classnames"
 import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -66,6 +64,7 @@ export const games = [
   "lamp.cats_and_dogs",
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
+  "lamp.spin_wheel",
 ]
 export default function ActivityList({
   researcherId,
@@ -114,6 +113,7 @@ export default function ActivityList({
       searchActivities()
     } else {
       setActivities([])
+      setLoading(false)
     }
   }, [selected])
 

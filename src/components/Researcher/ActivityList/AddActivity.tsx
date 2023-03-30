@@ -79,6 +79,7 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "inline-block",
         width: "100%",
         padding: "8px 30px",
+        minWidth: "300px",
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
       "& *": { cursor: "pointer" },
@@ -149,6 +150,10 @@ export default function AddActivity({
     "lamp.recording": `${t("Voice Recording")}`,
     "lamp.survey": `${t("Survey Instrument")}`,
     "lamp.group": `${t("Activity Group")}`,
+    "lamp.memory_game": `${t("Memory Game")}`,
+    "lamp.goals": `${t("Goals")}`,
+    "lamp.medications": `${t("Medications")}`,
+    "lamp.spin_wheel": `${t("Spin The Wheel")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -247,7 +252,7 @@ export default function AddActivity({
                 ))}
             </React.Fragment>
           )}
-          {[
+          {activitySpecs.filter((x) => !["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && [
             <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{`${t("Smartphone Cognitive Tests")}`}</b>
             </MenuItem>,

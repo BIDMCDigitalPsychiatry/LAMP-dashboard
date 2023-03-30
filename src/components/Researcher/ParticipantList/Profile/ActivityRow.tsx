@@ -55,12 +55,32 @@ export default function ActivityRow({
     "lamp.breathe": `${t("Breathe")}`,
     "lamp.dbt_diary_card": `${t("DBT Diary Card")}`,
     "lamp.scratch_image": `${t("Scratch image")}`,
+    "lamp.memory_game": `${t("Memory Game")}`,
+    "lamp.goals": `${t("Goals")}`,
+    "lamp.medications": `${t("Medications")}`,
   }
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     handleSelected(activity, event.target.checked)
     setChecked(event.target.checked)
   }
+
+  const intervals = [
+    { key: "hourly", value: `${t("Every hour")}` },
+    { key: "every3h", value: `${t("Every number hours", { number: 3 })}` },
+    { key: "every6h", value: `${t("Every number hours", { number: 6 })}` },
+    { key: "every12h", value: `${t("Every number hours", { number: 12 })}` },
+    { key: "daily", value: `${t("Every day")}` },
+    { key: "biweekly", value: `${t("Two times every week (Tue, Thurs)")}` },
+    { key: "triweekly", value: `${t("Three times every week (Mon, Wed, Fri)")}` },
+    { key: "weekly", value: `${t("Every week")}` },
+    { key: "bimonthly", value: `${t("Two times every month")}` },
+    { key: "fortnightly", value: `${t("Every 2 weeks")}` },
+    { key: "monthly", value: `${t("Every month")}` },
+    { key: "custom", value: `${t("Use custom times instead")}` },
+    { key: "none", value: `${t("Do not repeat")}` },
+  ]
+
   return (
     <Box style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }} p={1}>
       <Grid container alignItems="center">
@@ -74,7 +94,7 @@ export default function ActivityRow({
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {activity.name}
+            {`${t(activity.name)}`}
           </Typography>
         </Grid>
         <Grid item xs>
@@ -85,7 +105,7 @@ export default function ActivityRow({
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
             {(activity?.schedule ?? []).map((sc) => (
-              <Box>{sc.repeat_interval}</Box>
+              <Box>{`${t(intervals.filter((i) => i.key === sc.repeat_interval)[0]?.value)}`}</Box>
             ))}
           </Typography>
         </Grid>

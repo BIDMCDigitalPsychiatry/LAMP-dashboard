@@ -1,10 +1,184 @@
 import LAMP from "lamp-core"
-import { zero } from "vega"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 export const SchemaList = () => {
   return {
+    "lamp.spin_wheel": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["low_risk", "high_risk", "spins_per_game"],
+          properties: {
+            low_risk: {
+              title: i18n.t("Low Risk"),
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                required: ["win", "loose", "zero"],
+                properties: {
+                  win: {
+                    title: i18n.t("Win"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 50,
+                        enum: [50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                  loose: {
+                    title: i18n.t("Loose"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 50,
+                        enum: [50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                  zero: {
+                    title: i18n.t("Zero"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 0,
+                        enum: [0],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                },
+              },
+              "ui:options": {
+                addable: false,
+                removable: false,
+                orderable: false,
+              },
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            high_risk: {
+              title: i18n.t("High Risk"),
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                required: ["win", "loose", "zero"],
+                properties: {
+                  win: {
+                    title: i18n.t("Win"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 100,
+                        enum: [50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                  loose: {
+                    title: i18n.t("Loose"),
+                    type: "object",
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 250,
+                        enum: [50, 100, 250],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                  zero: {
+                    type: "object",
+                    title: i18n.t("Zero"),
+
+                    required: ["sum", "probability"],
+                    properties: {
+                      sum: {
+                        title: i18n.t("Sum"),
+                        type: "number",
+                        default: 0,
+                        enum: [0],
+                      },
+                      probability: {
+                        title: i18n.t("Probability"),
+                        type: "number",
+                        default: 50,
+                        enum: [0, 25, 50, 75],
+                      },
+                    },
+                  },
+                },
+              },
+              "ui:options": {
+                addable: false,
+                removable: false,
+                orderable: false,
+              },
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            spins_per_game: {
+              title: i18n.t("Spins per game"),
+              type: "number",
+              minimum: 1,
+              maximum: 100,
+              default: 20,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.balloon_risk": {
       type: "object",
       properties: {
@@ -133,7 +307,7 @@ export const SchemaList = () => {
           properties: {
             foils: {
               title: i18n.t("Foils"),
-              description: "3 from 9 :- 9 imagesand need to select 3, 4 from 12 :- 12 images and need to select 4.",
+              description: "3 from 9 :-  3x3 grid and 9 foils, 4 from 12 :-  3x3 grid and 12 foils.",
               type: "string",
               enum: [1, 2],
               enumNames: [i18n.t("3 from 9"), i18n.t("4 from 12")],
@@ -142,44 +316,36 @@ export const SchemaList = () => {
                 xs: 6,
               },
             },
-            sequence_length: {
-              title: i18n.t("Sequence length"),
-              description: "",
-              type: "number",
-              minimum: 3,
-              maximum: 4,
-              default: 3,
-              "ui:grid": {
-                xs: 3,
-              },
-            },
-            encoding_trials: {
-              title: i18n.t("Encoding trials"),
-              description: "",
-              type: "number",
-              minimum: 0,
-              maximum: 3,
-              default: 1,
-              "ui:grid": {
-                xs: 3,
-              },
-            },
+            // encoding_trials: {
+            //   title: i18n.t("Encoding trials"),
+            //   description: "",
+            //   type: "number",
+            //   minimum: 0,
+            //   maximum: 3,
+            //   default: 3,
+            //   readonly: true,
+            //   "ui:grid": {
+            //     xs: 3,
+            //   },
+            // },
             animation_interval: {
               title: i18n.t("Animation interval"),
+              description: i18n.t("seconds"),
               type: "number",
               minimum: 1,
               maximum: 5,
-              default: 1,
+              default: 2,
               "ui:grid": {
                 xs: 3,
               },
             },
             animation_persistance: {
               title: i18n.t("Animation persistance"),
+              description: i18n.t("seconds"),
               type: "number",
-              minimum: 2,
-              maximum: 6,
-              default: 2,
+              minimum: 1,
+              maximum: 5,
+              default: 1,
               "ui:grid": {
                 xs: 3,
               },
@@ -611,7 +777,6 @@ export const SchemaList = () => {
           title: i18n.t("Survey Questions"),
           description: i18n.t("Configure questions, parameters, and options."),
           type: "array",
-
           items: {
             required: ["text", "type"],
 
@@ -669,7 +834,7 @@ export const SchemaList = () => {
                           type: "object",
                           properties: {
                             value: {
-                              title: "Time pattern",
+                              title: i18n.t("Time pattern"),
                               type: "string",
                               enum: ["standard", "military"],
                               enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
@@ -758,6 +923,29 @@ export const SchemaList = () => {
                 ],
                 default: "text",
               },
+              warnings: {
+                type: "array",
+                title: i18n.t("Warnings"),
+                description: i18n.t(
+                  "Set warnings that will be shown in a dialog to participants when the corresponding answers are submitted."
+                ),
+                items: {
+                  type: "object",
+                  properties: {
+                    answer: {
+                      title: i18n.t("Answer"),
+                      description: i18n.t("The answer for which the warning will be shown."),
+                      type: "string",
+                    },
+                    warningText: {
+                      title: i18n.t("Warning Text"),
+                      description: i18n.t("The message that will be shown to participants."),
+                      type: "string",
+                    },
+                  },
+                  required: ["answer", "warningText"],
+                },
+              },
             },
           },
         },
@@ -794,7 +982,7 @@ export const SchemaList = () => {
                     minLength: 1,
                   },
                   measure: {
-                    title: "Measure of Action",
+                    title: i18n.t("Measure of Action"),
                     type: "string",
                     minLength: 1,
                     examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
@@ -804,6 +992,9 @@ export const SchemaList = () => {
             },
             targetIneffective: {
               title: i18n.t("Ineffective Target Behaviors"),
+              description: i18n.t(
+                "Default Ineffective Behaviors: Die, Self-Harm, Quit Therapy, Die by Suicide. Do not add these below."
+              ),
               type: "array",
               items: {
                 type: "object",
@@ -825,11 +1016,10 @@ export const SchemaList = () => {
             },
             emotions: {
               title: i18n.t("Emotions"),
-              description: i18n.t("Both good and bad emotions."),
+              description: i18n.t("Default Emotions: Sadness, Shame, Anger, Fear/Worry, Joy. Do not add these below."),
               type: "array",
               items: {
                 type: "object",
-                required: ["emotion"],
                 properties: {
                   emotion: {
                     title: i18n.t("Emotions"),
@@ -1035,6 +1225,7 @@ export function spliceActivity({ raw, tag }) {
                   description: tag?.questions?.[idx]?.options?.[idx2],
                 }))
               : question.options,
+          warnings: question.warnings,
         })),
   }
 }
@@ -1074,6 +1265,7 @@ export function unspliceActivity(x) {
             ? y?.options?.map((z) => z?.value ?? z)
             : y?.options,
         required: y?.required ?? false,
+        warnings: y?.warnings,
       })),
     },
     tag: {

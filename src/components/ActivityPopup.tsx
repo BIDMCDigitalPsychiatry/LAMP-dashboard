@@ -221,13 +221,13 @@ export default function ActivityPopup({
               className={classes.topicon}
               style={{
                 margin: "auto",
-                background: tag[activity?.id]?.photo
-                  ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                  ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
                   : activity?.spec === "lamp.breathe"
                   ? `url(${BreatheIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.journal"
                   ? `url(${JournalIcon}) center center/contain no-repeat`
-                  : activity?.spec === "lamp.scrath_image"
+                  : activity?.spec === "lamp.scratch_image"
                   ? `url(${ScratchCard}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
@@ -253,14 +253,14 @@ export default function ActivityPopup({
           )}
           {(activity?.spec === "lamp.survey" || activity?.spec === "lamp.dbt_diary_card") && (
             <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? `${t(" questions")}` : `${t(" question")}`} {/* (10 mins) */}
+              {questionCount} {questionCount > 1 ? `${t("questions")}` : `${t("question")}`} {/* (10 mins) */}
             </Typography>
           )}
           <Typography variant="body2" component="p">
             <ReactMarkdown
               children={
                 activity?.spec !== "lamp.dbt_diary_card"
-                  ? t(tag[activity?.id]?.description ?? null)
+                  ? t(tag.filter((x) => x.id === activity?.id)[0]?.description ?? null)
                   : `${t("Daily log of events and related feelings. Track target behaviors and use of skills.")}`
               }
               skipHtml={false}

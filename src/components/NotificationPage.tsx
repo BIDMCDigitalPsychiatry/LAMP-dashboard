@@ -10,6 +10,10 @@ import {
   Toolbar,
   IconButton,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import Streak from "./Streak"
@@ -17,8 +21,8 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
-import { getImage } from "./Manage"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
+import { Service } from "./DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -110,18 +114,51 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
-
+  const [openNotFound, setOpenNotFound] = useState(false)
+  const [tag, setTag] = useState(null)
   useEffect(() => {
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      LAMP.Activity.view(activityId).then((data: any) => {
-        getImage(activityId, data.spec).then((tag) => {
-          data = data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
-          setActivity(data)
+      LAMP.Activity.view(activityId)
+        .then((data: any) => {
+          if (!!data) {
+            Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
+              setTag(tags[0])
+              const tag = tags[0]
+              if (data.spec == "lamp.spin_wheel") {
+                ;(async () => {
+                  const events = await LAMP.ActivityEvent.allByParticipant(participant)
+                  let event = events.filter((event) => event.activity === activityId)[0] ?? {}
+                  const balance = !!event["temporal_slices"]
+                    ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
+                    : 2000
+                  data["settings"]["balance"] = balance
+                  data =
+                    data.spec === "lamp.survey"
+                      ? spliceActivity({ raw: data, tag })
+                      : spliceCTActivity({ raw: data, tag })
+                  setActivity(data)
+                  setLoading(false)
+                })()
+              } else {
+                data =
+                  data.spec === "lamp.survey"
+                    ? spliceActivity({ raw: data, tag })
+                    : spliceCTActivity({ raw: data, tag })
+                setActivity(data)
+                setLoading(false)
+              }
+            })
+          } else {
+            setOpenNotFound(true)
+            setLoading(false)
+          }
+        })
+        .catch((e) => {
+          setOpenNotFound(true)
           setLoading(false)
         })
-      })
     })()
   }, [activityId])
 
@@ -133,23 +170,22 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
 
   const showStreak = (participant, activity) => {
     setLoading(true)
-    getImage(activity?.id, activity?.spec).then((tag) => {
-      setStreakActivity(tag?.streak ?? null)
-      if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
-        getEvents(participant, activity.id).then((streak) => {
-          setStreak(streak)
-          setOpenComplete(true)
-          setTimeout(() => {
-            setOpenComplete(false)
-            returnResult()
-            setLoading(false)
-          }, 6000)
-        })
-      } else {
-        returnResult()
-        setLoading(false)
-      }
-    })
+
+    setStreakActivity(tag?.streak ?? null)
+    if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+      getEvents(participant, activity.id).then((streak) => {
+        setStreak(streak)
+        setOpenComplete(true)
+        setTimeout(() => {
+          setOpenComplete(false)
+          returnResult()
+          setLoading(false)
+        }, 5000)
+      })
+    } else {
+      returnResult()
+      setLoading(false)
+    }
   }
 
   return (
@@ -220,6 +256,29 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Dialog
+        open={openNotFound}
+        onClose={() => {
+          setOpenNotFound(false)
+          window.location.href = "/#/"
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>{t("Some error occured. This activity does not exist.")}</DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setLoading(false)
+              setOpenNotFound(false)
+              history.back()
+            }}
+            color="primary"
+          >
+            {`${t("Ok")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

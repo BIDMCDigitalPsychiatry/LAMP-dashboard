@@ -30,6 +30,7 @@ import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
+import { useTranslation } from "react-i18next"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -43,7 +44,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     let res = array.slice().sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
     return res
   }
-
+  const { t } = useTranslation()
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TARGETINFO",
     item: { target: id[id.length - 1], type, name, id_string: id },
@@ -189,10 +190,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         id[id.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
           : id[id.length - 1] === "Study"
-          ? `$LAMP.Study.list("${id[id.length - 2]}")}`
+          ? `$LAMP.Study.list("${id[id.length - 2]}")`
           : id[id.length - 1] === "Participant"
           ? queryDictionary.participantsWithName(id[id.length - 2])
-          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")}`
+          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")`
       getData(testQuery).then((res) => {
         if (!Array.isArray(res)) res = [res]
         setTree(res)
@@ -203,7 +204,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")}`
+      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")`
       onSetQuery(testQuery)
     }, [expanded])
   }
@@ -328,7 +329,9 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     if (showFilter && filterRef.current) filterRef.current.focus()
   }, [showFilter])
 
-  const [copyText, setCopyText] = React.useState(`Copy ${id.length >= 2 ? id[id.length - 2] : ""} ID to clipboard`)
+  const [copyText, setCopyText] = React.useState(
+    `${t("Copy")} ${id.length >= 2 ? id[id.length - 2] : ""} ${t("ID to clipboard")}`
+  )
 
   return (
     <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
@@ -389,7 +392,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       )}
       <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={isAlphabetized ? `Sort by date of creation` : `Alphabetize List`}>
+          <Tooltip title={isAlphabetized ? `${t("Sort by date of creation")}` : `${t("Alphabetize List")}`}>
             <IconButton
               className={isAlphabetized ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => toggleAlphabetized(!isAlphabetized)}
@@ -400,7 +403,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )}
 
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
+          <Tooltip title={`${t("Filter")}${currentFilter.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
             <IconButton
               className={currentFilter.length ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => {
@@ -463,7 +466,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   }
                   label={
                     <Box component="span" fontWeight={600}>
-                      File Name
+                      {`${t("File Name")}`}
                     </Box>
                   }
                 />
@@ -474,7 +477,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   control={<Checkbox checked={explodeParticipant} />}
                   label={
                     <Box component="span" fontWeight={600}>
-                      Separate participant data into multiple lines for each activity
+                      {`${t("Separate participant data into multiple lines for each activity")}`}
                     </Box>
                   }
                 />
@@ -485,7 +488,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     control={<Checkbox checked={explodeTemporalSlices} />}
                     label={
                       <Box component="span" fontWeight={600}>
-                        Separate activity data into multiple lines for each response
+                        {`${t("Separate activity data into multiple lines for each response")}`}
                       </Box>
                     }
                   />
@@ -496,7 +499,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   control={<Checkbox checked={downloadAllActivities} />}
                   label={
                     <Box component="span" fontWeight={600}>
-                      Download data for all activities for this {id[id.length - 2]}
+                      {`${t("Download data for all activities for this")}`} {id[id.length - 2]}
                     </Box>
                   }
                 />
@@ -583,7 +586,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         {isGUIEditor &&
           !Object.keys(tags_object).includes(id[id.length - 1]) &&
           Object.keys(tags_object).includes(id[id.length - 2]) && (
-            <Tooltip title={`Analyze ${id[id.length - 2]}`}>
+            <Tooltip title={`${t("Analyze")} ${id[id.length - 2]}`}>
               <IconButton
                 className={classes.treeButton}
                 onClick={() =>
@@ -606,11 +609,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               </Tooltip>
             ) : null
           ) : expanded ? (
-            <Tooltip title={"Collapse"}>
+            <Tooltip title={`${t("Collapse")}`}>
               <Icon>expand_less</Icon>
             </Tooltip>
           ) : (
-            <Tooltip title={"Expand"}>
+            <Tooltip title={`${t("Expand")}`}>
               <Icon>expand_more</Icon>
             </Tooltip>
           )}
