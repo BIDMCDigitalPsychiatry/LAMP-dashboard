@@ -433,9 +433,20 @@ export default function Feed({
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [tag, setTag] = useState(null)
   const { t } = useTranslation()
+  const [showFeed, setShowFeed] = useState(false)
 
   useEffect(() => {
-    getFeedByDate(new Date())
+    ;(async () => {
+      const showFeed = await LAMP.Type.getAttachment(participant.id, "lamp.show_feed").then((res: any) =>
+        res.error === undefined && typeof res.data != "undefined" ? res.data : true
+      )
+      setShowFeed(showFeed)
+      if (showFeed !== false) {
+        getFeedByDate(new Date())
+      } else {
+        setLoading(false)
+      }
+    })()
   }, [])
 
   function getDayNumber(date: Date) {
@@ -474,6 +485,7 @@ export default function Feed({
     if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
+        console.log(feeds)
         let currentDate = new Date(date)
         let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
@@ -808,91 +820,100 @@ export default function Feed({
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           {loading == false &&
-            (currentFeed.length === 0 ? (
+            (currentFeed.length === 0 || showFeed == false ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
-                <Icon>info</Icon>
-                <p>{`${t("There are no scheduled activities available.")}`}</p>
+                <Icon>info {showFeed}</Icon>
+                <p>
+                  {showFeed == false
+                    ? `${t("The managing researcher has disabled the user feed.")}`
+                    : `${t("There are no scheduled activities available.")}`}
+                </p>
               </Box>
             ) : null)}
-          <Stepper
-            orientation="vertical"
-            classes={{ root: classes.customstepper }}
-            connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
-          >
-            {typeof currentFeed !== "undefined" &&
-              currentFeed.map((feed, index) => (
-                <Step>
-                  <StepLabel
-                    StepIconProps={{
-                      completed: feed.completed,
-                      classes: {
-                        root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
-                        active: classes.stepActiveIcon,
-                        completed: classes[feed.group + "CompletedIcon"],
-                      },
-                    }}
-                  >
-                    <Card
-                      className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
-                      variant="outlined"
-                      onClick={() => {
-                        if (
-                          !feed.completed &&
-                          feed.clickable &&
-                          (typeof feed.activityData?.category === "undefined" ||
-                            feed.activityData?.category === null ||
-                            (!!feed.activityData?.category && feed.activityData?.category.length !== 0))
-                        ) {
-                          window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
-                        }
-                      }}
-                    >
-                      <Grid container spacing={0}>
-                        <Grid
-                          xs
-                          container
-                          justifyContent="center"
-                          direction="column"
-                          className={classes.feedtasks}
-                          spacing={0}
+          {showFeed !== false && (
+            <Stepper
+              orientation="vertical"
+              classes={{ root: classes.customstepper }}
+              connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
+            >
+              {typeof currentFeed !== "undefined" &&
+                currentFeed.map(
+                  (feed, index) =>
+                    (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.showFeed && (
+                      <Step>
+                        <StepLabel
+                          StepIconProps={{
+                            completed: feed.completed,
+                            classes: {
+                              root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
+                              active: classes.stepActiveIcon,
+                              completed: classes[feed.group + "CompletedIcon"],
+                            },
+                          }}
                         >
-                          <Box m={1}>
-                            <Typography variant="body2" color="textSecondary">
-                              <Box fontStyle="italic" className={classes.smalltext}>
-                                {feed.timeValue}
-                              </Box>
-                            </Typography>
-                            <Typography variant="h5">{`${t(feed.title)}`}</Typography>
-                            <Typography className={classes.smalltext} color="textSecondary">
-                              {feed.spec}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid container justifyContent="center" direction="column" className={classes.image}>
-                          <Box
-                            style={{
-                              margin: "auto",
-                              background: !["", null].includes(
-                                (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
-                              )
-                                ? `url(${
-                                    (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
-                                  }) center center/contain no-repeat`
-                                : `url(${InfoIcon}) center center/contain no-repeat`,
+                          <Card
+                            className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
+                            variant="outlined"
+                            onClick={() => {
+                              if (
+                                !feed.completed &&
+                                feed.clickable &&
+                                (typeof feed.activityData?.category === "undefined" ||
+                                  feed.activityData?.category === null ||
+                                  (!!feed.activityData?.category && feed.activityData?.category.length !== 0))
+                              ) {
+                                window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
+                              }
                             }}
-                          ></Box>
-                        </Grid>
-                      </Grid>
-                    </Card>
-                  </StepLabel>
-                  {index !== currentFeed.length - 1 && (
-                    <StepContent classes={{ root: classes.customsteppercontent }}>
-                      <div></div>
-                    </StepContent>
-                  )}
-                </Step>
-              ))}
-          </Stepper>
+                          >
+                            <Grid container spacing={0}>
+                              <Grid
+                                xs
+                                container
+                                justifyContent="center"
+                                direction="column"
+                                className={classes.feedtasks}
+                                spacing={0}
+                              >
+                                <Box m={1}>
+                                  <Typography variant="body2" color="textSecondary">
+                                    <Box fontStyle="italic" className={classes.smalltext}>
+                                      {feed.timeValue}
+                                    </Box>
+                                  </Typography>
+                                  <Typography variant="h5">{`${t(feed.title)}`}</Typography>
+                                  <Typography className={classes.smalltext} color="textSecondary">
+                                    {feed.spec}
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                              <Grid container justifyContent="center" direction="column" className={classes.image}>
+                                <Box
+                                  style={{
+                                    margin: "auto",
+                                    background: !["", null].includes(
+                                      (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                    )
+                                      ? `url(${
+                                          (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                        }) center center/contain no-repeat`
+                                      : `url(${InfoIcon}) center center/contain no-repeat`,
+                                  }}
+                                ></Box>
+                              </Grid>
+                            </Grid>
+                          </Card>
+                        </StepLabel>
+                        {index !== currentFeed.length - 1 && (
+                          <StepContent classes={{ root: classes.customsteppercontent }}>
+                            <div></div>
+                          </StepContent>
+                        )}
+                      </Step>
+                    )
+                )}
+            </Stepper>
+          )}
         </Grid>
         <Grid item xs className={classes.large_calendar}>
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />

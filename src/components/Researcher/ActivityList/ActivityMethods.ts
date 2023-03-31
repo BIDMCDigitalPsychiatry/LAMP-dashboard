@@ -1042,6 +1042,15 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.maze_game": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
     "lamp.cats_and_dogs_new": {
       type: "object",
       properties: {
@@ -1208,6 +1217,7 @@ export function spliceActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
@@ -1272,6 +1282,7 @@ export function unspliceActivity(x) {
       description: x.description,
       photo: x.photo,
       streak: x.streak,
+      showFeed: x.showFeed,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
@@ -1300,6 +1311,7 @@ export function unspliceCTActivity(x) {
       description: x.description,
       photo: x.photo,
       streak: x.streak,
+      showFeed: x.showFeed,
     },
   }
 }
@@ -1313,6 +1325,7 @@ export function spliceCTActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: raw.settings,
     category: raw.category,
@@ -1328,6 +1341,7 @@ export async function saveTipActivity(x) {
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
       streak: x.streak,
+      showFeed: x.showFeed,
     })
   } else {
     result = (await LAMP.Activity.update(x.id, {
@@ -1336,6 +1350,7 @@ export async function saveTipActivity(x) {
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
       streak: x.streak,
+      showFeed: x.showFeed,
     })
   }
   return result
@@ -1347,6 +1362,7 @@ export async function saveCTestActivity(x) {
     description: x.description,
     photo: x.photo,
     streak: x.streak,
+    showFeed: x.showFeed,
   })
   return newItem
 }
@@ -1405,6 +1421,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
         streak: x?.streak ?? null,
+        showFeed: x?.showFeed,
       })
       return result
     } else {
@@ -1422,6 +1439,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
           description: x.description,
           photo: x.photo,
           streak: x.streak,
+          showFeed: x?.showFeed,
         })
         return result
       }
@@ -1433,6 +1451,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     } else {
@@ -1442,6 +1461,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     }
@@ -1466,6 +1486,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         spec: "lamp.tips",
         settings: x.settings,
         streak: x.streak,
+        showFeed: x?.showFeed,
         schedule: [],
         category: x.category,
       }
@@ -1476,6 +1497,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     }
