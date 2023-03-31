@@ -1,5 +1,15 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
+import {
+  Grid,
+  ButtonBase,
+  Icon,
+  TextField,
+  Tooltip,
+  Box,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
@@ -53,6 +63,9 @@ export default function ActivityHeader({
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [streak, setStreak] = useState(details?.streak ? details?.streak : null)
+  const [showFeed, setShowFeed] = useState(
+    typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
+  )
 
   useEffect(() => {
     onChange({
@@ -61,12 +74,9 @@ export default function ActivityHeader({
       description,
       studyId,
       streak,
+      showFeed,
     })
-  }, [text, description, photo, studyId, streak])
-
-  useEffect(() => {
-    //
-  }, [])
+  }, [text, description, photo, studyId, streak, showFeed])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -165,6 +175,20 @@ export default function ActivityHeader({
             inputProps={{ maxLength: 2500 }}
           />
         </Box>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showFeed}
+              onChange={() => {
+                setShowFeed(!showFeed)
+              }}
+              name="showFeed"
+              color="primary"
+            />
+          }
+          label={`${t("Show activity in the participant feed?")}`}
+        />
       </Grid>
       <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
     </Grid>
