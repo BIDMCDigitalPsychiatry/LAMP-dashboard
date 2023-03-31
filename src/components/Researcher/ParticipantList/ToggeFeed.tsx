@@ -67,6 +67,7 @@ export default function ToggleFeed({ participants, setParticipants, ...props }) 
         classes={{ root: classes.btnText }}
         onClick={(event) => setConfirmationDialog(8)}
       >
+        <Icon>cached_outlined</Icon>
         {`${t("Update")}`}
       </Fab>
       <ConfirmationDialog

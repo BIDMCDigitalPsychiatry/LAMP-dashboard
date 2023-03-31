@@ -89,9 +89,12 @@ export default function Header({
       )}
       {(selectedParticipants || []).length > 0 && (
         <Box className={classes.optionsMain}>
-          <Box className={classes.optionsSub}>
-            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
+          <Box
+            className={classes.optionsSub}
+            sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+          >
             <ToggleFeed participants={selectedParticipants} setParticipants={setParticipants} />
+            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
           </Box>
         </Box>
       )}
