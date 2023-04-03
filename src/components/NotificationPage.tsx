@@ -134,10 +134,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
                     ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
                     : 2000
                   data["settings"]["balance"] = balance
-                  data =
-                    data.spec === "lamp.survey"
-                      ? spliceActivity({ raw: data, tag })
-                      : spliceCTActivity({ raw: data, tag })
+                  data = spliceCTActivity({ raw: data, tag })
                   setActivity(data)
                   setLoading(false)
                 })()

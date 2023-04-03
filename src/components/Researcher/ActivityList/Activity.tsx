@@ -26,6 +26,7 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
   "lamp.spin_wheel",
+  "lamp.maze_game",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
