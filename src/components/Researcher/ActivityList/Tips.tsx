@@ -12,6 +12,7 @@ import {
   MenuItem,
   CircularProgress,
   Backdrop,
+  FormControlLabel,
 } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
@@ -156,6 +157,9 @@ export default function Tips({
   const [isError, setIsError] = useState(false)
   const [newSchemaList, setNewSchemaList] = useState({})
   const [isImagError, setIsImagError] = useState(false)
+  const [showFeed, setShowFeed] = useState(
+    typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
+  )
 
   const toBinary = (string) => {
     const codeUnits = new Uint16Array(string.length)
@@ -425,6 +429,7 @@ export default function Tips({
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,
+            showFeed: showFeed,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -439,6 +444,7 @@ export default function Tips({
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
+            showFeed: showFeed,
             category: data.category,
           }
     onSave(dataObj, duplicate)
@@ -696,6 +702,19 @@ export default function Tips({
               </Grid>
               <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
             </Grid>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showFeed}
+                  onChange={() => {
+                    setShowFeed(!showFeed)
+                  }}
+                  name="showFeed"
+                  color="primary"
+                />
+              }
+              label={`${t("Show activity in the participant feed?")}`}
+            />
           </Grid>
 
           <ActivityStreak onChange={handleStreakChange} value={details?.streak} />
