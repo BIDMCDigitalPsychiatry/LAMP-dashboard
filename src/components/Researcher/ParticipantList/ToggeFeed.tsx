@@ -75,11 +75,7 @@ export default function ToggleFeed({ participants, setParticipants, ...props }) 
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={updateParticipants}
-        confirmationMsg={
-          showFeed === true
-            ? `${t("`Are you sure you want to hide feeds for this Participant(s)?`")}`
-            : `${t("`Are you sure you want to show feeds for this Participant(s)?`")}`
-        }
+        confirmationMsg={`${t("Are you sure you want to update this Participant(s)?")}`}
       />
     </span>
   )
