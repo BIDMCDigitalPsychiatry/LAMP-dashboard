@@ -392,6 +392,7 @@ export default function Tips({
             settings: settingsObj,
             studyID: studyId,
             category: data.category,
+            showFeed: showFeed,
           },
           false
         )
@@ -406,6 +407,7 @@ export default function Tips({
             settings: settingsObj,
             studyID: studyId,
             category: data.category,
+            showFeed: showFeed,
           },
           false
         )
