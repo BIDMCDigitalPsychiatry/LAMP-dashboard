@@ -396,9 +396,10 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
   return (
     <form onSubmit={handleSubmit}>
       <Autocomplete
-        id="serever-selector"
+        id="server-selector"
         options={options}
         sx={{ width: "100%", marginTop: "12px" }}
+        value={value}
         onSelect={onChange}
         renderInput={(params) => (
           <TextField
