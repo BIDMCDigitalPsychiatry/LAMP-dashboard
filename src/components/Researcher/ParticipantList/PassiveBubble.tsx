@@ -31,9 +31,9 @@ const daysSinceLast = (passive, timeAgo, t) => ({
 
 export const dataQuality = (passive, timeAgo, t, classes) => ({
   title:
-    `${t("GPS.")}` +
+    `${t("GPS")}` +
     `: ${daysSinceLast(passive, timeAgo, t).gpsString}, ` +
-    `${t("Accelerometer.")}` +
+    `${t("Accelerometer")}` +
     `: ${daysSinceLast(passive, timeAgo, t).accelString}`,
   class:
     daysSinceLast(passive, timeAgo, t).gps <= 2 && daysSinceLast(passive, timeAgo, t).accel <= 2

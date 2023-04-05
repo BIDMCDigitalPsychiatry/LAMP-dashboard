@@ -493,7 +493,7 @@
 	"You're ready to start using mindLAMP.": "आप माइंडलैम्प का उपयोग शुरू करने के लिए तैयार हैं।",
 	"You're using the src server to log into mindLAMP.": "माइंडलैम्प में लॉग करने के लिए आप {{src}} सर्वर का उपयोग कर रहे हैं।",
 	"GPS": "जीपीएस",
-	"Accelerometer.": "शारीर में हलचल मापने वाला यंत्र",
+	"Accelerometer": "शारीर में हलचल मापने वाला यंत्र",
 	"Never": "कभी नहीं",	
 	"Jewels A": "जवाहरात A",
 	"Jewels B": "जवाहरात B",
