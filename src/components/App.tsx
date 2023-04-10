@@ -970,12 +970,12 @@ function AppRouter({ ...props }) {
 
 export default function App({ ...props }) {
   useEffect(() => {
-    if (
-      window.location.href.includes("code") &&
-      window.location.href.includes("oauth") &&
-      window.location.href.includes("#/")
-    ) {
-      const newPath = window.location.href.replace(/(\/oauth\?)(code=.*)#\/(.*)/, "/#$1$3$2")
+    const path = window.location.href
+    if (path.includes("code") && path.includes("oauth") && path.includes("#/")) {
+      let newPath = path.replace(/(\/oauth\?)(code=.*)#\/(.*)/, "/#$1$3$2")
+      if (!path.includes("?")) {
+        newPath = path.replace(/(\/oauth)(\#\/)(code=.*)/, "/#$1?$3")
+      }
       window.location.href = newPath
     }
   }, [])
