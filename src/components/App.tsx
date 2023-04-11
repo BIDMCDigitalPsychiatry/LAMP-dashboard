@@ -971,12 +971,18 @@ function AppRouter({ ...props }) {
 export default function App({ ...props }) {
   useEffect(() => {
     const path = window.location.href
-    if (path.includes("code") && path.includes("oauth") && path.includes("#/")) {
-      let newPath = path.replace(/(\/oauth\?)(code=.*)#\/(.*)/, "/#$1$3$2")
-      if (!path.includes("?")) {
-        newPath = path.replace(/(\/oauth)(\#\/)(code=.*)/, "/#$1?$3")
+    if (path.includes("oauth") && path.includes("#/")) {
+      if (path.includes("error=access_denied")) {
+        let newPath = path.replace(/(\/oauth)(.*)/, "")
+        window.location.href = newPath
       }
-      window.location.href = newPath
+      if (path.includes("code")) {
+        let newPath = path.replace(/(\/oauth\?)(code=.*)#\/(.*)/, "/#$1$3$2")
+        if (!path.includes("?")) {
+          newPath = path.replace(/(\/oauth)(\#\/)(code=.*)/, "/#$1?$3")
+        }
+        window.location.href = newPath
+      }
     }
   }, [])
   return (
@@ -1088,7 +1094,7 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
   }
 
   useEffect(() => {
-    if (!oauthParams?.codeVerifier) {
+    if (!oauthParams?.codeVerifier || oauthParams?.error) {
       setState({ finished: true, success: false })
       return
     }
