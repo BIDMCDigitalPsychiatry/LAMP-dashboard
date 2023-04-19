@@ -186,7 +186,7 @@ export default function Activity({
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
         addActivity(x, studies)
-        enqueueSnackbar(`${t("Successfully duplicated the Activity.")}`, {
+        enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
           variant: "success",
         })
         history.back()

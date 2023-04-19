@@ -271,7 +271,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               handleSaveData(warningsDialogState.activitySubmitEvent)
             }}
           >
-            {t("OK")}
+            {t("Ok")}
           </Button>
         </DialogActions>
       </Dialog>
