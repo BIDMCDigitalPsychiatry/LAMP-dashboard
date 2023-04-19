@@ -96,7 +96,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         { label: "mindlamp-qa.dmh.lacounty.gov" },
       ]
     } else {
-      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
+      options = JSON.parse(cachedOptions).filter((o) => typeof o?.label !== "undefined")
     }
     setOptions(options)
     let query = window.location.hash.split("?")
@@ -125,7 +125,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
-    if (!options.find((item) => item.label == state.serverAddress)) {
+    if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
