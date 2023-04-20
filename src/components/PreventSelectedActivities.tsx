@@ -15,7 +15,8 @@ import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import da from "javascript-time-ago/locale/da"
 import de from "javascript-time-ago/locale/de"
-import zh from "javascript-time-ago/locale/zh"
+import zh_HK from "javascript-time-ago/locale/zh-Hans-HK"
+import zh_CN from "javascript-time-ago/locale/zh"
 import ko from "javascript-time-ago/locale/ko"
 import es from "javascript-time-ago/locale/es"
 import it from "javascript-time-ago/locale/it"
@@ -36,7 +37,8 @@ const localeMap = {
   "fr-FR": fr,
   "ko-KR": ko,
   "it-IT": it,
-  "zh-CN": zh,
+  "zh-CN": zh_CN,
+  "zh-HK": zh_HK,
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
