@@ -71,7 +71,7 @@ export default function StudiesList({
 
   useEffect(() => {
     if ((studies || []).length > 0) setAllStudies(studies)
-    else setAllStudies(null)
+    else setAllStudies([])
   }, [studies])
 
   const searchFilterStudies = async () => {
@@ -82,6 +82,7 @@ export default function StudiesList({
     } else {
       getAllStudies()
     }
+    setLoading(false)
   }
 
   useEffect(() => {

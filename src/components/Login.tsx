@@ -109,7 +109,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     }
   }, [])
   useEffect(() => {
-    console.log(selectedLanguage)
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
 

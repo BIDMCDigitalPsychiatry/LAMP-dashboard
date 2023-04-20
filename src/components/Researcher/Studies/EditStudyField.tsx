@@ -49,7 +49,7 @@ export default function EditStudyField({
       })
       .catch((err) =>
         enqueueSnackbar(
-          `${t("Failed to load group's alias: errorMessage", {
+          `${t("Failed to fetch the study details.", {
             alias: study,
             errorMessage: err.message,
           })}`,

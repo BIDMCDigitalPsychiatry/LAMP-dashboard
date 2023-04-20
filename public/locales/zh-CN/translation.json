@@ -737,4 +737,6 @@
 "TYPE": "类型",
 "Choose File": "选择文件",
 "Memory Game": "记忆游戏",
-"Does not match the password you entered above.": "与您在上面输入的密码不匹配"}
+"Does not match the password you entered above.": "与您在上面输入的密码不匹配",
+"Failed to fetch the study details.": "Failed to fetch the study details."
+}

@@ -1113,5 +1113,6 @@
 	"Please select the group": "Seleccionar el estudio", "Please select the Group.": "Seleccione el estudio"  , "Measure of Action": "Medida de acción"  ,
 	"Server Address": "dirección del servidor"   , "Data Portal": "portal de datos" , "Profile": "Perfil"  , "User": "Usuario", "Confirm Password": "Confirmar contraseña", 
 	"Confirmation": "Confirmación" , "NAME": "Nombre", "TYPE": "Tipo", "Choose File": "Elija el archivo"  , "Copy": "Copiar", "ID to clipboard": "ID al portapapeles" ,
-	"File Name": "Nombre de archivo" , "Memory Game": "juego de memoria" , "Analyze Researcher Data": "\u201cAnalizar al investigador datos"                                   
+	"File Name": "Nombre de archivo" , "Memory Game": "juego de memoria" , "Analyze Researcher Data": "\u201cAnalizar al investigador datos", 
+	"Failed to fetch the study details.": "No se pudieron obtener los detalles del estudio."                              
 }
