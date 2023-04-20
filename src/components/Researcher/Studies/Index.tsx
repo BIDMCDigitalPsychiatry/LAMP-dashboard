@@ -78,6 +78,7 @@ export default function StudiesList({
     if (!!search && search !== "") {
       let studiesList: any = await Service.getAll("studies")
       let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
+      console.log(newStudies)
       setAllStudies(newStudies)
     } else {
       getAllStudies()
@@ -110,45 +111,43 @@ export default function StudiesList({
       <Backdrop className={classes.backdrop} open={loading || allStudies === null}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {allStudies !== null && (allStudies || []).length > 0 && (
-        <Box>
-          <Header
-            studies={allStudies ?? null}
-            researcherId={researcherId}
-            searchData={handleSearchData}
-            setParticipants={searchFilterStudies}
-            newStudyObj={setNewStudy}
-          />
-          <Box className={classes.tableContainer} py={4}>
-            <Grid container spacing={3}>
-              {allStudies !== null && (allStudies || []).length > 0 ? (
-                (allStudies || []).map((study) => (
-                  <Grid item lg={6} xs={12} key={study.id}>
-                    <Box display="flex" p={1} className={classes.studyMain}>
-                      <Box flexGrow={1}>
-                        <EditStudy
-                          study={study}
-                          upatedDataStudy={handleUpdatedStudyObject}
-                          allStudies={allStudies}
-                          researcherId={researcherId}
-                        />
-                      </Box>
-                      <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
+      <Box>
+        <Header
+          studies={allStudies ?? null}
+          researcherId={researcherId}
+          searchData={handleSearchData}
+          setParticipants={searchFilterStudies}
+          newStudyObj={setNewStudy}
+        />
+        <Box className={classes.tableContainer} py={4}>
+          <Grid container spacing={3}>
+            {allStudies !== null && (allStudies || []).length > 0 ? (
+              (allStudies || []).map((study) => (
+                <Grid item lg={6} xs={12} key={study.id}>
+                  <Box display="flex" p={1} className={classes.studyMain}>
+                    <Box flexGrow={1}>
+                      <EditStudy
+                        study={study}
+                        upatedDataStudy={handleUpdatedStudyObject}
+                        allStudies={allStudies}
+                        researcherId={researcherId}
+                      />
                     </Box>
-                  </Grid>
-                ))
-              ) : (
-                <Grid item lg={6} xs={12}>
-                  <Box display="flex" alignItems="center" className={classes.norecords}>
-                    <Icon>info</Icon>
-                    {`${t("No Records Found")}`}
+                    <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
                   </Box>
                 </Grid>
-              )}
-            </Grid>
-          </Box>
+              ))
+            ) : (
+              <Grid item lg={6} xs={12}>
+                <Box display="flex" alignItems="center" className={classes.norecords}>
+                  <Icon>info</Icon>
+                  {`${t("No Records Found")}`}
+                </Box>
+              </Grid>
+            )}
+          </Grid>
         </Box>
-      )}
+      </Box>
     </React.Fragment>
   )
 }
