@@ -105,11 +105,12 @@ import daLocale from "date-fns/locale/da"
 import deLocale from "date-fns/locale/de"
 import itLocale from "date-fns/locale/it"
 import zhLocale from "date-fns/locale/zh-CN"
+import zhHKLocale from "date-fns/locale/zh-HK"
 import esLocale from "date-fns/locale/es"
 import enLocale from "date-fns/locale/en-US"
 import hiLocale from "date-fns/locale/hi"
 
-const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
 
 const localeMap = {
   "en-US": enLocale,
@@ -121,6 +122,7 @@ const localeMap = {
   "ko-KR": koLocale,
   "it-IT": itLocale,
   "zh-CN": zhLocale,
+  "zh-HK": zhHKLocale,
 }
 import DateFnsUtils from "@date-io/date-fns"
 
