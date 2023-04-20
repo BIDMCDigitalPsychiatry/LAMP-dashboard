@@ -743,5 +743,6 @@
 	"TYPE": "प्रकार",
 	"Choose File": "फाइलें चुनें",
 	"File Name": "फ़ाइल नाम",
-	"Memory Game": "स्मृति खेल"
+	"Memory Game": "स्मृति खेल",
+	"Failed to fetch the study details.": "अध्ययन विवरण प्राप्त करने में विफल"
 }
