@@ -78,7 +78,6 @@ export default function StudiesList({
     if (!!search && search !== "") {
       let studiesList: any = await Service.getAll("studies")
       let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
-      console.log(newStudies)
       setAllStudies(newStudies)
     } else {
       getAllStudies()
