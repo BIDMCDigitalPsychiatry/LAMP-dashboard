@@ -38,10 +38,8 @@ export default function Active({ participant, ...props }) {
     let isCancelled = false
     setTimeout(() => {
       Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-        console.log(data)
         if (!isCancelled) {
           let res = data[0]?.analytics
-          console.log(!!res && res.length > 0 ? res[0] : null)
           setLogins(!!res && res.length > 0 ? res[0] : null)
           let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
           setActive(active)
