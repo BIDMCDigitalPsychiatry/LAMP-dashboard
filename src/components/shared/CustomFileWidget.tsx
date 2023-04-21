@@ -49,8 +49,8 @@ function processFile(files) {
 }
 
 import locale_lang from "../../locale_map.json"
-import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES } from "@mui/material/locale"
-const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES, zhHK } from "@mui/material/locale"
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
 const languageObjects = {
   "en-US": enUS,
   "es-ES": esES,
@@ -61,6 +61,7 @@ const languageObjects = {
   "ko-KR": koKR,
   "it-IT": itIT,
   "zh-CN": zhCN,
+  "zh-HK": zhHK,
 }
 
 export default function CustomFileWidget(props) {
