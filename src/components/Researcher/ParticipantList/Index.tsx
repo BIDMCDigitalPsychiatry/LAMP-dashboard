@@ -9,6 +9,7 @@ import ko from "javascript-time-ago/locale/ko"
 import es from "javascript-time-ago/locale/es"
 import it from "javascript-time-ago/locale/it"
 import hi from "javascript-time-ago/locale/hi"
+import zhHK from "javascript-time-ago/locale/zh-Hans-HK"
 import fr from "javascript-time-ago/locale/fr"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
@@ -78,6 +79,12 @@ function getCurrentLanguage(language) {
     case "zh_CN":
       lang = "zh-CN"
       break
+    case "zh_HK":
+      lang = "zh-HK"
+      break
+    case "ko_KR":
+      lang = "ko-KR"
+      break
     default:
       lang = "en-US"
       break
@@ -109,8 +116,14 @@ function getCurrentLanguageCode(language) {
     case "fr_FR":
       langCode = fr
       break
+    case "ko_KR":
+      langCode = ko
+      break
     case "zh_CN":
       langCode = zh
+      break
+    case "zh_HK":
+      langCode = zhHK
       break
     default:
       langCode = en
