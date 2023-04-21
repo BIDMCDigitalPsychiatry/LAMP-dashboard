@@ -216,6 +216,9 @@ export const strategies = {
     })
     return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
   },
+  "lamp.maze_game": (slices, activity, scopedItem) => {
+    return (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length
+  },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
@@ -346,7 +349,9 @@ export default function PreventSelectedActivities({
                             x: new Date(d.timestamp),
                             y: strategies[activity.spec]
                               ? strategies[activity.spec](
-                                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                                  activity.spec === "lamp.survey" ||
+                                    activity.spec === "lamp.pop_the_bubbles" ||
+                                    activity.spec === "lamp.maze_game"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
                                     : activity.spec === "lamp.scratch_image" ||
                                       activity.spec === "lamp.breathe" ||

@@ -36,7 +36,9 @@ export default function ActivityCard({
         d.temporal_slices.map((t) => ({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+            activity.spec === "lamp.maze_game"
+              ? t.duration
+              : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
               ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
@@ -141,7 +143,9 @@ export default function ActivityCard({
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
               value:
-                typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
+                activity.spec === "lamp.maze_game"
+                  ? x.duration
+                  : typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
                   ? Number(x.value.replace(/\"/g, ""))
                   : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
@@ -164,7 +168,9 @@ export default function ActivityCard({
               minHeight={48}
               color={colors.blue[500]}
               data={eachData[idx]}
-              onClick={(datum) => setVisibleSlice(datum)}
+              onClick={(datum) => {
+                setVisibleSlice(datum)
+              }}
             />
           )}
           value={Object.values(
@@ -173,7 +179,9 @@ export default function ActivityCard({
                 d.temporal_slices.map((t) => ({
                   item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-                    activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                    activity.spec === "lamp.maze_game"
+                      ? t.duration
+                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
@@ -210,7 +218,8 @@ export default function ActivityCard({
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" ||
                     activity.spec === "lamp.spin_wheel" ||
-                    activity.spec === "lamp.pop_the_bubbles"
+                    activity.spec === "lamp.pop_the_bubbles" ||
+                    activity.spec === "lamp.maze_game"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
