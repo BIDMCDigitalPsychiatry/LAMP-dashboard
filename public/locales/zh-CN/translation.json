@@ -1,7 +1,7 @@
 
 
 {
-    "Welcome to the Portal Section.": "欢迎来到首页",
+    "Welcome to the Portal section": "欢迎来到首页",
 "Track progress and make connections.": "跟踪进度并建立联系",
 "Log feelings, behavior, and activity.": "记录感觉、行为和活动。",
 "Find useful information and practice healthy habits.": "寻找有用的信息，养成健康的习惯。",
@@ -19,7 +19,7 @@
 "Add a user": "添加用户",
 "Add a new group": "添加加一个新的群组",
 "Add a new user and group": "添加新用户和组",
-"Create a new user under their own group": "在自己的组下创建一个新的用户",
+"Create a new user under this group": "在自己的组下创建一个新的用户",
 "Duplicate from": "复制",
 "Last passive": "最后一个被动",
 "User view": "用户视图",
@@ -502,7 +502,7 @@
 "entries": "条目",
 "Social Context": "社会背景",
 "Edit goal": "编辑目标",
-"Current streak": "当前连胜记录:",
+"Current streak:": "当前连胜记录:",
 "Goal History": "目标历史记录",
 "Department of Mental Health (DMH)": "精神健康部(DMH)",
 "National Alliance on Mental Illness (NAMI)": "全国精神疾病联盟（NAMI）",
