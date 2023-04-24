@@ -34,7 +34,7 @@ export default function ActivityCard({
     events
       .map((d) =>
         d.temporal_slices.map((t) => ({
-          item: t.item,
+          item: activity.spec === "lamp.maze_game" ? t.level : t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
@@ -177,7 +177,7 @@ export default function ActivityCard({
             events
               .map((d) =>
                 d.temporal_slices.map((t) => ({
-                  item: t.item,
+                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
