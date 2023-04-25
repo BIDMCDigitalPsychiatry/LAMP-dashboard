@@ -183,7 +183,10 @@ export default function ScheduleRow({
     <TableRow key={index} style={{ verticalAlign: !isEdit ? "middle" : "top" }}>
       <TableCell component="th" scope="row">
         {!isEdit ? (
-          <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
+          <span>
+            {getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}
+            {`${t("No custom times")}`}
+          </span>
         ) : (
           <MuiThemeProvider theme={formTheme}>
             <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={DateFnsUtils}>
@@ -301,7 +304,11 @@ export default function ScheduleRow({
       <TableCell>
         {!isEdit ? (
           <span>
-            {data.repeat_interval === "custom" ? <span>{manyDates(data.custom_time)}</span> : `${t("No custom times")}`}
+            {data.repeat_interval === "custom" ? (
+              <span>{`${t(manyDates(data.custom_time))}`}</span>
+            ) : (
+              `${t("No custom times")}`
+            )}
           </span>
         ) : (
           <span>
