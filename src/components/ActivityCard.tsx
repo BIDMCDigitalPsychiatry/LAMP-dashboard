@@ -34,7 +34,7 @@ export default function ActivityCard({
     events
       .map((d) =>
         d.temporal_slices.map((t) => ({
-          item: activity.spec === "lamp.maze_game" ? t.level : t.item,
+          item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
@@ -74,6 +74,8 @@ export default function ActivityCard({
       }
     })
   })
+
+  console.log(eachData)
 
   return (
     <React.Fragment>
@@ -177,7 +179,7 @@ export default function ActivityCard({
             events
               .map((d) =>
                 d.temporal_slices.map((t) => ({
-                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
+                  item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
