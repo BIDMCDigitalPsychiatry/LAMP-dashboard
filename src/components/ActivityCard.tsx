@@ -75,8 +75,6 @@ export default function ActivityCard({
     })
   })
 
-  console.log(eachData)
-
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
