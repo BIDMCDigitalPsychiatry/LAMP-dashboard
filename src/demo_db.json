@@ -1064,7 +1064,7 @@
     {
       "#type": "Activity",
       "#parent": "study1",
-      "id": "activity60",
+      "id": "activity55",
       "spec": "lamp.recording",
       "name": "Voice Recording",
       "settings": {},
