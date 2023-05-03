@@ -951,6 +951,45 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.emotion_recognition": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity settings"),
+          type: "array",
+          items: {
+            required: ["image", "emotion"],
+            type: "object",
+            properties: {
+              image: {
+                type: "string",
+                title: i18n.t("Image"),
+                description: i18n.t(
+                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
+                ),
+                format: "data-url",
+                "ui:widget": "file",
+                "ui:options": {
+                  accept: ".gif,.jpg,.png,.svg",
+                },
+              },
+              emotionText: {
+                title: i18n.t("Text"),
+                type: "string",
+                default: "",
+              },
+              emotion: {
+                type: "string",
+                title: i18n.t("Emotion"),
+                enum: ["happiness", "sadness", "fear", "anger", "neutral"],
+                enumNames: [i18n.t("Happiness"), i18n.t("Sadness"), i18n.t("Fear"), i18n.t("Anger"), i18n.t("Neutral")],
+                default: "happiness",
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.dbt_diary_card": {
       type: "object",
       properties: {
