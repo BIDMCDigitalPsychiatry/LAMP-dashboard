@@ -1069,6 +1069,15 @@
       "name": "Voice Recording",
       "settings": {},
       "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity56",
+      "spec": "lamp.emotion_recognition",
+      "name": "Emotion Recognition",
+      "settings": {},
+      "schedule": []
     }
   ],
   "Sensor": [
@@ -32894,6 +32903,27 @@
       "#parent": null,
       "id": "lamp.recording",
       "name": "lamp.recording",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.emotion_recognition",
+      "name": "lamp.emotion_recognition",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.maze_game",
+      "name": "lamp.maze_game",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.spin_wheel",
+      "name": "lamp.spin_wheel",
       "settings_schema": {}
     }
   ],

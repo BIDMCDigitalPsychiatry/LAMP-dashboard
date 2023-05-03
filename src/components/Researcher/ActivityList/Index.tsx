@@ -56,6 +56,9 @@ export const availableActivitySpecs = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
   "lamp.recording",
+  "lamp.spin_wheel",
+  "lamp.maze_game",
+  "lamp.emotion_recognition",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -66,6 +69,7 @@ export const games = [
   "lamp.balloon_risk",
   "lamp.spin_wheel",
   "lamp.maze_game",
+  "lamp.emotion_recognition",
 ]
 export default function ActivityList({
   researcherId,
