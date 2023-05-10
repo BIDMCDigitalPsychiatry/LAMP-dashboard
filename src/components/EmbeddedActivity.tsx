@@ -42,6 +42,7 @@ const demoActivities = {
   "lamp.memory_game": "memorygame",
   "lamp.spin_wheel": "spin_wheel",
   "lamp.maze_game": "maze_game",
+  "lamp.emotion_recognition": "emotion_recognition",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -191,7 +192,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
-
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
