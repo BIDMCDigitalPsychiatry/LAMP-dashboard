@@ -219,6 +219,9 @@ export const strategies = {
   "lamp.maze_game": (slices, activity, scopedItem) => {
     return (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length
   },
+  "lamp.emotion_recognition": (slices, activity, scopedItem) => {
+    return (slices || []).map((x) => (!!x.type ? 1 : 0)).reduce((prev, cur) => prev + cur, 0)
+  },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>

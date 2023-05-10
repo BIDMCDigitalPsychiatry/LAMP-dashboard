@@ -241,6 +241,20 @@ export default function GameCreator({
       activitySpecId === "lamp.medications"
     ) {
       return validateGoals(duplicates)
+    } else if (
+      (value?.spec && ["lamp.emotion_recognition"].includes(value.spec)) ||
+      ["lamp.emotion_recognition"].includes(activitySpecId)
+    ) {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+        (data.settings || []).length < 10 ||
+        (data.settings || []).filter((d) => !!d.image).length !== (data.settings || []).length
+      )
     } else {
       return !(
         typeof data.studyID == "undefined" ||
