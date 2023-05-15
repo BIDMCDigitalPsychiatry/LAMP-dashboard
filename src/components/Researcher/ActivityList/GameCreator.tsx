@@ -252,8 +252,10 @@ export default function GameCreator({
         duplicates.length > 0 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-        (data.settings || []).length < 10 ||
-        (data.settings || []).filter((d) => !!d.image).length !== (data.settings || []).length
+        typeof data.settings === "undefined" ||
+        (typeof data.settings !== "undefined" &&
+          (Object.keys(data?.settings || {}).length < 10 ||
+            (data?.settings || []).filter((d) => !!d.image).length !== Object.keys(data?.settings || {}).length))
       )
     } else {
       return !(

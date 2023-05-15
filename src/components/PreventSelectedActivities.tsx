@@ -220,6 +220,7 @@ export const strategies = {
     return (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length
   },
   "lamp.emotion_recognition": (slices, activity, scopedItem) => {
+    console.log(slices)
     return (slices || []).map((x) => (!!x.type ? 1 : 0)).reduce((prev, cur) => prev + cur, 0)
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,

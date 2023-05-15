@@ -957,7 +957,7 @@ export const SchemaList = () => {
         settings: {
           title: i18n.t("Activity settings"),
           type: "array",
-          minItems: 10,
+          maxLength: 10,
           items: {
             required: ["image", "emotion"],
             type: "object",
