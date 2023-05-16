@@ -254,7 +254,7 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "") ||
         typeof data.settings === "undefined" ||
         (typeof data.settings !== "undefined" &&
-          (Object.keys(data?.settings || {}).length < 10 ||
+          ((data?.settings || []).filter((d) => !!d.emotionText).length !== Object.keys(data?.settings || {}).length ||
             (data?.settings || []).filter((d) => !!d.image).length !== Object.keys(data?.settings || {}).length))
       )
     } else {
