@@ -38,7 +38,9 @@ export default function ActivityCard({
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
-              : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              : activity.spec === "lamp.survey" ||
+                activity.spec === "lamp.pop_the_bubbles" ||
+                activity.spec === "lamp.emotion_recognition"
               ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
@@ -181,7 +183,9 @@ export default function ActivityCard({
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
-                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                      : activity.spec === "lamp.survey" ||
+                        activity.spec === "lamp.pop_the_bubbles" ||
+                        activity.spec === "lamp.emotion_recognition"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
@@ -217,6 +221,7 @@ export default function ActivityCard({
             y: strategies[activity.spec]
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" ||
+                    activity.spec === "lamp.emotion_recognition" ||
                     activity.spec === "lamp.spin_wheel" ||
                     activity.spec === "lamp.pop_the_bubbles" ||
                     activity.spec === "lamp.maze_game"
@@ -232,7 +237,9 @@ export default function ActivityCard({
               : 0,
             slice: d.temporal_slices,
             missing:
-              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              activity.spec === "lamp.survey" ||
+              activity.spec === "lamp.pop_the_bubbles" ||
+              activity.spec === "lamp.emotion_recognition"
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}

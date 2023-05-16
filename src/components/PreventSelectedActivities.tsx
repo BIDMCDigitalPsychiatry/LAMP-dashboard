@@ -355,7 +355,8 @@ export default function PreventSelectedActivities({
                               ? strategies[activity.spec](
                                   activity.spec === "lamp.survey" ||
                                     activity.spec === "lamp.pop_the_bubbles" ||
-                                    activity.spec === "lamp.maze_game"
+                                    activity.spec === "lamp.maze_game" ||
+                                    activity.spec === "lamp.emotion_recognition"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
                                     : activity.spec === "lamp.scratch_image" ||
                                       activity.spec === "lamp.breathe" ||
