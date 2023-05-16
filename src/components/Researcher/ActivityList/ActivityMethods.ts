@@ -957,7 +957,7 @@ export const SchemaList = () => {
         settings: {
           title: i18n.t("Activity settings"),
           type: "array",
-          maxLength: 10,
+          description: i18n.t("A maximum of 50 images can only be uploaded."),
           items: {
             required: ["image", "emotion"],
             type: "object",
