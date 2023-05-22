@@ -21,6 +21,7 @@ export default function ArrayView({
 }) {
   const { t } = useTranslation()
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
+
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>
@@ -47,7 +48,7 @@ export default function ArrayView({
                       {typeof row[key] === "string" ? (
                         <ReactMarkdown children={t(row[key])} skipHtml={false} remarkPlugins={[gfm, emoji]} />
                       ) : (
-                        row[key]
+                        row[key].toString()
                       )}
                     </TableCell>
                   )

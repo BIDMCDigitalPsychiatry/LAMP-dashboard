@@ -38,9 +38,7 @@ export default function ActivityCard({
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
-              : activity.spec === "lamp.survey" ||
-                activity.spec === "lamp.pop_the_bubbles" ||
-                activity.spec === "lamp.emotion_recognition"
+              : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
               ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
@@ -50,7 +48,7 @@ export default function ActivityCard({
                   ? Number(t.value.replace(/\"/g, ""))
                   : t.value
                 : t.value
-              : activity.spec === "lamp.spin_wheel"
+              : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
               ? t.type
               : !!t.type
               ? 1
@@ -147,6 +145,8 @@ export default function ActivityCard({
               value:
                 activity.spec === "lamp.maze_game"
                   ? x.duration
+                  : activity.spec === "lamp.emotion_recognition"
+                  ? x.type
                   : typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
                   ? Number(x.value.replace(/\"/g, ""))
                   : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
@@ -183,9 +183,7 @@ export default function ActivityCard({
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
-                      : activity.spec === "lamp.survey" ||
-                        activity.spec === "lamp.pop_the_bubbles" ||
-                        activity.spec === "lamp.emotion_recognition"
+                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
@@ -195,7 +193,7 @@ export default function ActivityCard({
                           ? Number(t.value.replace(/\"/g, ""))
                           : t.value
                         : t.value
-                      : activity.spec === "lamp.spin_wheel"
+                      : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
                       ? t.type
                       : !!t.type
                       ? 1
