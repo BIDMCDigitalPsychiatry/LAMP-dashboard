@@ -959,7 +959,7 @@ export const SchemaList = () => {
           type: "array",
           description: i18n.t("A maximum of 50 images can only be uploaded."),
           items: {
-            required: ["image", "emotion"],
+            required: ["image", "emotion", "emotionText"],
             type: "object",
             properties: {
               image: {
