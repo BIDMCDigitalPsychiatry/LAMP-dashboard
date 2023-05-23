@@ -48,7 +48,7 @@ export default function ArrayView({
                       {typeof row[key] === "string" ? (
                         <ReactMarkdown children={t(row[key])} skipHtml={false} remarkPlugins={[gfm, emoji]} />
                       ) : (
-                        row[key].toString()
+                        row[key]?.toString()
                       )}
                     </TableCell>
                   )
