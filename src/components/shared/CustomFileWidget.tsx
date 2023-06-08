@@ -1,6 +1,5 @@
 import React from "react"
-import { makeStyles, IconButton, Box, Icon, MuiThemeProvider, createTheme, Button } from "@material-ui/core"
-import { Widgets } from "@rjsf/material-ui"
+import { makeStyles, IconButton, Box, Icon, Button } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
@@ -47,74 +46,15 @@ function processFile(files) {
     reader.readAsDataURL(f)
   })
 }
-
-import locale_lang from "../../locale_map.json"
-import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES, zhHK } from "@mui/material/locale"
-const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
-const languageObjects = {
-  "en-US": enUS,
-  "es-ES": esES,
-  "hi-IN": hiIN,
-  "de-DE": deDE,
-  "da-DK": daDK,
-  "fr-FR": frFR,
-  "ko-KR": koKR,
-  "it-IT": itIT,
-  "zh-CN": zhCN,
-  "zh-HK": zhHK,
-}
-
 export default function CustomFileWidget(props) {
   const classes = useStyles()
   const ref = React.useRef(props.value)
-  const { t, i18n } = useTranslation()
-
-  const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
-    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
-  }
+  const { t } = useTranslation()
 
   const onClick = () => {
     ref.current.value = ""
     props.onChange("")
   }
-  const formTheme = createTheme(
-    {
-      props: {
-        MuiTextField: {
-          variant: "filled",
-        },
-        MuiPaper: {
-          variant: "outlined",
-        },
-      },
-
-      overrides: {
-        MuiFilledInput: {
-          root: {
-            border: 0,
-            backgroundColor: "#f4f4f4",
-            "& textarea": {
-              resize: "vertical",
-            },
-          },
-          underline: {
-            "&&&:before": {
-              borderBottom: "none",
-            },
-            "&&:after": {
-              borderBottom: "none",
-            },
-          },
-        },
-        MuiTypography: {
-          h5: { fontSize: 16, fontWeight: 600, marginBottom: 10 },
-        },
-      },
-    },
-    languageObjects[getSelectedLanguage()]
-  )
 
   return (
     <Box>

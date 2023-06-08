@@ -777,6 +777,15 @@ export const SchemaList = () => {
           title: i18n.t("Survey Questions"),
           description: i18n.t("Configure questions, parameters, and options."),
           type: "array",
+          "ui:schema": {
+            copyable: true,
+          },
+          "ui:options": {
+            addable: true,
+            removable: true,
+            orderable: true,
+            copyable: true,
+          },
           items: {
             required: ["text", "type"],
 
@@ -1025,7 +1034,8 @@ export const SchemaList = () => {
                     title: i18n.t("Measure of Action"),
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enum: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enumNames: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
@@ -1049,7 +1059,8 @@ export const SchemaList = () => {
                     title: i18n.t("Measure of action"),
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enum: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enumNames: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
