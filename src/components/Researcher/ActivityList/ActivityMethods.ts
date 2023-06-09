@@ -796,7 +796,7 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "boolean", "short_answer", "likert", "matrix"],
+                        enum: ["text", "boolean", "short", "likert", "matrix"],
                       },
                     },
                   },
