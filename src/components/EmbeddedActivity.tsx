@@ -77,6 +77,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [currentActivity])
 
   const handleSubmit = (e) => {
+    localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
     let warnings = []
     if (e.data !== null) {
       try {
@@ -139,7 +140,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
       // Listen to message from child window
       eventer(messageEvent, handleSubmit, false)
-      return () => window.removeEventListener(messageEvent, handleSaveData)
+      return () => window.removeEventListener(messageEvent, handleSubmit)
     }
   }, [iFrame])
 
