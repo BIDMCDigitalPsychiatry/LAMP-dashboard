@@ -1,11 +1,34 @@
 import React from "react"
-import { Table, TableBody, TableHead, TableCell, TableRow, Box } from "@material-ui/core"
+import { Table, TableBody, TableHead, TableCell, TableRow, makeStyles, createStyles, Theme } from "@material-ui/core"
 import { humanize } from "./Utils"
 
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { useTranslation } from "react-i18next"
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    table: {
+      "& tr": {
+        "& td": {
+          "&:first-child": {
+            position: "sticky",
+            left: 0,
+            background: "#fff",
+          },
+        },
+        "& th": {
+          "&:first-child": {
+            position: "sticky",
+            left: 0,
+            background: "#fff",
+          },
+        },
+      },
+    },
+  })
+)
 
 export default function ArrayView({
   value,
@@ -21,10 +44,10 @@ export default function ArrayView({
 }) {
   const { t } = useTranslation()
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
-
+  const classes = useStyles()
   return (
     <div style={{ overflowX: "auto" }}>
-      <Table>
+      <Table className={classes.table}>
         <TableHead>
           <TableRow>
             {displayKeys().map((key) => (
