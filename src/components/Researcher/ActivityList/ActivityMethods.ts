@@ -1120,6 +1120,15 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.symbol_digit_substitution": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
     "lamp.scratch_image": {
       type: "object",
       properties: {
