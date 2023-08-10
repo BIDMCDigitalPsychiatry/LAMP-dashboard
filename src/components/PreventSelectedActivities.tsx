@@ -211,7 +211,6 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
   "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
-    console.log(slices)
     let temporalSlices = slices.filter(function (data) {
       return !!data && data.type === true
     })
