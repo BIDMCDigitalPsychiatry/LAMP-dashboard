@@ -212,7 +212,7 @@ export const strategies = {
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
   "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
     let temporalSlices = slices.filter(function (data) {
-      return data.type === true
+      return !!data && data.type === true
     })
     return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
   },
