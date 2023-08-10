@@ -106,9 +106,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const findLastEvent = (events, activityId, balance, n = 0) => {
-  console.log(events)
   let event = events.filter((event) => event.activity === activityId)[n] ?? {}
-  console.log(event)
   if ((event["temporal_slices"] || []).length === 0) {
     return balance
   } else if (
@@ -147,7 +145,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       LAMP.Activity.view(activityId)
         .then((data: any) => {
           if (!!data) {
-            console.log(data)
             Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
               setTag(tags[0])
               const tag = tags[0]
