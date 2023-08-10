@@ -105,15 +105,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const findLastEvent = (events, activityId, n = 0) => {
+const findLastEvent = (events, activityId, balance, n = 0) => {
   let event = events.filter((event) => event.activity === activityId)[n] ?? {}
-  if ((event["temporal_slices"] || []).length === 0) {
-    return 2000
-  } else if (
-    (event["temporal_slices"] || []).length === 1 &&
-    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit"
+
+  if (
+    (event["temporal_slices"] || []).length === 0 ||
+    ((event["temporal_slices"] || []).length === 1 &&
+      event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit")
   ) {
-    return findLastEvent(events, activityId, ++n)
+    return balance
   } else if (
     (event["temporal_slices"] || []).length > 1 &&
     event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit"
@@ -121,8 +121,8 @@ const findLastEvent = (events, activityId, n = 0) => {
     return event["temporal_slices"][(event["temporal_slices"] || []).length - 2]?.type
   } else {
     event["temporal_slices"]
-      ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type ?? 2000
-      : 2000
+      ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type ?? balance
+      : balance
   }
 }
 
@@ -144,13 +144,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       LAMP.Activity.view(activityId)
         .then((data: any) => {
           if (!!data) {
+            console.log(data)
             Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
               setTag(tags[0])
               const tag = tags[0]
               if (data.spec == "lamp.spin_wheel") {
                 ;(async () => {
                   const events = await LAMP.ActivityEvent.allByParticipant(participant)
-                  const balance = findLastEvent(events, activityId)
+                  const balance = findLastEvent(events, activityId, data.settings?.balance ?? 2000)
                   data["settings"]["balance"] = balance
                   data = spliceCTActivity({ raw: data, tag })
                   setActivity(data)
