@@ -107,20 +107,21 @@ const useStyles = makeStyles((theme) => ({
 
 const findLastEvent = (events, activityId, balance, n = 0) => {
   let event = events.filter((event) => event.activity === activityId)[n] ?? {}
-
-  if (
-    (event["temporal_slices"] || []).length === 0 ||
-    ((event["temporal_slices"] || []).length === 1 &&
-      event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit")
-  ) {
+  if ((event["temporal_slices"] || []).length === 0) {
     return balance
+  } else if (
+    (event["temporal_slices"] || []).length === 1 &&
+    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit" &&
+    events.filter((event) => event.activity === activityId).length > 1
+  ) {
+    return findLastEvent(events, activityId, ++n)
   } else if (
     (event["temporal_slices"] || []).length > 1 &&
     event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit"
   ) {
     return event["temporal_slices"][(event["temporal_slices"] || []).length - 2]?.type
   } else {
-    event["temporal_slices"]
+    return event["temporal_slices"]
       ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type ?? balance
       : balance
   }

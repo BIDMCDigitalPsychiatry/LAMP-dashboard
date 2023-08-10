@@ -10,7 +10,7 @@ export const SchemaList = () => {
         settings: {
           title: i18n.t("Activity Settings"),
           type: "object",
-          required: ["low_risk", "high_risk", "spins_per_game"],
+          required: ["low_risk", "high_risk", "spins_per_game", "balance"],
           properties: {
             low_risk: {
               title: i18n.t("Low Risk"),
@@ -171,6 +171,14 @@ export const SchemaList = () => {
               minimum: 1,
               maximum: 100,
               default: 20,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            balance: {
+              title: i18n.t("Starting Balance"),
+              type: "number",
+              default: 2000,
               "ui:grid": {
                 xs: 6,
               },
