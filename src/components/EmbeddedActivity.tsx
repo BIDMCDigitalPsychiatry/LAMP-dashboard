@@ -43,6 +43,7 @@ const demoActivities = {
   "lamp.spin_wheel": "spin_wheel",
   "lamp.maze_game": "maze_game",
   "lamp.emotion_recognition": "emotion_recognition",
+  "lamp.symbol_digit_substitution": "symbol_digit_substitution",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
