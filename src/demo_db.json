@@ -803,6 +803,15 @@
     {
       "#type": "Activity",
       "#parent": "study1",
+      "id": "activity77",
+      "spec": "lamp.symbol_digit_substitution",
+      "name": "Symbol digit substitution",
+      "settings": {},
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
       "id": "activity7",
       "spec": "lamp.nback",
       "name": "N-Back",
