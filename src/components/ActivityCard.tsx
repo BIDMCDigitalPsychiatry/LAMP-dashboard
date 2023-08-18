@@ -30,6 +30,7 @@ export default function ActivityCard({
   const { t } = useTranslation()
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
+  console.log(events)
   let each = Object.values(
     events
       .map((d) =>
@@ -38,7 +39,9 @@ export default function ActivityCard({
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
-              : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              : activity.spec === "lamp.survey" ||
+                activity.spec === "lamp.pop_the_bubbles" ||
+                activity.spec === "lamp.symbol_digit_substitution"
               ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
@@ -183,7 +186,9 @@ export default function ActivityCard({
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
-                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                      : activity.spec === "lamp.survey" ||
+                        activity.spec === "lamp.pop_the_bubbles" ||
+                        activity.spec === "lamp.symbol_digit_substitution"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
@@ -222,7 +227,8 @@ export default function ActivityCard({
                     activity.spec === "lamp.emotion_recognition" ||
                     activity.spec === "lamp.spin_wheel" ||
                     activity.spec === "lamp.pop_the_bubbles" ||
-                    activity.spec === "lamp.maze_game"
+                    activity.spec === "lamp.maze_game" ||
+                    activity.spec === "lamp.symbol_digit_substitution"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
