@@ -207,6 +207,8 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.jewels_b": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.symbol_digit_substitution": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
@@ -355,7 +357,8 @@ export default function PreventSelectedActivities({
                                   activity.spec === "lamp.survey" ||
                                     activity.spec === "lamp.pop_the_bubbles" ||
                                     activity.spec === "lamp.maze_game" ||
-                                    activity.spec === "lamp.emotion_recognition"
+                                    activity.spec === "lamp.emotion_recognition" ||
+                                    activity.spec === "lamp.symbol_digit_substitution"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
                                     : activity.spec === "lamp.scratch_image" ||
                                       activity.spec === "lamp.breathe" ||
