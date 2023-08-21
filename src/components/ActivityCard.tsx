@@ -30,12 +30,16 @@ export default function ActivityCard({
   const { t } = useTranslation()
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
-  console.log(events)
   let each = Object.values(
     events
       .map((d) =>
         d.temporal_slices.map((t) => ({
-          item: activity.spec === "lamp.maze_game" ? t.level : t.item,
+          item:
+            activity.spec === "lamp.symbol_digit_substitution"
+              ? t.type
+              : activity.spec === "lamp.maze_game"
+              ? t.level
+              : t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.maze_game"
               ? t.duration
@@ -143,12 +147,12 @@ export default function ActivityCard({
         ) : (
           <ArrayView
             hiddenKeys={["x"]}
-            value={(visibleSlice.slice || []).map((x) => ({
+            value={(visibleSlice.slice || []).map((x, index) => ({
               item: x.item,
               value:
                 activity.spec === "lamp.maze_game"
                   ? x.duration
-                  : activity.spec === "lamp.emotion_recognition"
+                  : activity.spec === "lamp.emotion_recognition" || activity.spec === "lamp.symbol_digit_substitution"
                   ? x.type
                   : typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
                   ? Number(x.value.replace(/\"/g, ""))
@@ -181,8 +185,15 @@ export default function ActivityCard({
           value={Object.values(
             events
               .map((d) =>
-                d.temporal_slices.map((t) => ({
-                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
+                d.temporal_slices.map((t, index) => ({
+                  item:
+                    activity.spec === "lamp.symbol_digit_substitution"
+                      ? d.temporal_slices.length > index + 1
+                        ? "Digit " + (index + 1) + " : " + t.type
+                        : t.type
+                      : activity.spec === "lamp.maze_game"
+                      ? t.level
+                      : t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
@@ -227,8 +238,7 @@ export default function ActivityCard({
                     activity.spec === "lamp.emotion_recognition" ||
                     activity.spec === "lamp.spin_wheel" ||
                     activity.spec === "lamp.pop_the_bubbles" ||
-                    activity.spec === "lamp.maze_game" ||
-                    activity.spec === "lamp.symbol_digit_substitution"
+                    activity.spec === "lamp.maze_game"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
