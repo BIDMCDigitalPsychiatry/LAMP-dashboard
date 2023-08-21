@@ -33,10 +33,12 @@ export default function ActivityCard({
   let each = Object.values(
     events
       .map((d) =>
-        d.temporal_slices.map((t) => ({
+        d.temporal_slices.map((t, index) => ({
           item:
             activity.spec === "lamp.symbol_digit_substitution"
-              ? t.type
+              ? d.temporal_slices.length > index + 1
+                ? "Digit " + (index + 1) + " : " + t.type
+                : t.type
               : activity.spec === "lamp.maze_game"
               ? t.level
               : t.item,
