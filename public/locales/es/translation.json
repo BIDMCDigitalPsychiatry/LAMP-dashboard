@@ -13,6 +13,7 @@
 	"QUESTION_NUMBER_OF_TOTAL": "Pregunta {{ number }} de {{ total }}",
 	"Question": "Pregunta",
 	"of":"de",
+	"Self evaluation":"Self evaluation",
 	"Next" : "Siguiente",
 	"Submit": "Enviar",
 	"Mood": "Humor",
