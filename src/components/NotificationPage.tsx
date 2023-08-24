@@ -105,6 +105,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const findLastEvent = (events, activityId, balance, n = 0) => {
+  let event = events.filter((event) => event.activity === activityId)[n] ?? {}
+  if ((event["temporal_slices"] || []).length === 0) {
+    return balance
+  } else if (
+    (event["temporal_slices"] || []).length === 1 &&
+    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit" &&
+    events.filter((event) => event.activity === activityId).length > 1
+  ) {
+    return findLastEvent(events, activityId, ++n)
+  } else if (
+    (event["temporal_slices"] || []).length > 1 &&
+    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit"
+  ) {
+    return event["temporal_slices"][(event["temporal_slices"] || []).length - 2]?.type
+  } else {
+    return event["temporal_slices"]
+      ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type ?? balance
+      : balance
+  }
+}
+
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -129,10 +151,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               if (data.spec == "lamp.spin_wheel") {
                 ;(async () => {
                   const events = await LAMP.ActivityEvent.allByParticipant(participant)
-                  let event = events.filter((event) => event.activity === activityId)[0] ?? {}
-                  const balance = !!event["temporal_slices"]
-                    ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type
-                    : 2000
+                  const balance = findLastEvent(events, activityId, data.settings?.balance ?? 2000)
                   data["settings"]["balance"] = balance
                   data = spliceCTActivity({ raw: data, tag })
                   setActivity(data)
