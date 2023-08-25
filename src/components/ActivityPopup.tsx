@@ -251,11 +251,17 @@ export default function ActivityPopup({
               {`${t("Quick Tips to Improve Your")}`} {`${t(activity?.name)}`}
             </Typography>
           )}
-          {(activity?.spec === "lamp.survey" || activity?.spec === "lamp.dbt_diary_card") && (
+          {activity?.spec === "lamp.survey" && (
             <Typography variant="h4" gutterBottom>
               {questionCount} {questionCount > 1 ? `${t("questions")}` : `${t("question")}`} {/* (10 mins) */}
             </Typography>
           )}
+          {activity?.spec === "lamp.dbt_diary_card" && (
+            <Typography variant="h4" gutterBottom>
+              {`${t("Self evaluation")}`}
+            </Typography>
+          )}
+
           <Typography variant="body2" component="p">
             <ReactMarkdown
               children={
