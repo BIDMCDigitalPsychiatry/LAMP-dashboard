@@ -87,7 +87,10 @@ export default function ActivityCard({
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
-        {!Boolean(visibleSlice) && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
+        {!Boolean(visibleSlice) &&
+        activity.spec !== "lamp.scratch_image" &&
+        activity.spec !== "lamp.symbol_digit_substitution" &&
+        activity.spec !== "lamp.breathe" ? (
           <Tooltip title={`${t("Switch Views")}`}>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
               <Icon fontSize="small">dashboard</Icon>
@@ -95,7 +98,7 @@ export default function ActivityCard({
           </Tooltip>
         ) : (
           <Tooltip title={`${t("Go Back")}`}>
-            <IconButton onClick={(event) => setVisibleSlice(undefined)}>
+            <IconButton onClick={() => window.history.back()}>
               <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
