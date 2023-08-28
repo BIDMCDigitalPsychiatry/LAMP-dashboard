@@ -39,7 +39,6 @@ export const getDateVal = (dateVal) => {
 export default function SymbolDigitResponses({ activityData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  console.log(activityData)
 
   return (
     <div className={classes.root}>
