@@ -9,7 +9,7 @@ import { strategies } from "./PreventSelectedActivities"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
-
+import SymbolDigitResponses from "./SymbolDigitResponses"
 export default function ActivityCard({
   activity,
   events,
@@ -28,6 +28,11 @@ export default function ActivityCard({
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
+
+  useEffect(() => {
+    console.log(showGrid, visibleSlice)
+  }, [showGrid, visibleSlice])
+
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
@@ -87,10 +92,7 @@ export default function ActivityCard({
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
-        {!Boolean(visibleSlice) &&
-        activity.spec !== "lamp.scratch_image" &&
-        activity.spec !== "lamp.symbol_digit_substitution" &&
-        activity.spec !== "lamp.breathe" ? (
+        {!Boolean(visibleSlice) && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
           <Tooltip title={`${t("Switch Views")}`}>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
               <Icon fontSize="small">dashboard</Icon>
@@ -166,6 +168,8 @@ export default function ActivityCard({
             }))}
           />
         )
+      ) : showGrid && activity.spec === "lamp.symbol_digit_substitution" ? (
+        <SymbolDigitResponses activityData={events} />
       ) : showGrid &&
         activity.spec !== "lamp.scratch_image" &&
         activity.spec !== "lamp.tips" &&
@@ -191,20 +195,11 @@ export default function ActivityCard({
             events
               .map((d) =>
                 d.temporal_slices.map((t, index) => ({
-                  item:
-                    activity.spec === "lamp.symbol_digit_substitution"
-                      ? d.temporal_slices.length > index + 1
-                        ? "Digit " + (index + 1) + " : " + t.type
-                        : t.type
-                      : activity.spec === "lamp.maze_game"
-                      ? t.level
-                      : t.item,
+                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.maze_game"
                       ? t.duration
-                      : activity.spec === "lamp.survey" ||
-                        activity.spec === "lamp.pop_the_bubbles" ||
-                        activity.spec === "lamp.symbol_digit_substitution"
+                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
