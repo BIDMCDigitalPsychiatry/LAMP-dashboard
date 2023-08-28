@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles, TableCell, Table, TableRow, TableHead, TableBody } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-
+import Pagination from "./PaginatedElement"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -9,10 +9,21 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
+    tablestyle: {
+      "& th": {
+        background: "#f4f4f4",
+        padding: "6px !important",
+      },
+      "& td": {
+        borderBottom: "#e3e3e3 solid 1px",
+        padding: "6px !important",
+      },
+      "& td:not(:first-child)": {
+        textAlign: "center",
+      },
+    },
   })
 )
-
-import { getDateString } from "./PreventDBT"
 
 export const getDateStringValue = (timestamp) => {
   let date = new Date(parseInt(timestamp))
@@ -22,7 +33,11 @@ export const getDateStringValue = (timestamp) => {
   var curr_hr = date.getHours()
   var curr_min = date.getMinutes()
   let dateString = curr_month + "-" + curr_date + "-" + curr_year + "-" + curr_hr + "-" + curr_min
-  return getDateString(getDateVal(dateString))
+  return (
+    getDateVal(dateString).toLocaleDateString([]) +
+    " " +
+    getDateVal(dateString).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  )
 }
 
 export const getDateVal = (dateVal) => {
@@ -39,10 +54,19 @@ export const getDateVal = (dateVal) => {
 export default function SymbolDigitResponses({ activityData, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [page, setPage] = useState(1)
+  const [rowCount, setRowCount] = useState(10)
+  const [paginated, setPaginated] = useState(activityData.slice(page * rowCount, page * rowCount + rowCount))
+
+  const handleChangePage = (page: number, rowCount: number) => {
+    setPage(page)
+    setRowCount(rowCount)
+    setPaginated(activityData.slice(page * rowCount, page * rowCount + rowCount))
+  }
 
   return (
     <div className={classes.root}>
-      <Table>
+      <Table className={classes.tablestyle}>
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
@@ -55,10 +79,10 @@ export default function SymbolDigitResponses({ activityData, ...props }) {
         </TableHead>
         <TableBody>
           {activityData.length > 0 ? (
-            activityData.map((event) => (
+            paginated.map((event) => (
               <TableRow>
                 <TableCell>{getDateStringValue(event?.timestamp)}</TableCell>
-                <TableCell>{event?.static_data?.number_of_responses} </TableCell>
+                <TableCell>{event?.static_data?.number_of_responses}</TableCell>
                 <TableCell>{event?.static_data?.number_of_correct_responses}</TableCell>
                 <TableCell>{event?.static_data?.number_of_incorrect_responses}</TableCell>
                 <TableCell>{event?.static_data?.avg_correct_response_time}</TableCell>
@@ -72,6 +96,7 @@ export default function SymbolDigitResponses({ activityData, ...props }) {
           )}
         </TableBody>
       </Table>
+      <Pagination data={activityData} updatePage={handleChangePage} rowPerPage={[10, 20, 50, 100]} />
     </div>
   )
 }
