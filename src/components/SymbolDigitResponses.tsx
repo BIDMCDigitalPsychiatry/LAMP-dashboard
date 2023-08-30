@@ -82,7 +82,7 @@ export default function SymbolDigitResponses({ activityData, ...props }) {
             paginated.map((event) => (
               <TableRow>
                 <TableCell>{getDateStringValue(event?.timestamp)}</TableCell>
-                <TableCell>{event?.static_data?.number_of_responses}</TableCell>
+                <TableCell>{event?.static_data?.number_of_symbols}</TableCell>
                 <TableCell>{event?.static_data?.number_of_correct_responses}</TableCell>
                 <TableCell>{event?.static_data?.number_of_incorrect_responses}</TableCell>
                 <TableCell>{event?.static_data?.avg_correct_response_time}</TableCell>
