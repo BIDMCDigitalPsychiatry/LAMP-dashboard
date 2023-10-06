@@ -126,15 +126,23 @@ const useStyles = makeStyles((theme: Theme) =>
           right: 10,
         },
       },
+      "& h5": {
+        color: "#4C66D6",
+        fontSize: 12,
+        textAlign: "right",
+        padding: "0 25px 0 10px",
+        fontWeight: 600,
+      },
     },
     preventlabelFull: {
       minHeight: "auto",
       fontSize: 16,
-
       padding: "0 0 0 15px",
-      marginTop: 8,
       width: "100%",
       textAlign: "left",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
       "& span": { color: "#618EF7" },
     },
     maxw300: {
@@ -343,6 +351,7 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
+                    {activity.spec === "lamp.survey" && <Typography variant="h5">20% completed</Typography>}
                   </Typography>
                   <Box className={classes.maxw300}>
                     <VegaLite
