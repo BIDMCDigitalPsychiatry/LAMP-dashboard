@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { makeStyles, createStyles, Theme, Grid, TextField, Button } from "@material-ui/core"
+import { makeStyles, createStyles, Theme, Grid, TextField, Button, Box } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 
@@ -15,8 +15,6 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "capitalize",
       fontSize: "16px",
       color: "#fff",
-      position: "absolute",
-      top: 25,
       "&:hover": { background: "#5680f9" },
       [theme.breakpoints.down("sm")]: {
         minWidth: "auto",
@@ -47,8 +45,13 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:focus": {
         borderColor: "rgba(0,0,0,1)",
       },
-      option: {
-        padding: 100,
+    },
+    formHeading: {
+      padding: "0 10px",
+      borderTop: "#eee solid 1px",
+      marginTop: 15,
+      "& h4": {
+        marginBottom: "10px",
       },
     },
   })
@@ -57,7 +60,12 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PercentageSettings({ activityId, ...props }) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const [settings, setSettings] = useState({ limit: null, unit: null, timeframe: null })
+  const [settings, setSettings] = useState({
+    limit: null,
+    unit: null,
+    timeframe: null,
+    startDate: new Date().getTime(),
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -69,11 +77,15 @@ export default function PercentageSettings({ activityId, ...props }) {
   }, [])
 
   const updateSettings = async () => {
+    settings["startDate"] = new Date().getTime()
     await LAMP.Type.setAttachment(activityId, "me", "lamp.dashboard.percentage_settings", settings)
   }
 
   return (
     <Grid container spacing={2}>
+      <Grid xs={12} className={classes.formHeading}>
+        <h4>Survey percentage settings</h4>
+      </Grid>
       <Grid item xs={4} className={classes.formouter}>
         <label className={classes.formlabel}>{`${t("Required number of completions")}`}</label>
         <TextField
@@ -91,7 +103,6 @@ export default function PercentageSettings({ activityId, ...props }) {
           name="unit"
           value={settings.unit}
           onChange={(e) => {
-            console.log(e.target.value)
             setSettings({ ...settings, unit: e.target.value })
           }}
           className={classes.formSelect}
@@ -113,7 +124,11 @@ export default function PercentageSettings({ activityId, ...props }) {
           }}
         />
       </Grid>
-      <Button onClick={updateSettings}>Save</Button>
+      <Box marginLeft={1} paddingBottom={4}>
+        <Button onClick={updateSettings} className={classes.btnBlue}>
+          Save
+        </Button>
+      </Box>
     </Grid>
   )
 }
