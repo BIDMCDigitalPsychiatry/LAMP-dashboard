@@ -126,15 +126,23 @@ const useStyles = makeStyles((theme: Theme) =>
           right: 10,
         },
       },
+      "& h5": {
+        color: "#4C66D6",
+        fontSize: 12,
+        textAlign: "right",
+        padding: "0 25px 0 10px",
+        fontWeight: 600,
+      },
     },
     preventlabelFull: {
       minHeight: "auto",
       fontSize: 16,
-
       padding: "0 0 0 15px",
-      marginTop: 8,
       width: "100%",
       textAlign: "left",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
       "& span": { color: "#618EF7" },
     },
     maxw300: {
@@ -241,6 +249,44 @@ export const strategies = {
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
+
+const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
+  let percentage = []
+  return await Promise.all(
+    percentage.concat(
+      activities.map(async (activity) => {
+        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        const endTime = getEndTime(tag)
+        let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, null, tag.startDate, endTime)
+        return { activityId: activity.id, percentage: (activityEvents.length / tag.limit) * 100 }
+      })
+    )
+  )
+}
+
+const getEndTime = (tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
+  let endTime = tag.startDate
+  switch (tag.unit) {
+    case "weeks":
+      endTime = tag.startDate + 7 * tag.timeframe * 24 * 60 * 60 * 1000
+      break
+    case "months":
+      const d = new Date(tag.startDate)
+      d.setMonth(d.getMonth() + tag.timeframe)
+      endTime = d.getTime()
+      break
+    case "days":
+      endTime = tag.startDate + tag.timeframe * 24 * 60 * 60 * 1000
+      break
+    case "hours":
+      endTime = tag.startDate + tag.timeframe * 60 * 60 * 1000
+      break
+  }
+  return endTime
+}
+
 export default function PreventSelectedActivities({
   participant,
   activities,
@@ -269,12 +315,23 @@ export default function PreventSelectedActivities({
   const { t, i18n } = useTranslation()
   const [timeAgo, setLang] = useState(new TimeAgo("en-US"))
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+  const [percentages, setPercentages] = React.useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
+
+  React.useEffect(() => {
+    ;(async () => {
+      const percentages = await getPercentageSettings(
+        participant.id,
+        activities.filter((activity) => activity.spec === "lamp.survey")
+      )
+      setPercentages(percentages)
+    })()
+  }, [activities])
 
   useEffect(() => {
     TimeAgo.addLocale(localeMap[getSelectedLanguage()])
@@ -343,6 +400,11 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
+                    {activity.spec === "lamp.survey" && (
+                      <Typography variant="h5">
+                        {percentages.filter((p) => p.activityId === activity.id)[0]?.percentage ?? 0}% completed
+                      </Typography>
+                    )}
                   </Typography>
                   <Box className={classes.maxw300}>
                     <VegaLite
