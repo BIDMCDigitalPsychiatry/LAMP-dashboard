@@ -252,14 +252,18 @@ export const strategies = {
 
 const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
+  console.log(activities)
   return await Promise.all(
     percentage.concat(
       activities.map(async (activity) => {
         let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
           !!y.error ? undefined : y.data
         )[0]
+        console.log(tag)
         const endTime = getEndTime(tag)
+        console.log(endTime, await LAMP.ActivityEvent.allByParticipant(participantId))
         let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, null, tag.startDate, endTime)
+        console.log(activityEvents.length, tag.limit, Math.round((activityEvents.length / tag.limit) * 100 * 100) / 100)
         return {
           activityId: activity.id,
           percentage: Math.round((activityEvents.length / tag.limit) * 100 * 100) / 100,
@@ -332,6 +336,7 @@ export default function PreventSelectedActivities({
         participant.id,
         activities.filter((activity) => activity.spec === "lamp.survey")
       )
+      console.log(percentages)
       setPercentages(percentages)
     })()
   }, [activities])
