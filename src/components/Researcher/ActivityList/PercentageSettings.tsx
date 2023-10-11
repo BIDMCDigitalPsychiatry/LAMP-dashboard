@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react"
-import { makeStyles, createStyles, Theme, Grid, TextField, Button, Box } from "@material-ui/core"
+import { makeStyles, createStyles, Theme, Grid, TextField, Button, Box, Tooltip, Fab, Icon } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,6 +61,8 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function PercentageSettings({ activityId, ...props }) {
   const { t } = useTranslation()
   const classes = useStyles()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [settings, setSettings] = useState({
     limit: null,
     unit: null,
@@ -79,6 +82,9 @@ export default function PercentageSettings({ activityId, ...props }) {
   const updateSettings = async () => {
     settings["startDate"] = new Date().getTime()
     await LAMP.Type.setAttachment(activityId, "me", "lamp.dashboard.percentage_settings", settings)
+    enqueueSnackbar(`${t("Successfully updated survey percentage settings.")}`, {
+      variant: "success",
+    })
   }
 
   return (
@@ -92,6 +98,7 @@ export default function PercentageSettings({ activityId, ...props }) {
           type="number"
           value={settings.limit}
           variant="filled"
+          InputProps={{ inputProps: { min: 1 } }}
           onChange={(e) => {
             setSettings({ ...settings, limit: parseInt(e.target.value) })
           }}
@@ -119,15 +126,20 @@ export default function PercentageSettings({ activityId, ...props }) {
           type="number"
           value={settings.timeframe}
           variant="filled"
+          InputProps={{ inputProps: { min: 1 } }}
           onChange={(e) => {
             setSettings({ ...settings, timeframe: parseInt(e.target.value) })
           }}
         />
       </Grid>
       <Box marginLeft={1} paddingBottom={4}>
-        <Button onClick={updateSettings} className={classes.btnBlue}>
-          Save
-        </Button>
+        <Tooltip title={`${t("Save this activity.")}`}>
+          <Fab className={classes.btnBlue} aria-label="Save" variant="extended" onClick={updateSettings}>
+            {`${t("Save")}`}
+            <span style={{ width: 8 }} />
+            <Icon>save</Icon>
+          </Fab>
+        </Tooltip>
       </Box>
     </Grid>
   )
