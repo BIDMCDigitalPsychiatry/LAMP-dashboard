@@ -260,7 +260,10 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
         )[0]
         const endTime = getEndTime(tag)
         let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, null, tag.startDate, endTime)
-        return { activityId: activity.id, percentage: (activityEvents.length / tag.limit) * 100 }
+        return {
+          activityId: activity.id,
+          percentage: Math.round((activityEvents.length / tag.limit) * 100 * 100) / 100,
+        }
       })
     )
   )
