@@ -250,8 +250,9 @@ export const strategies = {
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
-const getPercentageSettings = async (activityEvents, activities: ActivityObj[]) => {
+const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
   return await Promise.all(
     percentage.concat(
       activities.map(async (activity) => {
@@ -336,7 +337,7 @@ export default function PreventSelectedActivities({
   React.useEffect(() => {
     ;(async () => {
       const percentages = await getPercentageSettings(
-        activityEvents,
+        participant.id,
         activities.filter((activity) => activity.spec === "lamp.survey")
       )
       setPercentages(percentages)
