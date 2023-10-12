@@ -252,6 +252,7 @@ export const strategies = {
 
 const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
   return await Promise.all(
     percentage.concat(
       activities.map(async (activity) => {
@@ -259,10 +260,17 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
           !!y.error ? undefined : y.data
         )[0]
         const endTime = getEndTime(tag)
-        let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, null, tag.startDate, endTime)
         return {
           activityId: activity.id,
-          percentage: Math.round((activityEvents.length / tag.limit) * 100 * 100) / 100,
+          percentage:
+            Math.round(
+              (activityEvents.filter(
+                (a) => a.activity === activity.id && a.timestamp >= tag.startDate && a.timestamp <= endTime
+              ).length /
+                tag.limit) *
+                100 *
+                100
+            ) / 100,
         }
       })
     )
