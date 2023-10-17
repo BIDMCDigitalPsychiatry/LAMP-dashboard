@@ -259,18 +259,21 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
         let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
           !!y.error ? undefined : y.data
         )[0]
-        const endTime = getEndTime(tag)
-        return {
-          activityId: activity.id,
-          percentage:
-            Math.round(
-              (activityEvents.filter(
-                (a) => a.activity === activity.id && a.timestamp >= tag.startDate && a.timestamp <= endTime
-              ).length /
-                tag.limit) *
-                100 *
-                100
-            ) / 100,
+        if (!!tag) {
+          const endTime = getEndTime(tag)
+
+          return {
+            activityId: activity.id,
+            percentage:
+              Math.round(
+                (activityEvents.filter(
+                  (a) => a.activity === activity.id && a.timestamp >= tag.startDate && a.timestamp <= endTime
+                ).length /
+                  tag.limit) *
+                  100 *
+                  100
+              ) / 100,
+          }
         }
       })
     )
@@ -411,9 +414,10 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
-                    {activity.spec === "lamp.survey" && (
+                    {activity.spec === "lamp.survey" && !!percentages && (
                       <Typography variant="h5">
-                        {percentages.filter((p) => p.activityId === activity.id)[0]?.percentage ?? 0}% completed
+                        {(percentages || []).filter((p) => p?.activityId === activity.id)[0]?.percentage ?? 0}%
+                        completed
                       </Typography>
                     )}
                   </Typography>
