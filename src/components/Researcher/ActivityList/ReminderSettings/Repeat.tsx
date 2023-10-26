@@ -30,7 +30,16 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function Repeat({ ...props }) {
   const classes = useStyles()
-  const [selected, setSelected] = useState("")
+  const [data, setData] = useState(props.value ?? null)
+
+  useEffect(() => {
+    if (data !== props.value) props.onUpdate(data)
+  }, [data])
+
+  useEffect(() => {
+    setData(props.value)
+  }, [props?.value])
+
   return (
     <Grid item xs={4} className={classes.formouter}>
       <FormControl variant="outlined" size="medium" className={classes.formSelect}>
@@ -38,11 +47,14 @@ export default function Repeat({ ...props }) {
         <Select
           variant="filled"
           label="text"
-          value={selected}
+          value={data}
+          disabled={props.disabled}
           onChange={(event) => {
-            setSelected(event.target?.value)
+            setData(event.target?.value)
           }}
         >
+          <MenuItem value={null}>Select</MenuItem>
+
           {(props?.options || []).map((option) => (
             <MenuItem value={option.value}>{option.text}</MenuItem>
           ))}

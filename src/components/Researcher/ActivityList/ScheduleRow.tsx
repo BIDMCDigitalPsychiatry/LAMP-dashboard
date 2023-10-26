@@ -14,9 +14,6 @@ import {
   createStyles,
   createTheme,
   MuiThemeProvider,
-  Grid,
-  FormControlLabel,
-  Checkbox,
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
@@ -209,6 +206,10 @@ export default function ScheduleRow({
   ]
 
   useEffect(() => {
+    if (scheduleRow.reminderSettings || !!isEdit) setShowReminderSettings(true)
+  }, [scheduleRow])
+
+  useEffect(() => {
     validate()
   }, [data])
 
@@ -373,7 +374,12 @@ export default function ScheduleRow({
         </TableCell>
         <TableCell>
           {!isEdit ? (
-            <IconButton onClick={() => setEdit(true)}>
+            <IconButton
+              onClick={() => {
+                setEdit(true)
+                setShowReminderSettings(true)
+              }}
+            >
               <Icon>edit</Icon>
             </IconButton>
           ) : (
@@ -404,7 +410,17 @@ export default function ScheduleRow({
         </TableCell>
       </TableRow>
       <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
-        <ReminderSettings repeat_interval={data?.repeat_interval} />
+        <ReminderSettings
+          isEdit={isEdit}
+          reminderSettings={data.reminderSettings}
+          repeat_interval={data?.repeat_interval}
+          onUpdate={(settings) => {
+            setData({
+              ...data,
+              reminderSettings: settings,
+            })
+          }}
+        />
       </TableRow>
     </>
   )

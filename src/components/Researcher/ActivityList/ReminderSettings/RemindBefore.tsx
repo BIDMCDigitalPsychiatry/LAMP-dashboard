@@ -31,21 +31,23 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function RemindBefore({ ...props }) {
   const classes = useStyles()
-  const [options, setOptions] = useState([])
+  const [options, setOptions] = useState(props?.options ?? [])
   const [repeatOptions, setRepeatOptions] = useState([])
-  const [selected, setSelected] = useState("")
+  const [data, setData] = useState(props?.value ?? null)
 
   useEffect(() => {
     setOptions(props?.options)
-  }, [props])
+    setData(props.value)
+    if (!!props.value) setRepeatOptions(props?.options.find((option) => option.value === props.value?.before)?.every)
+  }, [props?.options])
 
   useEffect(() => {
-    console.log(options)
-  }, [options])
+    if (!!data?.before) setRepeatOptions(options.find((option) => option.value === data?.before)?.every)
+  }, [data?.before])
 
   useEffect(() => {
-    setRepeatOptions(options.find((option) => option.value === selected)?.every)
-  }, [selected])
+    if (data !== props.value) props.onUpdate(data)
+  }, [data])
 
   return (
     <>
@@ -55,18 +57,29 @@ export default function RemindBefore({ ...props }) {
           <Select
             variant="filled"
             label="text"
-            value={selected}
+            disabled={props.disabled}
+            value={data?.before ?? ""}
             onChange={(event) => {
-              setSelected(event.target?.value)
+              setData({ ...data, before: event.target?.value })
             }}
           >
+            <MenuItem value={null}>Select</MenuItem>
             {options.map((option) => (
               <MenuItem value={option.value}>{option.text}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </Grid>
-      {(repeatOptions || []).length > 0 && <Repeat options={repeatOptions ?? []} />}
+      {(repeatOptions || []).length > 0 && (
+        <Repeat
+          disabled={props.disabled}
+          options={repeatOptions ?? []}
+          value={data?.every}
+          onUpdate={(every) => {
+            setData({ ...data, every })
+          }}
+        />
+      )}
     </>
   )
 }

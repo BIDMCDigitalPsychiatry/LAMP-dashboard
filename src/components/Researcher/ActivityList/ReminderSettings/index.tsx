@@ -1,14 +1,5 @@
-import React, { useState } from "react"
-import {
-  TableCell,
-  makeStyles,
-  Theme,
-  createStyles,
-  createTheme,
-  Grid,
-  FormControlLabel,
-  Checkbox,
-} from "@material-ui/core"
+import React, { useEffect, useState } from "react"
+import { TableCell, makeStyles, Theme, createStyles, Grid, FormControlLabel, Checkbox } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { KeyboardTimePicker } from "@material-ui/pickers"
 const useStyles = makeStyles((theme: Theme) =>
@@ -71,98 +62,16 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 12,
     },
   })
-) //MuiTypography-root MuiPickersCalendarHeader-dayLabel MuiTypography-caption
-const formTheme = createTheme({
-  overrides: {
-    MuiTypography: {
-      h4: { textTransform: "capitalize" },
-    },
-    MuiPaper: {
-      root: { textTransform: "capitalize" },
-    },
-  },
-})
-
-export const getDate = (val) => {
-  if ((val || "").length > 0) {
-    const dateVal = val.split("T")[0].split("-")
-    const timeVal = val.split("T")[1].split(":")
-    const newDate = new Date()
-    newDate.setFullYear(parseInt(dateVal[0]))
-    newDate.setMonth(parseInt(dateVal[1]) - 1)
-    newDate.setDate(parseInt(dateVal[2]))
-    newDate.setHours(timeVal[0])
-    newDate.setMinutes(timeVal[1])
-    newDate.setSeconds(0)
-    return newDate
-  }
-  return new Date()
-}
-
-export const manyDates = (items) =>
-  items?.length > 0
-    ? items
-        ?.slice(0, 3)
-        .map((x) => getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
-        .join(", ") + (items?.length > 3 ? ", ..." : "")
-    : "No custom times"
-
-export const dateInUTCformat = (val) => {
-  let month =
-    (val || new Date()).getMonth() + 1 > 9
-      ? (val || new Date()).getMonth() + 1
-      : "0" + ((val || new Date()).getMonth() + 1)
-  let date = (val || new Date()).getDate() > 9 ? (val || new Date()).getDate() : "0" + (val || new Date()).getDate()
-  const dateVal =
-    (val || new Date()).getFullYear() +
-    "-" +
-    month +
-    "-" +
-    date +
-    "T" +
-    ((val || new Date()).getHours() > 9 ? (val || new Date()).getHours() : "0" + (val || new Date()).getHours()) +
-    ":" +
-    ((val || new Date()).getMinutes() > 9 ? (val || new Date()).getMinutes() : "0" + (val || new Date()).getMinutes()) +
-    ":" +
-    ((val || new Date()).getSeconds() > 9 ? (val || new Date()).getSeconds() : "0" + (val || new Date()).getSeconds()) +
-    ".000Z"
-  return dateVal
-}
-
-import { MuiPickersUtilsProvider } from "@material-ui/pickers"
-import frLocale from "date-fns/locale/fr"
-import koLocale from "date-fns/locale/ko"
-import daLocale from "date-fns/locale/da"
-import deLocale from "date-fns/locale/de"
-import itLocale from "date-fns/locale/it"
-import zhLocale from "date-fns/locale/zh-CN"
-import zhHKLocale from "date-fns/locale/zh-HK"
-import esLocale from "date-fns/locale/es"
-import enLocale from "date-fns/locale/en-US"
-import hiLocale from "date-fns/locale/hi"
-
-const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
-
-const localeMap = {
-  "en-US": enLocale,
-  "es-ES": esLocale,
-  "hi-IN": hiLocale,
-  "de-DE": deLocale,
-  "da-DK": daLocale,
-  "fr-FR": frLocale,
-  "ko-KR": koLocale,
-  "it-IT": itLocale,
-  "zh-CN": zhLocale,
-  "zh-HK": zhHKLocale,
-}
-import DateFnsUtils from "@date-io/date-fns"
+)
+import { getDate, dateInUTCformat } from "../ScheduleRow"
 import RemindBefore from "./RemindBefore"
 
 export default function ReminderSettings({ ...props }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [reminderCustom, setReminderCustom] = useState(false)
   const [reminderLastDayCustom, setReminderLastDayCustom] = useState(false)
+  const [reminderSettings, setReminderSettings] = useState(props?.reminderSettings ?? null)
 
   const beforeMoreThanOneday = [
     {
@@ -222,7 +131,7 @@ export default function ReminderSettings({ ...props }) {
       ],
     },
   ]
-
+  const [optionValues, setOptions] = useState([])
   const beforeLessThanOneday = [
     {
       value: "1 hour",
@@ -373,9 +282,7 @@ export default function ReminderSettings({ ...props }) {
         },
       ],
     },
-
     { key: "biweekly", before: beforeMoreThanOneday, lastday: true },
-
     { key: "triweekly", before: beforeMoreThanOneday, lastday: true },
     { key: "weekly", before: beforeMoreThanOneday, lastday: true },
     { key: "bimonthly", before: beforeMoreThanOneday, lastday: true },
@@ -384,30 +291,80 @@ export default function ReminderSettings({ ...props }) {
     { key: "custom", before: beforeMoreThanOneday, lastday: true },
   ]
 
+  useEffect(() => {
+    setOptions(options.find((d) => d.key === props?.repeat_interval)?.before)
+    setReminderSettings(props?.reminderSettings)
+  }, [])
+
+  useEffect(() => {
+    if (reminderSettings !== props?.reminderSettings) props.onUpdate(reminderSettings)
+  }, [reminderSettings])
+
   return (
     <TableCell colSpan={5}>
       <Grid container spacing={2}>
         <Grid xs={12} className={classes.formHeading}>
           <h4>Reminder settings</h4>
           <FormControlLabel
-            control={<Checkbox onChange={() => setReminderCustom(!reminderCustom)} />}
+            control={
+              <Checkbox
+                checked={reminderSettings?.beforeTime !== null}
+                disabled={!props.isEdit}
+                onChange={() => setReminderCustom(!reminderCustom)}
+              />
+            }
             label="Use custom time"
           />
         </Grid>
         {!reminderCustom ? (
-          <RemindBefore options={options.find((d) => d.key === props?.repeat_interval).before ?? []} />
+          <RemindBefore
+            options={optionValues}
+            disabled={!props.isEdit}
+            onUpdate={(data) => {
+              setReminderSettings({ ...reminderSettings, before: data, beforeTime: null })
+            }}
+            value={reminderSettings?.before}
+          />
         ) : (
           <KeyboardTimePicker
             className={classes.datePicker}
             size="small"
             autoOk
+            disabled={!props.isEdit}
             variant="inline"
             inputVariant="outlined"
             format="hh:mm a"
             mask="__:__ _M"
             placeholder="HH:MM AM"
-            onChange={() => console.log("sdsf")}
-            value={null}
+            onChange={(date) => {
+              setReminderSettings({
+                ...reminderSettings,
+                before: null,
+                beforeTime: date?.isValid() ? dateInUTCformat(date) : null,
+              })
+            }}
+            value={reminderSettings?.beforeTime ? getDate(reminderSettings?.beforeTime ?? "") : ""}
+            onBlur={(event) => {
+              const date = new Date()
+              const value = event.target.value
+              const parts = value.match(/(\d+)\:(\d+) (\w+)/)
+              const hours =
+                /am/i.test(parts[3]) || /AM/i.test(parts[3])
+                  ? parseInt(parts[1], 10) === 12
+                    ? 0
+                    : parseInt(parts[1], 10)
+                  : parseInt(parts[1], 10) === 12
+                  ? parseInt(parts[1], 10) + 0
+                  : parseInt(parts[1], 10) + 12
+              const minutes = parseInt(parts[2], 10)
+              date.setHours(hours)
+              date.setMinutes(minutes)
+              setReminderSettings({
+                ...reminderSettings,
+                before: null,
+                beforeTime: date?.isValid() ? dateInUTCformat(date) : null,
+              })
+            }}
           />
         )}
         {options.findIndex((d) => d.key === props?.repeat_interval) > 4 && (
@@ -415,68 +372,69 @@ export default function ReminderSettings({ ...props }) {
             <Grid xs={12} className={classes.formHeading}>
               <h4>Set last day reminder</h4>
               <FormControlLabel
-                control={<Checkbox onChange={() => setReminderLastDayCustom(!reminderLastDayCustom)} />}
+                control={
+                  <Checkbox
+                    checked={reminderSettings?.beforeLastDayTime !== null}
+                    disabled={!props.isEdit}
+                    onChange={() => setReminderLastDayCustom(!reminderLastDayCustom)}
+                  />
+                }
                 label="Use custom time"
               />
             </Grid>
             {!reminderLastDayCustom ? (
-              <RemindBefore options={beforeLessThanOneday} />
+              <RemindBefore
+                options={beforeLessThanOneday}
+                disabled={!props.isEdit}
+                onUpdate={(data) => {
+                  setReminderSettings({ ...reminderSettings, beforeLastDayTime: null, beforeLastDay: data })
+                }}
+                value={reminderSettings?.beforeTime}
+              />
             ) : (
               <KeyboardTimePicker
                 className={classes.datePicker}
                 size="small"
                 autoOk
+                disabled={!props.isEdit}
                 variant="inline"
                 inputVariant="outlined"
                 format="hh:mm a"
                 mask="__:__ _M"
                 placeholder="HH:MM AM"
-                onChange={() => console.log("sdsf")}
-                value={null}
+                onChange={(date) => {
+                  setReminderSettings({
+                    ...reminderSettings,
+                    beforeLastDay: null,
+                    beforeLastDayTime: date?.isValid() ? dateInUTCformat(date) : null,
+                  })
+                }}
+                value={reminderSettings?.beforeLastDayTime ? getDate(reminderSettings?.beforeLastDayTime ?? "") : ""}
+                onBlur={(event) => {
+                  const date = new Date()
+                  const value = event.target.value
+                  const parts = value.match(/(\d+)\:(\d+) (\w+)/)
+                  const hours =
+                    /am/i.test(parts[3]) || /AM/i.test(parts[3])
+                      ? parseInt(parts[1], 10) === 12
+                        ? 0
+                        : parseInt(parts[1], 10)
+                      : parseInt(parts[1], 10) === 12
+                      ? parseInt(parts[1], 10) + 0
+                      : parseInt(parts[1], 10) + 12
+                  const minutes = parseInt(parts[2], 10)
+                  date.setHours(hours)
+                  date.setMinutes(minutes)
+                  setReminderSettings({
+                    ...reminderSettings,
+                    beforeLastDay: null,
+                    beforeLastDayTime: date?.isValid() ? dateInUTCformat(date) : null,
+                  })
+                }}
               />
             )}
           </>
         )}
-        {/* <Grid xs={12} className={classes.formHeading}>
-              <h4>Set last day reminder</h4><FormControlLabel control={<Checkbox defaultChecked />} label="Use custom time" />
-            </Grid>
-            <RemindBefore options={beforeLessThanOneday}/> */}
-
-        {/* <KeyboardTimePicker
-              className={classes.datePicker}
-              size="small"
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              format="hh:mm a"
-              mask="__:__ _M"
-              placeholder="HH:MM AM"
-              error={data.time === "" || data.time === null}
-              InputAdornmentProps={{ position: "end" }}
-              value={data.time ? getDate(data.time ?? "") : ""}
-              defaultValue={data.time ? getDate(data.time ?? "") : ""}
-              onChange={(date) => {
-                setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
-              }}
-              onBlur={(event) => {
-                const date = data?.start_date ? new Date(data?.start_date) : new Date()
-
-                const value = event.target.value
-                const parts = value.match(/(\d+)\:(\d+) (\w+)/)
-                const hours =
-                  /am/i.test(parts[3]) || /AM/i.test(parts[3])
-                    ? parseInt(parts[1], 10) === 12
-                      ? 0
-                      : parseInt(parts[1], 10)
-                    : parseInt(parts[1], 10) === 12
-                      ? parseInt(parts[1], 10) + 0
-                      : parseInt(parts[1], 10) + 12
-                const minutes = parseInt(parts[2], 10)
-                date.setHours(hours)
-                date.setMinutes(minutes)
-                setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
-              }}
-            /> */}
       </Grid>
     </TableCell>
   )
