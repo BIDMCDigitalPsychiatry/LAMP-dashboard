@@ -1138,7 +1138,7 @@ export const SchemaList = () => {
           properties: {
             count_of_symbols: {
               title: i18n.t("Number of symbols"),
-              description: i18n.t("Number of symbols in the mapping."),
+              description: i18n.t("Number of symbols in the mapping (min: 4, max: 10)"),
               type: "number",
               minimum: 4,
               maximum: 10,
@@ -1158,10 +1158,10 @@ export const SchemaList = () => {
             },
             duration: {
               title: i18n.t("Duration"),
-              description: i18n.t("Duration of task (in seconds)."),
+              description: i18n.t("Duration of task (in seconds) (min: 20, max: 400)."),
               type: "number",
               minimum: 20,
-              maximum: 300,
+              maximum: 400,
               default: 120,
               "ui:grid": {
                 xs: 6,
