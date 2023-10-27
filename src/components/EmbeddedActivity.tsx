@@ -187,13 +187,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,
@@ -222,8 +215,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-
       return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"
