@@ -1132,8 +1132,42 @@ export const SchemaList = () => {
       type: "object",
       properties: {
         settings: {
-          title: i18n.t("Activity Settings"),
+          title: i18n.t("Activity settings"),
+          required: ["count_of_symbols", "show_mapping", "duration"],
           type: "object",
+          properties: {
+            count_of_symbols: {
+              title: i18n.t("Number of symbols"),
+              description: i18n.t("Number of symbols in the mapping."),
+              type: "number",
+              minimum: 4,
+              maximum: 10,
+              default: 10,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            show_mapping: {
+              title: i18n.t("Show Mapping Table"),
+              description: i18n.t("Whether to show mapping table."),
+              enum: ["before", "during", "not_at_all"],
+              enumNames: [i18n.t("Before Game"), i18n.t("During Game"), i18n.t("Not at all")],
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            duration: {
+              title: i18n.t("Duration"),
+              description: i18n.t("Duration of task (in seconds)."),
+              type: "number",
+              minimum: 20,
+              maximum: 300,
+              default: 120,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+          },
         },
       },
     },

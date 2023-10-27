@@ -23,6 +23,7 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
+import { duplicate } from "vega-lite"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -235,6 +236,11 @@ export default function GameCreator({
     } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       return validateBreathe(duplicates)
     } else if (
+      (value?.spec && ["lamp.symbol_digit_substitution"].includes(value.spec)) ||
+      activitySpecId === "lamp.symbol_digit_substitution"
+    ) {
+      return validateSymbol(duplicates)
+    } else if (
       (value?.spec && ["lamp.goals"].includes(value.spec)) ||
       activitySpecId === "lamp.goals" ||
       (value?.spec && ["lamp.medications"].includes(value.spec)) ||
@@ -282,6 +288,21 @@ export default function GameCreator({
       typeof data.settings?.rerecord_label === "undefined" ||
       data.settings?.record_label === "" ||
       data.settings?.rerecord_label === "" ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validateSymbol = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      data.settings?.count_of_symbols > 10 ||
+      data.settings?.count_of_symbols < 4 ||
+      data.settings?.duration > 300 ||
+      data.settings?.duration < 20 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )
