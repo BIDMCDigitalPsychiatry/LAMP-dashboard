@@ -148,23 +148,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
               setTag(tags[0])
               const tag = tags[0]
-              if (data.spec == "lamp.spin_wheel") {
-                ;(async () => {
-                  const events = await LAMP.ActivityEvent.allByParticipant(participant)
-                  const balance = findLastEvent(events, activityId, data.settings?.balance ?? 2000)
-                  data["settings"]["balance"] = balance
-                  data = spliceCTActivity({ raw: data, tag })
-                  setActivity(data)
-                  setLoading(false)
-                })()
-              } else {
-                data =
-                  data.spec === "lamp.survey"
-                    ? spliceActivity({ raw: data, tag })
-                    : spliceCTActivity({ raw: data, tag })
-                setActivity(data)
-                setLoading(false)
-              }
+              data =
+                data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
+              setActivity(data)
+              setLoading(false)
             })
           } else {
             setOpenNotFound(true)
