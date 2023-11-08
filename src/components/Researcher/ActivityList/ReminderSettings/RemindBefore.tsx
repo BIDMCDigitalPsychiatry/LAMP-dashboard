@@ -64,7 +64,7 @@ export default function RemindBefore({ ...props }) {
             }}
           >
             <MenuItem value={null}>Select</MenuItem>
-            {options.map((option) => (
+            {(options || []).map((option) => (
               <MenuItem value={option.value}>{option.text}</MenuItem>
             ))}
           </Select>

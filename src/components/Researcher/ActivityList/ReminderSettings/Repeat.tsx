@@ -37,7 +37,7 @@ export default function Repeat({ ...props }) {
   }, [data])
 
   useEffect(() => {
-    setData(props.value)
+    if (data !== props.value) setData(props.value)
   }, [props?.value])
 
   return (

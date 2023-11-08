@@ -292,9 +292,10 @@ export default function ReminderSettings({ ...props }) {
   ]
 
   useEffect(() => {
+    console.log(props)
     setOptions(options.find((d) => d.key === props?.repeat_interval)?.before)
     setReminderSettings(props?.reminderSettings)
-  }, [])
+  }, [props?.repeat_interval])
 
   useEffect(() => {
     if (reminderSettings !== props?.reminderSettings) props.onUpdate(reminderSettings)

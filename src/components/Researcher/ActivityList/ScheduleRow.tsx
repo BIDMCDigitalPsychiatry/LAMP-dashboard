@@ -206,7 +206,8 @@ export default function ScheduleRow({
   ]
 
   useEffect(() => {
-    if (scheduleRow.reminderSettings || !!isEdit) setShowReminderSettings(true)
+    console.log(data)
+    if (scheduleRow.reminderSettings || (!!isEdit && !!data.repeat_interval)) setShowReminderSettings(true)
   }, [scheduleRow])
 
   useEffect(() => {
