@@ -25,6 +25,7 @@ import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
+import { dateTimeToTimestamp } from "vega-lite/build/src/datetime"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -260,14 +261,14 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
           !!y.error ? undefined : y.data
         )[0]
         if (!!tag) {
-          const endTime = getEndTime(tag)
-
+          const startTime = getStartTime(tag)
+          const endTime = getEndTime(startTime, tag)
           return {
             activityId: activity.id,
             percentage:
               Math.round(
                 (activityEvents.filter(
-                  (a) => a.activity === activity.id && a.timestamp >= tag.startDate && a.timestamp <= endTime
+                  (a) => a.activity === activity.id && a.timestamp >= startTime && a.timestamp <= endTime
                 ).length /
                   tag.limit) *
                   100 *
@@ -280,22 +281,50 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
   )
 }
 
-const getEndTime = (tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
-  let endTime = tag.startDate
+const getStartTime = (tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
+  let startTime = tag.startDate
+  let diff = 1
+  let diffDate = new Date(tag.startDate)
   switch (tag.unit) {
     case "weeks":
-      endTime = tag.startDate + 7 * tag.timeframe * 24 * 60 * 60 * 1000
+      diff = (new Date().getTime() - diffDate.getTime()) / (7 * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + 7 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
       break
     case "months":
-      const d = new Date(tag.startDate)
+      diff = (new Date().getTime() - diffDate.getTime()) / (30 * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + 30 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      break
+    case "days":
+      diff = (new Date().getTime() - diffDate.getTime()) / (24 * tag.timeframe * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      break
+    case "hours":
+      diff = (new Date().getTime() - diffDate.getTime()) / (tag.timeframe * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 60 * 60 * 1000)
+      break
+  }
+  diffDate.setHours(new Date(tag.startDate).getHours())
+  diffDate.setMinutes(new Date(tag.startDate).getMinutes())
+  diffDate.setSeconds(new Date(tag.startDate).getSeconds())
+  startTime = diffDate.getTime()
+  return startTime
+}
+const getEndTime = (startTime: number, tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
+  let endTime = startTime
+  switch (tag.unit) {
+    case "weeks":
+      endTime = startTime + 7 * tag.timeframe * 24 * 60 * 60 * 1000
+      break
+    case "months":
+      const d = new Date(startTime)
       d.setMonth(d.getMonth() + tag.timeframe)
       endTime = d.getTime()
       break
     case "days":
-      endTime = tag.startDate + tag.timeframe * 24 * 60 * 60 * 1000
+      endTime = startTime + tag.timeframe * 24 * 60 * 60 * 1000
       break
     case "hours":
-      endTime = tag.startDate + tag.timeframe * 60 * 60 * 1000
+      endTime = startTime + tag.timeframe * 60 * 60 * 1000
       break
   }
   return endTime
