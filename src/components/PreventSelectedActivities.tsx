@@ -289,7 +289,7 @@ const getStartTime = (tag: { limit: number; unit: string; timeframe: number; sta
     case "weeks":
       diff = (new Date().getTime() - diffDate.getTime()) / (7 * tag.timeframe * 24 * 60 * 60 * 1000)
       diffDate = new Date(tag.startDate + 7 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
-      diffDate.setDate(diffDate.getDate() - 7 * tag.timeframe)
+      diffDate.setDate(diffDate.getDate())
       break
     case "months":
       diff = (new Date().getTime() - diffDate.getTime()) / (30 * tag.timeframe * 24 * 60 * 60 * 1000)
@@ -298,11 +298,11 @@ const getStartTime = (tag: { limit: number; unit: string; timeframe: number; sta
       break
     case "days":
       diff = (new Date().getTime() - diffDate.getTime()) / (24 * tag.timeframe * 60 * 60 * 1000)
-      diffDate = new Date(tag.startDate + Math.round(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
-      diffDate.setDate(diffDate.getDate() - tag.timeframe)
+      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate.setDate(diffDate.getDate())
       break
     case "hours":
-      diff = (new Date().getTime() - diffDate.getTime()) / (tag.timeframe * 60 * 60 * 1000) - tag.timeframe
+      diff = (new Date().getTime() - diffDate.getTime()) / (tag.timeframe * 60 * 60 * 1000)
       diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 60 * 60 * 1000)
       break
   }
