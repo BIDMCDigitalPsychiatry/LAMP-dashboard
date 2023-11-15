@@ -382,6 +382,7 @@ export default function PreventSelectedActivities({
   useEffect(() => {
     TimeAgo.addLocale(localeMap[getSelectedLanguage()])
     setLang(new TimeAgo(getSelectedLanguage()))
+    console.log(strategies["lamp.survey"])
   }, [])
 
   return (

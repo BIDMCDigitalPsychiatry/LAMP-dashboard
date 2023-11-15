@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from "react"
-import { TableCell, makeStyles, Theme, createStyles, Grid, FormControlLabel, Checkbox } from "@material-ui/core"
+import {
+  TableCell,
+  makeStyles,
+  Theme,
+  MenuItem,
+  Select,
+  FormControl,
+  createStyles,
+  Grid,
+  FormControlLabel,
+  Checkbox,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { KeyboardTimePicker } from "@material-ui/pickers"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
@@ -318,14 +330,84 @@ export default function ReminderSettings({ ...props }) {
           />
         </Grid>
         {!reminderCustom ? (
-          <RemindBefore
-            options={optionValues}
-            disabled={!props.isEdit}
-            onUpdate={(data) => {
-              setReminderSettings({ ...reminderSettings, before: data, beforeTime: null })
-            }}
-            value={reminderSettings?.before}
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={3} className={classes.formouter}>
+              <FormControl variant="outlined" size="medium" className={classes.formSelect}>
+                <label className={classes.formlabel}>Before</label>
+                <Select
+                  variant="filled"
+                  label="text"
+                  disabled={props.disabled}
+                  value={""}
+                  onChange={(event) => {
+                    // setData({ ...data, before: event.target?.value })
+                  }}
+                >
+                  <MenuItem value={null}>Select</MenuItem>
+                  {/* {(options || []).map((option) => (
+                  <MenuItem value={option.value}>{option.text}</MenuItem>
+                ))} */}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3} className={classes.formouter}>
+              <FormControl variant="outlined" size="medium" className={classes.formSelect}>
+                <label className={classes.formlabel}>Before</label>
+                <Select
+                  variant="filled"
+                  label="text"
+                  disabled={props.disabled}
+                  value={""}
+                  onChange={(event) => {
+                    // setData({ ...data, before: event.target?.value })
+                  }}
+                >
+                  <MenuItem value={null}>Select</MenuItem>
+                  {/* {(options || []).map((option) => (
+                  <MenuItem value={option.value}>{option.text}</MenuItem>
+                ))} */}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3} className={classes.formouter}>
+              <FormControl variant="outlined" size="medium" className={classes.formSelect}>
+                <label className={classes.formlabel}>Before</label>
+                <Select
+                  variant="filled"
+                  label="text"
+                  disabled={props.disabled}
+                  value={""}
+                  onChange={(event) => {
+                    // setData({ ...data, before: event.target?.value })
+                  }}
+                >
+                  <MenuItem value={null}>Select</MenuItem>
+                  {/* {(options || []).map((option) => (
+                  <MenuItem value={option.value}>{option.text}</MenuItem>
+                ))} */}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3} className={classes.formouter}>
+              <FormControl variant="outlined" size="medium" className={classes.formSelect}>
+                <label className={classes.formlabel}>Before</label>
+                <Select
+                  variant="filled"
+                  label="text"
+                  disabled={props.disabled}
+                  value={""}
+                  onChange={(event) => {
+                    // setData({ ...data, before: event.target?.value })
+                  }}
+                >
+                  <MenuItem value={null}>Select</MenuItem>
+                  {/* {(options || []).map((option) => (
+                  <MenuItem value={option.value}>{option.text}</MenuItem>
+                ))} */}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
         ) : (
           <KeyboardTimePicker
             className={classes.datePicker}
@@ -367,74 +449,6 @@ export default function ReminderSettings({ ...props }) {
               })
             }}
           />
-        )}
-        {options.findIndex((d) => d.key === props?.repeat_interval) > 4 && (
-          <>
-            <Grid xs={12} className={classes.formHeading}>
-              <h4>Set last day reminder</h4>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={reminderSettings?.beforeLastDayTime !== null}
-                    disabled={!props.isEdit}
-                    onChange={() => setReminderLastDayCustom(!reminderLastDayCustom)}
-                  />
-                }
-                label="Use custom time"
-              />
-            </Grid>
-            {!reminderLastDayCustom ? (
-              <RemindBefore
-                options={beforeLessThanOneday}
-                disabled={!props.isEdit}
-                onUpdate={(data) => {
-                  setReminderSettings({ ...reminderSettings, beforeLastDayTime: null, beforeLastDay: data })
-                }}
-                value={reminderSettings?.beforeTime}
-              />
-            ) : (
-              <KeyboardTimePicker
-                className={classes.datePicker}
-                size="small"
-                autoOk
-                disabled={!props.isEdit}
-                variant="inline"
-                inputVariant="outlined"
-                format="hh:mm a"
-                mask="__:__ _M"
-                placeholder="HH:MM AM"
-                onChange={(date) => {
-                  setReminderSettings({
-                    ...reminderSettings,
-                    beforeLastDay: null,
-                    beforeLastDayTime: date?.isValid() ? dateInUTCformat(date) : null,
-                  })
-                }}
-                value={reminderSettings?.beforeLastDayTime ? getDate(reminderSettings?.beforeLastDayTime ?? "") : ""}
-                onBlur={(event) => {
-                  const date = new Date()
-                  const value = event.target.value
-                  const parts = value.match(/(\d+)\:(\d+) (\w+)/)
-                  const hours =
-                    /am/i.test(parts[3]) || /AM/i.test(parts[3])
-                      ? parseInt(parts[1], 10) === 12
-                        ? 0
-                        : parseInt(parts[1], 10)
-                      : parseInt(parts[1], 10) === 12
-                      ? parseInt(parts[1], 10) + 0
-                      : parseInt(parts[1], 10) + 12
-                  const minutes = parseInt(parts[2], 10)
-                  date.setHours(hours)
-                  date.setMinutes(minutes)
-                  setReminderSettings({
-                    ...reminderSettings,
-                    beforeLastDay: null,
-                    beforeLastDayTime: date?.isValid() ? dateInUTCformat(date) : null,
-                  })
-                }}
-              />
-            )}
-          </>
         )}
       </Grid>
     </TableCell>

@@ -31,6 +31,7 @@ export default function ActivityCard({
 
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
+  console.log(events)
   let each = Object.values(
     events
       .map((d) =>
@@ -70,6 +71,7 @@ export default function ActivityCard({
   )
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
+  console.log(each)
   let eachData = []
   each = each.map((d, key) => {
     let keys = Object.keys(d)
@@ -84,6 +86,7 @@ export default function ActivityCard({
       }
     })
   })
+  console.log(eachData)
 
   return (
     <React.Fragment>
