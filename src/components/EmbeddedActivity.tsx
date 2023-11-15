@@ -235,7 +235,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             setIframe(e)
           }}
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-          allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
+          allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone 'src' 'self'; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
           srcDoc={embeddedActivity}
           sandbox="allow-forms allow-same-origin allow-scripts allow-popups allow-top-navigation "
         />
