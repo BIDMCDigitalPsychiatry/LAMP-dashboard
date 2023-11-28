@@ -1151,6 +1151,7 @@ export const SchemaList = () => {
               title: i18n.t("Show Mapping Table"),
               description: i18n.t("Whether to show mapping table."),
               enum: ["before", "during", "not_at_all"],
+              default: "during",
               enumNames: [i18n.t("Before Game"), i18n.t("During Game"), i18n.t("Not at all")],
               "ui:grid": {
                 xs: 6,
