@@ -764,7 +764,7 @@ function AppRouter({ ...props }) {
                       props.history.push(`/participant/${id}/portal`)
                     })()
                   }}
-                  mode={state.researcherType}
+                  mode={"researcher"} // Defaulting to researcher mode for now {state.researcherType}
                   tab={props.match.params.tab}
                 />
               </NavigationLayout>
