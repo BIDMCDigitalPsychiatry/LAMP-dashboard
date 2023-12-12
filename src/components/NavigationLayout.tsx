@@ -428,7 +428,9 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-              {(authType === "researcher" || authType === "admin") &&
+
+              {/**Commenting for now
+               {(authType === "researcher" || authType === "admin") &&
                 title !== "Administrator" &&
                 title !== "User Administrator" &&
                 title !== "Practice Lead" &&
@@ -437,7 +439,7 @@ export default function NavigationLayout({
                   <Box>
                     <ModeToggleButton changeResearcherType={changeResearcherType} />
                   </Box>
-                )}
+                )} */}
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
