@@ -251,6 +251,12 @@ export const strategies = {
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
+/**
+ * Get percentage value for particular survey activity for the seletced participant.
+ * @param participantId
+ * @param activities
+ * @returns
+ */
 const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
   let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
@@ -356,7 +362,8 @@ export default function PreventSelectedActivities({
   const { t, i18n } = useTranslation()
   const [timeAgo, setLang] = useState(new TimeAgo("en-US"))
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
-  const [percentages, setPercentages] = React.useState([])
+  // State for survey percentage
+  // const [percentages, setPercentages] = React.useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -364,15 +371,18 @@ export default function PreventSelectedActivities({
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
 
-  React.useEffect(() => {
-    ;(async () => {
-      const percentages = await getPercentageSettings(
-        participant.id,
-        activities.filter((activity) => activity.spec === "lamp.survey")
-      )
-      setPercentages(percentages)
-    })()
-  }, [activities])
+  /**
+   * Enable the survey percentage settings by uncommenting the below section
+   */
+  // React.useEffect(() => {
+  //   ;(async () => {
+  //     const percentages = await getPercentageSettings(
+  //       participant.id,
+  //       activities.filter((activity) => activity.spec === "lamp.survey")
+  //     )
+  //     setPercentages(percentages)
+  //   })()
+  // }, [activities])
 
   useEffect(() => {
     TimeAgo.addLocale(localeMap[getSelectedLanguage()])
@@ -441,12 +451,13 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
+                    {/* Uncomment below lines to show the survey percentage value
                     {activity.spec === "lamp.survey" && !!percentages && (
                       <Typography variant="h5">
                         {(percentages || []).filter((p) => p?.activityId === activity.id)[0]?.percentage ?? 0}%
                         completed
                       </Typography>
-                    )}
+                    )} */}
                   </Typography>
                   <Box className={classes.maxw300}>
                     <VegaLite
