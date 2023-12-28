@@ -172,7 +172,6 @@ class DBService {
         })
       })
       .catch((error) => {
-        console.log(error)
         // Do something?
       })
   }

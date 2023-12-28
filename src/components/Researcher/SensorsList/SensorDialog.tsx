@@ -227,7 +227,9 @@ export default function SensorDialog({
         addOrUpdateSensor()
       })
       .catch((e) => {
-        console.dir(e)
+        enqueueSnackbar(`${t("An error occured while updating the sensor.")}`, {
+          variant: "error",
+        })
         setLoading(false)
       })
   }
@@ -267,7 +269,9 @@ export default function SensorDialog({
         })
       })
       .catch((e) => {
-        console.dir(e)
+        enqueueSnackbar(`${t("An error occured while creating the sensor.")}`, {
+          variant: "error",
+        })
         setLoading(false)
       })
   }

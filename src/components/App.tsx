@@ -27,6 +27,8 @@ import TwoFA from "./TwoFA"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
+  const { t } = useTranslation()
+
   useEffect(() => {
     StackTrace.fromError(error).then(setTrace)
   }, [])
@@ -50,20 +52,21 @@ function ErrorFallback({ error }) {
       }}
     >
       <pre>
-        <code style={{ fontSize: "16px" }}>
+        {/* <code style={{ fontSize: "16px" }}>
           {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
         </code>
         <br />
         <code style={{ color: "#fff" }}>
           {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code>
+        </code> */}
+        <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
         <br />
-        <code>
+        {/* <code>
           mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code>
+        </code> */}
         <br />
         <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
-          Back to page
+          {`${t("Back to page.")}`}
         </a>
       </pre>
     </div>
@@ -987,7 +990,7 @@ export default function App({ ...props }) {
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
-        <span
+        {/* <span
           style={{
             position: "fixed",
             bottom: 16,
@@ -998,7 +1001,7 @@ export default function App({ ...props }) {
           }}
         >
           {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
-        </span>
+        </span> */}
       </ThemeProvider>
     </ErrorBoundary>
   )

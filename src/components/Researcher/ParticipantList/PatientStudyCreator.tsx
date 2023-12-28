@@ -183,7 +183,7 @@ export default function PatientStudyCreator({
                 newParticipant["id"] = idData
               }
               Service.updateCount("studies", newStudyObj.id, "participant_count")
-              newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+              newParticipant.id = "U" + crypto.getRandomValues(new Uint32Array(1))[0].toString().substring(0, 8)
               newParticipant.study_id = newStudyObj.id
               newParticipant.study_name = studyName
               Service.addData("participants", [newParticipant])
