@@ -78,8 +78,8 @@ export default function TwoFA({ ...props }) {
   }
 
   const generatePasscode = () => {
-    const passcode = Math.floor(Math.random() * 90000) + 10000
-    setCode(passcode.toString())
+    const passcode = crypto.getRandomValues(new Uint32Array(1))[0].toString().substring(0, 6)
+    setCode(passcode)
     return sendEmail(passcode)
   }
 

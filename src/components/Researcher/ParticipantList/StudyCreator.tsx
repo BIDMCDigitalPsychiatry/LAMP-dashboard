@@ -105,7 +105,9 @@ export default function StudyCreator({
         setLoading(false)
       })
       .catch((e) => {
-        console.dir(e)
+        enqueueSnackbar(`${t("An error occured while creating new group - studyName.", { studyName: studyName })}`, {
+          variant: "error",
+        })
         setLoading(false)
       })
   }

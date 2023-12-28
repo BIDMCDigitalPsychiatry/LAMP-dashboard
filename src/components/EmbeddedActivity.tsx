@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,6 +61,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [timestamp, setTimestamp] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [warningsDialogState, setWarningsDialogState] = useState(null)
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     setCurrentActivity(activity)
@@ -159,7 +161,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           setCurrentActivity(null)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
-              console.dir(e)
+              enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                variant: "error",
+              })
             })
             .then((x) => {
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
