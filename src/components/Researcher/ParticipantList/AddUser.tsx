@@ -150,7 +150,7 @@ export default function AddUser({
       let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
       setStudyBtnClicked(true)
       let newParticipant: any = {}
-      newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+      newParticipant.id = "U" + crypto.getRandomValues(new Uint32Array(1))[0].toString().substring(0, 8)
       newParticipant.study_id = selectedStudy
       newParticipant.study_name = studyName
       Service.addData("participants", [newParticipant])

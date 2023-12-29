@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Fab,
   Box,
@@ -18,6 +18,7 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
+import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
@@ -25,9 +26,6 @@ import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
-
-import pkceChallenge from "pkce-challenge"
-import { OAuthParams, StartFlowResponse } from "lamp-core/dist/service/OAuth.service"
 import { Autocomplete } from "@mui/material"
 
 type SuggestedUrlOption = {
@@ -62,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
-    loginInner: { maxWidth: 280 },
+    loginInner: { maxWidth: 320 },
     loginDisabled: {
       opacity: 0.5,
     },
@@ -71,119 +69,134 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const { t, i18n } = useTranslation()
-  const classes = useStyles()
-  const { enqueueSnackbar } = useSnackbar()
-
-  enum Screen {
-    serverAddress,
-    legacyLogin,
-  }
-  const [screen, goToScreen] = useState(Screen.serverAddress)
-
-  const [serverAddress, setServerAddress] = useState("")
-  const defaultServerAddress = "api.lamp.digital"
-
-  const [legacyCredentials, setLegacyCredentials] = useState({
-    id: null,
-    password: null,
-  })
-
+  const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
+  const [loginClick, setLoginClick] = useState(false)
+  const [options, setOptions] = useState([])
+  const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
+  const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
 
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
+  const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
   useEffect(() => {
+    const cachedOptions = localStorage.getItem("cachedOptions")
+    let options: SuggestedUrlOption[]
+    if (!cachedOptions) {
+      options = [
+        { label: "api.lamp.digital" },
+        { label: "mindlamp-api.pronet.med.yale.edu" },
+        { label: "mindlamp.orygen.org.au" },
+        { label: "mindlamp-qa.dmh.lacounty.gov" },
+      ]
+    } else {
+      options = JSON.parse(cachedOptions).filter((o) => typeof o?.label !== "undefined")
+    }
+    setOptions(options)
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
-        setServerAddress(src)
+        setState((state) => ({ ...state, serverAddress: src }))
         setSrcLocked(true)
       }
     }
   }, [])
+  useEffect(() => {
+    i18n.changeLanguage(selectedLanguage)
+  }, [selectedLanguage])
 
-  let handleSuccess = () => {
-    process.env.REACT_APP_LATEST_LAMP === "true"
-      ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
-      : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
-    ;(async () => {
-      await Service.deleteDB()
-    })()
-
-    onComplete()
+  let handleServerInput = (value) => {
+    setState({ ...state, serverAddress: value?.label ?? value })
   }
 
-  const form = useCallback(() => {
-    switch (screen) {
-      case Screen.serverAddress:
-        return (
-          <ServerAddressInput
-            value={serverAddress}
-            defaultValue={defaultServerAddress}
-            locked={srcLocked}
-            onChange={(event: any) => setServerAddress(event.target.value)}
-            onComplete={(urls: StartFlowResponse) => {
-              if (urls.logoutURL) {
-                urls.logoutURL.searchParams.set("post_logout_redirect_uri", window.location.origin)
-                sessionStorage.setItem("logout_url", urls.logoutURL.href)
-              } else {
-                sessionStorage.removeItem("logout_url")
-              }
+  let handleChange = (event) =>
+    setState({
+      ...state,
+      [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
+    })
 
-              if (urls.loginURL) {
-                let params: OAuthParams
-                params = JSON.parse(sessionStorage?.getItem("LAMP._oauth"))
-                urls.loginURL.searchParams.set("code_challenge", params.codeChallenge)
-                sessionStorage?.setItem("LAMP._oauth_enabled", JSON.stringify(true))
-                window.location.assign(urls.loginURL.href)
-              } else {
-                goToScreen(Screen.legacyLogin)
-              }
-            }}
-            onError={(error: Error) => {
-              enqueueSnackbar(error.message, { variant: "error" })
-              goToScreen(Screen.legacyLogin)
-            }}
-          />
-        )
-      case Screen.legacyLogin:
-        return (
-          <LegacyLoginInput
-            values={legacyCredentials}
-            onChange={(event: any) =>
-              setLegacyCredentials({
-                ...legacyCredentials,
-                [event.target.name]: event.target.value,
-              })
-            }
-            onSubmit={() => {
-              if (!legacyCredentials.id || !legacyCredentials.password) {
-                enqueueSnackbar("Incorrect username, password, or server address.", {
-                  variant: "error",
-                })
-              }
-
-              handleLegacyLogin(
-                !serverAddress.length ? defaultServerAddress : serverAddress,
-                legacyCredentials,
-                setIdentity
-              )
-            }}
-            onSuccess={handleSuccess}
-            onError={(error: Error) => {
-              enqueueSnackbar(error.message, { variant: "error" })
-
-              if (!srcLocked) {
-                enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), {
-                  variant: "info",
-                })
-              }
-            }}
-          />
-        )
+  let handleLogin = (event: any, mode?: string): void => {
+    event.preventDefault()
+    if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
+      options.push({ label: state.serverAddress })
+      localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
-  }, [screen, serverAddress, legacyCredentials])
+    setOptions(options)
+    setLoginClick(true)
+    if (mode === undefined && (!state.id || !state.password)) {
+      enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+        variant: "error",
+      })
+      setLoginClick(false)
+      return
+    }
+    setIdentity({
+      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+      password: !!mode ? "demo" : state.password,
+      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+    })
+      .then((res) => {
+        if (res.authType === "participant") {
+          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
+          LAMP.SensorEvent.create(res.identity.id, {
+            timestamp: Date.now(),
+            sensor: "lamp.analytics",
+            data: {
+              type: "login",
+              device_type: "Dashboard",
+              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+            },
+          } as any).then((res) => console.dir(res))
+          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
+        }
+        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+          let studiesSelected =
+            localStorage.getItem("studies_" + res.identity.id) !== null
+              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+              : []
+          if (studiesSelected.length === 0) {
+            let studiesList = [res.identity.name]
+            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+          }
+        }
+        process.env.REACT_APP_LATEST_LAMP === "true"
+          ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
+          : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
+        localStorage.setItem(
+          "LAMP_user_" + res.identity.id,
+          JSON.stringify({
+            language: selectedLanguage,
+          })
+        )
+        ;(async () => {
+          await Service.deleteDB()
+          await Service.deleteUserDB()
+        })()
+        setLoginClick(false)
+        onComplete()
+      })
+      .catch((err) => {
+        console.warn("error with auth request", err)
+        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+          variant: "error",
+        })
+        if (!srcLocked)
+          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
+        setLoginClick(false)
+      })
+  }
+  const timezoneVal = () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    return timezone
+  }
 
   return (
     <Slide direction="right" in={true} mountOnEnter unmountOnExit>
@@ -231,361 +244,190 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         </Menu>
         <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
-            <Box>
-              <Box className={classes.logoLogin}>
-                <Logo />
-              </Box>
-              <Box className={classes.logoText}>
-                <Logotext />
-                <div
-                  style={{
-                    height: 6,
-                    marginBottom: 30,
-                    background:
-                      "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+            <form onSubmit={(e) => handleLogin(e)}>
+              <Box>
+                <Box className={classes.logoLogin}>
+                  <Logo />
+                </Box>
+                <Box className={classes.logoText}>
+                  <Logotext />
+                  <div
+                    style={{
+                      height: 6,
+                      marginBottom: 30,
+                      background:
+                        "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                    }}
+                  />
+                </Box>
+                <TextField
+                  select
+                  label={`${t("Select Language")}`}
+                  style={{ width: "100%" }}
+                  onChange={(event) => {
+                    setSelectedLanguage(event.target.value)
+                  }}
+                  variant="filled"
+                  value={selectedLanguage || "en-US"}
+                >
+                  {Object.keys(locale_lang).map((key, value) => {
+                    if (userLanguages.includes(key)) {
+                      return (
+                        <MenuItem key={key} value={key}>
+                          {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+                        </MenuItem>
+                      )
+                    }
+                  })}
+                </TextField>
+                <Autocomplete
+                  freeSolo={true}
+                  id="serever-selector"
+                  options={options}
+                  sx={{ width: "100%", marginTop: "12px" }}
+                  value={state.serverAddress || ""}
+                  onChange={(event, value) => handleServerInput(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="serverAddress"
+                      variant="filled"
+                      value={state.serverAddress || ""}
+                      onChange={(event) => handleServerInput(event.target.value)}
+                      InputProps={{ ...params.InputProps, disableUnderline: true }}
+                      label={t("Server Address")}
+                      helperText={t("Don't enter a domain if you're not sure what this option does.")}
+                    />
+                  )}
+                />
+                <TextField
+                  required
+                  name="id"
+                  type="email"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50 }}
+                  placeholder={`${t("my.email@address.com")}`}
+                  value={state.id || ""}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                    autoCapitalize: "off",
                   }}
                 />
-              </Box>
-              <LanguageSelector />
 
-              {form()}
-              <Box textAlign="center" width={1} mt={4} mb={4}>
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => setTryitMenu(event.currentTarget)}
-                >
-                  {t("Try it")}
-                </Link>
-                <br />
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                >
-                  {t("Research studies using mindLAMP")}
-                </Link>
-                <Menu
-                  keepMounted
-                  open={Boolean(tryitMenu)}
-                  anchorPosition={tryitMenu?.getBoundingClientRect()}
-                  anchorReference="anchorPosition"
-                  onClose={() => setTryitMenu(undefined)}
-                >
-                  <MenuItem disabled divider>
-                    <b>{t("Try mindLAMP out as a...")}</b>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleDemoLogin("researcher", setIdentity)
-                    }}
+                <TextField
+                  required
+                  name="password"
+                  type="password"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50, marginBottom: 40 }}
+                  placeholder="•••••••••"
+                  value={state.password || ""}
+                  onChange={handleChange}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                  }}
+                />
+
+                <Box className={classes.buttonNav} width={1} textAlign="center">
+                  <Fab
+                    variant="extended"
+                    type="submit"
+                    style={{ background: "#7599FF", color: "White" }}
+                    onClick={handleLogin}
+                    className={loginClick ? classes.loginDisabled : ""}
                   >
-                    {t("Researcher")}
-                  </MenuItem>
-                  <MenuItem
-                    divider
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleDemoLogin("clinician", setIdentity)
-                    }}
+                    {`${t("Login")}`}
+                    <input
+                      type="submit"
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        width: "100%",
+                        opacity: 0,
+                      }}
+                      disabled={loginClick}
+                    />
+                  </Fab>
+                </Box>
+
+                <Box textAlign="center" width={1} mt={4} mb={4}>
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => setTryitMenu(event.currentTarget)}
                   >
-                    {t("Clinician")}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleDemoLogin("participant", setIdentity)
-                    }}
+                    {`${t("Try it")}`}
+                  </Link>
+                  <br />
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
                   >
-                    {t("Participant")}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleDemoLogin("patient", setIdentity)
-                    }}
+                    {`${t("Research studies using mindLAMP")}`}
+                  </Link>
+                  <Menu
+                    keepMounted
+                    open={Boolean(tryitMenu)}
+                    anchorPosition={tryitMenu?.getBoundingClientRect()}
+                    anchorReference="anchorPosition"
+                    onClose={() => setTryitMenu(undefined)}
                   >
-                    {t("Patient")}
-                  </MenuItem>
-                </Menu>
+                    <MenuItem disabled divider>
+                      <b>{`${t("Try mindLAMP out as a...")}`}</b>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "researcher")
+                      }}
+                    >
+                      {`${t("Researcher")}`}
+                    </MenuItem>
+                    <MenuItem
+                      divider
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "clinician")
+                      }}
+                    >
+                      {`${t("Clinician")}`}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "participant")
+                      }}
+                    >
+                      {`${t("Participant")}`}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "patient")
+                      }}
+                    >
+                      {`${t("User")}`}
+                    </MenuItem>
+                  </Menu>
+                </Box>
               </Box>
-            </Box>
+            </form>
           </Grid>
         </Grid>
       </ResponsiveMargin>
     </Slide>
-  )
-}
-
-function LanguageSelector() {
-  const { i18n, t, ready } = useTranslation()
-
-  if (!ready) return null
-
-  return (
-    <TextField
-      select
-      label={t("Select Language")}
-      style={{ width: "100%" }}
-      onChange={(event: any) => i18n.changeLanguage(event.target.value)}
-      variant="filled"
-      value={i18n.language}
-    >
-      {(i18n.options.supportedLngs || []).map((code) =>
-        code === "cimode" ? null : (
-          <MenuItem key={code} value={code}>
-            {`${new Intl.DisplayNames([code], { type: "language" }).of(code)} (${new Intl.DisplayNames(["en"], {
-              type: "language",
-            }).of(code)})`}
-          </MenuItem>
-        )
-      )}
-    </TextField>
-  )
-}
-
-function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete, onError }) {
-  const { t } = useTranslation()
-  const classes = useStyles()
-
-  const [disabled, setDisabled] = useState(false)
-  const [options, setOptions] = useState([])
-
-  useEffect(() => {
-    const cachedOptions = localStorage.getItem("cachedOptions")
-    let options: SuggestedUrlOption[]
-
-    if (cachedOptions) {
-      options = JSON.parse(cachedOptions).filter((o) => typeof o.label !== "undefined")
-      console.log(options)
-    }
-    if (!options || options.length === 0) {
-      options = [
-        { label: "api.lamp.digital" },
-        { label: "mindlamp-api.pronet.med.yale.edu" },
-        { label: "mindlamp.orygen.org.au" },
-        { label: "mindlamp-qa.dmh.lacounty.gov" },
-      ]
-    }
-    setOptions(options)
-  }, [])
-
-  let handleSubmit = async (event: any) => {
-    event.preventDefault()
-    setDisabled(true)
-    await LAMP.Auth.set_identity({ serverAddress: value })
-
-    const pkce = pkceChallenge(pkceCodeVerifierLength)
-
-    let param: OAuthParams = { codeChallenge: pkce.code_challenge, codeVerifier: pkce.code_verifier }
-
-    sessionStorage?.setItem("LAMP._oauth", JSON.stringify(param))
-    let urls: StartFlowResponse
-    try {
-      urls = await LAMP.OAuth.start_flow()
-    } catch (error) {
-      setDisabled(false)
-      onError(Error(`OAuth start URL could not be retrieved from server at ${value}: ${error.message}`))
-      return
-    }
-
-    onComplete(urls)
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <Autocomplete
-        id="server-selector"
-        options={options}
-        sx={{ width: "100%", marginTop: "12px" }}
-        value={value}
-        onSelect={onChange}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            name="serverAddress"
-            variant="filled"
-            value={value}
-            onChange={onChange}
-            InputProps={{ ...params.InputProps, disableUnderline: true }}
-            label={"Server Address"}
-            helperText={t("Don't enter a domain if you're not sure what this option does.")}
-          />
-        )}
-      />
-
-      <Box className={classes.buttonNav} width={1} textAlign="center">
-        <Fab
-          variant="extended"
-          style={{ background: "#7599FF", color: "White" }}
-          className={disabled ? classes.loginDisabled : ""}
-        >
-          {t("Continue")}
-          <input
-            type="submit"
-            style={{
-              cursor: "pointer",
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              right: 0,
-              left: 0,
-              width: "100%",
-              opacity: 0,
-            }}
-            disabled={disabled}
-          />
-        </Fab>
-      </Box>
-    </form>
-  )
-}
-
-function LegacyLoginInput({ values, onChange, onSubmit, onSuccess, onError }) {
-  const { t } = useTranslation()
-  const classes = useStyles()
-
-  const [disabled, setDisabled] = useState(false)
-
-  let handleSubmit = async (event: any) => {
-    event.preventDefault()
-    setDisabled(true)
-
-    try {
-      await onSubmit()
-    } catch (error) {
-      onError(Error(error.message))
-      setDisabled(false)
-      return
-    }
-
-    onSuccess()
-    setDisabled(false)
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <TextField
-        required
-        name="id"
-        margin="normal"
-        variant="outlined"
-        style={{ width: "100%", height: 50 }}
-        placeholder="my.email@address.com"
-        value={values.id || ""}
-        onChange={onChange}
-        disabled={disabled}
-        InputLabelProps={{ shrink: true }}
-        InputProps={{
-          classes: {
-            root: classes.textfieldStyle,
-          },
-          autoCapitalize: "off",
-        }}
-      />
-
-      <TextField
-        required
-        name="password"
-        type="password"
-        margin="normal"
-        variant="outlined"
-        style={{ width: "100%", height: 50, marginBottom: 40 }}
-        placeholder="•••••••••"
-        value={values.password || ""}
-        onChange={onChange}
-        disabled={disabled}
-        InputProps={{
-          classes: {
-            root: classes.textfieldStyle,
-          },
-        }}
-      />
-
-      <Box className={classes.buttonNav} width={1} textAlign="center">
-        <Fab
-          variant="extended"
-          type="submit"
-          style={{ background: "#7599FF", color: "White" }}
-          className={disabled ? classes.loginDisabled : ""}
-        >
-          {t("Login")}
-          <input
-            type="submit"
-            style={{
-              cursor: "pointer",
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              right: 0,
-              left: 0,
-              width: "100%",
-              opacity: 0,
-            }}
-            disabled={disabled}
-          />
-        </Fab>
-      </Box>
-    </form>
-  )
-}
-
-const pkceCodeVerifierLength = 43
-
-let handleLegacyLogin = async (
-  serverAddress: string,
-  credentials: { id: string; password: string },
-  setIdentity
-): Promise<void> => {
-  try {
-    const res = await setIdentity({
-      ...credentials,
-      serverAddress: serverAddress,
-    })
-
-    if (res.authType === "participant") {
-      localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
-      LAMP.SensorEvent.create(res.identity.id, {
-        timestamp: Date.now(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "login",
-          device_type: "Dashboard",
-          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-        },
-      } as any).then((res) => console.dir(res))
-      LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
-    }
-    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
-      let studiesSelected =
-        localStorage.getItem("studies_" + res.identity.id) !== null
-          ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
-          : []
-      if (studiesSelected.length === 0) {
-        let studiesList = [res.identity.name]
-        localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
-        localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
-      }
-    }
-  } catch (error) {
-    console.warn("error with auth request", error)
-    throw Error("Incorrect username, password, or server address.")
-  }
-}
-
-const timezoneVal = () => {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  return timezone
-}
-
-let handleDemoLogin = async (mode: string, setIdentity) => {
-  await handleLegacyLogin(
-    "demo.lamp.digital",
-    {
-      id: `${mode}@demo.lamp.digital`,
-      password: "demo",
-    },
-    setIdentity
   )
 }

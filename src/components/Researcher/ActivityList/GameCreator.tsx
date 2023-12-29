@@ -23,6 +23,7 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
+import { duplicate } from "vega-lite"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -96,6 +97,7 @@ export default function GameCreator({
     description: "",
     photo: details?.photo ?? null,
     streak: details?.streak ?? null,
+    showFeed: details?.showFeed ?? null,
     settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? null,
@@ -234,12 +236,36 @@ export default function GameCreator({
     } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       return validateBreathe(duplicates)
     } else if (
+      (value?.spec && ["lamp.symbol_digit_substitution"].includes(value.spec)) ||
+      activitySpecId === "lamp.symbol_digit_substitution"
+    ) {
+      return validateSymbol(duplicates)
+    } else if (
       (value?.spec && ["lamp.goals"].includes(value.spec)) ||
       activitySpecId === "lamp.goals" ||
       (value?.spec && ["lamp.medications"].includes(value.spec)) ||
       activitySpecId === "lamp.medications"
     ) {
       return validateGoals(duplicates)
+    } else if (
+      (value?.spec && ["lamp.emotion_recognition"].includes(value.spec)) ||
+      ["lamp.emotion_recognition"].includes(activitySpecId)
+    ) {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+        typeof data.settings === "undefined" ||
+        Object.keys(data?.settings || {}).length === 0 ||
+        (typeof data.settings !== "undefined" &&
+          Object.keys(data?.settings || {}).length > 0 &&
+          (data?.settings || []).length > 50) ||
+        (data?.settings || {}).filter((d) => !!d.emotionText).length !== Object.keys(data?.settings || {}).length ||
+        (data?.settings || {}).filter((d) => !!d.image).length !== Object.keys(data?.settings || {}).length
+      )
     } else {
       return !(
         typeof data.studyID == "undefined" ||
@@ -262,6 +288,21 @@ export default function GameCreator({
       typeof data.settings?.rerecord_label === "undefined" ||
       data.settings?.record_label === "" ||
       data.settings?.rerecord_label === "" ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validateSymbol = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      data.settings?.count_of_symbols > 10 ||
+      data.settings?.count_of_symbols < 4 ||
+      data.settings?.duration > 300 ||
+      data.settings?.duration < 20 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )
@@ -421,6 +462,7 @@ export default function GameCreator({
       description: details.description,
       photo: details.photo,
       streak: details.streak,
+      showFeed: details.showFeed,
       studyID: details.studyId,
       category: data?.category ?? [],
     })

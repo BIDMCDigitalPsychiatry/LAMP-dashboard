@@ -803,6 +803,15 @@
     {
       "#type": "Activity",
       "#parent": "study1",
+      "id": "activity77",
+      "spec": "lamp.symbol_digit_substitution",
+      "name": "Symbol digit substitution",
+      "settings": {},
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
       "id": "activity7",
       "spec": "lamp.nback",
       "name": "N-Back",
@@ -1064,9 +1073,18 @@
     {
       "#type": "Activity",
       "#parent": "study1",
-      "id": "activity50",
+      "id": "activity55",
       "spec": "lamp.recording",
       "name": "Voice Recording",
+      "settings": {},
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity56",
+      "spec": "lamp.emotion_recognition",
+      "name": "Emotion Recognition",
       "settings": {},
       "schedule": []
     }
@@ -32894,6 +32912,27 @@
       "#parent": null,
       "id": "lamp.recording",
       "name": "lamp.recording",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.emotion_recognition",
+      "name": "lamp.emotion_recognition",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.maze_game",
+      "name": "lamp.maze_game",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.spin_wheel",
+      "name": "lamp.spin_wheel",
       "settings_schema": {}
     }
   ],

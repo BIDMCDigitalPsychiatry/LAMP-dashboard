@@ -435,7 +435,9 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-              {(authType === "researcher" || authType === "admin") &&
+
+              {/**Commenting for now
+               {(authType === "researcher" || authType === "admin") &&
                 title !== "Administrator" &&
                 title !== "User Administrator" &&
                 title !== "Practice Lead" &&
@@ -444,7 +446,7 @@ export default function NavigationLayout({
                   <Box>
                     <ModeToggleButton changeResearcherType={changeResearcherType} />
                   </Box>
-                )}
+                )} */}
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
@@ -493,29 +495,27 @@ export default function NavigationLayout({
                 </Container>
               )}
               <Box flexGrow={1} />
-              {typeof title != "undefined" &&
-                title.startsWith("User") &&
-                title !== "User Administrator" &&
-                (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
-                  <Box className={classes.headerRight}>
-                    {hideNotifications.indexOf(activeTab) < 0 ? (
-                      <Tooltip title={`${t("Notifications")}`}>
-                        <Badge
-                          badgeContent={msgCount > 0 ? msgCount : undefined}
-                          color="primary"
-                          onClick={() => {
-                            localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
-                            updateAnalytics()
-                          }}
-                        >
-                          <Icon>comment</Icon>
-                        </Badge>
-                      </Tooltip>
-                    ) : (
-                      ""
-                    )}
-                  </Box>
-                )}
+              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
+                // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
+                <Box className={classes.headerRight}>
+                  {hideNotifications.indexOf(activeTab) < 0 ? (
+                    <Tooltip title={`${t("Notifications")}`}>
+                      <Badge
+                        badgeContent={msgCount > 0 ? msgCount : undefined}
+                        color="primary"
+                        onClick={() => {
+                          localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+                          updateAnalytics()
+                        }}
+                      >
+                        <Icon>comment</Icon>
+                      </Badge>
+                    </Tooltip>
+                  ) : (
+                    ""
+                  )}
+                </Box>
+              )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
                 <Box>
                   <Tooltip title={`${t("Profile & Settings")}`}>

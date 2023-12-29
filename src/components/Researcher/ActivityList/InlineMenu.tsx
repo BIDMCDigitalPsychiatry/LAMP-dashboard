@@ -27,7 +27,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={(e) => setOpen(e.currentTarget)}>
-        {manyDates(items)}
+        {`${t(manyDates(items))}`}
       </Button>
       <Menu
         keepMounted

@@ -170,6 +170,7 @@ export default function Participant({
               data.push({
                 id: activity.id,
                 category: activity.category,
+                showFeed: img?.showFeed ?? true,
                 spec: activity.spec,
                 description: img?.description ?? "",
                 photo: img?.photo ?? null,

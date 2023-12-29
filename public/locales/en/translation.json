@@ -443,7 +443,7 @@
 	"the hidden image": "the hidden image",
 	"am": "am",
 	"pm": "pm",
-	"Your response:": "Your response:",
+	"Your response": "Your response",
 	"Nearly All the Time": "Nearly All the Time",
 	"More than Half the Time": "More than Half the Time",
 	"Several Times": "Several Times",
@@ -733,5 +733,6 @@
 	"Does not match the password you entered above.":"Does not match the password you entered above." ,
 	"Password is not complex enough and does not comply with organization password requirement.":"Password is not complex enough and does not comply with organization password requirement.",
 	"Urge to Die by suicide": "Urge to Die by suicide",
-	"Urge to Quit Therapy": "Urge to Quit Therapy"
+	"Urge to Quit Therapy": "Urge to Quit Therapy",
+	"Failed to fetch the study details.": "Failed to fetch the study details."
 }

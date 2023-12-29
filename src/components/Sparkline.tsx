@@ -5,9 +5,7 @@ import { Vega } from "react-vega"
 import { Handler } from "vega-tooltip"
 
 export default function Sparkline({ ...props }) {
-  const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [parentHeight, setParentHeight] = useState(null)
   const [parentWidth, setParentWidth] = useState(null)
   const div = useCallback((node) => {

@@ -154,6 +154,9 @@ export default function AddActivity({
     "lamp.goals": `${t("Goals")}`,
     "lamp.medications": `${t("Medications")}`,
     "lamp.spin_wheel": `${t("Spin The Wheel")}`,
+    "lamp.maze_game": `${t("Maze Game")}`,
+    "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
+    "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
   }
 
   const getActivitySpec = async (id) => {

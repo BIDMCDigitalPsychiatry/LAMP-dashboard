@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles, FormControlLabel, Checkbox } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import ExportActivity from "./ExportActivity"
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: "-50vw",
     },
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
+    showFeed: { marginTop: "10px" },
   })
 )
 export default function Header({
@@ -47,7 +48,6 @@ export default function Header({
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const { t } = useTranslation()
-
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
   }
@@ -72,6 +72,7 @@ export default function Header({
           />
         </Box>
       </Box>
+
       <Box>
         <StudyFilterList
           studies={studies}

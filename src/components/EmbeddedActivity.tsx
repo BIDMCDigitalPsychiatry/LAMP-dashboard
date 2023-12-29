@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,6 +42,9 @@ const demoActivities = {
   "lamp.medications": "medicationtracker",
   "lamp.memory_game": "memorygame",
   "lamp.spin_wheel": "spin_wheel",
+  "lamp.maze_game": "maze_game",
+  "lamp.emotion_recognition": "emotion_recognition",
+  "lamp.symbol_digit_substitution": "symbol_digit_substitution",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -57,6 +61,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [timestamp, setTimestamp] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [warningsDialogState, setWarningsDialogState] = useState(null)
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     setCurrentActivity(activity)
@@ -75,6 +80,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [currentActivity])
 
   const handleSubmit = (e) => {
+    localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
     let warnings = []
     if (e.data !== null) {
       try {
@@ -137,7 +143,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
       // Listen to message from child window
       eventer(messageEvent, handleSubmit, false)
-      return () => window.removeEventListener(messageEvent, handleSaveData)
+      return () => window.removeEventListener(messageEvent, handleSubmit)
     }
   }, [iFrame])
 
@@ -155,7 +161,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           setCurrentActivity(null)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
-              console.dir(e)
+              enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                variant: "error",
+              })
             })
             .then((x) => {
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
@@ -190,7 +198,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
-
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
@@ -232,7 +239,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             setIframe(e)
           }}
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-          allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
+          allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone 'src' 'self'; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
           srcDoc={embeddedActivity}
           sandbox="allow-forms allow-same-origin allow-scripts allow-popups allow-top-navigation "
         />
@@ -270,7 +277,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               handleSaveData(warningsDialogState.activitySubmitEvent)
             }}
           >
-            {t("OK")}
+            {t("Ok")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -433,9 +433,20 @@ export default function Feed({
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [tag, setTag] = useState(null)
   const { t } = useTranslation()
+  const [showFeed, setShowFeed] = useState(false)
 
   useEffect(() => {
-    getFeedByDate(new Date())
+    ;(async () => {
+      const showFeed = await LAMP.Type.getAttachment(participant.id, "lamp.show_feed").then((res: any) =>
+        res.error === undefined && typeof res.data != "undefined" ? res.data : true
+      )
+      setShowFeed(showFeed)
+      if (showFeed !== false) {
+        getFeedByDate(new Date())
+      } else {
+        setLoading(false)
+      }
+    })()
   }, [])
 
   function getDayNumber(date: Date) {
@@ -474,300 +485,302 @@ export default function Feed({
     if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
-        let currentDate = new Date(date)
-        let startD = new Date(date)
-        savedData = events.filter((event) => event.activity === feed.id)
-        feed.schedule.map((schedule) => {
-          scheduleStartDate = getDate(schedule.start_date)
-          scheduleStartDate.setHours(0)
-          scheduleStartDate.setMinutes(0)
-          scheduleStartDate.setSeconds(0)
-          currentDate.setDate(1)
-          if (
-            currentDate.getTime() <= scheduleStartDate.getTime() &&
-            scheduleStartDate.getMonth() === date.getMonth() &&
-            scheduleStartDate.getFullYear() === date.getFullYear()
-          ) {
-            currentDate = getDate(schedule.start_date)
-          }
-          currentDate.setHours(0)
-          currentDate.setMinutes(0)
-          currentDate.setSeconds(0)
-          let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
-          endDate.setHours(23)
-          endDate.setMinutes(59)
+        if ((tag || []).filter((x) => x.id === feed.id)[0]?.showFeed) {
+          let currentDate = new Date(date)
+          let startD = new Date(date)
+          savedData = events.filter((event) => event.activity === feed.id)
+          feed.schedule.map((schedule) => {
+            scheduleStartDate = getDate(schedule.start_date)
+            scheduleStartDate.setHours(0)
+            scheduleStartDate.setMinutes(0)
+            scheduleStartDate.setSeconds(0)
+            currentDate.setDate(1)
+            if (
+              currentDate.getTime() <= scheduleStartDate.getTime() &&
+              scheduleStartDate.getMonth() === date.getMonth() &&
+              scheduleStartDate.getFullYear() === date.getFullYear()
+            ) {
+              currentDate = getDate(schedule.start_date)
+            }
+            currentDate.setHours(0)
+            currentDate.setMinutes(0)
+            currentDate.setSeconds(0)
+            let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+            endDate.setHours(23)
+            endDate.setMinutes(59)
 
-          if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = getDate(schedule.time)
-            let timeVal = getTimeValue(scheduleTime)
-            startD.setHours(scheduleTime.getHours())
-            startD.setMinutes(scheduleTime.getMinutes())
-            startD.setSeconds(0)
-            let scheduledDate = new Date(scheduleStartDate)
-            let scDate = new Date(scheduleStartDate)
-            scDate.setHours(0)
-            scDate.setMinutes(0)
-            scDate.setSeconds(0)
-            scheduledDate.setHours(scheduleTime.getHours())
-            scheduledDate.setMinutes(scheduleTime.getMinutes())
-            schedule.group =
-              feed.spec === "lamp.survey" || feed.spec === "lamp.group"
-                ? "assess"
-                : feed.spec === "lamp.tips"
-                ? "learn"
-                : "manage"
-            schedule.type = feed.spec
-            schedule.title = feed.name
-            schedule.activityData = JSON.parse(JSON.stringify(Object.assign({}, feed, { schedule: undefined })))
-            schedule.clickable =
-              new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-              startD.getTime() <= new Date().getTime()
-                ? true
-                : false
-            schedule.timeValue = timeVal
-            schedule.timestamp = startD.getTime()
-            let first = new Date(currentDate)
-            first.setHours(0)
-            first.setMinutes(0)
-            first.setSeconds(0)
-            let end = new Date(endDate)
-            end.setHours(12)
-            let feedCheck = false
-            switch (schedule.repeat_interval) {
-              case "triweekly":
-              case "biweekly":
-                schedule.completed = savedData.length > 0 ? true : false
-                let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
-                while (first.getTime() <= end.getTime()) {
-                  let dayNum = first.getDay()
-                  if (type.indexOf(dayNum) > -1) {
-                    feedCheck = type.indexOf(dayNumber) > -1 ? true : false
-                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                  }
-                  first.setDate(first.getDate() + 1)
-                }
-                if (feedCheck) currentFeed.push(schedule)
-                break
-              case "weekly":
-                schedule.completed = savedData.length > 0 ? true : false
-                let dayNo = getDayNumber(new Date(scheduleStartDate))
-                while (first.getTime() <= end.getTime()) {
-                  let dayNum = first.getDay()
-                  if (dayNo === dayNum) {
-                    feedCheck = dayNo === dayNumber ? true : false
-                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                  }
-                  first.setDate(first.getDate() + 1)
-                }
-                if (feedCheck) currentFeed.push(schedule)
-                break
-              case "fortnightly":
-                schedule.completed = savedData.length > 0 ? true : false
-                if (first.getTime() > scheduleStartDate.getTime()) {
-                  let found = false
+            if (scheduleStartDate.getTime() <= endDate.getTime()) {
+              scheduleTime = getDate(schedule.time)
+              let timeVal = getTimeValue(scheduleTime)
+              startD.setHours(scheduleTime.getHours())
+              startD.setMinutes(scheduleTime.getMinutes())
+              startD.setSeconds(0)
+              let scheduledDate = new Date(scheduleStartDate)
+              let scDate = new Date(scheduleStartDate)
+              scDate.setHours(0)
+              scDate.setMinutes(0)
+              scDate.setSeconds(0)
+              scheduledDate.setHours(scheduleTime.getHours())
+              scheduledDate.setMinutes(scheduleTime.getMinutes())
+              schedule.group =
+                feed.spec === "lamp.survey" || feed.spec === "lamp.group"
+                  ? "assess"
+                  : feed.spec === "lamp.tips"
+                  ? "learn"
+                  : "manage"
+              schedule.type = feed.spec
+              schedule.title = feed.name
+              schedule.activityData = JSON.parse(JSON.stringify(Object.assign({}, feed, { schedule: undefined })))
+              schedule.clickable =
+                new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+                startD.getTime() <= new Date().getTime()
+                  ? true
+                  : false
+              schedule.timeValue = timeVal
+              schedule.timestamp = startD.getTime()
+              let first = new Date(currentDate)
+              first.setHours(0)
+              first.setMinutes(0)
+              first.setSeconds(0)
+              let end = new Date(endDate)
+              end.setHours(12)
+              let feedCheck = false
+              switch (schedule.repeat_interval) {
+                case "triweekly":
+                case "biweekly":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
                   while (first.getTime() <= end.getTime()) {
-                    let dayNo = getDayNumber(new Date(scheduleStartDate))
-                    if (first.getDate() === 0) first.setDate(first.getDate() + dayNo)
-                    first.setHours(1)
-                    let diff = first.getTime() - new Date(scheduleStartDate).getTime()
-                    let weeksBetweenDates = Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
-                    if (!!found) {
+                    let dayNum = first.getDay()
+                    if (type.indexOf(dayNum) > -1) {
+                      feedCheck = type.indexOf(dayNumber) > -1 ? true : false
                       selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                      feedCheck = date.getDate() === first.getDate() ? true : false
-                      if (feedCheck) currentFeed.push(schedule)
-                      first.setDate(first.getDate() + 14)
-                    } else {
-                      if (weeksBetweenDates % 2 === 0) {
-                        let dayNo = getDayNumber(new Date(scheduleStartDate))
-                        let firstDayNo = getDayNumber(first)
-                        if (firstDayNo === dayNo) {
-                          selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                          feedCheck = date.getDate() === first.getDate() ? true : false
-                          if (feedCheck) currentFeed.push(schedule)
-                          first.setDate(first.getDate() + 14)
-                          found = true
-                          continue
-                        }
-                      }
-                      if (!found) {
-                        first.setDate(first.getDate() + 1)
-                      }
                     }
+                    first.setDate(first.getDate() + 1)
                   }
-                } else {
-                  let firstDate = new Date(scheduleStartDate)
-                  while (firstDate.getTime() <= end.getTime()) {
-                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
-                    feedCheck = date.getDate() === firstDate.getDate() ? true : false
-                    if (feedCheck) currentFeed.push(schedule)
-                    firstDate.setDate(firstDate.getDate() + 14)
+                  if (feedCheck) currentFeed.push(schedule)
+                  break
+                case "weekly":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  let dayNo = getDayNumber(new Date(scheduleStartDate))
+                  while (first.getTime() <= end.getTime()) {
+                    let dayNum = first.getDay()
+                    if (dayNo === dayNum) {
+                      feedCheck = dayNo === dayNumber ? true : false
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                    }
+                    first.setDate(first.getDate() + 1)
                   }
-                }
-                break
-              case "daily":
-              case "hourly":
-              case "every3h":
-              case "every6h":
-              case "every12h":
-                while (first.getTime() <= end.getTime()) {
-                  if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    if (schedule.repeat_interval === "daily") {
-                      schedule.completed = savedData.length > 0 ? true : false
-                      currentFeed.push(schedule)
-                    } else {
-                      let startTime = scheduledDate.getTime()
-                      const hourVal =
-                        schedule.repeat_interval === "hourly"
-                          ? 1 * 60 * 60 * 1000
-                          : schedule.repeat_interval === "every3h"
-                          ? 3 * 60 * 60 * 1000
-                          : schedule.repeat_interval === "every6h"
-                          ? 6 * 60 * 60 * 1000
-                          : 12 * 60 * 60 * 1000
-                      let endTime = date.getTime() + 86400000
-
-                      startTime =
-                        date.toLocaleDateString() === new Date(startTime).toLocaleDateString()
-                          ? startTime
-                          : endTime - ((date.getTime() - startTime) % hourVal) - 86400000
-                      let intervalStart, intervalEnd
-                      let time
-                      let completedVal
-                      let clickableVal
-                      for (let start = startTime; start <= endTime; start = start + hourVal) {
-                        let newDateVal = new Date(start)
-                        if (newDateVal.getDate() === date.getDate()) {
-                          time = getTimeValue(newDateVal)
-                          intervalStart = new Date(start).getTime()
-                          intervalEnd = new Date(start).getTime() + hourVal
-                          let filteredData = savedData.filter(
-                            (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
-                          )
-                          completedVal = filteredData.length > 0 ? true : false
-                          clickableVal =
-                            new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                            new Date().getTime() >= intervalStart &&
-                            new Date().getTime() <= intervalEnd
-                              ? true
-                              : false
-                          let each = {
-                            ...schedule,
-                            clickable: clickableVal,
-                            completed: completedVal,
-                            timeValue: time,
-                            timestamp: newDateVal.getTime(),
+                  if (feedCheck) currentFeed.push(schedule)
+                  break
+                case "fortnightly":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  if (first.getTime() > scheduleStartDate.getTime()) {
+                    let found = false
+                    while (first.getTime() <= end.getTime()) {
+                      let dayNo = getDayNumber(new Date(scheduleStartDate))
+                      if (first.getDate() === 0) first.setDate(first.getDate() + dayNo)
+                      first.setHours(1)
+                      let diff = first.getTime() - new Date(scheduleStartDate).getTime()
+                      let weeksBetweenDates = Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
+                      if (!!found) {
+                        selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                        feedCheck = date.getDate() === first.getDate() ? true : false
+                        if (feedCheck) currentFeed.push(schedule)
+                        first.setDate(first.getDate() + 14)
+                      } else {
+                        if (weeksBetweenDates % 2 === 0) {
+                          let dayNo = getDayNumber(new Date(scheduleStartDate))
+                          let firstDayNo = getDayNumber(first)
+                          if (firstDayNo === dayNo) {
+                            selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                            feedCheck = date.getDate() === first.getDate() ? true : false
+                            if (feedCheck) currentFeed.push(schedule)
+                            first.setDate(first.getDate() + 14)
+                            found = true
+                            continue
                           }
-                          currentFeed.push(each)
+                        }
+                        if (!found) {
+                          first.setDate(first.getDate() + 1)
                         }
                       }
                     }
+                  } else {
+                    let firstDate = new Date(scheduleStartDate)
+                    while (firstDate.getTime() <= end.getTime()) {
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
+                      feedCheck = date.getDate() === firstDate.getDate() ? true : false
+                      if (feedCheck) currentFeed.push(schedule)
+                      firstDate.setDate(firstDate.getDate() + 14)
+                    }
                   }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                  first.setDate(first.getDate() + 1)
-                }
-                break
-              case "custom":
-                while (first.getTime() <= end.getTime()) {
-                  if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    schedule.custom_time.map((time, index) => {
-                      let scheduledDate = new Date(first)
-                      scheduledDate.setHours(getDate(time).getHours())
-                      scheduledDate.setMinutes(getDate(time).getMinutes())
-                      let nextScheduleDate = new Date(first)
-                      if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
-                        nextScheduleDate.setHours(getDate(schedule.custom_time[index + 1]).getHours())
-                        nextScheduleDate.setMinutes(getDate(schedule.custom_time[index + 1]).getMinutes())
+                  break
+                case "daily":
+                case "hourly":
+                case "every3h":
+                case "every6h":
+                case "every12h":
+                  while (first.getTime() <= end.getTime()) {
+                    if (date.toLocaleDateString() === first.toLocaleDateString()) {
+                      if (schedule.repeat_interval === "daily") {
+                        schedule.completed = savedData.length > 0 ? true : false
+                        currentFeed.push(schedule)
+                      } else {
+                        let startTime = scheduledDate.getTime()
+                        const hourVal =
+                          schedule.repeat_interval === "hourly"
+                            ? 1 * 60 * 60 * 1000
+                            : schedule.repeat_interval === "every3h"
+                            ? 3 * 60 * 60 * 1000
+                            : schedule.repeat_interval === "every6h"
+                            ? 6 * 60 * 60 * 1000
+                            : 12 * 60 * 60 * 1000
+                        let endTime = date.getTime() + 86400000
+
+                        startTime =
+                          date.toLocaleDateString() === new Date(startTime).toLocaleDateString()
+                            ? startTime
+                            : endTime - ((date.getTime() - startTime) % hourVal) - 86400000
+                        let intervalStart, intervalEnd
+                        let time
+                        let completedVal
+                        let clickableVal
+                        for (let start = startTime; start <= endTime; start = start + hourVal) {
+                          let newDateVal = new Date(start)
+                          if (newDateVal.getDate() === date.getDate()) {
+                            time = getTimeValue(newDateVal)
+                            intervalStart = new Date(start).getTime()
+                            intervalEnd = new Date(start).getTime() + hourVal
+                            let filteredData = savedData.filter(
+                              (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
+                            )
+                            completedVal = filteredData.length > 0 ? true : false
+                            clickableVal =
+                              new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+                              new Date().getTime() >= intervalStart &&
+                              new Date().getTime() <= intervalEnd
+                                ? true
+                                : false
+                            let each = {
+                              ...schedule,
+                              clickable: clickableVal,
+                              completed: completedVal,
+                              timeValue: time,
+                              timestamp: newDateVal.getTime(),
+                            }
+                            currentFeed.push(each)
+                          }
+                        }
                       }
-                      let filteredData = savedData.filter(
-                        (item) =>
-                          item.timestamp >= scheduledDate.getTime() &&
-                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
-                            ? item.timestamp <= nextScheduleDate.getTime()
-                            : true)
-                      )
-                      let completedVal = filteredData.length > 0 ? true : false
-                      let each = {
-                        ...schedule,
-                        clickable:
-                          new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                          scheduledDate.getTime() <= new Date().getTime() &&
-                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
-                            ? new Date().getTime() <= nextScheduleDate.getTime()
-                            : true),
-                        completed: completedVal,
-                        timeValue: getTimeValue(getDate(time)),
-                        timestamp: scheduledDate.getTime(),
-                      }
-                      currentFeed.push(each)
-                    })
-                  }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
-                  first.setDate(first.getDate() + 1)
-                }
-                break
-              case "monthly":
-                schedule.completed = savedData.length > 0 ? true : false
-                while (first.getTime() <= end.getTime()) {
-                  if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck = new Date(date).getDate() === new Date(scheduleStartDate).getDate() ? true : false
+                    }
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                    first.setDate(first.getDate() + 1)
                   }
-                  first.setDate(first.getDate() + 1)
-                }
-                if (feedCheck) currentFeed.push(schedule)
-                break
-              case "bimonthly":
-                schedule.completed = savedData.length > 0 ? true : false
-                while (first.getTime() <= end.getTime()) {
-                  if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
-                    if (
-                      first.getTime() <=
-                      new Date(
-                        new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
-                      ).getTime()
-                    )
-                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                  break
+                case "custom":
+                  while (first.getTime() <= end.getTime()) {
+                    if (date.toLocaleDateString() === first.toLocaleDateString()) {
+                      schedule.custom_time.map((time, index) => {
+                        let scheduledDate = new Date(first)
+                        scheduledDate.setHours(getDate(time).getHours())
+                        scheduledDate.setMinutes(getDate(time).getMinutes())
+                        let nextScheduleDate = new Date(first)
+                        if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
+                          nextScheduleDate.setHours(getDate(schedule.custom_time[index + 1]).getHours())
+                          nextScheduleDate.setMinutes(getDate(schedule.custom_time[index + 1]).getMinutes())
+                        }
+                        let filteredData = savedData.filter(
+                          (item) =>
+                            item.timestamp >= scheduledDate.getTime() &&
+                            (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                              ? item.timestamp <= nextScheduleDate.getTime()
+                              : true)
+                        )
+                        let completedVal = filteredData.length > 0 ? true : false
+                        let each = {
+                          ...schedule,
+                          clickable:
+                            new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+                            scheduledDate.getTime() <= new Date().getTime() &&
+                            (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                              ? new Date().getTime() <= nextScheduleDate.getTime()
+                              : true),
+                          completed: completedVal,
+                          timeValue: getTimeValue(getDate(time)),
+                          timestamp: scheduledDate.getTime(),
+                        }
+                        currentFeed.push(each)
+                      })
+                    }
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                    first.setDate(first.getDate() + 1)
+                  }
+                  break
+                case "monthly":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  while (first.getTime() <= end.getTime()) {
+                    if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
+                      schedule.timeValue = getTimeValue(scheduleTime)
+                      feedCheck = new Date(date).getDate() === new Date(scheduleStartDate).getDate() ? true : false
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                    }
+                    first.setDate(first.getDate() + 1)
+                  }
+                  if (feedCheck) currentFeed.push(schedule)
+                  break
+                case "bimonthly":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  while (first.getTime() <= end.getTime()) {
+                    if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
+                      schedule.timeValue = getTimeValue(scheduleTime)
+                      feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
+                      if (
+                        first.getTime() <=
                         new Date(
                           new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
-                        ).toLocaleDateString()
+                        ).getTime()
                       )
-                    if (
-                      first.getTime() <=
-                      new Date(
-                        new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
-                      ).getTime()
-                    )
-                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                        selectedWeekViewDays = selectedWeekViewDays.concat(
+                          new Date(
+                            new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
+                          ).toLocaleDateString()
+                        )
+                      if (
+                        first.getTime() <=
                         new Date(
                           new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
-                        ).toLocaleDateString()
+                        ).getTime()
                       )
+                        selectedWeekViewDays = selectedWeekViewDays.concat(
+                          new Date(
+                            new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
+                          ).toLocaleDateString()
+                        )
+                    }
+                    first.setDate(first.getDate() + 1)
                   }
-                  first.setDate(first.getDate() + 1)
-                }
-                if (feedCheck) currentFeed.push(schedule)
-                break
-              case "none":
-                schedule.completed = savedData.length > 0 ? true : false
-                while (first.getTime() <= end.getTime()) {
-                  if (new Date(first).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck =
-                      new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
-                        ? true
-                        : false
-                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                  if (feedCheck) currentFeed.push(schedule)
+                  break
+                case "none":
+                  schedule.completed = savedData.length > 0 ? true : false
+                  while (first.getTime() <= end.getTime()) {
+                    if (new Date(first).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
+                      schedule.timeValue = getTimeValue(scheduleTime)
+                      feedCheck =
+                        new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
+                          ? true
+                          : false
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                    }
+                    first.setDate(first.getDate() + 1)
                   }
-                  first.setDate(first.getDate() + 1)
-                }
-                if (feedCheck) currentFeed.push(schedule)
-                break
+                  if (feedCheck) currentFeed.push(schedule)
+                  break
+              }
             }
-          }
-        })
+          })
+        }
       })
       setSelectedDays(selectedWeekViewDays)
       currentFeed = currentFeed.sort((x, y) => {
@@ -808,91 +821,100 @@ export default function Feed({
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           {loading == false &&
-            (currentFeed.length === 0 ? (
+            (currentFeed.length === 0 || showFeed == false ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
-                <Icon>info</Icon>
-                <p>{`${t("There are no scheduled activities available.")}`}</p>
+                <Icon>info {showFeed}</Icon>
+                <p>
+                  {showFeed == false
+                    ? `${t("The managing researcher has disabled the user feed.")}`
+                    : `${t("There are no scheduled activities available.")}`}
+                </p>
               </Box>
             ) : null)}
-          <Stepper
-            orientation="vertical"
-            classes={{ root: classes.customstepper }}
-            connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
-          >
-            {typeof currentFeed !== "undefined" &&
-              currentFeed.map((feed, index) => (
-                <Step>
-                  <StepLabel
-                    StepIconProps={{
-                      completed: feed.completed,
-                      classes: {
-                        root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
-                        active: classes.stepActiveIcon,
-                        completed: classes[feed.group + "CompletedIcon"],
-                      },
-                    }}
-                  >
-                    <Card
-                      className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
-                      variant="outlined"
-                      onClick={() => {
-                        if (
-                          !feed.completed &&
-                          feed.clickable &&
-                          (typeof feed.activityData?.category === "undefined" ||
-                            feed.activityData?.category === null ||
-                            (!!feed.activityData?.category && feed.activityData?.category.length !== 0))
-                        ) {
-                          window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
-                        }
-                      }}
-                    >
-                      <Grid container spacing={0}>
-                        <Grid
-                          xs
-                          container
-                          justifyContent="center"
-                          direction="column"
-                          className={classes.feedtasks}
-                          spacing={0}
+          {showFeed !== false && (
+            <Stepper
+              orientation="vertical"
+              classes={{ root: classes.customstepper }}
+              connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
+            >
+              {typeof currentFeed !== "undefined" &&
+                currentFeed.map(
+                  (feed, index) =>
+                    (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.showFeed && (
+                      <Step>
+                        <StepLabel
+                          StepIconProps={{
+                            completed: feed.completed,
+                            classes: {
+                              root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
+                              active: classes.stepActiveIcon,
+                              completed: classes[feed.group + "CompletedIcon"],
+                            },
+                          }}
                         >
-                          <Box m={1}>
-                            <Typography variant="body2" color="textSecondary">
-                              <Box fontStyle="italic" className={classes.smalltext}>
-                                {feed.timeValue}
-                              </Box>
-                            </Typography>
-                            <Typography variant="h5">{`${t(feed.title)}`}</Typography>
-                            <Typography className={classes.smalltext} color="textSecondary">
-                              {feed.spec}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid container justifyContent="center" direction="column" className={classes.image}>
-                          <Box
-                            style={{
-                              margin: "auto",
-                              background: !["", null].includes(
-                                (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
-                              )
-                                ? `url(${
-                                    (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
-                                  }) center center/contain no-repeat`
-                                : `url(${InfoIcon}) center center/contain no-repeat`,
+                          <Card
+                            className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
+                            variant="outlined"
+                            onClick={() => {
+                              if (
+                                !feed.completed &&
+                                feed.clickable &&
+                                (typeof feed.activityData?.category === "undefined" ||
+                                  feed.activityData?.category === null ||
+                                  (!!feed.activityData?.category && feed.activityData?.category.length !== 0))
+                              ) {
+                                window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
+                              }
                             }}
-                          ></Box>
-                        </Grid>
-                      </Grid>
-                    </Card>
-                  </StepLabel>
-                  {index !== currentFeed.length - 1 && (
-                    <StepContent classes={{ root: classes.customsteppercontent }}>
-                      <div></div>
-                    </StepContent>
-                  )}
-                </Step>
-              ))}
-          </Stepper>
+                          >
+                            <Grid container spacing={0}>
+                              <Grid
+                                xs
+                                container
+                                justifyContent="center"
+                                direction="column"
+                                className={classes.feedtasks}
+                                spacing={0}
+                              >
+                                <Box m={1}>
+                                  <Typography variant="body2" color="textSecondary">
+                                    <Box fontStyle="italic" className={classes.smalltext}>
+                                      {feed.timeValue}
+                                    </Box>
+                                  </Typography>
+                                  <Typography variant="h5">{`${t(feed.title)}`}</Typography>
+                                  <Typography className={classes.smalltext} color="textSecondary">
+                                    {feed.spec}
+                                  </Typography>
+                                </Box>
+                              </Grid>
+                              <Grid container justifyContent="center" direction="column" className={classes.image}>
+                                <Box
+                                  style={{
+                                    margin: "auto",
+                                    background: !["", null].includes(
+                                      (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                    )
+                                      ? `url(${
+                                          (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
+                                        }) center center/contain no-repeat`
+                                      : `url(${InfoIcon}) center center/contain no-repeat`,
+                                  }}
+                                ></Box>
+                              </Grid>
+                            </Grid>
+                          </Card>
+                        </StepLabel>
+                        {index !== currentFeed.length - 1 && (
+                          <StepContent classes={{ root: classes.customsteppercontent }}>
+                            <div></div>
+                          </StepContent>
+                        )}
+                      </Step>
+                    )
+                )}
+            </Stepper>
+          )}
         </Grid>
         <Grid item xs className={classes.large_calendar}>
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />

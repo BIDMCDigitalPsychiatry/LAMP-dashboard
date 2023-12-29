@@ -53,7 +53,9 @@ export default function Active({ participant, ...props }) {
 
   const dateInfo = (id) => ({
     relative: active?.timestamp ?? 0,
-    absolute: new Date(parseInt((logins || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
+    absolute: !!logins
+      ? new Date(parseInt((logins || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium"))
+      : "",
     device: (logins || { data: {} }).data?.device_type || `${t("an unknown device")}`,
     userAgent: (logins || { data: {} }).data?.user_agent || `${t("unknown device model")}`,
   })
@@ -91,7 +93,7 @@ export default function Active({ participant, ...props }) {
              typeof dateInfo(participant.id).userAgent === "object"
                ? userAgentConcat(dateInfo(participant.id).userAgent)
                : dateInfo(participant.id).userAgent
-           }`}
+           } )`}
         >
           <Chip
             label={`${t("Last Active")}`}

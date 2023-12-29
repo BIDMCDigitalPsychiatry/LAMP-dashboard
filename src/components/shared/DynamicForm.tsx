@@ -1,14 +1,21 @@
 import React from "react"
 import { Grid, Button, Icon, MuiThemeProvider, Box, Paper, makeStyles, createStyles, Theme } from "@material-ui/core"
-import { Autocomplete } from "@material-ui/lab"
-import Form, { Widgets } from "@rjsf/material-ui"
-import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
+import Form from "@rjsf/material-ui"
+import {
+  ObjectFieldTemplateProps,
+  TitleFieldProps,
+  DescriptionFieldProps,
+  ArrayFieldTemplateProps,
+  RegistryWidgetsType,
+} from "@rjsf/utils"
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
 import { createTheme } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
-import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES } from "@mui/material/locale"
-const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+import validator from "@rjsf/validator-ajv8"
+
+import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES, zhHK } from "@mui/material/locale"
+const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
 const languageObjects = {
   "en-US": enUS,
   "es-ES": esES,
@@ -19,34 +26,63 @@ const languageObjects = {
   "ko-KR": koKR,
   "it-IT": itIT,
   "zh-CN": zhCN,
+  "zh-HK": zhHK,
 }
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
 // Supported container props: alignContent, alignItems, direction, justify, spacing, wrap
 // Supported item props: lg, md, sm, xs, xl
 // TODO: Does not support adding dividers or padding before/after the children items yet.
+
+function TitleFieldTemplate(props: TitleFieldProps) {
+  const { id, required, title } = props
+  return (
+    <header id={id}>
+      {title}
+      {required && <mark>*</mark>}
+    </header>
+  )
+}
+
+function DescriptionFieldTemplate(props: DescriptionFieldProps) {
+  const { description, id } = props
+  return <small id={id}>{description}</small>
+}
+
+function AutoCompleteTemplate(props: DescriptionFieldProps) {
+  const { description, id } = props
+  return <small id={id}>{description}</small>
+}
+
+//TextWidget: AutocompleteTextWidget,
+const widgets: RegistryWidgetsType = {
+  FileWidget: CustomFileWidget,
+}
+
 const ObjectFieldTemplate = ({
-  DescriptionField,
   description,
-  TitleField,
   title,
   properties,
   required,
-  disabled,
-  readonly,
   uiSchema,
   idSchema,
   schema,
-  formData,
-  onAddClick,
+  registry,
 }: ObjectFieldTemplateProps) => {
   const { t } = useTranslation()
   return (
     <>
-      {!!properties && (properties || []).length > 0 && (uiSchema["ui:title"] || title) && (
-        <TitleField id={`${idSchema.$id}-title`} title={t(title)} required={required} />
+      {/* {!!properties && (properties || []).length > 0 && (uiSchema["ui:title"] || title) && (
+        <TitleFieldTemplate id={`${idSchema.$id}-title`} title={t(title)} required={required} registry={registry} schema={schema} />
+      )} */}
+      {description && (
+        <DescriptionFieldTemplate
+          id={`${idSchema.$id}-description`}
+          description={t(description)}
+          registry={registry}
+          schema={schema}
+        />
       )}
-      {description && <DescriptionField id={`${idSchema.$id}-description`} description={t(description)} />}
       <Grid container={true} spacing={2} style={{ marginTop: 10 }} {...(uiSchema?.["ui:grid"] ?? {})}>
         {properties.map((element: any, index: number) => (
           <Grid
@@ -59,20 +95,6 @@ const ObjectFieldTemplate = ({
             {element.content}
           </Grid>
         ))}
-        {utils.canExpand(schema, uiSchema, formData) && (
-          <Grid container justifyContent="flex-end">
-            <Grid item={true}>
-              <Button
-                className="object-property-expand"
-                color="secondary"
-                onClick={onAddClick(schema)}
-                disabled={disabled || readonly}
-              >
-                <Icon>add</Icon> {t("ADD ITEM")}
-              </Button>
-            </Grid>
-          </Grid>
-        )}
       </Grid>
     </>
   )
@@ -97,15 +119,30 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-function ArrayFieldTemplate(props) {
+
+function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const { t } = useTranslation()
   const classes = useStyles()
-
   return (
     <Grid container={true} alignItems="center" className={classes.toolbardashboard}>
       <Box width={1}>
-        {props.schema.title && <props.TitleField title={t(props.schema.title)} required={props.required} />}
-        {props.schema.description && <props.DescriptionField description={t(props.schema.description)} />}
+        {props.schema.title && (
+          <TitleFieldTemplate
+            id={props.idSchema.$id}
+            title={t(props.schema.title)}
+            required={props.required}
+            schema={props.schema}
+            registry={props.registry}
+          />
+        )}
+        {props.schema.description && (
+          <DescriptionFieldTemplate
+            description={t(props.schema.description)}
+            id={props.idSchema.$id}
+            schema={props.schema}
+            registry={props.registry}
+          />
+        )}
       </Box>
       {props.items.map((element, index) => (
         <Grid container={true} alignItems="center">
@@ -116,7 +153,6 @@ function ArrayFieldTemplate(props) {
               </Paper>
             </Box>
           </Grid>
-
           {element.hasToolbar && (
             <Grid item={true}>
               {(element.hasMoveUp || element.hasMoveDown) && (
@@ -135,6 +171,15 @@ function ArrayFieldTemplate(props) {
                   className={classes.btnarrange}
                 >
                   <Icon>arrow_downward</Icon>
+                </button>
+              )}
+              {element.hasCopy && (
+                <button
+                  onClick={element.onCopyIndexClick(index)}
+                  disabled={element.disabled || element.readonly}
+                  className={classes.btnarrange}
+                >
+                  <Icon>content_copy</Icon>
                 </button>
               )}
               {element.hasRemove && (
@@ -177,23 +222,6 @@ function _extract(schema) {
   }
 }
 
-// Add support for the "examples" array for the property as an auto-complete menu.
-function AutocompleteTextWidget(props) {
-  if (!Array.isArray(props.schema.examples)) {
-    return <Widgets.TextWidget {...props} />
-  }
-
-  return (
-    <Autocomplete
-      onChange={(_, data) => props.onChange(data)}
-      freeSolo
-      options={props.schema.examples ?? []}
-      renderInput={(params) => <Widgets.TextWidget {...params} {...props} />}
-      {...(props.uiSchema ?? {})}
-      value={props.value}
-    />
-  )
-}
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
@@ -253,9 +281,9 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         onChange={(x) => {
           onChange(x.formData)
         }}
-        ArrayFieldTemplate={ArrayFieldTemplate}
-        ObjectFieldTemplate={ObjectFieldTemplate}
-        widgets={{ TextWidget: AutocompleteTextWidget, FileWidget: CustomFileWidget }}
+        validator={validator}
+        templates={{ ArrayFieldTemplate, ObjectFieldTemplate, TitleFieldTemplate }}
+        widgets={widgets}
       />
     </MuiThemeProvider>
   )

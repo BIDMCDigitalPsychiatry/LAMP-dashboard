@@ -15,7 +15,8 @@ import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import da from "javascript-time-ago/locale/da"
 import de from "javascript-time-ago/locale/de"
-import zh from "javascript-time-ago/locale/zh"
+import zh_HK from "javascript-time-ago/locale/zh-Hans-HK"
+import zh_CN from "javascript-time-ago/locale/zh"
 import ko from "javascript-time-ago/locale/ko"
 import es from "javascript-time-ago/locale/es"
 import it from "javascript-time-ago/locale/it"
@@ -24,6 +25,7 @@ import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
+import { dateTimeToTimestamp } from "vega-lite/build/src/datetime"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -36,7 +38,8 @@ const localeMap = {
   "fr-FR": fr,
   "ko-KR": ko,
   "it-IT": it,
-  "zh-CN": zh,
+  "zh-CN": zh_CN,
+  "zh-HK": zh_HK,
 }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -124,15 +127,23 @@ const useStyles = makeStyles((theme: Theme) =>
           right: 10,
         },
       },
+      "& h5": {
+        color: "#4C66D6",
+        fontSize: 12,
+        textAlign: "right",
+        padding: "0 25px 0 10px",
+        fontWeight: 600,
+      },
     },
     preventlabelFull: {
       minHeight: "auto",
       fontSize: 16,
-
       padding: "0 0 0 15px",
-      marginTop: 8,
       width: "100%",
       textAlign: "left",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
       "& span": { color: "#618EF7" },
     },
     maxw300: {
@@ -205,14 +216,22 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.jewels_b": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.symbol_digit_substitution": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
   "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
     let temporalSlices = slices.filter(function (data) {
-      return data.type === true
+      return !!data && data.type === true
     })
     return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
+  },
+  "lamp.maze_game": (slices, activity, scopedItem) => {
+    return (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length
+  },
+  "lamp.emotion_recognition": (slices, activity, scopedItem) => {
+    return (slices || []).map((x) => (!!x.type ? 1 : 0)).reduce((prev, cur) => prev + cur, 0)
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
@@ -231,6 +250,90 @@ export const strategies = {
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
+
+/**
+ * Get percentage value for particular survey activity for the seletced participant.
+ * @param participantId
+ * @param activities
+ * @returns
+ */
+const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
+  let percentage = []
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
+  return await Promise.all(
+    percentage.concat(
+      activities.map(async (activity) => {
+        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        if (!!tag) {
+          const startTime = getStartTime(tag)
+          const endTime = getEndTime(startTime, tag)
+          return {
+            activityId: activity.id,
+            percentage:
+              Math.round(
+                (activityEvents.filter(
+                  (a) => a.activity === activity.id && a.timestamp >= startTime && a.timestamp <= endTime
+                ).length /
+                  tag.limit) *
+                  100 *
+                  100
+              ) / 100,
+          }
+        }
+      })
+    )
+  )
+}
+
+const getStartTime = (tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
+  let startTime = tag.startDate
+  let diff = 1
+  let diffDate = new Date(tag.startDate)
+  switch (tag.unit) {
+    case "weeks":
+      diff = (new Date().getTime() - diffDate.getTime()) / (7 * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + 7 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      break
+    case "months":
+      diff = (new Date().getTime() - diffDate.getTime()) / (30 * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + 30 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      diffDate.setDate(new Date(tag.startDate).getDate())
+      break
+    case "days":
+      diff = (new Date().getTime() - diffDate.getTime()) / (24 * tag.timeframe * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
+      break
+    case "hours":
+      diff = (new Date().getTime() - diffDate.getTime()) / (tag.timeframe * 60 * 60 * 1000)
+      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 60 * 60 * 1000)
+      break
+  }
+  startTime = diffDate.getTime()
+  return startTime
+}
+const getEndTime = (startTime: number, tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
+  let endTime = startTime
+  switch (tag.unit) {
+    case "weeks":
+      endTime = startTime + 7 * tag.timeframe * 24 * 60 * 60 * 1000
+      break
+    case "months":
+      const d = new Date(startTime)
+      d.setMonth(d.getMonth() + tag.timeframe)
+      endTime = d.getTime()
+      break
+    case "days":
+      endTime = startTime + tag.timeframe * 24 * 60 * 60 * 1000
+      break
+    case "hours":
+      endTime = startTime + tag.timeframe * 60 * 60 * 1000
+      break
+  }
+  return endTime
+}
+
 export default function PreventSelectedActivities({
   participant,
   activities,
@@ -259,12 +362,27 @@ export default function PreventSelectedActivities({
   const { t, i18n } = useTranslation()
   const [timeAgo, setLang] = useState(new TimeAgo("en-US"))
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
+  // State for survey percentage
+  // const [percentages, setPercentages] = React.useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
+
+  /**
+   * Enable the survey percentage settings by uncommenting the below section
+   */
+  // React.useEffect(() => {
+  //   ;(async () => {
+  //     const percentages = await getPercentageSettings(
+  //       participant.id,
+  //       activities.filter((activity) => activity.spec === "lamp.survey")
+  //     )
+  //     setPercentages(percentages)
+  //   })()
+  // }, [activities])
 
   useEffect(() => {
     TimeAgo.addLocale(localeMap[getSelectedLanguage()])
@@ -333,6 +451,13 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
+                    {/* Uncomment below lines to show the survey percentage value
+                    {activity.spec === "lamp.survey" && !!percentages && (
+                      <Typography variant="h5">
+                        {(percentages || []).filter((p) => p?.activityId === activity.id)[0]?.percentage ?? 0}%
+                        completed
+                      </Typography>
+                    )} */}
                   </Typography>
                   <Box className={classes.maxw300}>
                     <VegaLite
@@ -344,7 +469,10 @@ export default function PreventSelectedActivities({
                             x: new Date(d.timestamp),
                             y: strategies[activity.spec]
                               ? strategies[activity.spec](
-                                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                                  activity.spec === "lamp.survey" ||
+                                    activity.spec === "lamp.pop_the_bubbles" ||
+                                    activity.spec === "lamp.maze_game" ||
+                                    activity.spec === "lamp.emotion_recognition"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
                                     : activity.spec === "lamp.scratch_image" ||
                                       activity.spec === "lamp.breathe" ||

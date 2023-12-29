@@ -26,6 +26,9 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
   "lamp.spin_wheel",
+  "lamp.maze_game",
+  "lamp.emotion_recognition",
+  "lamp.symbol_digit_substitution",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -185,7 +188,7 @@ export default function Activity({
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
         addActivity(x, studies)
-        enqueueSnackbar(`${t("Successfully duplicated the Activity.")}`, {
+        enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
           variant: "success",
         })
         history.back()

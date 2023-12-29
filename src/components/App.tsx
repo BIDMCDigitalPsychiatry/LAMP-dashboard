@@ -36,6 +36,8 @@ import TwoFA from "./TwoFA"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
+  const { t } = useTranslation()
+
   useEffect(() => {
     StackTrace.fromError(error).then(setTrace)
   }, [])
@@ -59,20 +61,21 @@ function ErrorFallback({ error }) {
       }}
     >
       <pre>
-        <code style={{ fontSize: "16px" }}>
+        {/* <code style={{ fontSize: "16px" }}>
           {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
         </code>
         <br />
         <code style={{ color: "#fff" }}>
           {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code>
+        </code> */}
+        <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
         <br />
-        <code>
+        {/* <code>
           mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code>
+        </code> */}
         <br />
         <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
-          Back to page
+          {`${t("Back to page.")}`}
         </a>
       </pre>
     </div>
@@ -559,7 +562,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -591,7 +596,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -624,7 +631,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -656,7 +665,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -690,7 +701,10 @@ function AppRouter({ ...props }) {
                   onComplete={() => props.history.replace("/")}
                 />
               </React.Fragment>
-            ) : JSON.parse(localStorage.getItem("verified"))?.value === false && state.authType !== "participant" ? (
+            ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+                typeof state.auth?.serverAddress === "undefined") &&
+              JSON.parse(localStorage.getItem("verified"))?.value === false &&
+              state.authType !== "participant" ? (
               <React.Fragment>
                 <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
                 <TwoFA
@@ -729,7 +743,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -775,7 +791,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -814,7 +832,7 @@ function AppRouter({ ...props }) {
                       props.history.push(`/participant/${id}/portal`)
                     })()
                   }}
-                  mode={state.researcherType}
+                  mode={"researcher"} // Defaulting to researcher mode for now {state.researcherType}
                   tab={props.match.params.tab}
                 />
               </NavigationLayout>
@@ -836,7 +854,9 @@ function AppRouter({ ...props }) {
                 onComplete={() => props.history.replace("/data_portal")}
               />
             </React.Fragment>
-          ) : JSON.parse(localStorage.getItem("verified"))?.value === false ? (
+          ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
+              typeof state.auth?.serverAddress === "undefined") &&
+            JSON.parse(localStorage.getItem("verified"))?.value === false ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
@@ -1051,7 +1071,7 @@ export default function App({ ...props }) {
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
-        <span
+        {/* <span
           style={{
             position: "fixed",
             bottom: 16,
@@ -1062,7 +1082,7 @@ export default function App({ ...props }) {
           }}
         >
           {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
-        </span>
+        </span> */}
       </ThemeProvider>
     </ErrorBoundary>
   )

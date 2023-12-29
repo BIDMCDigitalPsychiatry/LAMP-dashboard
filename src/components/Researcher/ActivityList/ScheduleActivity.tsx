@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Box, IconButton, Icon, Fab, Dialog, DialogContent, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
+import PercentageSettings from "./PercentageSettings"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     btnWhite: {
@@ -66,6 +67,9 @@ export default function ScheduleActivity({ activity, activities, setActivities, 
             </IconButton>
           </Box>
           <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
+          {/* 
+          Percentage settings section can be enabled by uncommenting this.
+          {activity.spec === "lamp.survey" && <PercentageSettings activityId={activity.id} />} */}
         </DialogContent>
       </Dialog>
     </span>

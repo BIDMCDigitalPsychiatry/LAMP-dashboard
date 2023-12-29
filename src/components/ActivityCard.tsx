@@ -9,7 +9,7 @@ import { strategies } from "./PreventSelectedActivities"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
-
+import SymbolDigitResponses from "./SymbolDigitResponses"
 export default function ActivityCard({
   activity,
   events,
@@ -28,15 +28,27 @@ export default function ActivityCard({
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
+
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
     events
       .map((d) =>
-        d.temporal_slices.map((t) => ({
-          item: t.item,
+        d.temporal_slices.map((t, index) => ({
+          item:
+            activity.spec === "lamp.symbol_digit_substitution"
+              ? d.temporal_slices.length > index + 1
+                ? "Digit " + (index + 1) + " : " + t.type
+                : t.type
+              : activity.spec === "lamp.maze_game"
+              ? t.level
+              : t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+            activity.spec === "lamp.maze_game"
+              ? t.duration
+              : activity.spec === "lamp.survey" ||
+                activity.spec === "lamp.pop_the_bubbles" ||
+                activity.spec === "lamp.symbol_digit_substitution"
               ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
@@ -46,7 +58,7 @@ export default function ActivityCard({
                   ? Number(t.value.replace(/\"/g, ""))
                   : t.value
                 : t.value
-              : activity.spec === "lamp.spin_wheel"
+              : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
               ? t.type
               : !!t.type
               ? 1
@@ -84,7 +96,7 @@ export default function ActivityCard({
           </Tooltip>
         ) : (
           <Tooltip title={`${t("Go Back")}`}>
-            <IconButton onClick={(event) => setVisibleSlice(undefined)}>
+            <IconButton onClick={() => window.history.back()}>
               <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
@@ -138,16 +150,22 @@ export default function ActivityCard({
         ) : (
           <ArrayView
             hiddenKeys={["x"]}
-            value={(visibleSlice.slice || []).map((x) => ({
+            value={(visibleSlice.slice || []).map((x, index) => ({
               item: x.item,
               value:
-                typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
+                activity.spec === "lamp.maze_game"
+                  ? x.duration
+                  : activity.spec === "lamp.emotion_recognition" || activity.spec === "lamp.symbol_digit_substitution"
+                  ? x.type
+                  : typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
                   ? Number(x.value.replace(/\"/g, ""))
                   : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
         )
+      ) : showGrid && activity.spec === "lamp.symbol_digit_substitution" ? (
+        <SymbolDigitResponses activityData={events} />
       ) : showGrid &&
         activity.spec !== "lamp.scratch_image" &&
         activity.spec !== "lamp.tips" &&
@@ -164,16 +182,20 @@ export default function ActivityCard({
               minHeight={48}
               color={colors.blue[500]}
               data={eachData[idx]}
-              onClick={(datum) => setVisibleSlice(datum)}
+              onClick={(datum) => {
+                setVisibleSlice(datum)
+              }}
             />
           )}
           value={Object.values(
             events
               .map((d) =>
-                d.temporal_slices.map((t) => ({
-                  item: t.item,
+                d.temporal_slices.map((t, index) => ({
+                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-                    activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                    activity.spec === "lamp.maze_game"
+                      ? t.duration
+                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                       ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
@@ -183,7 +205,7 @@ export default function ActivityCard({
                           ? Number(t.value.replace(/\"/g, ""))
                           : t.value
                         : t.value
-                      : activity.spec === "lamp.spin_wheel"
+                      : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
                       ? t.type
                       : !!t.type
                       ? 1
@@ -209,8 +231,10 @@ export default function ActivityCard({
             y: strategies[activity.spec]
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" ||
+                    activity.spec === "lamp.emotion_recognition" ||
                     activity.spec === "lamp.spin_wheel" ||
-                    activity.spec === "lamp.pop_the_bubbles"
+                    activity.spec === "lamp.pop_the_bubbles" ||
+                    activity.spec === "lamp.maze_game"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
@@ -223,7 +247,9 @@ export default function ActivityCard({
               : 0,
             slice: d.temporal_slices,
             missing:
-              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              activity.spec === "lamp.survey" ||
+              activity.spec === "lamp.pop_the_bubbles" ||
+              activity.spec === "lamp.emotion_recognition"
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}

@@ -439,7 +439,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                         ) : (
                           <TableRow>
                             <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
-                              No records found
+                              {`${t("No records found")}`}
                             </TableCell>
                           </TableRow>
                         )}

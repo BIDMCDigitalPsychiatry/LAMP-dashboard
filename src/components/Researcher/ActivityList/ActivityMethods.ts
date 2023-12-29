@@ -10,7 +10,7 @@ export const SchemaList = () => {
         settings: {
           title: i18n.t("Activity Settings"),
           type: "object",
-          required: ["low_risk", "high_risk", "spins_per_game"],
+          required: ["low_risk", "high_risk", "spins_per_game", "balance"],
           properties: {
             low_risk: {
               title: i18n.t("Low Risk"),
@@ -171,6 +171,14 @@ export const SchemaList = () => {
               minimum: 1,
               maximum: 100,
               default: 20,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            balance: {
+              title: i18n.t("Starting Balance"),
+              type: "number",
+              default: 2000,
               "ui:grid": {
                 xs: 6,
               },
@@ -777,6 +785,15 @@ export const SchemaList = () => {
           title: i18n.t("Survey Questions"),
           description: i18n.t("Configure questions, parameters, and options."),
           type: "array",
+          "ui:schema": {
+            copyable: true,
+          },
+          "ui:options": {
+            addable: true,
+            removable: true,
+            orderable: true,
+            copyable: true,
+          },
           items: {
             required: ["text", "type"],
 
@@ -787,7 +804,7 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "boolean", "short_answer", "likert", "matrix"],
+                        enum: ["text", "boolean", "short", "likert", "matrix"],
                       },
                     },
                   },
@@ -951,6 +968,46 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.emotion_recognition": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity settings"),
+          type: "array",
+          description: i18n.t("A maximum of 50 images can only be uploaded."),
+          items: {
+            required: ["image", "emotion", "emotionText"],
+            type: "object",
+            properties: {
+              image: {
+                type: "string",
+                title: i18n.t("Image"),
+                description: i18n.t(
+                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
+                ),
+                format: "data-url",
+                "ui:widget": "file",
+                "ui:options": {
+                  accept: ".gif,.jpg,.png,.svg",
+                },
+              },
+              emotionText: {
+                title: i18n.t("Text"),
+                type: "string",
+                default: "",
+              },
+              emotion: {
+                type: "string",
+                title: i18n.t("Emotion"),
+                enum: ["happiness", "sadness", "fear", "anger", "neutral"],
+                enumNames: [i18n.t("Happiness"), i18n.t("Sadness"), i18n.t("Fear"), i18n.t("Anger"), i18n.t("Neutral")],
+                default: "happiness",
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.dbt_diary_card": {
       type: "object",
       properties: {
@@ -985,7 +1042,8 @@ export const SchemaList = () => {
                     title: i18n.t("Measure of Action"),
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enum: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enumNames: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
@@ -1009,7 +1067,8 @@ export const SchemaList = () => {
                     title: i18n.t("Measure of action"),
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enum: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                    enumNames: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
@@ -1042,6 +1101,15 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.maze_game": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
     "lamp.cats_and_dogs_new": {
       type: "object",
       properties: {
@@ -1057,6 +1125,50 @@ export const SchemaList = () => {
         settings: {
           title: i18n.t("Activity Settings"),
           type: "object",
+        },
+      },
+    },
+    "lamp.symbol_digit_substitution": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity settings"),
+          required: ["count_of_symbols", "show_mapping", "duration"],
+          type: "object",
+          properties: {
+            count_of_symbols: {
+              title: i18n.t("Number of symbols"),
+              description: i18n.t("Number of symbols in the mapping (min: 4, max: 10)"),
+              type: "number",
+              minimum: 4,
+              maximum: 10,
+              default: 10,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            show_mapping: {
+              title: i18n.t("Show Mapping Table"),
+              description: i18n.t("Whether to show mapping table."),
+              enum: ["before", "during", "not_at_all"],
+              default: "during",
+              enumNames: [i18n.t("Before Game"), i18n.t("During Game"), i18n.t("Not at all")],
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            duration: {
+              title: i18n.t("Duration"),
+              description: i18n.t("Duration of task (in seconds) (min: 20, max: 400)."),
+              type: "number",
+              minimum: 20,
+              maximum: 400,
+              default: 120,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+          },
         },
       },
     },
@@ -1208,6 +1320,7 @@ export function spliceActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
@@ -1272,6 +1385,7 @@ export function unspliceActivity(x) {
       description: x.description,
       photo: x.photo,
       streak: x.streak,
+      showFeed: x.showFeed,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
@@ -1300,6 +1414,7 @@ export function unspliceCTActivity(x) {
       description: x.description,
       photo: x.photo,
       streak: x.streak,
+      showFeed: x.showFeed,
     },
   }
 }
@@ -1313,6 +1428,7 @@ export function spliceCTActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: raw.settings,
     category: raw.category,
@@ -1328,6 +1444,7 @@ export async function saveTipActivity(x) {
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
       streak: x.streak,
+      showFeed: x.showFeed,
     })
   } else {
     result = (await LAMP.Activity.update(x.id, {
@@ -1336,6 +1453,7 @@ export async function saveTipActivity(x) {
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
       streak: x.streak,
+      showFeed: x.showFeed,
     })
   }
   return result
@@ -1347,6 +1465,7 @@ export async function saveCTestActivity(x) {
     description: x.description,
     photo: x.photo,
     streak: x.streak,
+    showFeed: x.showFeed,
   })
   return newItem
 }
@@ -1405,6 +1524,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
         streak: x?.streak ?? null,
+        showFeed: x?.showFeed,
       })
       return result
     } else {
@@ -1422,6 +1542,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
           description: x.description,
           photo: x.photo,
           streak: x.streak,
+          showFeed: x?.showFeed,
         })
         return result
       }
@@ -1433,6 +1554,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     } else {
@@ -1442,6 +1564,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     }
@@ -1466,6 +1589,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         spec: "lamp.tips",
         settings: x.settings,
         streak: x.streak,
+        showFeed: x?.showFeed,
         schedule: [],
         category: x.category,
       }
@@ -1476,6 +1600,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
         streak: x.streak,
+        showFeed: x?.showFeed,
       })
       return result
     }

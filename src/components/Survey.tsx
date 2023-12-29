@@ -28,6 +28,9 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
   "lamp.spin_wheel",
+  "lamp.maze_game",
+  "lamp.emotion_recognition",
+  "lamp.symbol_digit_substitution",
 ]
 
 export default function Survey({ participant, activities, showStreak, ...props }) {
