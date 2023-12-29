@@ -9,7 +9,7 @@ function execShellCommand(cmd) {
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
-        console.error(error)
+        // console.error(error)
         reject(error)
       }
       if (stdout) {
@@ -107,6 +107,6 @@ prepareDestination()
   })
   .catch((err) => {
     console.error(`${file} file preparation failed`)
-    console.error(err)
+    // console.error(err)
     process.exit(1) // Failure
   })
