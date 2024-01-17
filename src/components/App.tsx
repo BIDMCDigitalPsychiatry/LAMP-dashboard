@@ -98,7 +98,7 @@ function AppRouter({ ...props }) {
         ...state,
         activeTab: newTab,
       }))
-      window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+      window.location.href = encodeURIComponent(`/#/participant/${participantId}/${newTab.toLowerCase()}`)
     }
   }
 
@@ -141,7 +141,7 @@ function AppRouter({ ...props }) {
         return
       }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      if (a === undefined) window.location.href = "/#/"
+      if (a === undefined) window.location.href = encodeURIComponent("/#/")
       let x = atob(a).split(":")
       //
       reset({
@@ -152,7 +152,7 @@ function AppRouter({ ...props }) {
             ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
             : "api.lamp.digital",
       }).then((x) => {
-        window.location.href = query[0]
+        window.location.href = encodeURIComponent(query[0])
       })
     } else if (!state.identity) {
       refreshPage()
@@ -243,7 +243,7 @@ function AppRouter({ ...props }) {
       state.authType !== "participant" &&
       !status
     ) {
-      window.location.href = "/#/2fa"
+      window.location.href = encodeURIComponent("/#/2fa")
     }
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar(`${t("Proceed with caution: you are logged in as the administrator.")}`, {
@@ -317,7 +317,7 @@ function AppRouter({ ...props }) {
           : state.auth.serverAddress,
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
-      window.location.href = "/#/"
+      window.location.href = encodeURIComponent("/#/")
     }
   }
 
