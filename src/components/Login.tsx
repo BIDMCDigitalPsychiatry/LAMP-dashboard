@@ -184,7 +184,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         onComplete()
       })
       .catch((err) => {
-        console.warn("error with auth request", err)
+        // console.warn("error with auth request", err)
         enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
           variant: "error",
         })
