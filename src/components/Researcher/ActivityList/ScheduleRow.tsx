@@ -165,9 +165,9 @@ const localeMap = {
   "zh-HK": zhHKLocale,
 }
 import DateFnsUtils from "@date-io/date-fns"
-import RemindBefore from "./ReminderSettings/RemindBefore"
-import Repeat from "./ReminderSettings/Repeat"
-import ReminderSettings from "./ReminderSettings"
+// import RemindBefore from "./ReminderSettings/RemindBefore"
+// import Repeat from "./ReminderSettings/Repeat"
+// import ReminderSettings from "./ReminderSettings"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -409,7 +409,7 @@ export default function ScheduleRow({
           )}
         </TableCell>
       </TableRow>
-      <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
+      {/* <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
         <ReminderSettings
           isEdit={isEdit}
           reminderSettings={data.reminderSettings}
@@ -421,7 +421,7 @@ export default function ScheduleRow({
             })
           }}
         />
-      </TableRow>
+      </TableRow> */}
     </>
   )
 }
