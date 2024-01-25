@@ -271,11 +271,11 @@ export default function NavigationLayout({
 
   const updateAnalytics = async () => {
     setSensorData(null)
+    window.location.href = `/#/participant/${id}/messages`
     await sensorEventUpdate("conversations", id, null)
     let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
-    data = data.filter((d) => d.data.page === "conversations")
+    data = (data || []).filter((d) => d.data.page === "conversations")
     setSensorData(data ? data[0] : [])
-    window.location.href = `/#/participant/${id}/messages`
   }
 
   const refreshMessages = async () => {
