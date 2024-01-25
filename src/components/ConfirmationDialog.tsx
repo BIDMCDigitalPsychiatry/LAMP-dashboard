@@ -15,11 +15,15 @@ export default function ConfirmationDialog({
   confirmAction,
   confirmationDialog,
   confirmationMsg,
+  okText,
+  cancelText,
   ...props
 }: {
   confirmAction: Function
-  confirmationDialog: number
+  confirmationDialog?: number
   confirmationMsg: string
+  okText?: string
+  cancelText?: string
 } & DialogProps) {
   const { t } = useTranslation()
   const [isClicked, setIsClicked] = useState(false)
@@ -36,7 +40,7 @@ export default function ConfirmationDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={() => confirmAction("No")} color="primary">
-          {`${t("No")}`}
+          {`${t(cancelText ?? "No")}`}
         </Button>
         <Button
           onClick={() => {
@@ -48,7 +52,7 @@ export default function ConfirmationDialog({
           autoFocus
           disabled={!!isClicked}
         >
-          {`${t("Yes")}`}
+          {`${t(okText ?? "Yes")}`}
         </Button>
       </DialogActions>
     </Dialog>

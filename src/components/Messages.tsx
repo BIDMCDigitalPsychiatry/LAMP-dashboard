@@ -20,7 +20,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-
+import ConfirmationDialog from "./ConfirmationDialog"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -157,6 +157,8 @@ export default function Messages({
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [confirmationDialog, setConfirmationDialog] = useState(true)
+
   const { t } = useTranslation()
 
   useInterval(
@@ -296,6 +298,13 @@ export default function Messages({
     )
   }
 
+  const confirmAction = (status: string) => {
+    if (status == "No") {
+      history.back()
+    }
+    setConfirmationDialog(false)
+  }
+
   if (msgOpen) {
     return (
       <Container>
@@ -305,6 +314,14 @@ export default function Messages({
   } else {
     return (
       <Box>
+        <ConfirmationDialog
+          open={confirmationDialog}
+          onClose={() => setConfirmationDialog(false)}
+          confirmAction={confirmAction}
+          okText={"Okay"}
+          cancelText={"Take me back"}
+          confirmationMsg={`${t("This chat is not monitored and should not be used for urgent matters.")}`}
+        />
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton onClick={() => history.back()} color="default" aria-label="Menu">
