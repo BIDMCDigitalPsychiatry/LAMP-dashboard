@@ -157,7 +157,7 @@ export default function Messages({
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [confirmationDialog, setConfirmationDialog] = useState(true)
+  const [confirmationDialog, setConfirmationDialog] = useState(!!participantOnly)
 
   const { t } = useTranslation()
 
