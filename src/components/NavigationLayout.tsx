@@ -213,7 +213,7 @@ export default function NavigationLayout({
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
-  const [openMessages, setOpenMessages] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -276,6 +276,17 @@ export default function NavigationLayout({
     let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
     data = (data || []).filter((d) => d.data.page === "conversations")
     setSensorData(data ? data[0] : [])
+  }
+
+  const onDeleteAccount = async () => {
+    await LAMP.Credential.list(id).then((cred) => {
+      cred = cred.filter((c) => c.hasOwnProperty("origin"))
+      ;(cred || []).map(async (each) => {
+        await LAMP.Credential.delete(id, each["access_key"])
+      })
+    })
+    await LAMP.Type.setAttachment(id, "me", "lamp.name", null)
+    onLogout()
   }
 
   const refreshMessages = async () => {
@@ -530,6 +541,9 @@ export default function NavigationLayout({
                     <MenuItem disabled divider>
                       <b>{`${t("User number", { number: title.split(" ")[1] })}`}</b>
                     </MenuItem>
+                    <MenuItem divider onClick={() => setConfirmDelete(true)}>
+                      {`${t("Delete Account")}`}
+                    </MenuItem>
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
                     </MenuItem>
@@ -602,35 +616,50 @@ export default function NavigationLayout({
         </ResponsiveMargin>
       </Box>
       <Dialog
-        open={!!confirmLogout}
-        onClose={() => setConfirmLogout(false)}
+        open={!!confirmLogout || !!confirmDelete}
+        onClose={() => {
+          setConfirmLogout(false)
+          setConfirmDelete(false)
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">{`${t(
-          "Are you sure you want to log out of LAMP right now?"
+          !!confirmDelete ? "Confirmation" : "Are you sure you want to log out of LAMP right now?"
         )}`}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {`${t("If you've made some changes, make sure they're saved before you continue to log out.")}`}
+            {`${t(
+              !!confirmDelete
+                ? "Are you sure you want to delete account?"
+                : "If you've made some changes, make sure they're saved before you continue to log out."
+            )}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmLogout(false)} color="secondary">
-            {`${t("Go Back")}`}
-          </Button>
+          {!!confirmLogout && (
+            <Button onClick={() => setConfirmLogout(false)} color="secondary">
+              {`${t("Go Back")}`}
+            </Button>
+          )}
           <Button
             onClick={() => {
-              onLogout()
-              setConfirmLogout(false)
+              if (!!confirmLogout) {
+                onLogout()
+                setConfirmLogout(false)
+              } else {
+                onDeleteAccount()
+                setConfirmDelete(false)
+              }
             }}
             color="primary"
             autoFocus
           >
-            {`${t("Logout")}`}
+            {`${t(!!confirmDelete ? "Delete" : "Logout")}`}
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
