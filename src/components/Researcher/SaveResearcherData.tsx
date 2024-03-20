@@ -118,7 +118,6 @@ export const saveDataToCache = (authString, id) => {
       "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
       " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"
   ).then((data: any) => {
-    console.log(data)
     let studies = Object.values(data?.studies || []).map((study: StudyObject) => {
       return {
         id: study?.id || "",
