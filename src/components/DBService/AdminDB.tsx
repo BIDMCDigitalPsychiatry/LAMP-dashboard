@@ -26,6 +26,7 @@ interface LampDB extends DBSchema {
     value: {
       id: string
       name: string
+      is_deleted: boolean | null
       gps: Array<JSON>
       accelerometer: Array<JSON>
       active: Array<JSON>

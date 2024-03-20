@@ -279,6 +279,7 @@ export default function NavigationLayout({
   }
 
   const onDeleteAccount = async () => {
+    await LAMP.Type.setAttachment(id, "me", "lamp.is_deleted", true)
     await LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       ;(cred || []).map(async (each) => {
@@ -286,7 +287,12 @@ export default function NavigationLayout({
       })
     })
     await LAMP.Type.setAttachment(id, "me", "lamp.name", null)
-    onLogout()
+    Service.updateValue("participants", { participants: [{ is_deleted: true, id: id }] }, "is_deleted", "id")
+    if (authType === "researcher" || authType === "admin") {
+      participantBack()
+    } else {
+      onLogout()
+    }
   }
 
   const refreshMessages = async () => {
