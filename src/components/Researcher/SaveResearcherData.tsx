@@ -110,7 +110,7 @@ export const saveDataToCache = (authString, id) => {
       "','to.unityhealth.psychiatry.enabled')," +
       "'studies':[$map($studyList,function($study){{'name': $study.name,'id':$study.id," +
       "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
-      "$LAMP.Tag.get($id,'lamp.name'), 'unity_settings' : $unitySettings ? " +
+      "$LAMP.Tag.get($id,'lamp.name'), 'is_deleted': $LAMP.Tag.get($id,'lamp.is_deleted'), 'unity_settings' : $unitySettings ? " +
       "$LAMP.Tag.get($id,'to.unityhealth.psychiatry.settings') : null,'id':$id, 'study_id' : $study.id, 'study_name': $study.name }})]," +
       "'activities':[$map($LAMP.Activity.list($study.id),function($activity){{'name': " +
       " $activity.name, 'spec': $activity.spec, 'category': $activity.category, 'schedule': $activity.schedule, 'settings': $filterAudioOut($activity.settings),  'id':$activity.id, 'study_id' " +
