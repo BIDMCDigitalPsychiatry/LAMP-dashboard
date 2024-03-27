@@ -248,7 +248,7 @@ export default function ActivityPopup({
         <DialogContent className={classes.surveytextarea}>
           {activity?.spec === "lamp.tips" && (
             <Typography variant="h4" gutterBottom>
-              {`${t("Quick Tips to Improve Your")}`} {`${t(activity?.name)}`}
+              {`${t(activity?.name)}`}
             </Typography>
           )}
           {activity?.spec === "lamp.survey" && (
