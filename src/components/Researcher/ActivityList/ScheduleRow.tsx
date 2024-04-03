@@ -232,10 +232,7 @@ export default function ScheduleRow({
       <TableRow key={index} style={{ verticalAlign: !isEdit ? "middle" : "top" }}>
         <TableCell component="th" scope="row">
           {!isEdit ? (
-            <span>
-              {getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}
-              {`${t("No custom times")}`}
-            </span>
+            <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
           ) : (
             <MuiThemeProvider theme={formTheme}>
               <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={DateFnsUtils}>
