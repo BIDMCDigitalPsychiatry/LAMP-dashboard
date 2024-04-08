@@ -26,6 +26,7 @@ import { Service } from "./DBService/DBService"
 import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import locale_lang from "../locale_map.json"
+import VisualPopup from "./VisualPopup"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -134,7 +135,6 @@ export default function Participant({
 
   const [tab, _setTab] = useState(getTab())
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const { enqueueSnackbar } = useSnackbar()
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const [hiddenEvents, setHiddenEvents] = React.useState([])
@@ -143,6 +143,8 @@ export default function Participant({
   const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
+  const [visualPopup, setVisualPopup] = useState(null)
+  const [currentActivity, setCurrentActivity] = useState(null)
   const { t, i18n } = useTranslation()
 
   const tabDirection = (currentTab) => {
@@ -191,6 +193,7 @@ export default function Participant({
                 photo: img?.photo ?? null,
                 streak: img?.streak ?? null,
                 questions: img?.questions ?? null,
+                visualSettings: img?.visualSettings ?? null,
               })
               if (count === activities.length - 1) {
                 Service.addUserData("activitytags", data, true).then(() => {
@@ -226,7 +229,20 @@ export default function Participant({
     }
   }
 
+  const showVisualPopup = (activity) => {
+    Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
+      const tag = tags[0]
+      if (typeof tag?.visualSettings === "undefined" || !!tag?.visualSettings) {
+        setVisualPopup(tag?.visualSettings)
+        setCurrentActivity(activity)
+      } else {
+        showStreak(participant, activity)
+      }
+    })
+  }
+
   const showStreak = (participant, activity) => {
+    setVisualPopup(null)
     Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
       const tag = tags[0]
       setStreakActivity(tag?.streak ?? null)
@@ -251,17 +267,27 @@ export default function Participant({
         <Box>
           <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Learn participant={participant} activities={activities} activeTab={activeTab} showStreak={showStreak} />
+              <Learn
+                participant={participant}
+                activities={activities}
+                activeTab={activeTab}
+                showStreak={showVisualPopup}
+              />
             </Box>
           </Slide>
           <Slide in={tab === "assess"} direction={tabDirection(1)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Survey participant={participant} activities={activities} showStreak={showStreak} />
+              <Survey participant={participant} activities={activities} showStreak={showVisualPopup} />
             </Box>
           </Slide>
           <Slide in={tab === "manage"} direction={tabDirection(2)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Manage participant={participant} activities={activities} activeTab={activeTab} showStreak={showStreak} />
+              <Manage
+                participant={participant}
+                activities={activities}
+                activeTab={activeTab}
+                showStreak={showVisualPopup}
+              />
             </Box>
           </Slide>
           <Slide in={tab === "portal"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
@@ -272,7 +298,7 @@ export default function Participant({
                 allActivities={activities}
                 hiddenEvents={hiddenEvents}
                 enableEditMode={!_patientMode()}
-                showStreak={showStreak}
+                showStreak={showVisualPopup}
                 activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
                   setSurveyName(activity.name)
@@ -317,7 +343,7 @@ export default function Participant({
                 activities={activities}
                 visibleActivities={visibleActivities}
                 setVisibleActivities={setVisibleActivities}
-                showStreak={showStreak}
+                showStreak={showVisualPopup}
               />
             </Box>
           </Slide>
@@ -347,6 +373,13 @@ export default function Participant({
         activity={streakActivity}
         streak={streak}
       />
+      {!!visualPopup?.checked && (
+        <VisualPopup
+          open={visualPopup?.checked ?? false}
+          image={visualPopup?.image}
+          showStreak={() => showStreak(participant, currentActivity)}
+        />
+      )}
     </React.Fragment>
   )
 }

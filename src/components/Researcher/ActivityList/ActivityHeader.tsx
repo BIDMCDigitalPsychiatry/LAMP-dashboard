@@ -9,12 +9,14 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Divider,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 import ActivityTab from "./ActivityTab"
 import ActivityStreak from "./ActivityStreak"
+import ActivityImage from "./ActivityImage"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -63,6 +65,7 @@ export default function ActivityHeader({
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [streak, setStreak] = useState(details?.streak ? details?.streak : null)
+  const [visualSettings, setVisualSettings] = useState(details?.visual_settings ? details?.visual_settings : null)
   const [showFeed, setShowFeed] = useState(
     typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
   )
@@ -75,8 +78,9 @@ export default function ActivityHeader({
       studyId,
       streak,
       showFeed,
+      visualSettings,
     })
-  }, [text, description, photo, studyId, streak, showFeed])
+  }, [text, description, photo, studyId, streak, showFeed, visualSettings])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -191,6 +195,22 @@ export default function ActivityHeader({
         />
       </Grid>
       <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
+      <Divider />
+      {[
+        "lamp.jewels_a",
+        "lamp.jewels_b",
+        "lamp.spatial_span",
+        "lamp.maze_game",
+        "lamp.symbol_digit_substitution",
+        "lamp.spin_wheel",
+      ].includes(activitySpecId) && (
+        <ActivityImage
+          onChange={(val) => setVisualSettings(val)}
+          activitySpecId={activitySpecId}
+          value={details?.visual_settings}
+        />
+      )}
+      <Divider />
     </Grid>
   )
 }
