@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
-
+import VisualPopup from "./VisualPopup"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -138,6 +138,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [streakActivity, setStreakActivity] = useState(null)
   const [openNotFound, setOpenNotFound] = useState(false)
   const [tag, setTag] = useState(null)
+  const [visualPopup, setVisualPopup] = useState(null)
+
   useEffect(() => {
     setLoading(true)
     setResponse(false)
@@ -173,7 +175,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
 
   const showStreak = (participant, activity) => {
     setLoading(true)
-
+    setVisualPopup(null)
     setStreakActivity(tag?.streak ?? null)
     if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
       getEvents(participant, activity.id).then((streak) => {
@@ -189,6 +191,17 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       returnResult()
       setLoading(false)
     }
+  }
+
+  const showVisualPopup = (activity) => {
+    Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
+      const tag = tags[0]
+      if (typeof tag?.visualSettings === "undefined" || !!tag?.visualSettings) {
+        setVisualPopup(tag?.visualSettings)
+      } else {
+        showStreak(participant, activity)
+      }
+    })
   }
 
   return (
@@ -238,7 +251,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
-              } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
+              } else if (!!data && !!data?.timestamp) {
+                showVisualPopup(activity)
+              }
             }}
           />
         ))}
@@ -282,6 +297,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           </Button>
         </DialogActions>
       </Dialog>
+      <VisualPopup
+        open={visualPopup?.checked ?? false}
+        image={visualPopup?.image}
+        showStreak={() => showStreak(participant, activity)}
+      />
     </div>
   )
 }

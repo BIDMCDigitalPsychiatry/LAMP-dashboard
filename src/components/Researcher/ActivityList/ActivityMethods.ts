@@ -1320,6 +1320,7 @@ export function spliceActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    visualSettings: tag?.visualSettings,
     showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
@@ -1414,6 +1415,7 @@ export function unspliceCTActivity(x) {
       description: x.description,
       photo: x.photo,
       streak: x.streak,
+      visualSettings: x?.visualSettings,
       showFeed: x.showFeed,
     },
   }
@@ -1428,6 +1430,7 @@ export function spliceCTActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
+    visualSettings: tag?.visualSettings,
     showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: raw.settings,
@@ -1465,6 +1468,7 @@ export async function saveCTestActivity(x) {
     description: x.description,
     photo: x.photo,
     streak: x.streak,
+    visualSettings: x?.visualSettings,
     showFeed: x.showFeed,
   })
   return newItem
@@ -1542,6 +1546,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
           description: x.description,
           photo: x.photo,
           streak: x.streak,
+          visualSettings: x?.visualSettings,
           showFeed: x?.showFeed,
         })
         return result
@@ -1564,6 +1569,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
+        visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
       })
       return result
@@ -1600,6 +1606,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
         streak: x.streak,
+        visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
       })
       return result
