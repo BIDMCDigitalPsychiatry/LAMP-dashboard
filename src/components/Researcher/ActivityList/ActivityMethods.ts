@@ -1528,6 +1528,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
         streak: x?.streak ?? null,
+        visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
       })
       return result
@@ -1569,7 +1570,6 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x.description,
         photo: x.photo,
         streak: x.streak,
-        visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
       })
       return result

@@ -207,7 +207,7 @@ export default function ActivityHeader({
         <ActivityImage
           onChange={(val) => setVisualSettings(val)}
           activitySpecId={activitySpecId}
-          value={details?.visual_settings}
+          value={details?.visualSettings}
         />
       )}
       <Divider />
