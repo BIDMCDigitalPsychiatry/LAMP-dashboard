@@ -140,7 +140,6 @@ export default function Activity({
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
             !!y.error ? undefined : y.data
           )[0]
-          console.log(tag)
           setDetails(tag ?? [])
         }
         setLoading(false)
