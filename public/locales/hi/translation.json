@@ -23,6 +23,8 @@
 	"In this game, you will be shown a symbol in the middle of your screen, represented by a greek letter. This symbol will correspond to a numerical digit. There is a symbol-mapping legend in the top row of your screen. Use the legend to identify the digit which corresponds to your symbol. Then, press the button at the bottom of the screen which contains this digit. After you select the correct button, you will move on to a new symbol. Try to get as many symbols as you can.":
 		"इस खेल में आपको स्क्रीन के बीच में एक चिह्न दिखाया जाएगा। यह चिह्न किसी संख्या से मिलता जुलता होगा। स्क्रीन के ऊपर दिखाए गए चिह्न -मैपिंग/ पहचान को देखे और अपने चिह्न को ढूंढ़ें। जिस चिह्न से आपका चिह्न मेल खाता है, उसे पहचानें और उससे मिलती हुई संख्या का चयन करें | एक बार जब आप सही चयन करते हैं, तो आप एक नए चिह्न पर जाएंगे और यह प्रक्रिया समय समाप्त होने तक दोहराई जाएगी। जितना तेज़ आप चलेंगे, उतने ही अधिक अंक मिलते जाएंगे।",
 	"Begin": "शुरू करें।",
+	"In this game you will be shown a symbol in the middle of your screen, represented by a Greek letter. The symbol will correspond to a numerical digit.":
+		"इस खेल में आपको अपनी स्क्रीन के बीच में एक चिह्न दिखाया जाएगा, जिसे एक ग्रीक अक्षर से प्रतिष्ठित किया जाएगा। यह चिह्न एक संख्या के साथ मेल खाएगा।",
 	"Symbol-digit Substitution":"सही चिन्ह पहचानना और स्थापित करना",
 	"Symbol digit substitution":"सही चिन्ह पहचानना और स्थापित करना",
 	"Symbol-Digit Substitution":"सही चिन्ह पहचानना और स्थापित करना",
@@ -50,8 +52,6 @@
 	"Water and Nutrition": "पानी और पोषण/भोजन",
 	"Back": "पहले का",
 	"Yes": "हाँ",
-	"Nearly every day": "लगभग रोज़ाना",
-
       "No": "नही",
 	"Please enter your response": "कृपया अपनी प्रतिक्रिया दर्ज करें",
 	"Your response": "आपका जवाब",
@@ -828,22 +828,94 @@
 	"Okay":"ठीक है",
 	"Graph": "ग्राफ",
 	"How often have you been bothered by the following over the past week?":
-	"पिछले सप्ताह में आपने कितनी बार काम करने में दिलचस्पी या उत्साह में कमी महसूस की हैं ?",
+		"पिछले सप्ताह में आपने कितनी बार काम करने में दिलचस्पी या उत्साह में कमी महसूस की हैं ?",
 	"Several days": "कई दिन",
 	"More than half the days": "आधे से अधिक दिन",
-	"How often have you been bothered by the following over the past week? Little interest or pleasure in doing things?":
-		"पिछले सप्ताह में आपने कितनी बार काम करने में दिलचस्पी या उत्साह में कमी महसूस की हैं ?",
+	"Nearly every day": "लगभग रोज़ाना",
+	"How often have you been bothered by the following over the past week? Little interest or pleasure in doing things? Feeling nervous, anxious, or on edge?":
+		"पिछले सप्ताह में आपने कितनी बार काम करने में दिलचस्पी या उत्साह में कमी महसूस की हैं ? बेचैनी, चिंता या तनाव महसूस करना",
 	"No difficulty at all": "बिल्कुल भी मुश्किल नहीं है",
-	"In the past seven days....": "पिछले सात दिनों में....",
 	"Somewhat difficult": "कुछ हद तक मुश्किल",
-	"Very difficult": "बहुत कठिन",
+	"Very Difficult": "बहुत कठिन",
 	"Extremely difficult": "बेहद मुश्किल",
 	"Data Portal": "डेटा पोर्टल",
+	"In the past seven days....": "पिछले सात दिनों में....",
 	"Very Poor": "बहुत ख़राब",
 	"Poor": "ख़राब",
 	"Fair": "सामान्य",
-	"Strongly disagree": "पूर्ण तरह से असहमत",
+	"Strongly Agree": "पूर्ण तरह से सहमत",
 	"Delete Account": "एकाउंट हटा दो",
-	"In this game you will be shown a symbol in the middle of your screen, represented by a Greek letter. The symbol will correspond to a numerical digit.":
-		"इस खेल में आपको अपनी स्क्रीन के बीच में एक चिह्न दिखाया जाएगा, जिसे एक ग्रीक अक्षर से प्रतिष्ठित किया जाएगा। यह चिह्न एक संख्या के साथ मेल खाएगा।"
+	"I am able to manage my day-to-day life. Please rate how strongly you agree or disagree with this statement.":
+		"मैं अपने दैनिक जीवन को संचालित करने में सक्षम हूँ। कृपया इस कथन के साथ आपकी सहमति या असहमति से दर्ज करें।",
+	"Agree": "सहमत",
+	"Neither agree or disagree": "न सहमत न असहमत",
+	"Disagree": "असहमत",
+	"Strongly disagree": "पूर्ण तरह से असहमत",
+	"My sleep quality was…": "मेरी नींद की गुणवत्ता थी...",
+	"Very good": "बहुत अच्छा",
+	"Today I have heard voices or saw things others cannot": "आज मैंने ऐसी आवाजें सुनी या ऐसी चीजें देखी हैं जो दूसरे नहीं कर सकते।",
+	"Today I have thought racing through my head.": "आज मैंने सोचा है कि में मेरे सिर से दौड़ रहा है।",
+	"Today I feel I have special powers": "आज मुझे लगता है कि मेरे पास विशेष शक्तियां हैं।",
+	"Today I feel people are watching me": "आज मुझे लगता है कि लोग मुझे देख रहे हैं।",
+	"Today I feel people are against me": "आज मुझे लगता है कि लोग मेरे खिलाफ हैं।",
+	"Feeling down, depressed, or hopeless?": "निराश, उदास, या तनाव महसूस कर रहे हैं ?",
+	"Trouble falling or staying asleep, or sleeping too much?": "नींद आने में तकलीफ या जरुरत से ज्यादा नींद आना ?",
+	"Feeling tired or having little energy?": "थकान महसूस करना या ताकत की कमी महसूस करना",
+	"Poor appetite or overeating?": "भूख कम लगना या जरुरत से ज्यादा खाना ?",
+	"Feeling bad about yourself- or that you are a failure or have let yourself or your family down?":
+		"आप खुद के बारे में बुरा महसूस करते हैं या आपको लगता है कि आपके कारण आपके परिवार को नीचा देखना पड़ा ?",
+		"Trouble concentrating on things, such as reading the newspaper or watching television?": 
+		"किसी भी चीज पर ध्यान लगाने में परेशानी जैसे कि समाचार पत्र पढ़ते वक्त या टीवी देखते समय ?",
+	"Moving or speaking so slowly that other people could have noticed? Or so fidgety or restless that you have been moving a lot more than usual?":
+		"इतना धीरे चलना या बोलना कि लोगों के ध्यान में आ जाये या इसके विपरीत जरुरत से ज्यादा घूमना फिरना या बैचेन रहना ?",
+	"Thoughts that you would be better off dead, or thoughts of hurting yourself in some way?":
+		"विचार आना कि मर जाना ही बेहतर होगा, या स्वयं को चोट पहुँचाने के विचार आना ?",
+	"If you checked off any problems, how difficult have these problems made it to do work, take care of things at home, or get along with other people?":
+		"यदि आपने किसी भी समस्या की जाँच की है, तो इन समस्याओं ने काम करना, घर पर चीजों की देखभाल करना, या अन्य लोगों के साथ मिलना-जुलना कितना कठिन बना दिया है?",
+	"Not difficult at all": "बिल्कुल भी मुश्किल नहीं है",
+	"Very difficult": "बहुत कठिन",
+	"Sleep Survey": "नींद सर्वेक्षण",
+	"My sleep was restless.": "मेरी नींद बेचैन कर देने वाली थी.",
+	"A little bit": "थोड़ा सा",
+	"Somewhat": "कुछ हद तक",
+	"Quite a bit": "काफ़ी थोड़ा",
+	"Very much": "बहुत ज्यादा",
+	"I was satisfied with my sleep.": "मैं अपनी नींद से संतुष्ट था.",
+	"My sleep was refreshing.": "मेरी नींद ताज़ा थी.",
+	"I had difficulty falling asleep.": "मुझे सोने में कठिनाई हो रही थी।",
+	"I had trouble staying asleep.": "मुझे सोते रहने में परेशानी हो रही थी।",
+	"Rarely": "शायद ही कभी",
+	"Sometimes": "कभी-कभी",
+	"Often": "अक्सर",
+	"Always": "हमेशा",
+	"I had trouble sleeping.": "मुझे सोने में दिक्कत हो रही थी.",
+	"I got enough sleep.": "मुझे पर्याप्त नींद मिली.",
+	"All Daily Survey": "दैनिक सर्वेक्षण",
+	"Please complete these 3 questions relating to your anxiety, daily functioning and mood.":
+		"कृपया इन 3 सवालों का उत्तर दें जो आपके चिंता, दैनिक क्षमता, और मूड से संबंधित हैं। सर्वे शुरू करें |",
+	"Overall, how would I rate my anxiety today": "आज मेरी चिंता को कैसे रेट करूँ?",
+	"No anxiety at all": "बिल्कुल भी चिंता नहीं",
+	"The worst it has ever been.": "इससे खराब कभी नहीं हुआ है।",
+	"I am able to manage my day to day life Please rate how strongly you agree or disagree with this statement.":
+		"मैं अपने दैनिक जीवन को संचालित करने में सक्षम हूँ। कृपया इस कथन के साथ आपकी सहमति या असहमति से दर्ज करें।",
+	"Neither Disagree nor agree": "न सहमत न असहमत",
+	"Overall, how would you rate your mood today?": "आपके आज के मूड को संपूर्ण रूप से आप कैसे रेट करेंगे?",
+	"Best": "सबसे अच्छा",
+	"Worst": "सबसे खराब",
+	"Approximately what time did you fall asleep last night?": "कल रात आप लगभग किस समय सोए थे?",
+	"Approximately what time did you wake up this morning?": "आज सुबह आप लगभग किस समय उठे थे?",
+	"GAD-7": "जी ए डी - 7",
+	"How often have you been bothered by the following over the past week? ":
+	"पिछले सप्ताह में आपने कितनी बार काम करने में दिलचस्पी या उत्साह में कमी महसूस की हैं ?",
+	"Would you like to resume this activity where you left off?": "क्या आपने जहां गतिविधि को छोड़ा था वहीं से दुबारा शुरू करना चाहेंगे?",
+	"Feeling nervous, anxious, or on edge": "बेचैनी, चिंता या तनाव महसूस करना",
+	"Not being able to stop or control worrying": "चिंता रोकने या नियंत्रित कर सकने में असफल रहना",
+	"Worrying too much about different things": "विभिन चीजों के लिए बहुत ज्यादा चिंता",
+	"Trouble relaxing": "आराम करने में परेशानी",
+	"Being so restless that it is hard to sit still": "इतनी ज्यादा बेचैनी कि स्थिर बैठना मुश्किल हो जाता है",
+	"Becoming easily annoyed or irritable": "आसानी से चिढ़ना या खिजना",
+	"Feeling afraid, as if something awful": "डर महसूस होना कि शायद कुछ बहुत बुरा हो सकता है",
+	"If you checked any problem how difficult have they made it for you to do your work, take care of things at home or get along with other people":
+		"यदि आपने पिछले प्रश्नों समस्याओं का चयन किया है, तो वे आपके काम को कितने कठिन बना दिया है, घर में चीजों का ध्यान रखना, या दूसरों के साथ ठीक से रहना?"
+
 }
