@@ -987,7 +987,8 @@
         "x_changes_in_level_count": 1,
         "x_diamond_count": 1,
         "y_changes_in_level_count": 1,
-        "y_shape_count": 2
+        "y_shape_count": 2,
+        "variant": "trails_b"
       },
       "schedule": [
         {
