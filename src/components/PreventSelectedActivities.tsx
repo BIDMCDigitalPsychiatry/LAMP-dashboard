@@ -25,7 +25,6 @@ import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
-import { dateTimeToTimestamp } from "vega-lite/build/src/datetime"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 

@@ -208,7 +208,7 @@ export default function ParticipantList({
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
     if (selectedData.length > 0) {
       Service.getAll("participants").then((participantData) => {
-        participantData = (participantData || []).filter((p) => p.is_deleted != true)
+        // participantData = (participantData || []).filter((p) => p.is_deleted != true)
         if (!!searchTxt && searchTxt.trim().length > 0) {
           participantData = (participantData || []).filter(
             (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
