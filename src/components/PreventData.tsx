@@ -1,13 +1,10 @@
 // Core Imports
 import React from "react"
 import { Typography, makeStyles, Box, Grid, colors, CardContent } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
+import LAMP, { Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
 import ActivityCard from "./ActivityCard"
 import { useTranslation } from "react-i18next"
-import ReactMarkdown from "react-markdown"
-import emoji from "remark-emoji"
-import gfm from "remark-gfm"
 
 const useStyles = makeStyles((theme) => ({
   root: {
