@@ -216,6 +216,7 @@ export default function NavigationLayout({
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
+  const [isDeleted, setIsDeleted] = useState(false)
   const [loading, setLoading] = useState(true)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
@@ -236,8 +237,11 @@ export default function NavigationLayout({
         title !== "User Administrator"
       ) {
         Service.getAll("researcher").then((researcher) => {
-          setResId(researcher[0]["id"])
+          setResId(researcher[0] && researcher[0]["id"] ? researcher[0]["id"] : "")
           setLoading(false)
+        })
+        Service.getDataByKey("participants", [id], "id").then((data) => {
+          setIsDeleted(data[0]?.is_deleted)
         })
       } else {
         setLoading(false)
@@ -547,9 +551,11 @@ export default function NavigationLayout({
                     <MenuItem disabled divider>
                       <b>{`${t("User number", { number: title.split(" ")[1] })}`}</b>
                     </MenuItem>
-                    <MenuItem divider onClick={() => setConfirmDelete(true)}>
-                      {`${t("Delete Account")}`}
-                    </MenuItem>
+                    {(isDeleted === null || !isDeleted) && (
+                      <MenuItem divider onClick={() => setConfirmDelete(true)}>
+                        {`${t("Delete Account")}`}
+                      </MenuItem>
+                    )}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
                     </MenuItem>

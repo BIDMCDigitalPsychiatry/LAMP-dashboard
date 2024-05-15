@@ -105,28 +105,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const findLastEvent = (events, activityId, balance, n = 0) => {
-  let event = events.filter((event) => event.activity === activityId)[n] ?? {}
-  if ((event["temporal_slices"] || []).length === 0) {
-    return balance
-  } else if (
-    (event["temporal_slices"] || []).length === 1 &&
-    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit" &&
-    events.filter((event) => event.activity === activityId).length > 1
-  ) {
-    return findLastEvent(events, activityId, ++n)
-  } else if (
-    (event["temporal_slices"] || []).length > 1 &&
-    event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type === "manual_exit"
-  ) {
-    return event["temporal_slices"][(event["temporal_slices"] || []).length - 2]?.type
-  } else {
-    return event["temporal_slices"]
-      ? event["temporal_slices"][(event["temporal_slices"] || []).length - 1]?.type ?? balance
-      : balance
-  }
-}
-
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -139,6 +117,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [openNotFound, setOpenNotFound] = useState(false)
   const [tag, setTag] = useState(null)
   const [visualPopup, setVisualPopup] = useState(null)
+  const [staticData, setStaticData] = useState(0)
 
   useEffect(() => {
     setLoading(true)
@@ -248,6 +227,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             noBack={false}
             tab={tab}
             onComplete={(data) => {
+              setStaticData(data.static_data)
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
@@ -300,6 +280,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       <VisualPopup
         open={visualPopup?.checked ?? false}
         image={visualPopup?.image}
+        data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
     </div>
