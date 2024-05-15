@@ -16,6 +16,7 @@ import {
   Button,
   Box,
   Fab,
+  Grid,
   Typography,
 } from "@material-ui/core"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
@@ -60,15 +61,28 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
       padding: "5px 0 15px",
     },
+    score: {
+      border: "#aedbff solid 1px",
+      color: "#2196f3",
+      padding: "4px 12px",
+      borderRadius: 15,
+      marginTop: 3,
+    },
+    maxscore: {
+      fontSize: 12,
+      marginTop: 3,
+    },
   })
 )
 
 export default function VisualPopup({
   image,
   showStreak,
+  data,
   ...props
 }: {
   image?: any
+  data?: any
   showStreak?: Function
 } & DialogProps) {
   const classes = useStyles()
@@ -96,6 +110,10 @@ export default function VisualPopup({
             }}
           ></Box>
         </Box>
+        <Grid container direction="row" justifyContent="space-between" alignItems="center">
+          <span className={classes.score}>{`Score: ${data?.score}`}</span>
+          <span className={classes.maxscore}>{`Maximum score: ${data?.max_score ?? 100}`}</span>
+        </Grid>
       </DialogContent>
       <DialogActions className={classes.justifyCenter}>
         <Fab

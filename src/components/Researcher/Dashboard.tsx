@@ -138,7 +138,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 const sortStudies = (studies, order) => {
-  return studies.sort((a, b) => {
+  return (studies || []).sort((a, b) => {
     return !!order
       ? a["name"] > b["name"]
         ? 1
