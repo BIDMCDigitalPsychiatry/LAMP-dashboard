@@ -90,7 +90,7 @@ export default function StudyFilterList({
   const refreshStudies = () => {
     Service.getAll("studies").then((data: any) => {
       setStuds(data || [])
-      let studiesArray = data.map(function (obj) {
+      let studiesArray = (data || []).map(function (obj) {
         return obj.name
       })
       setAllStudies(studiesArray)
