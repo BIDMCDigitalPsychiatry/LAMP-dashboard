@@ -2,6 +2,8 @@ import LAMP from "lamp-core"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
+import AutoSuggest from "../../shared/AutoSuggest"
+
 export const SchemaList = () => {
   return {
     "lamp.spin_wheel": {
@@ -998,10 +1000,8 @@ export const SchemaList = () => {
               },
               emotion: {
                 type: "string",
+                "ui:widget": AutoSuggest,
                 title: i18n.t("Emotion"),
-                enum: ["happiness", "sadness", "fear", "anger", "neutral"],
-                enumNames: [i18n.t("Happiness"), i18n.t("Sadness"), i18n.t("Fear"), i18n.t("Anger"), i18n.t("Neutral")],
-                default: "happiness",
               },
             },
           },
