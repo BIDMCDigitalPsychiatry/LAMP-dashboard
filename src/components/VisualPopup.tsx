@@ -1,30 +1,17 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import {
   Dialog,
   DialogProps,
   DialogContent,
-  DialogTitle,
-  Icon,
-  IconButton,
-  Slide,
-  useTheme,
-  useMediaQuery,
   makeStyles,
   Theme,
   createStyles,
   DialogActions,
-  Button,
   Box,
   Fab,
   Grid,
-  Typography,
 } from "@material-ui/core"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import ReactMarkdown from "react-markdown"
-import emoji from "remark-emoji"
-import gfm from "remark-gfm"
-import { LinkRenderer } from "./ActivityPopup"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -110,10 +97,12 @@ export default function VisualPopup({
             }}
           ></Box>
         </Box>
-        <Grid container direction="row" justifyContent="space-between" alignItems="center">
-          <span className={classes.score}>{`Score: ${data?.score}`}</span>
-          <span className={classes.maxscore}>{`Maximum score: ${data?.max_score ?? 100}`}</span>
-        </Grid>
+        {!!data?.score && (
+          <Grid container direction="row" justifyContent="space-between" alignItems="center">
+            <span className={classes.score}>{`Score: ${data?.score}`}</span>
+            <span className={classes.maxscore}>{`Maximum score: ${data?.max_score ?? 100}`}</span>
+          </Grid>
+        )}
       </DialogContent>
       <DialogActions className={classes.justifyCenter}>
         <Fab
