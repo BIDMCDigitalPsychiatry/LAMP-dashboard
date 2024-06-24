@@ -260,7 +260,7 @@ export default function Participant({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={activities == null || loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       {activities !== null && !loading && (

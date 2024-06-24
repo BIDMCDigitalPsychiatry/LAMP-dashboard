@@ -246,7 +246,9 @@ export default function NavigationLayout({
       } else {
         setLoading(false)
       }
-      refresh()
+      if (!!isMounted) {
+        refresh()
+      }
     }
     return () => {
       isMounted = false
