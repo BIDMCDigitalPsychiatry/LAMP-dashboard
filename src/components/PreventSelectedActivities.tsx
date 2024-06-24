@@ -212,13 +212,29 @@ export const strategies = {
 
   "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
   "lamp.jewels_a": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.jewels_b": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.symbol_digit_substitution": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
   "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
     let temporalSlices = slices.filter(function (data) {
@@ -459,72 +475,74 @@ export default function PreventSelectedActivities({
                     )} */}
                   </Typography>
                   <Box className={classes.maxw300}>
-                    <VegaLite
-                      actions={false}
-                      style={{ backgroundColor: "#00000000" }}
-                      spec={{
-                        data: {
-                          values: activityEvents?.[activity.name]?.map((d) => ({
-                            x: new Date(d.timestamp),
-                            y: strategies[activity.spec]
-                              ? strategies[activity.spec](
-                                  activity.spec === "lamp.survey" ||
-                                    activity.spec === "lamp.pop_the_bubbles" ||
-                                    activity.spec === "lamp.maze_game" ||
-                                    activity.spec === "lamp.emotion_recognition"
-                                    ? d?.temporal_slices ?? d["temporal_slices"]
-                                    : activity.spec === "lamp.scratch_image" ||
-                                      activity.spec === "lamp.breathe" ||
-                                      activity.spec === "lamp.tips"
-                                    ? d
-                                    : d.static_data,
-                                  activity,
-                                  undefined
-                                )
-                              : 0,
-                          })),
-                        },
-                        width: 300,
-                        height: 70,
-                        background: "#00000000",
-                        config: {
-                          view: { stroke: "transparent" },
-                          title: {
-                            color: "rgba(0, 0, 0, 0.75)",
-                            fontSize: 25,
-                            font: "Inter",
-                            fontWeight: 600,
-                            align: "left",
-                            anchor: "start",
+                    {!!activityEvents?.[activity.name] && (
+                      <VegaLite
+                        actions={false}
+                        style={{ backgroundColor: "#00000000" }}
+                        spec={{
+                          data: {
+                            values: activityEvents?.[activity.name]?.map((d) => ({
+                              x: new Date(d.timestamp),
+                              y: strategies[activity.spec]
+                                ? strategies[activity.spec](
+                                    activity.spec === "lamp.survey" ||
+                                      activity.spec === "lamp.pop_the_bubbles" ||
+                                      activity.spec === "lamp.maze_game" ||
+                                      activity.spec === "lamp.emotion_recognition"
+                                      ? d?.temporal_slices ?? d["temporal_slices"]
+                                      : activity.spec === "lamp.scratch_image" ||
+                                        activity.spec === "lamp.breathe" ||
+                                        activity.spec === "lamp.tips"
+                                      ? d
+                                      : d.static_data,
+                                    activity,
+                                    undefined
+                                  )
+                                : 0,
+                            })),
                           },
-                          legend: {
-                            title: null,
-                            orient: "bottom",
-                            columns: 2,
-                            labelColor: "rgba(0, 0, 0, 0.75)",
-                            labelFont: "Inter",
-                            labelFontSize: 14,
-                            labelFontWeight: 600,
-                            symbolStrokeWidth: 12,
-                            symbolSize: 150,
-                            symbolType: "circle",
-                            offset: 0,
+                          width: 300,
+                          height: 70,
+                          background: "#00000000",
+                          config: {
+                            view: { stroke: "transparent" },
+                            title: {
+                              color: "rgba(0, 0, 0, 0.75)",
+                              fontSize: 25,
+                              font: "Inter",
+                              fontWeight: 600,
+                              align: "left",
+                              anchor: "start",
+                            },
+                            legend: {
+                              title: null,
+                              orient: "bottom",
+                              columns: 2,
+                              labelColor: "rgba(0, 0, 0, 0.75)",
+                              labelFont: "Inter",
+                              labelFontSize: 14,
+                              labelFontWeight: 600,
+                              symbolStrokeWidth: 12,
+                              symbolSize: 150,
+                              symbolType: "circle",
+                              offset: 0,
+                            },
+                            axisX: {
+                              disable: true,
+                            },
+                            axisY: {
+                              disable: true,
+                            },
                           },
-                          axisX: {
-                            disable: true,
+                          mark: { type: "line", interpolate: "cardinal", tension: 0.8, color: "#3C5DDD" },
+                          encoding: {
+                            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+                            y: { field: "y", type: "quantitative" },
+                            strokeWidth: { value: 2 },
                           },
-                          axisY: {
-                            disable: true,
-                          },
-                        },
-                        mark: { type: "line", interpolate: "cardinal", tension: 0.8, color: "#3C5DDD" },
-                        encoding: {
-                          x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
-                          y: { field: "y", type: "quantitative" },
-                          strokeWidth: { value: 2 },
-                        },
-                      }}
-                    />
+                        }}
+                      />
+                    )}
                   </Box>
                   <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
                 </Card>

@@ -254,9 +254,9 @@ export default function Prevent({
     if (gActivities.length > 0) {
       Service.getAllTags("activitytags").then((data) => {
         setTag((data || []).filter((x: any) => !!x?.category && x?.category.includes("prevent")))
-        setLoading(false)
       })
     }
+    setLoading(false)
   }
 
   React.useEffect(() => {
@@ -279,7 +279,6 @@ export default function Prevent({
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       if (!disabled) await loadActivityEvents()
-
       loadVisualizations()
     })()
   }
@@ -292,7 +291,6 @@ export default function Prevent({
         .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
       setVisualCounts(Object.assign({}, visualizationCount))
       setCortex(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
-      setLoading(false)
     })
   }
 
