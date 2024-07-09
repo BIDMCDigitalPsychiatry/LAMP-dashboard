@@ -241,6 +241,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           >
             <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
           </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://docs.lamp.digital/privacy/", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+          </MenuItem>
         </Menu>
         <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
