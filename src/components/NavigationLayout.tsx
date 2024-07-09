@@ -448,6 +448,15 @@ export default function NavigationLayout({
                     >
                       {`${t("Contact Us")}`}
                     </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://docs.lamp.digital/privacy/", "_blank")
+                      }}
+                    >
+                      <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+                    </MenuItem>
                   </Popover>
                 </Box>
               )}
