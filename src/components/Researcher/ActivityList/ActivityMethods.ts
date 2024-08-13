@@ -1306,6 +1306,29 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.gyroscope": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          required: ["level"],
+          type: "object",
+          properties: {
+            level: {
+              title: i18n.t("Game Level"),
+              description: i18n.t(
+                '"Easy" - 10 rotation trials, "Medium" - 20 trials with rotations +15, -15, +30, -30, "Hard" - 30 trails with rotation +15, -15, +30, -30, +45, -45 degrees'
+              ),
+              type: "string",
+              minLength: 1,
+              enum: ["Easy", "Medium", "Hard"],
+              enumNames: [i18n.t("Easy"), i18n.t("Medium"), i18n.t("Hard")],
+              default: "Easy",
+            },
+          },
+        },
+      },
+    },
   }
 }
 

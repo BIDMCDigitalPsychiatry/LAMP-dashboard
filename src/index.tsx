@@ -14,7 +14,6 @@ import "regenerator-runtime/runtime"
 import "url-search-params-polyfill"
 import "material-icons"
 import "./i18n"
-import { sensorEventUpdate } from "./components/BottomMenu"
 
 // in index.html: <!DOCTYPE html><html></html>
 let root = document.createElement("div")
@@ -40,7 +39,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
     user-select: text;
     cursor: text;
 }`
-
 // IE9+ CustomEvent polyfill.
 ;(function () {
   if (typeof window.CustomEvent === "function") return false

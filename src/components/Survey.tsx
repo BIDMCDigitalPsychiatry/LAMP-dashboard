@@ -31,6 +31,7 @@ export const games = [
   "lamp.maze_game",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
+  "lamp.gyroscope",
 ]
 
 export default function Survey({ participant, activities, showStreak, ...props }) {

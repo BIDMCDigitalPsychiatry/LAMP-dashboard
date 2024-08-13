@@ -29,6 +29,7 @@ export const games = [
   "lamp.maze_game",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
+  "lamp.gyroscope",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>

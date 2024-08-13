@@ -7,7 +7,7 @@ import Header from "./Header"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
-
+import LAMP from "lamp-core"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -72,6 +72,7 @@ export const games = [
   "lamp.maze_game",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
+  "lamp.gyroscope",
 ]
 export default function ActivityList({
   researcherId,
@@ -106,6 +107,7 @@ export default function ActivityList({
   )
 
   useEffect(() => {
+    // LAMP.ActivitySpec.all().then((res) => console.log(res))
     let params = JSON.parse(localStorage.getItem("activities"))
     setPage(params?.page ?? 0)
     setRowCount(params?.rowCount ?? 40)
