@@ -227,7 +227,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             noBack={false}
             tab={tab}
             onComplete={(data) => {
-              setStaticData(data.static_data)
+              setStaticData(data?.static_data ?? {})
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
