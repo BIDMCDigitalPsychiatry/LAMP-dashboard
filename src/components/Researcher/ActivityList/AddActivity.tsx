@@ -157,6 +157,7 @@ export default function AddActivity({
     "lamp.maze_game": `${t("Maze Game")}`,
     "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
     "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
+    "lamp.dcog": `${t("D-Cog")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -173,6 +174,7 @@ export default function AddActivity({
 
   useEffect(() => {
     ;(async () => {
+      LAMP.ActivitySpec.create({ name: "lamp.dcog" })
       const allSpecs = await LAMP.ActivitySpec.all()
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))

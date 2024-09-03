@@ -73,6 +73,7 @@ export const games = [
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
   "lamp.gyroscope",
+  "lamp.dcog",
 ]
 export default function ActivityList({
   researcherId,
