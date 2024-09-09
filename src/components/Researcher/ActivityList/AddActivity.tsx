@@ -174,7 +174,6 @@ export default function AddActivity({
 
   useEffect(() => {
     ;(async () => {
-      LAMP.ActivitySpec.create({ name: "lamp.dcog" })
       const allSpecs = await LAMP.ActivitySpec.all()
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
