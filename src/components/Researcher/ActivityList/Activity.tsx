@@ -30,6 +30,7 @@ export const games = [
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
   "lamp.gyroscope",
+  "lamp.dcog",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
