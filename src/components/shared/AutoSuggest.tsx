@@ -73,10 +73,6 @@ export default function AutoSuggest(props) {
     setValue(newValue)
   }
 
-  useEffect(() => {
-    console.log(props)
-  }, [props])
-
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
   const onSuggestionsFetchRequested = ({ value }) => {
