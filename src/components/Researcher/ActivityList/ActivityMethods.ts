@@ -1008,15 +1008,6 @@ export const SchemaList = () => {
         },
       },
     },
-    "lamp.dcog": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-        },
-      },
-    },
     "lamp.dbt_diary_card": {
       type: "object",
       properties: {
