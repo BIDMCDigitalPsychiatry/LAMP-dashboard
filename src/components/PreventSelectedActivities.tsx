@@ -544,7 +544,9 @@ export default function PreventSelectedActivities({
                       />
                     )}
                   </Box>
-                  <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
+                  <Typography variant="h6">
+                    {activity?.name && timeAgo.format(timeSpans[activity?.name]?.timestamp)}
+                  </Typography>
                 </Card>
               </ButtonBase>
             </Grid>
