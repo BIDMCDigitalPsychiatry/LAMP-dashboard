@@ -188,7 +188,7 @@ async function getActivityEvents(
   from: number,
   to: number
 ): Promise<{ [groupName: string]: ActivityEventObj[] }> {
-  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to))
+  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to, null, true))
     .map((x) => ({
       ...x,
       activity: _activities.find((y) => x.activity === y.id),

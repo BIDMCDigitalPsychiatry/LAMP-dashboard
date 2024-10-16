@@ -94,7 +94,16 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
 }
 
 export async function getEvents(participant: any, activityId: string) {
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant?.id ?? participant, activityId)
+  let from = new Date()
+  from.setMonth(from.getMonth() - 6)
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(
+    participant?.id ?? participant,
+    activityId,
+    from.getTime(),
+    new Date().getTime(),
+    null,
+    true
+  )
   let dates = []
   let streak = 0
   activityEvents.map((activityEvent, i) => {
