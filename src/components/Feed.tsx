@@ -470,7 +470,7 @@ export default function Feed({
     date.setSeconds(0)
     let startTime = date.getTime()
     let endTime = startTime + 86400000
-    let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime)
+    let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime, null, true)
     return activityEvents
   }
 
