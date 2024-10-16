@@ -87,13 +87,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (e.data !== null) {
       try {
         const data = JSON.parse(e.data)
-        for (const [index, response] of data["temporal_slices"].entries()) {
-          for (const warning of currentActivity.settings[index].warnings) {
-            if (warning.answer === response.value) {
-              warnings.push(warning)
-            }
+        currentActivity.settings.map((setting, index) => {
+          if (!!setting.warnings && !!data["temporal_slices"][index]) {
+            setting.warnings.map((warning) => {
+              if (warning.answer === data["temporal_slices"][index].value) {
+                warnings.push(warning)
+              }
+            })
           }
-        }
+        })
       } catch {}
     }
 
