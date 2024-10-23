@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Icon, Fab, makeStyles, Theme, createStyles, Link } from "@material-ui/core"
+import { Icon, Fab, makeStyles, Theme, createStyles, Link, Tooltip } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import LAMP from "lamp-core"
@@ -52,22 +52,26 @@ export default function UpdateActivity({
   return (
     <span>
       {!!profile ? (
-        <Fab
-          size="small"
-          color="primary"
-          classes={{ root: classes.btnWhite }}
-          onClick={(event) => {
-            participantCount > 1
-              ? setConfirmationDialog(3)
-              : (window.location.href = `/#/researcher/${researcherId}/activity/${activity.id}`)
-          }}
-        >
-          <Icon>mode_edit</Icon>
-        </Fab>
+        <Tooltip title={participantCount > 1 ? t("Edit activity for multiple participants") : t("Edit activity")} arrow>
+          <Fab
+            size="small"
+            color="primary"
+            classes={{ root: classes.btnWhite }}
+            onClick={(event) => {
+              participantCount > 1
+                ? setConfirmationDialog(3)
+                : (window.location.href = `/#/researcher/${researcherId}/activity/${activity.id}`)
+            }}
+          >
+            <Icon>mode_edit</Icon>
+          </Fab>
+        </Tooltip>
       ) : (
-        <Link href={`/#/researcher/${researcherId}/activity/${activity.id}`} underline="none">
-          <Icon>mode_edit</Icon>
-        </Link>
+        <Tooltip title={t("Edit activity")} arrow>
+          <Link href={`/#/researcher/${researcherId}/activity/${activity.id}`} underline="none">
+            <Icon>mode_edit</Icon>
+          </Link>
+        </Tooltip>
       )}
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}

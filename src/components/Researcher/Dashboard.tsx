@@ -337,7 +337,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemIcon className={classes.menuIcon}>
                       <Studies />
                     </ListItemIcon>
-                    <ListItemText primary={`${t("Studies")}`} />
+                    <ListItemText primary={`${t("Groups")}`} />
                   </ListItem>
                 )}
                 {mode === "researcher" && (

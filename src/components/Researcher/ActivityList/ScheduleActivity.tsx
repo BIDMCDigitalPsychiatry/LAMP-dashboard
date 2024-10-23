@@ -1,5 +1,16 @@
 import React, { useState } from "react"
-import { Box, IconButton, Icon, Fab, Dialog, DialogContent, makeStyles, Theme, createStyles } from "@material-ui/core"
+import {
+  Box,
+  IconButton,
+  Icon,
+  Fab,
+  Dialog,
+  DialogContent,
+  makeStyles,
+  Theme,
+  createStyles,
+  Tooltip,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
 import PercentageSettings from "./PercentageSettings"
@@ -42,16 +53,18 @@ export default function ScheduleActivity({ activity, activities, setActivities, 
   const [showScheduler, setShowScheduler] = useState(false)
   return (
     <span>
-      <Fab
-        size="small"
-        color="primary"
-        classes={{ root: classes.btnWhite }}
-        onClick={() => {
-          setShowScheduler(true)
-        }}
-      >
-        <Icon>calendar_today</Icon>
-      </Fab>
+      <Tooltip title={t("Schedule activity")} arrow>
+        <Fab
+          size="small"
+          color="primary"
+          classes={{ root: classes.btnWhite }}
+          onClick={() => {
+            setShowScheduler(true)
+          }}
+        >
+          <Icon>calendar_today</Icon>
+        </Fab>
+      </Tooltip>
       <Dialog
         fullWidth
         maxWidth="md"
