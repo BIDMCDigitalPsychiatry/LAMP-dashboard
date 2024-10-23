@@ -157,7 +157,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           label={`${t("Name")}`}
           type="text"
           variant="outlined"
-          helperText={`${t("Enter the family member or clinician's name here.")}`}
+          // helperText={`${t("Enter the family member or clinician's name here.")}`}
           value={name}
           onChange={(event) => setName(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -170,9 +170,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           label={`${t("Role")}`}
           type="text"
           variant="outlined"
-          helperText={`${t(
-            "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
-          )}`}
+          // helperText={`${t(
+          //   "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+          // )}`}
           value={role}
           onChange={(event) => setRole(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -236,9 +236,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             helperText={
               !accepted
                 ? `${t("Password is not complex enough and does not comply with organization password requirement.")}`
-                : `${t(
-                    "Enter the new password here, then press the 'Done' button on the right of the box. Tap elsewhere if you do not want to change the password."
-                  )}`
+                : `${t("On the right of the box, press the check mark in the circle to save changes.")}`
             }
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -568,7 +566,7 @@ export const CredentialManager: React.FunctionComponent<{
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title={`${t("Add a new member of your care team.")}`}>
+          <Tooltip title={`${t("Add Credentials")}`}>
             <IconButton
               onClick={() =>
                 setSelected((selected) => ({
