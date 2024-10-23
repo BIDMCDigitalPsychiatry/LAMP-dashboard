@@ -318,8 +318,15 @@ export default function Prevent({
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
   const [newEvent, setNewEvent] = React.useState(false)
-  const [startDate, setStartDate] = React.useState<number>()
-  const [endDate, setEndDate] = React.useState<number>()
+
+  let currentDate = new Date()
+  let prevDate = new Date()
+  let endTime = currentDate.getTime()
+  prevDate.setMonth(prevDate.getMonth() - 3)
+  let startTime = prevDate.getTime()
+
+  const [startDate, setStartDate] = React.useState<number>(startTime)
+  const [endDate, setEndDate] = React.useState<number>(endTime)
 
   const setTabActivities = () => {
     let gActivities = allActivities.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
