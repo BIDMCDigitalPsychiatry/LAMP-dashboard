@@ -78,7 +78,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
-
+  const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -122,6 +122,23 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
+  const generateTokens = async (args: { id: string; password: string }) => {
+    const userName = args?.id?.trim()
+    const password = args?.password?.trim()
+    if (userName && password) {
+      try {
+        await LAMP.Credential.login(userName, password).then((res) => {
+          localStorage.setItem(
+            userTokenKey,
+            JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+          )
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
@@ -143,6 +160,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
       .then((res) => {
+        generateTokens(res?.auth)
         if (res.authType === "participant") {
           localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
           LAMP.SensorEvent.create(res.identity.id, {

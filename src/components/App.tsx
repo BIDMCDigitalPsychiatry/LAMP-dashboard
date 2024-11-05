@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { HashRouter, Route, Redirect, Switch, useLocation, useParams } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
@@ -90,7 +90,15 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
+  const location: any = useLocation()
 
+  useEffect(() => {
+    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    if (location?.pathname === "/" && !userToken?.accessToken) {
+      //window.location.href = "/#/"
+      reset()
+    }
+  }, [location?.pathname])
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
     if (window.location.href.indexOf("participant") >= 0) {
@@ -126,7 +134,7 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
-  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital"]
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "localhost:3006"]
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -150,7 +158,7 @@ function AppRouter({ ...props }) {
         serverAddress:
           x.length > 2 && typeof x[2] !== "undefined"
             ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-            : "api.lamp.digital",
+            : "localhost:3006",
       }).then((x) => {
         window.location.href = query[0]
       })
@@ -182,7 +190,7 @@ function AppRouter({ ...props }) {
     })
   }
 
-  const getAdminType = () => {
+  const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (res?.data) {
         let checked = false
@@ -237,11 +245,13 @@ function AppRouter({ ...props }) {
     if (typeof localStorage.getItem("verified") !== undefined) {
       status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
     }
+    const userToken = localStorage.getItem("tokenInfo")
     if (
       !!state.identity &&
       (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
-      !status
+      !status &&
+      userToken
     ) {
       window.location.href = "/#/2fa"
     }
@@ -276,6 +286,7 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    localStorage.removeItem("tokenInfo")
     Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
@@ -312,9 +323,9 @@ function AppRouter({ ...props }) {
         auth: null,
         authType: null,
         activeTab: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
+        lastDomain: ["localhost:3006", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
           ? undefined
-          : state.auth.serverAddress,
+          : state?.auth?.serverAddress,
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       window.location.href = "/#/"
@@ -812,7 +823,7 @@ function AppRouter({ ...props }) {
                 token={{
                   username: LAMP.Auth._auth.id,
                   password: LAMP.Auth._auth.password,
-                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "localhost:3006",
                   type: state.authType === "admin" ? "Administrator" : "Researcher",
                   //@ts-ignore: state.identity will have an id param if not admin
                   id: state.authType === "admin" ? null : state.identity.id,
