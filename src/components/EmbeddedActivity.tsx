@@ -47,6 +47,7 @@ const demoActivities = {
   "lamp.symbol_digit_substitution": "symbol_digit_substitution",
   "lamp.gyroscope": "gyroscope",
   "lamp.dcog": "d-cog",
+  "lamp.simple_memory": "funnymemory",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
