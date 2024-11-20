@@ -47,6 +47,7 @@ const demoActivities = {
   "lamp.symbol_digit_substitution": "symbol_digit_substitution",
   "lamp.gyroscope": "gyroscope",
   "lamp.dcog": "d-cog",
+  "lamp.simple_memory": "funnymemory",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -195,13 +196,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,
