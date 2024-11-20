@@ -14,7 +14,7 @@ import {
   Link,
 } from "@material-ui/core"
 
-import LAMP, { ActivitySpec } from "lamp-core"
+import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>

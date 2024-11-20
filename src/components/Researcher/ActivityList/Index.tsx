@@ -57,10 +57,10 @@ export const availableActivitySpecs = [
   "lamp.balloon_risk",
   "lamp.recording",
   "lamp.spin_wheel",
-  "lamp.simple_memory",
   "lamp.maze_game",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
+  "lamp.simple_memory",
 ]
 export const games = [
   "lamp.jewels_a",

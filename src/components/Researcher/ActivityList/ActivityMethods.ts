@@ -234,6 +234,48 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.simple_memory": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["delayBeforeRecall", "numberOfTrials", "imageExposureTime"],
+          properties: {
+            delayBeforeRecall: {
+              title: i18n.t("Delay before recall"),
+              description: i18n.t("Minutes"),
+              type: "number",
+              enum: [1, 2, 3, 5],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3"), i18n.t("5")],
+              "ui:grid": {
+                xs: 4,
+              },
+            },
+            numberOfTrials: {
+              title: i18n.t("Number of Learning trials"),
+              type: "number",
+              enum: [1, 2, 3],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3")],
+              "ui:grid": {
+                xs: 4,
+              },
+            },
+            imageExposureTime: {
+              title: i18n.t("Image Exposure Time"),
+              description: i18n.t("Seconds"),
+              type: "number",
+              enum: [2, 5],
+              enumNames: [i18n.t("2"), i18n.t("5")],
+              default: 2,
+              "ui:grid": {
+                xs: 4,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.pop_the_bubbles": {
       type: "object",
       properties: {

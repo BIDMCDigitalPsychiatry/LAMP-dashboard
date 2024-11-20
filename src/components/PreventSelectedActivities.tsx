@@ -186,29 +186,33 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && typeof x?.value !== "undefined")
-          return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
-        else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)
-        else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
-          let sum = 0
-          Object.keys(x.value || []).map((val) => {
-            if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
-              sum += (x.value[val]?.value || [])
-                .map((elt) => {
-                  // assure the value can be converted into an integer
-                  return !isNaN(Number(elt)) ? Number(elt) : 0
-                })
-                .reduce((sum, current) => sum + current)
-            }
-          })
-          return sum
-        } else return Number(x?.value) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
+    (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length / 1000,
+
+  // (slices ?? [])
+  //   .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+  //   .map((x, idx) => {
+  //     console.log(slices)
+
+  //     let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+  //     if (!!question && typeof x?.value !== "undefined")
+  //       return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
+  //     else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)
+  //     else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
+  //       let sum = 0
+  //       Object.keys(x.value || []).map((val) => {
+  //         if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
+  //           sum += (x.value[val]?.value || [])
+  //             .map((elt) => {
+  //               // assure the value can be converted into an integer
+  //               return !isNaN(Number(elt)) ? Number(elt) : 0
+  //             })
+  //             .reduce((sum, current) => sum + current)
+  //         }
+  //       })
+  //       return sum
+  //     } else return Number(x?.value) || 0
+  //   })
+  //   .reduce((prev, curr) => prev + curr, 0),
 
   "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
   "lamp.jewels_a": (slices, activity, scopedItem) =>
@@ -250,6 +254,8 @@ export const strategies = {
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.simple_memory": (slices, activity, scopedItem) =>
+    (slices.number_of_correct_pairs_recalled / slices.number_of_total_pairs) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100

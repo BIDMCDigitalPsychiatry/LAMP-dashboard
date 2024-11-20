@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import { useMediaQuery, useTheme } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { Handler } from "vega-tooltip"
@@ -102,7 +102,7 @@ export default function Sparkline({ ...props }) {
           },
           encoding: {
             x: { field: "x", type: "ordinal", timeUnit: "yearmonthdate" },
-            y: { field: "y", type: "quantitative" },
+            y: { field: "y", type: "ordinal" },
             strokeWidth: { value: 2 },
             tooltip: [
               {

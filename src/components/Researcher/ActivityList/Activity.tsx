@@ -27,11 +27,11 @@ export const games = [
   "lamp.balloon_risk",
   "lamp.spin_wheel",
   "lamp.maze_game",
-  "lamp.simple_memory",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
   "lamp.gyroscope",
   "lamp.dcog",
+  "lamp.simple_memory",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
