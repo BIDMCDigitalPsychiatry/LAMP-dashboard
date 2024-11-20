@@ -14,7 +14,7 @@ import {
   Link,
 } from "@material-ui/core"
 
-import LAMP, { ActivitySpec } from "lamp-core"
+import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -158,7 +158,6 @@ export default function AddActivity({
     "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
     "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
     "lamp.dcog": `${t("D-Cog")}`,
-    "lamp.simple_memory": `${t("Funny Memory Game")}`,
   }
 
   const getActivitySpec = async (id) => {

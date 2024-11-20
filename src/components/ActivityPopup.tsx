@@ -54,8 +54,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     closeButton: {
       position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
+      right: 0,
+      top: 0,
       color: theme.palette.grey[500],
     },
     dialogueStyle: {
@@ -149,7 +149,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     dialogtitle: { padding: 0 },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400, minWidth: 325 },
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },

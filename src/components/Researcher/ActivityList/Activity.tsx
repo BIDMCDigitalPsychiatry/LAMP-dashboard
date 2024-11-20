@@ -27,7 +27,6 @@ export const games = [
   "lamp.balloon_risk",
   "lamp.spin_wheel",
   "lamp.maze_game",
-  "lamp.simple_memory",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
   "lamp.gyroscope",
