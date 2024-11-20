@@ -244,11 +244,10 @@ export const SchemaList = () => {
           properties: {
             delayBeforeRecall: {
               title: i18n.t("Delay before recall"),
-              description: i18n.t("Delay before Recall(In minutes)"),
+              description: i18n.t("Minutes"),
               type: "number",
-              default: 1,
-              minimum: 1,
-              maximum: 5,
+              enum: [1, 2, 3, 5],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3"), i18n.t("5")],
               "ui:grid": {
                 xs: 4,
               },
@@ -256,16 +255,15 @@ export const SchemaList = () => {
             numberOfTrials: {
               title: i18n.t("Number of Learning trials"),
               type: "number",
-              default: 1,
-              minimum: 1,
-              maximum: 3,
+              enum: [1, 2, 3],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3")],
               "ui:grid": {
                 xs: 4,
               },
             },
             imageExposureTime: {
               title: i18n.t("Image Exposure Time"),
-              description: i18n.t("In seconds"),
+              description: i18n.t("Seconds"),
               type: "number",
               enum: [2, 5],
               enumNames: [i18n.t("2"), i18n.t("5")],
