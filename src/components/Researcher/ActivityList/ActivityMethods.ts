@@ -1033,6 +1033,7 @@ export const SchemaList = () => {
                 "ui:widget": "file",
                 "ui:options": {
                   accept: ".gif,.jpg,.png,.svg",
+                  maxSize: 4000,
                 },
               },
               emotionText: {
