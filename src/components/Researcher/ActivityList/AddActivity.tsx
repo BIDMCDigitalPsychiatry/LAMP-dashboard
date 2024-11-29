@@ -144,6 +144,7 @@ export default function AddActivity({
     "lamp.cats_and_dogs": `${t("Cats and Dogs")}`,
     "lamp.jewels_a": `${t("Jewels A")}`,
     "lamp.jewels_b": `${t("Jewels B")}`,
+    "lamp.trails_b": `${t("Trails B")}`,
     "lamp.spatial_span": `${t("Spatial Span")}`,
     "lamp.pop_the_bubbles": `${t("Pop the bubbles")}`,
     "lamp.balloon_risk": `${t("Balloon Risk")}`,
@@ -158,7 +159,8 @@ export default function AddActivity({
     "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
     "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
     "lamp.dcog": `${t("D-Cog")}`,
-    "lamp.simple_memory": `${t("Funny Memory Game")}`,
+    "lamp.funny_memory": `${t("Funny Memory Game")}`,
+    "lamp.voice_survey": `${t("Speech Recording")}`,
   }
 
   const getActivitySpec = async (id) => {
