@@ -191,10 +191,7 @@ export const strategies = {
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
-        console.log(slices)
-
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        console.log(activity)
         if (!!question && typeof x?.value !== "undefined")
           return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
         else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)

@@ -169,7 +169,6 @@ export default function Participant({
   useEffect(() => {
     setLoading(true)
     LAMP.Activity.allByParticipant(participant.id, null).then((activities) => {
-      console.log(activities)
       setActivities(activities)
       props.activeTab(tab, participant.id)
       let language = !!localStorage.getItem("LAMP_user_" + participant.id)
