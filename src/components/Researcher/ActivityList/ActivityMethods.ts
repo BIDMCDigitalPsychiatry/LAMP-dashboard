@@ -285,7 +285,7 @@ export const SchemaList = () => {
           required: ["level1dot_count", "level2_dot_count", "level1_timeout", "level2_timeout"],
           properties: {
             level1dot_count: {
-              title: i18n.t("Number of dots for Level"),
+              title: i18n.t("Number of dots for Level 1"),
               type: "number",
               enum: [10, 12],
               enumNames: [i18n.t("10"), i18n.t("12")],
@@ -294,7 +294,7 @@ export const SchemaList = () => {
               },
             },
             level2_dot_count: {
-              title: i18n.t("Number of Learning trials"),
+              title: i18n.t("Number of dots for Level 2"),
               type: "number",
               enum: [20, 24],
               enumNames: [i18n.t("20"), i18n.t("24")],
