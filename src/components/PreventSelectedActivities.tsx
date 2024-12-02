@@ -193,9 +193,14 @@ export const strategies = {
       .map((x, idx) => {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && typeof x?.value !== "undefined")
-          return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
-        else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)
-        else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
+          return ["Yes", "True"].includes(x.value)
+            ? 1
+            : ["No", "False"].includes(x.value)
+            ? 0
+            : Number(x.value.replace(/\"/g, "")) || 0
+        else if (!!question && !!!question.options)
+          return Math.max((question.options || []).indexOf(x.value.replace(/\"/g, "")), 0)
+        else if (typeof x?.value.replace(/\"/g, "") !== "number" && typeof x?.value.replace(/\"/g, "") !== "string") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
             if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
@@ -208,7 +213,7 @@ export const strategies = {
             }
           })
           return sum
-        } else return Number(x?.value) || 0
+        } else return Number(x?.value.replace(/\"/g, "")) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
 
@@ -499,7 +504,8 @@ export default function PreventSelectedActivities({
                                       activity.spec === "lamp.pop_the_bubbles" ||
                                       activity.spec === "lamp.maze_game" ||
                                       activity.spec === "lamp.emotion_recognition"
-                                      ? d?.temporal_slices ?? d["temporal_slices"]
+                                      ? d?.temporal_slices.filter((t) => t.type != "manual_exit") ??
+                                          d["temporal_slices"].filter((t) => t.type != "manual_exit")
                                       : activity.spec === "lamp.scratch_image" ||
                                         activity.spec === "lamp.breathe" ||
                                         activity.spec === "lamp.tips"
