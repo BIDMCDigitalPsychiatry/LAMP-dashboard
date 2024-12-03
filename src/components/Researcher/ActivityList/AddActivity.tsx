@@ -158,7 +158,9 @@ export default function AddActivity({
     "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
     "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
     "lamp.dcog": `${t("D-Cog")}`,
-    "lamp.simple_memory": `${t("Funny Memory Game")}`,
+    "lamp.funny_memory": `${t("Funny Memory Game")}`,
+    "lamp.trails_b": `${t("Trails B")}`,
+    "lamp.voice_survey": `${t("Speech Recording")}`,
   }
 
   const getActivitySpec = async (id) => {

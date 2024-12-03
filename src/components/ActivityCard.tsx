@@ -28,42 +28,43 @@ export default function ActivityCard({
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
-
   const selectedActivity = activity
   events.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
     events
       .map((d) =>
-        d.temporal_slices.map((t, index) => ({
-          item:
-            activity.spec === "lamp.symbol_digit_substitution"
-              ? d.temporal_slices.length > index + 1
-                ? "Digit " + (index + 1) + " : " + t.type
-                : t.type
-              : activity.spec === "lamp.maze_game"
-              ? t.level
-              : t.item,
-          [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.maze_game"
-              ? t.duration
-              : activity.spec === "lamp.survey" ||
-                activity.spec === "lamp.pop_the_bubbles" ||
-                activity.spec === "lamp.symbol_digit_substitution"
-              ? typeof t.value === "string" && t.value !== null
-                ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
-                  ? 1
-                  : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
-                  ? 0
-                  : !isNaN(Number(t.value.replace(/\"/g, "")))
-                  ? Number(t.value.replace(/\"/g, ""))
+        d.temporal_slices
+          .filter((t) => t.type != "manual_exit")
+          .map((t, index) => ({
+            item:
+              activity.spec === "lamp.symbol_digit_substitution"
+                ? d.temporal_slices.length > index + 1
+                  ? "Digit " + (index + 1) + " : " + t.type
+                  : t.type
+                : activity.spec === "lamp.maze_game"
+                ? t.level
+                : t.item,
+            [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+              activity.spec === "lamp.maze_game"
+                ? t.duration
+                : activity.spec === "lamp.survey" ||
+                  activity.spec === "lamp.pop_the_bubbles" ||
+                  activity.spec === "lamp.symbol_digit_substitution"
+                ? typeof t.value === "string" && t.value !== null
+                  ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
+                    ? 1
+                    : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
+                    ? 0
+                    : !isNaN(Number(t.value.replace(/\"/g, "")))
+                    ? Number(t.value.replace(/\"/g, ""))
+                    : t.value
                   : t.value
-                : t.value
-              : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
-              ? t.type
-              : !!t.type
-              ? 1
-              : 0,
-        }))
+                : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
+                ? t.type
+                : !!t.type
+                ? 1
+                : 0,
+          }))
       )
       .reduce((x, y) => x.concat(y), [])
       .groupBy("item")
@@ -190,27 +191,29 @@ export default function ActivityCard({
           value={Object.values(
             events
               .map((d) =>
-                d.temporal_slices.map((t, index) => ({
-                  item: activity.spec === "lamp.maze_game" ? t.level : t.item,
-                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-                    activity.spec === "lamp.maze_game"
-                      ? t.duration
-                      : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                      ? typeof t.value === "string" && t.value !== null
-                        ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
-                          ? 1
-                          : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
-                          ? 0
-                          : !isNaN(Number(t.value.replace(/\"/g, "")))
-                          ? Number(t.value.replace(/\"/g, ""))
+                d.temporal_slices
+                  .filter((t) => t.type != "manual_exit")
+                  .map((t, index) => ({
+                    item: activity.spec === "lamp.maze_game" ? t.level : t.item,
+                    [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+                      activity.spec === "lamp.maze_game"
+                        ? t.duration
+                        : activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                        ? typeof t.value === "string" && t.value !== null
+                          ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
+                            ? 1
+                            : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
+                            ? 0
+                            : !isNaN(Number(t.value.replace(/\"/g, "")))
+                            ? Number(t.value.replace(/\"/g, ""))
+                            : t.value
                           : t.value
-                        : t.value
-                      : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
-                      ? t.type
-                      : !!t.type
-                      ? 1
-                      : 0,
-                }))
+                        : activity.spec === "lamp.spin_wheel" || activity.spec === "lamp.emotion_recognition"
+                        ? t.type
+                        : !!t.type
+                        ? 1
+                        : 0,
+                  }))
               )
               .reduce((x, y) => x.concat(y), [])
               .groupBy("item")
@@ -235,7 +238,7 @@ export default function ActivityCard({
                     activity.spec === "lamp.spin_wheel" ||
                     activity.spec === "lamp.pop_the_bubbles" ||
                     activity.spec === "lamp.maze_game"
-                    ? d.temporal_slices
+                    ? d.temporal_slices.filter((t) => t.type != "manual_exit")
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
                       activity.spec === "lamp.tips"
@@ -245,7 +248,7 @@ export default function ActivityCard({
                   undefined
                 )
               : 0,
-            slice: d.temporal_slices,
+            slice: d.temporal_slices.filter((t) => t.type != "manual_exit"),
             missing:
               activity.spec === "lamp.survey" ||
               activity.spec === "lamp.pop_the_bubbles" ||
