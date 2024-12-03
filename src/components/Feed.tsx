@@ -330,6 +330,7 @@ import zhLocale from "date-fns/locale/zh-CN"
 import esLocale from "date-fns/locale/es"
 import enLocale from "date-fns/locale/en-US"
 import hiLocale from "date-fns/locale/hi"
+import { getSelfHelpAllActivityEvents } from "./Participant"
 
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
@@ -470,7 +471,10 @@ export default function Feed({
     date.setSeconds(0)
     let startTime = date.getTime()
     let endTime = startTime + 86400000
-    let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime, null, true)
+    let activityEvents =
+      LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+        ? await getSelfHelpAllActivityEvents(startTime, endTime)
+        : await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime, null, true)
     return activityEvents
   }
 

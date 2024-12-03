@@ -234,7 +234,7 @@ export const SchemaList = () => {
         },
       },
     },
-    "lamp.funny_memory": {
+    "lamp.simple_memory": {
       type: "object",
       properties: {
         settings: {
@@ -267,58 +267,6 @@ export const SchemaList = () => {
               type: "number",
               enum: [2, 5],
               enumNames: [i18n.t("2"), i18n.t("5")],
-              default: 2,
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-          },
-        },
-      },
-    },
-    "lamp.trails_b": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-          required: ["level1dot_count", "level2_dot_count", "level1_timeout", "level2_timeout"],
-          properties: {
-            level1dot_count: {
-              title: i18n.t("Number of dots for Level 1"),
-              type: "number",
-              enum: [10, 12],
-              enumNames: [i18n.t("10"), i18n.t("12")],
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-            level2_dot_count: {
-              title: i18n.t("Number of dots for Level 2"),
-              type: "number",
-              enum: [20, 24],
-              enumNames: [i18n.t("20"), i18n.t("24")],
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-            level1_timeout: {
-              title: i18n.t("Timeout period for Level 1"),
-              description: i18n.t("Seconds"),
-              type: "number",
-              enum: [60, 90, 120],
-              enumNames: [i18n.t("60"), i18n.t("90"), i18n.t("120")],
-              default: 2,
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-            level2_timeout: {
-              title: i18n.t("Timeout period for Level 2"),
-              description: i18n.t("Seconds"),
-              type: "number",
-              enum: [90, 120, 180],
-              enumNames: [i18n.t("90"), i18n.t("120"), i18n.t("180")],
               default: 2,
               "ui:grid": {
                 xs: 4,
@@ -1085,7 +1033,6 @@ export const SchemaList = () => {
                 "ui:widget": "file",
                 "ui:options": {
                   accept: ".gif,.jpg,.png,.svg",
-                  maxSize: 4000,
                 },
               },
               emotionText: {
@@ -1097,26 +1044,6 @@ export const SchemaList = () => {
                 type: "string",
                 "ui:widget": AutoSuggest,
                 title: i18n.t("Emotion"),
-              },
-            },
-          },
-        },
-      },
-    },
-    "lamp.voice_survey": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity settings"),
-          type: "array",
-          items: {
-            required: ["question"],
-            type: "object",
-            properties: {
-              question: {
-                title: i18n.t("Question"),
-                type: "string",
-                default: "",
               },
             },
           },

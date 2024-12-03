@@ -31,6 +31,7 @@ import { generate_ids, queryDictionary } from "./DataPortalShared"
 import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
 import { useTranslation } from "react-i18next"
+import { getSelfHelpAllActivityEvents } from "../Participant"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -257,7 +258,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     //now, let's pull some data
     let resultsPulled = (await Promise.all(
       id_list.map(async (id) => {
-        let res: Array<any> = await LAMP.ActivityEvent.allByParticipant(id)
+        let res: Array<any> =
+          LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+            ? await getSelfHelpAllActivityEvents()
+            : await LAMP.ActivityEvent.allByParticipant(id)
         res = res.reduce((acc, event) => {
           let activity_obj = {
             ActivityName: lookup_dict[event.activity]?.name ?? "UNKNOWN",

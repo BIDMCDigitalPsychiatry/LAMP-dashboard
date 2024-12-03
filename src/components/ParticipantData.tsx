@@ -326,9 +326,7 @@ export default function ParticipantData({
             <Typography variant="subtitle2" color="primary">
               {((activityEvents || {})[x.name] || []).slice(-1).length > 0
                 ? strategies["lamp.survey"](
-                    ((activityEvents || {})[x.name] || [])
-                      .slice(-1)?.[0]
-                      ?.temporal_slices.filter((t) => t.type != "manual_exit"),
+                    ((activityEvents || {})[x.name] || []).slice(-1)?.[0]?.temporal_slices,
                     x,
                     undefined
                   )

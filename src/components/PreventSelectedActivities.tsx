@@ -25,6 +25,7 @@ import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
+import { getSelfHelpAllActivityEvents } from "./Participant"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -186,45 +187,36 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
-    // (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length / 1000,
+    (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length / 1000,
 
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && typeof x?.value !== "undefined")
-          return ["Yes", "True"].includes(x.value)
-            ? 1
-            : ["No", "False"].includes(x.value)
-            ? 0
-            : Number(x.value.replace(/\"/g, "")) || 0
-        else if (!!question && !!!question.options)
-          return Math.max((question.options || []).indexOf(x.value.replace(/\"/g, "")), 0)
-        else if (typeof x?.value.replace(/\"/g, "") !== "number" && typeof x?.value.replace(/\"/g, "") !== "string") {
-          let sum = 0
-          Object.keys(x.value || []).map((val) => {
-            if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
-              sum += (x.value[val]?.value || [])
-                .map((elt) => {
-                  // assure the value can be converted into an integer
-                  return !isNaN(Number(elt)) ? Number(elt) : 0
-                })
-                .reduce((sum, current) => sum + current)
-            }
-          })
-          return sum
-        } else return Number(x?.value.replace(/\"/g, "")) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
+  // (slices ?? [])
+  //   .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+  //   .map((x, idx) => {
+  //     console.log(slices)
+
+  //     let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+  //     if (!!question && typeof x?.value !== "undefined")
+  //       return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
+  //     else if (!!question && !!!question.options) return Math.max((question.options || []).indexOf(x.value), 0)
+  //     else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
+  //       let sum = 0
+  //       Object.keys(x.value || []).map((val) => {
+  //         if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
+  //           sum += (x.value[val]?.value || [])
+  //             .map((elt) => {
+  //               // assure the value can be converted into an integer
+  //               return !isNaN(Number(elt)) ? Number(elt) : 0
+  //             })
+  //             .reduce((sum, current) => sum + current)
+  //         }
+  //       })
+  //       return sum
+  //     } else return Number(x?.value) || 0
+  //   })
+  //   .reduce((prev, curr) => prev + curr, 0),
 
   "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
   "lamp.jewels_a": (slices, activity, scopedItem) =>
-    slices.score == "NaN"
-      ? 0
-      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
-      ? 100
-      : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.trails_b": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
@@ -263,7 +255,7 @@ export const strategies = {
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
-  "lamp.funny_memory": (slices, activity, scopedItem) =>
+  "lamp.simple_memory": (slices, activity, scopedItem) =>
     (slices.number_of_correct_pairs_recalled / slices.number_of_total_pairs) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
@@ -289,7 +281,10 @@ export const strategies = {
  */
 const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
+  let activityEvents =
+    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+      ? await getSelfHelpAllActivityEvents()
+      : await LAMP.ActivityEvent.allByParticipant(participantId)
   return await Promise.all(
     percentage.concat(
       activities.map(async (activity) => {
@@ -504,8 +499,7 @@ export default function PreventSelectedActivities({
                                       activity.spec === "lamp.pop_the_bubbles" ||
                                       activity.spec === "lamp.maze_game" ||
                                       activity.spec === "lamp.emotion_recognition"
-                                      ? d?.temporal_slices.filter((t) => t.type != "manual_exit") ??
-                                          d["temporal_slices"].filter((t) => t.type != "manual_exit")
+                                      ? d?.temporal_slices ?? d["temporal_slices"]
                                       : activity.spec === "lamp.scratch_image" ||
                                         activity.spec === "lamp.breathe" ||
                                         activity.spec === "lamp.tips"

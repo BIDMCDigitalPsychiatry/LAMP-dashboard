@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
+import { Service } from "./DBService/DBService"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -47,9 +48,7 @@ const demoActivities = {
   "lamp.symbol_digit_substitution": "symbol_digit_substitution",
   "lamp.gyroscope": "gyroscope",
   "lamp.dcog": "d-cog",
-  "lamp.funny_memory": "funnymemory",
-  "lamp.trails_b": "dottouch",
-  "lamp.voice_survey": "speech",
+  "lamp.simple_memory": "funnymemory",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -129,6 +128,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           data["timestamp"] = activityTimestamp
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
+          if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
+            setTimeout(() => {
+              Service.addUserDBRow("activityEvents", data)
+            }, 500)
+          }
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {
@@ -198,6 +202,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+      })
       setSettings({
         ...settings,
         activity: currentActivity,

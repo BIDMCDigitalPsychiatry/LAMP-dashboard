@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
   },
   imgBox: { padding: "20px 0 0 0" },
   closeIcon: { color: "red", cursor: "pointer" },
-  errorText: { color: "red" },
 }))
 
 function processFile(files) {
@@ -51,7 +50,6 @@ export default function CustomFileWidget(props) {
   const classes = useStyles()
   const ref = React.useRef(props.value)
   const { t } = useTranslation()
-  const [error, setError] = React.useState("")
 
   const onClick = () => {
     ref.current.value = ""
@@ -78,20 +76,9 @@ export default function CustomFileWidget(props) {
         name="file"
         style={{ display: "none" }}
         onChange={(event) => {
-          if (event.target.files[0].size / 1024 > props.options.maxSize) {
-            setError("Maximum file size should be 4MB")
-            ref.current.value = ""
-            props.onChange("")
-          } else {
-            setError("")
-            processFile(event.target.files).then(props.onChange)
-          }
+          processFile(event.target.files).then(props.onChange)
         }}
       />
-      <span className={classes.errorText}>
-        <br />
-        {error}
-      </span>
       {props?.value && (
         <Box className={classes.imgBox}>
           <Box className={classes.imgInnerBox}>

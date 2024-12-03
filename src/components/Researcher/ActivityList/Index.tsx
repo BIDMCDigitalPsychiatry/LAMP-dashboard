@@ -60,7 +60,7 @@ export const availableActivitySpecs = [
   "lamp.maze_game",
   "lamp.emotion_recognition",
   "lamp.symbol_digit_substitution",
-  "lamp.funny_memory",
+  "lamp.simple_memory",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -75,9 +75,7 @@ export const games = [
   "lamp.symbol_digit_substitution",
   "lamp.gyroscope",
   "lamp.dcog",
-  "lamp.funny_memory",
-  "lamp.trails_b",
-  "lamp.voice_survey",
+  "lamp.simple_memory",
 ]
 export default function ActivityList({
   researcherId,
