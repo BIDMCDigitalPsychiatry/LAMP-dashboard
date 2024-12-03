@@ -25,6 +25,7 @@ import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
+import { getSelfHelpAllActivityEvents } from "./Participant"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -186,8 +187,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
-    // (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length / 1000,
-
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
@@ -216,15 +215,14 @@ export const strategies = {
         } else return Number(x?.value.replace(/\"/g, "")) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-
-  "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
-  "lamp.jewels_a": (slices, activity, scopedItem) =>
+  "lamp.trails_b": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.trails_b": (slices, activity, scopedItem) =>
+  "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
+  "lamp.jewels_a": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
@@ -289,7 +287,10 @@ export const strategies = {
  */
 const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
   let percentage = []
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId)
+  let activityEvents =
+    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+      ? await getSelfHelpAllActivityEvents()
+      : await LAMP.ActivityEvent.allByParticipant(participantId)
   return await Promise.all(
     percentage.concat(
       activities.map(async (activity) => {

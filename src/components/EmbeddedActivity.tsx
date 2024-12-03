@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
+import { Service } from "./DBService/DBService"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -129,6 +130,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           data["timestamp"] = activityTimestamp
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
+          if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
+            setTimeout(() => {
+              Service.addUserDBRow("activityEvents", data)
+            }, 500)
+          }
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {

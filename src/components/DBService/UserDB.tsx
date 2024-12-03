@@ -13,6 +13,17 @@ interface LampUSERDB extends DBSchema {
     }
     indexes: { id: string }
   }
+  activityEvents: {
+    key: string
+    value: {
+      activity: string
+      timestamp: string
+      duration: any
+      static_data: object
+      temporal_slices: []
+    }
+    indexes: { id: number }
+  }
 }
 
 export const userDbPromise = idb.openDB<LampUSERDB>(DATABASE_NAME, 1, {
@@ -20,6 +31,10 @@ export const userDbPromise = idb.openDB<LampUSERDB>(DATABASE_NAME, 1, {
     if (!lampUserDb.objectStoreNames.contains("activitytags")) {
       const user = lampUserDb.createObjectStore("activitytags", { keyPath: "id" })
       user.createIndex("id", "id", { unique: true })
+    }
+    if (!lampUserDb.objectStoreNames.contains("activityEvents")) {
+      const activityEvents = lampUserDb.createObjectStore("activityEvents", { autoIncrement: true })
+      activityEvents.createIndex("id", "id", { unique: true })
     }
   },
 })

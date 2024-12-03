@@ -71,7 +71,6 @@ export default function ActivityCard({
   )
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
-  console.log(each)
   let eachData = []
   each = each.map((d, key) => {
     let keys = Object.keys(d)

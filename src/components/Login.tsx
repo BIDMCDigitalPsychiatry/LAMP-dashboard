@@ -27,7 +27,8 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 import { Autocomplete } from "@mui/material"
-
+import demo_db from "../demo_db.json"
+import self_help_db from "../self_help_db.json"
 type SuggestedUrlOption = {
   label: string
 }
@@ -58,7 +59,13 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
+    linkBlue: {
+      color: "#6083E7",
+      fontWeight: "bold",
+      cursor: "pointer",
+      marginRight: "20px",
+      "&:hover": { textDecoration: "underline" },
+    },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
     loginDisabled: {
@@ -178,7 +185,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         )
         ;(async () => {
           await Service.deleteDB()
-          await Service.deleteUserDB()
+          if (mode != "selfHelp") {
+            await Service.deleteUserDB()
+          }
         })()
         setLoginClick(false)
         onComplete()
@@ -375,9 +384,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   <Link
                     underline="none"
                     className={classes.linkBlue}
-                    onClick={(event) => setTryitMenu(event.currentTarget)}
+                    onClick={(event) => {
+                      LAMP.initializeDemoDB(demo_db)
+                      localStorage.setItem("demo_mode", "try_it")
+                      setTryitMenu(event.currentTarget)
+                    }}
                   >
                     {`${t("Try it")}`}
+                  </Link>
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => {
+                      LAMP.initializeDemoDB(self_help_db)
+                      localStorage.setItem("demo_mode", "self_help")
+                      handleLogin(event, "selfHelp")
+                    }}
+                  >
+                    {`${t("Self Help")}`}
                   </Link>
                   <br />
                   <Link

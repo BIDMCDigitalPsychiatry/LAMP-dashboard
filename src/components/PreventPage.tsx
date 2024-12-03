@@ -21,6 +21,7 @@ import PreventDBT from "./PreventDBT"
 import PreventData from "./PreventData"
 import PreventGoalData from "./PreventGoalData"
 import VoiceRecoding from "./VoiceRecoding"
+import { getSelfHelpAllActivityEvents } from "./Participant"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -208,10 +209,17 @@ export default function PreventPage({ activityId, type, participantId, ...props 
     setLoading(true)
     LAMP.Activity.view(activityId).then((data) => {
       setActivity(data)
-      LAMP.ActivityEvent.allByParticipant(participantId).then((events) => {
-        setActivityEvents(events.filter((event) => event.activity === activityId))
-        setLoading(false)
-      })
+      if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
+        getSelfHelpAllActivityEvents().then((events) => {
+          setActivityEvents(events.filter((event) => event.activity === activityId))
+          setLoading(false)
+        })
+      } else {
+        LAMP.ActivityEvent.allByParticipant(participantId).then((events) => {
+          setActivityEvents(events.filter((event) => event.activity === activityId))
+          setLoading(false)
+        })
+      }
     })
   }, [])
 

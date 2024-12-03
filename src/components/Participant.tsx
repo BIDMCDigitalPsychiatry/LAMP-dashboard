@@ -93,17 +93,52 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
+export async function getSelfHelpActivityEvents(activityId: string, from: number, to: number) {
+  let result = []
+  return await Service.getActivityEventData("activityEvents", activityId).then((res) => {
+    if (res) {
+      result = res
+      if (from != null) {
+        result = res?.filter((val) => val.timestamp >= from)
+      }
+      if (to != null) {
+        result = res?.filter((val) => val?.timestamp <= to)
+      }
+    }
+    return result.reverse()
+  })
+}
+
+export async function getSelfHelpAllActivityEvents(from?: number, to?: number) {
+  let result = []
+  return await Service.getAllTags("activityEvents").then((res) => {
+    if (res) {
+      result = res
+      if (from != null) {
+        result = res.filter((val) => val.timestamp >= from)
+      }
+      if (to != null) {
+        result = res.filter((val) => val?.timestamp <= to)
+      }
+    }
+    return result
+  })
+}
+
 export async function getEvents(participant: any, activityId: string) {
   let from = new Date()
   from.setMonth(from.getMonth() - 6)
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(
-    participant?.id ?? participant,
-    activityId,
-    from.getTime(),
-    new Date().getTime(),
-    null,
-    true
-  )
+  let activityEvents =
+    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+      ? await getSelfHelpActivityEvents(activityId, from.getTime(), new Date().getTime())
+      : await LAMP.ActivityEvent.allByParticipant(
+          participant?.id ?? participant,
+          activityId,
+          from.getTime(),
+          new Date().getTime(),
+          null,
+          true
+        )
   let dates = []
   let streak = 0
   activityEvents.map((activityEvent, i) => {
@@ -168,17 +203,19 @@ export default function Participant({
 
   useEffect(() => {
     setLoading(true)
-    LAMP.Activity.allByParticipant(participant.id, null).then((activities) => {
-      setActivities(activities)
-      props.activeTab(tab, participant.id)
-      let language = !!localStorage.getItem("LAMP_user_" + participant.id)
-        ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-        : getSelectedLanguage()
-        ? getSelectedLanguage()
-        : "en-US"
-      i18n.changeLanguage(language)
-      //  getShowWelcome(participant).then(setOpen)
-    })
+    LAMP.Activity.allByParticipant(participant.id, null, !(LAMP.Auth._auth.serverAddress === "demo.lamp.digital")).then(
+      (activities) => {
+        setActivities(activities)
+        props.activeTab(tab, participant.id)
+        let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+          ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+          : getSelectedLanguage()
+          ? getSelectedLanguage()
+          : "en-US"
+        i18n.changeLanguage(language)
+        //  getShowWelcome(participant).then(setOpen)
+      }
+    )
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
