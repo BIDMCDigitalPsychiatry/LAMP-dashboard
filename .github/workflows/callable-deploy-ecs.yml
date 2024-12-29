@@ -1,0 +1,42 @@
+name: "Deploy ECS"
+on:
+  workflow_call:
+    inputs:
+      env:
+        description: Target environment of deployment. (stg, prod)
+        required: true
+        type: string
+      container_tag:
+        description: 'The container tag to deploy'
+        required: true
+        type: string
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::544847369688:role/my-github-actions-role
+          aws-region: us-east-2
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEF_FAMILY }} --query taskDefinition > task-definition.json
+
+      # TODO: Substitute in the correct tag that should be deployed next
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

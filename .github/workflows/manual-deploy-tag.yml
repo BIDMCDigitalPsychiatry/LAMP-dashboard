@@ -1,0 +1,31 @@
+name: 'Manually deploy tag'
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+        description: The tag to deploy (must already exist)
+      env:
+        type: environment
+        default: stg
+
+jobs:
+  pre-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+
+  deploy-env-stg:
+    name: "Deploy to stg environment"
+    uses: ./.github/workflows/callable-deploy-ecs.yml
+    secrets: inherit
+    with:
+      env: ${{ inputs.env }}
+      container_tag: ${{ inputs.tag }}
+    needs: 
+      - pre-run
