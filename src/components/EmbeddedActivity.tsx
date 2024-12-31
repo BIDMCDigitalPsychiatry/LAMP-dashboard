@@ -71,25 +71,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    setCurrentActivity({
-      id: "activity1",
-      spec: "lamp.tips",
-      name: "Tip Demo",
-      schedule: [
-        {
-          start_date: "2018-08-22T00:00:00.000Z",
-          time: "2018-08-22T20:00:00.000Z",
-          repeat_interval: "triweekly",
-          custom_time: null,
-        },
-      ],
-      settings: [
-        {
-          title: "Tip 1",
-          text: "[sample link](https://www.youtube.com/watch?v=wDchsz8nmbo)",
-        },
-      ],
-    })
+    setCurrentActivity(activity)
     setSaved(true)
     setEmbeddedActivity("")
     setSettings(null)
