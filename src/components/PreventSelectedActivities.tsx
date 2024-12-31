@@ -240,6 +240,12 @@ export const strategies = {
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.fragmented_letters": (slices, activity, scopedItem) =>
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0

@@ -203,6 +203,7 @@ export default function ActivityHeader({
         "lamp.maze_game",
         "lamp.symbol_digit_substitution",
         "lamp.spin_wheel",
+        "lamp.fragmented_letters",
       ].includes(activitySpecId) && (
         <ActivityImage
           onChange={(val) => setVisualSettings(val)}

@@ -303,6 +303,7 @@ export const SchemaList = () => {
               "ui:grid": {
                 xs: 4,
               },
+              default: 1,
             },
             numberOfTrials: {
               title: i18n.t("Number of Learning trials"),
@@ -312,6 +313,7 @@ export const SchemaList = () => {
               "ui:grid": {
                 xs: 4,
               },
+              default: 1,
             },
             imageExposureTime: {
               title: i18n.t("Image Exposure Time"),
@@ -452,6 +454,27 @@ export const SchemaList = () => {
               default: 1,
               "ui:grid": {
                 xs: 3,
+              },
+            },
+          },
+        },
+      },
+    },
+    "lamp.fragmented_letters": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          properties: {
+            startingFragmentation: {
+              title: i18n.t("Starting Fragmentation"),
+              type: "string",
+              enum: ["30%", "40%", "50%"],
+              enumNames: [i18n.t("30%"), i18n.t("40%"), , i18n.t("50%")],
+              default: "30%",
+              "ui:grid": {
+                xs: 6,
               },
             },
           },

@@ -30,6 +30,7 @@ const demoActivities = {
   "Dot Touch": "dottouch",
   "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
+  "lamp.fragmented_letters": "fragmentedletters",
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
@@ -50,7 +51,7 @@ const demoActivities = {
   "lamp.dcog": "d-cog",
   "lamp.funny_memory": "funnymemory",
   "lamp.trails_b": "dottouch",
-  "lamp.voice_survey": "speech",
+  "lamp.voice_survey": "speechrecording",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -70,7 +71,25 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    setCurrentActivity(activity)
+    setCurrentActivity({
+      id: "activity1",
+      spec: "lamp.tips",
+      name: "Tip Demo",
+      schedule: [
+        {
+          start_date: "2018-08-22T00:00:00.000Z",
+          time: "2018-08-22T20:00:00.000Z",
+          repeat_interval: "triweekly",
+          custom_time: null,
+        },
+      ],
+      settings: [
+        {
+          title: "Tip 1",
+          text: "[sample link](https://www.youtube.com/watch?v=wDchsz8nmbo)",
+        },
+      ],
+    })
     setSaved(true)
     setEmbeddedActivity("")
     setSettings(null)
@@ -131,9 +150,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
-            setTimeout(() => {
-              Service.addUserDBRow("activityEvents", data)
-            }, 500)
+            Service.addUserDBRow("activityEvents", data)
           }
           setEmbeddedActivity(undefined)
           setSettings(null)
