@@ -161,6 +161,7 @@ export default function AddActivity({
     "lamp.funny_memory": `${t("Funny Memory Game")}`,
     "lamp.trails_b": `${t("Trails B")}`,
     "lamp.voice_survey": `${t("Speech Recording")}`,
+    "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
   }
 
   const getActivitySpec = async (id) => {

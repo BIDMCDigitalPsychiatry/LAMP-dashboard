@@ -174,6 +174,7 @@ function AppRouter({ ...props }) {
           : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any)?.id, null)
       }
     })
+
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 

@@ -30,6 +30,7 @@ const demoActivities = {
   "Dot Touch": "dottouch",
   "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
+  "lamp.fragmented_letters": "fragmentedletters",
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
@@ -50,7 +51,7 @@ const demoActivities = {
   "lamp.dcog": "d-cog",
   "lamp.funny_memory": "funnymemory",
   "lamp.trails_b": "dottouch",
-  "lamp.voice_survey": "speech",
+  "lamp.voice_survey": "speechrecording",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -131,9 +132,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
-            setTimeout(() => {
-              Service.addUserDBRow("activityEvents", data)
-            }, 500)
+            Service.addUserDBRow("activityEvents", data)
           }
           setEmbeddedActivity(undefined)
           setSettings(null)

@@ -34,6 +34,7 @@ export const games = [
   "lamp.funny_memory",
   "lamp.trails_b",
   "lamp.voice_survey",
+  "lamp.fragmented_letters",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
