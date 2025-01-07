@@ -32,7 +32,7 @@
     "@rjsf/material-ui": "^5.8.1",
     "@rjsf/utils": "^5.8.1",
     "@rjsf/validator-ajv8": "^5.8.1",
-    "ajv": "^8.17.1",
+    "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "classnames": "^2.3.1",
     "core-js": "^3.19.1",
@@ -47,7 +47,7 @@
     "jsonata": "^1.8.4",
     "jsonexport": "^3.2.0",
     "jspdf": "^2.3.1",
-    "lamp-core": "^2024.11.18",
+    "lamp-core": "^2024.10.16",
     "material-icons": "^1.10.11",
     "monaco-editor": "^0.33.0",
     "notistack": "^2.0.5",
@@ -72,7 +72,7 @@
     "stream": "^0.0.2",
     "vega": "^5.22.1",
     "vega-embed": "^6.20.8",
-    "vega-lite": "^5.23.0",
+    "vega-lite": "^5.2.0",
     "vega-tooltip": "^0.28.0"
   },
   "resolutions": {
