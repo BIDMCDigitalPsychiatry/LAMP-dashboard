@@ -30,7 +30,7 @@ const demoActivities = {
   "Dot Touch": "dottouch",
   "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
-  "lamp.fragmented_letters": "fragmentedletters",
+  "lamp.fragmented_letters": "fragmentationofletters",
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
