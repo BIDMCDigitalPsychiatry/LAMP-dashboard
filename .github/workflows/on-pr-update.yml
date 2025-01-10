@@ -12,5 +12,5 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      sha: ${{ github.sha }}
+      ref: ${{ github.sha }}
       push: false
