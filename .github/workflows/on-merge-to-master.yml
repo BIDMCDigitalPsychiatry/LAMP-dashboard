@@ -21,6 +21,8 @@ jobs:
     with:
       ref: ${{ github.sha }}
       push: true
+    needs:
+      - pre-run
 
   deploy-env-stg:
     name: "Deploy to stg environment"
@@ -29,3 +31,5 @@ jobs:
     with:
       env: stg
       container_tag: ${{ github.sha }}
+    needs: 
+      - build-docker
