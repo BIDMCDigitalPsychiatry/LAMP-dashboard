@@ -1,0 +1,16 @@
+name: Pull Request Updated
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  build-docker:
+    name: "Build Container"
+    uses: ./.github/workflows/callable-build-docker.yml
+    secrets: inherit
+    with:
+      sha: ${{ github.sha }}
+      push: false

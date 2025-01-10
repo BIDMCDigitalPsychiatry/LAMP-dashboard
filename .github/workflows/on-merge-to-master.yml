@@ -1,0 +1,31 @@
+name: On merge to master
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  pre-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+  build-docker:
+    name: "Build Container"
+    uses: ./.github/workflows/callable-build-docker.yml
+    secrets: inherit
+    with:
+      ref: ${{ github.sha }}
+      push: true
+
+  deploy-env-stg:
+    name: "Deploy to stg environment"
+    uses: ./.github/workflows/callable-deploy-ecs.yml
+    secrets: inherit
+    with:
+      env: stg
+      container_tag: ${{ github.sha }}
