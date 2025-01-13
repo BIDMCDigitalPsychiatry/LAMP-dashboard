@@ -30,6 +30,6 @@ jobs:
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container-tag: ${{ inputs.ref }}
+      container_tag: ${{ inputs.ref }}
     needs: 
       - build-docker
