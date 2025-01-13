@@ -1,11 +1,11 @@
-name: 'Manually deploy tag'
+name: 'Manually build and deploy ref'
 on:
   workflow_dispatch:
     inputs:
       ref:
         type: string
         required: true
-        description: 
+        description: Sha, tag, or branch to build and deploy
       env:
         type: environment
         default: stg

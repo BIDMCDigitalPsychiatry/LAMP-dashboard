@@ -1,6 +1,10 @@
-name: "Deploy ECS"
+name: "Deploy Github Pages"
 on:
   workflow_call:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   publish:

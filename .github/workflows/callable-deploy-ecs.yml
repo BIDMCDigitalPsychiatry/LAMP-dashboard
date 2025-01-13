@@ -15,6 +15,10 @@ permissions:
   contents: 'read'
   id-token: 'write'
 
+concurrency:
+  group: ${{ inputs.env }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -37,7 +41,7 @@ jobs:
 
       # TODO: Substitute in the correct tag that should be deployed next
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: task-definition.json
           service: ${{ vars.ECS_SERVICE }}

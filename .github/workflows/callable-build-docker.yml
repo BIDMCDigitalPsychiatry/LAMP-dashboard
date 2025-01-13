@@ -1,4 +1,4 @@
-name: "Deploy ECS"
+name: "Build docker image"
 on:
   workflow_call:
     inputs:
@@ -16,6 +16,10 @@ permissions:
   contents: read
   attestations: write
   id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-image:

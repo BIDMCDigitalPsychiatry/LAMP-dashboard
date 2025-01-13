@@ -4,6 +4,10 @@ on:
     tags: '*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-run:
     runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ github.sha }}
+      ref: ${{ github.ref }}
       push: true
     needs:
       - pre-run
@@ -29,7 +33,7 @@ jobs:
     secrets: inherit
     with:
       env: stg
-      container_tag: aoeuaoeu
+      container_tag: ${{ github.ref }}
     needs: 
       - build-docker
 
