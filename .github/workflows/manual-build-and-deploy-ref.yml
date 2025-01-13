@@ -10,14 +10,11 @@ on:
         type: environment
         default: stg
 
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.ref }}
+  cancel-in-progress: false
+
 jobs:
-  pre-run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
 
   build-docker:
     name: "Build Container"
@@ -26,8 +23,6 @@ jobs:
     with:
       ref: ${{ inputs.ref }}
       push: true
-    needs:
-      - pre-run
 
   deploy-ecs:
     name: "Deploy container to ECS"

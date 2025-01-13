@@ -10,15 +10,11 @@ on:
         type: environment
         default: stg
 
-jobs:
-  pre-run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
+jobs:
 
   deploy-env-stg:
     name: "Deploy to stg environment"
@@ -27,5 +23,3 @@ jobs:
     with:
       env: ${{ inputs.env }}
       container_tag: ${{ inputs.tag }}
-    needs: 
-      - pre-run
