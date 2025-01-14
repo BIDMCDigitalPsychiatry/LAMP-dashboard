@@ -1257,6 +1257,15 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.digit_span": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
     "lamp.cats_and_dogs_new": {
       type: "object",
       properties: {
