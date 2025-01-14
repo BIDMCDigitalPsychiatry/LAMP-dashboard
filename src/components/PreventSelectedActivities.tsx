@@ -272,7 +272,12 @@ export const strategies = {
     return (slices || []).map((x) => (!!x.type ? 1 : 0)).reduce((prev, cur) => prev + cur, 0)
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
-  "lamp.digit_span": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.digit_span": (slices, activity, scopedItem) =>
+    slices.score == "NaN"
+      ? 0
+      : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
+      ? 100
+      : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.funny_memory": (slices, activity, scopedItem) =>
     (slices.number_of_correct_pairs_recalled / slices.number_of_total_pairs) * 100,
