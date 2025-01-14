@@ -37,6 +37,7 @@ export const games = [
   "lamp.funny_memory",
   "lamp.trails_b",
   "lamp.voice_survey",
+  "lamp.digit_span",
 ]
 
 export default function Survey({ participant, activities, showStreak, ...props }) {
