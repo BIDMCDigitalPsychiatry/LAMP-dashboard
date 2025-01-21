@@ -1,7 +1,8 @@
-name: Tag Pushed
+name: On Push Tag
 on:
   push:
     tags: '*'
+    branches: master
 
 concurrency:
   group: ${{ github.ref }}
@@ -14,7 +15,6 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ github.ref }}
       push: true
 
   deploy-stg:
@@ -23,6 +23,6 @@ jobs:
     secrets: inherit
     with:
       env: stg
-      container_tag: ${{ github.ref }}
+      container_tag: ${{ github.ref_name }}
     needs: 
       - build-docker

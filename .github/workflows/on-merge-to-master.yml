@@ -1,4 +1,4 @@
-name: Merge to Master
+name: On Merge or Push (to master)
 on:
   push:
     branches:
@@ -12,19 +12,18 @@ concurrency:
 jobs:
 
   build-docker:
-    name: "Build Container"
+    name: "Build & Push Docker Image"
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ github.sha }}
       push: true
 
   deploy-env-stg:
-    name: "Deploy to stg environment"
+    name: "Deploy in Staging"
     uses: ./.github/workflows/callable-deploy-ecs.yml
     secrets: inherit
     with:
       env: stg
-      container_tag: ${{ github.sha }}
+      container_tag: master
     needs: 
       - build-docker
