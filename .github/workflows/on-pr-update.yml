@@ -1,4 +1,4 @@
-name: Pull Request Updated
+name: On PR Update
 on:
   pull_request:
     types:
@@ -17,5 +17,4 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ github.ref_name }}
       push: false

@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: ${{ inputs.env }}
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +38,9 @@ jobs:
             --task-definition ${{ vars.ECS_TASK_DEF_FAMILY }} \
             --query taskDefinition \
             > task-definition.json
+          cat task-definition.json
+          which jq
 
-      # TODO: Substitute in the correct tag that should be deployed next
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:

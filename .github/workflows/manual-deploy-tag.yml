@@ -1,11 +1,11 @@
-name: 'Manually deploy tag'
+name: 'Manual Deploy'
 on:
   workflow_dispatch:
     inputs:
       tag:
         type: string
         required: true
-        description: The tag to deploy (must already exist)
+        description: The container tag to deploy
       env:
         type: environment
         default: stg
@@ -16,8 +16,8 @@ concurrency:
 
 jobs:
 
-  deploy-env-stg:
-    name: "Deploy to stg environment"
+  deploy:
+    name: "Deploy"
     uses: ./.github/workflows/callable-deploy-ecs.yml
     secrets: inherit
     with:

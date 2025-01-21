@@ -2,16 +2,16 @@ name: 'Manual Build & Deploy'
 on:
   workflow_dispatch:
     inputs:
-      ref:
+      sha:
         type: string
         required: true
-        description: Ref name of branch, sha, or tag
+        description: Git sha to build and deploy
       env:
         type: environment
         default: stg
 
 concurrency:
-  group: ${{ github.workflow }}-${{ inputs.ref }}
+  group: ${{ github.workflow }}-${{ inputs.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -21,7 +21,8 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ inputs.ref }}
+      override_sha: ${{ inputs.sha }}
+      override_image_tag: ${{ inputs.sha }}
       push: true
 
   deploy-ecs:
@@ -30,6 +31,6 @@ jobs:
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container_tag: ${{ inputs.ref }}
+      container_tag: ${{ inputs.sha }}
     needs: 
       - build-docker
