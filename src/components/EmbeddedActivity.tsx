@@ -52,6 +52,7 @@ const demoActivities = {
   "lamp.funny_memory": "funnymemory",
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
+  "lamp.digit_span": "digitspan",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {

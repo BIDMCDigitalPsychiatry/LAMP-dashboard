@@ -162,6 +162,7 @@ export default function AddActivity({
     "lamp.trails_b": `${t("Trails B")}`,
     "lamp.voice_survey": `${t("Speech Recording")}`,
     "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
+    "lamp.digit_span": `${t("Digit Span")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -179,6 +180,7 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
+      console.log(allSpecs)
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
