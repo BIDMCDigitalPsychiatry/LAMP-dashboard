@@ -28,7 +28,6 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha != '' }}
         with:
-          fetch-depth: 1
           ref: ${{ inputs.override_sha }}
 
       - uses: actions/checkout@v4
