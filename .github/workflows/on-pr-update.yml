@@ -3,11 +3,12 @@ on:
   pull_request:
     types:
       - opened
+      - reopened
       - edited
       - synchronize
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
@@ -16,5 +17,5 @@ jobs:
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
-      ref: ${{ github.sha }}
+      ref: ${{ github.ref_name }}
       push: false

@@ -1,8 +1,7 @@
-name: On tag
+name: Tag Pushed
 on:
   push:
     tags: '*'
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.ref }}
@@ -27,10 +26,3 @@ jobs:
       container_tag: ${{ github.ref }}
     needs: 
       - build-docker
-
-  deploy-pages:
-    name: "Publish gh-pages"
-    uses: ./.github/workflows/callable-deploy-ghpages.yml
-    secrets: inherit
-    needs: 
-      - deploy-stg
