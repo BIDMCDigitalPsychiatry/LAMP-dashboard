@@ -27,9 +27,8 @@ jobs:
           fi
 
           length=$(expr length "${{ inputs.sha }}")
-          if [ $length != "7" ] || \
-             [ $length != "40"]
-          then
+          echo "length: $length"
+          if [ "$length" != "7" ] || [ "$length" != "40"]; then
             echo "sha must be 7 or 40 characters"; exit 1
           fi
           
@@ -48,6 +47,8 @@ jobs:
     with:
       override_sha: ${{ inputs.sha }}
       push: true
+    needs:
+      - validate
 
   deploy-ecs:
     name: "Deploy container to ECS"
