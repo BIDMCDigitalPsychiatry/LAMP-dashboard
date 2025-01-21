@@ -16,13 +16,37 @@ concurrency:
 
 jobs:
 
+  validate:
+    name: "Validate sha"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify sha is hex
+        run: |
+          if [[ ! "${{ inputs.sha }}" =~ ^[0-9A-Fa-f]+$ ]]; then
+            echo "sha must be hexidecimal"; exit 1
+          fi
+
+          length=$(expr length "${{ inputs.sha }}")
+          if [ $length != "7" ] || \
+             [ $length != "40"]
+          then
+            echo "sha must be 7 or 40 characters"; exit 1
+          fi
+          
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+
+      - name: Verify commit exists
+        run: |
+          git cat-file commit ${{ inputs.sha }}
+
   build-docker:
     name: "Build Container"
     uses: ./.github/workflows/callable-build-docker.yml
     secrets: inherit
     with:
       override_sha: ${{ inputs.sha }}
-      override_image_tag: ${{ inputs.sha }}
       push: true
 
   deploy-ecs:
@@ -31,6 +55,6 @@ jobs:
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container_tag: ${{ inputs.sha }}
+      container_tag: sha-${{ inputs.sha }}
     needs: 
       - build-docker

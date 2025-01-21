@@ -6,10 +6,6 @@ on:
         description: 'Optionally force checkout of a specific sha'
         required: false
         type: string
-      override_image_tag:
-        description: 'Optionally force a specific docker image tag'
-        required: false
-        type: string
       push:
         description: 'To push or not to push'
         required: true
@@ -33,7 +29,7 @@ jobs:
         if: ${{ inputs.override_sha != '' }}
         with:
           fetch-depth: 1
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.override_sha }}
 
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha == '' }}
@@ -56,6 +52,15 @@ jobs:
         with:
           context: git
           images: ghcr.io/${{ github.repository_owner}}/${{ github.event.repository.name }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            # minimal (short sha)
+            type=sha,event=workflow_dispatch
+            # full length sha
+            type=sha,format=long,event=workflow_dispatch
 
       - name: Build and push Docker image
         id: push
