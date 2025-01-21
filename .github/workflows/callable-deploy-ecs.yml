@@ -34,17 +34,32 @@ jobs:
 
       - name: Download task definition
         run: |
+          export TARGET_IMAGE=ghcr.io/${{ github.repository_owner}}/${{ github.event.repository.name }}:${{ inputs.container_tag }}
           aws ecs describe-task-definition \
             --task-definition ${{ vars.ECS_TASK_DEF_FAMILY }} \
             --query taskDefinition \
-            > task-definition.json
-          cat task-definition.json
-          which jq
+            > task.json
+          
+          # Remove Ignored Properties
+
+          echo "$( jq 'del(.compatibilities)'    task.json )" > task.json
+          echo "$( jq 'del(.taskDefinitionArn)'  task.json )" > task.json
+          echo "$( jq 'del(.requiresAttributes)' task.json )" > task.json
+          echo "$( jq 'del(.revision)'           task.json )" > task.json
+          echo "$( jq 'del(.status)'             task.json )" > task.json
+          echo "$( jq 'del(.registeredAt)'       task.json )" > task.json
+          echo "$( jq 'del(.registeredBy)'       task.json )" > task.json
+
+          # Update Image
+
+          echo "$( jq '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= "$TARGET_IMAGE")' task.json )" > task.json
+          cat task.json
+
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: task-definition.json
+          task-definition: task.json
           service: ${{ vars.ECS_SERVICE }}
           cluster: ${{ vars.ECS_CLUSTER }}
           wait-for-service-stability: true
