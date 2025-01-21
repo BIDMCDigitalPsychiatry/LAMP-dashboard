@@ -13,7 +13,7 @@ on:
     outputs:
       container_image_digest:
         description: "The sha256 digest of the built container image"
-        value: ${{ jobs.build-image.outputs.push_info.digest }}
+        value: ${{ jobs.build-image.outputs.digest }}
 
 permissions:
   packages: write
@@ -29,7 +29,7 @@ jobs:
   build-image:
     runs-on: ubuntu-24.04
     outputs:
-      push_info: ${{ steps.push.outputs }}
+      digest: ${{ steps.push.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha != '' }}
