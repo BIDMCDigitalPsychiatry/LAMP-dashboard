@@ -16,10 +16,11 @@ concurrency:
 
 jobs:
 
+  # todo: find digest
   deploy:
     name: "Deploy"
     uses: ./.github/workflows/callable-deploy-ecs.yml
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container_tag: ${{ inputs.tag }}
+      container_digest: ${{ inputs.tag }}

@@ -56,6 +56,6 @@ jobs:
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container_digest: ${{ needs.build-docker.outputs.imageid }}
+      container_digest: ${{ needs.build-docker.outputs.container_image_digest }}
     needs: 
       - build-docker
