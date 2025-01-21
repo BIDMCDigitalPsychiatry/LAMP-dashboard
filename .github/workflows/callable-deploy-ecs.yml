@@ -6,8 +6,8 @@ on:
         description: Target environment of deployment. (stg, prod)
         required: true
         type: string
-      container_tag:
-        description: 'The container tag to deploy'
+      container_digest:
+        description: 'The container sha256 digest to deploy'
         required: true
         type: string
 
@@ -34,7 +34,7 @@ jobs:
 
       - name: Download task definition
         run: |
-          export TARGET_IMAGE=ghcr.io/${{ github.repository_owner}}/${{ github.event.repository.name }}:${{ inputs.container_tag }}
+          export TARGET_IMAGE=ghcr.io/${{ github.repository_owner}}/${{ github.event.repository.name }}@${{ inputs.container_digest }}
           aws ecs describe-task-definition \
             --task-definition ${{ vars.ECS_TASK_DEF_FAMILY }} \
             --query taskDefinition \

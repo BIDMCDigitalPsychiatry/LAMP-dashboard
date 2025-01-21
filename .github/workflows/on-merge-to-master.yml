@@ -24,6 +24,6 @@ jobs:
     secrets: inherit
     with:
       env: stg
-      container_tag: ${{ needs.build-docker.outputs.imageid }}
+      container_digest: ${{ needs.build-docker.outputs.imageid }}
     needs: 
       - build-docker
