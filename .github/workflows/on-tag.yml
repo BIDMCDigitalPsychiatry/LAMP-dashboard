@@ -1,8 +1,7 @@
 name: On Push Tag
 on:
-  push:
-    tags: '*'
-    branches: master
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.ref }}
