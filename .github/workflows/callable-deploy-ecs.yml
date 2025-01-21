@@ -52,7 +52,7 @@ jobs:
 
           # Update Image
 
-          echo "$( jq '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= "$TARGET_IMAGE")' task.json )" > task.json
+          echo "$( jq --arg image "$TARGET_IMAGE" '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= $image)' task.json )" > task.json
           cat task.json
 
 
