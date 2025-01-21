@@ -10,6 +10,10 @@ on:
         description: 'To push or not to push'
         required: true
         type: boolean
+    outputs:
+      container_image_w_sha256:
+        description: "The container that can be used in a deploy"
+        value: ${{ jobs.build-image.outputs.push_info.imageid }}
 
 permissions:
   packages: write
@@ -24,10 +28,13 @@ concurrency:
 jobs:
   build-image:
     runs-on: ubuntu-24.04
+    outputs:
+      push_info: ${{ steps.push.outputs }}
     steps:
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha != '' }}
         with:
+          fetch-depth: 1
           ref: ${{ inputs.override_sha }}
 
       - uses: actions/checkout@v4
@@ -56,10 +63,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
-            # minimal (short sha)
-            type=sha,event=workflow_dispatch
-            # full length sha
-            type=sha,format=long,event=workflow_dispatch
+            type=raw,value=sha-${{ github.event.inputs.sha }}
 
       - name: Build and push Docker image
         id: push
@@ -70,6 +74,14 @@ jobs:
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: temp
+        run: |
+          echo "imageid: ${{ steps.push.outputs.imageid }}"
+          echo "digest: ${{ steps.push.outputs.digest }}"
+          echo "metadata: ${{ steps.push.outputs.metadata }}"
+
+          echo "${{ steps.push.outputs }}"
   
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
