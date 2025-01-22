@@ -62,6 +62,7 @@ jobs:
           type=ref,event=pr
           EOF
           `
+          echo $DEFAULT_TAGS
           if [[ "${{ inputs.override_sha }}" == "" ]]; then
             echo "TAGS=${DEFAULT_TAGS}" >> "$GITHUB_OUTPUT"
           else
