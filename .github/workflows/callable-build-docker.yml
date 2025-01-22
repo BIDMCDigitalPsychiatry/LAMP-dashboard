@@ -54,6 +54,20 @@ jobs:
           TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
 
+          SPECIFIC_TAG="type=raw,value=sha-${{ inputs.override_sha }}"
+          DEFAULT_TAGS=`cat <<EOF
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+          EOF
+          `
+          if [[ "${{ inputs.override_sha }}" == "" ]]; then
+            echo "TAGS=${SPECIFIC_TAG}" >> "$GITHUB_OUTPUT"
+          else
+
+            echo "TAGS=${DEFAULT_TAGS}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -70,11 +84,7 @@ jobs:
         with:
           context: git
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
-            type=raw,event=workflow_call,value=sha-${{ inputs.override_sha || github.sha }}
+          tags: ${{ steps.confi.outputs.TAGS }}
 
       - name: Build and push Docker image
         id: push
