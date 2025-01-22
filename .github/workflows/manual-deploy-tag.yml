@@ -17,10 +17,42 @@ concurrency:
 jobs:
 
   # todo: find digest
+  locate:
+    runs-on: ubuntu-24.04
+    outputs:
+      digest: ${{ steps.inspect.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Pull target tag & inspect
+        id: inspect
+        run: |
+          set -e
+
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          TARGET_IMAGE=ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}:${{ inputs.tag }}
+          docker pull $TARGET_IMAGE
+          sha256sum=$(docker inspect $TARGET_IMAGE | jq '.[].RepoDigests.[]')
+          echo "digest=${sha256sum}" >> "$GITHUB_OUTPUT"
   deploy:
     name: "Deploy"
     uses: ./.github/workflows/callable-deploy-ecs.yml
     secrets: inherit
     with:
       env: ${{ inputs.env }}
-      container_digest: ${{ inputs.tag }}
+      container_digest: ${{ needs.locate.outputs.digest }}
+    needs:
+      - locate
