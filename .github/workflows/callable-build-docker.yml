@@ -54,6 +54,7 @@ jobs:
           TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
 
+          # Image Tags
           SPECIFIC_TAG="type=raw,value=sha-${{ inputs.override_sha }}"
           DEFAULT_TAGS=`cat <<EOF
             type=ref,event=branch
@@ -64,8 +65,20 @@ jobs:
           if [[ "${{ inputs.override_sha }}" == "" ]]; then
             echo "TAGS=${SPECIFIC_TAG}" >> "$GITHUB_OUTPUT"
           else
-
             echo "TAGS=${DEFAULT_TAGS}" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Image Labels
+          OVERRIDE_SHA_LABELS=`cat <<EOF
+          org.opencontainers.image.revision=${{ inputs.override_sha }}
+          org.opencontainers.image.version=""
+          EOF
+          `
+
+          if [[ "${{ inputs.override_sha }}" == "" ]]; then
+            echo "OVERRIDE_LABELS=" >> "$GITHUB_OUTPUT"
+          else
+            echo "OVERRIDE_LABELS=$OVERRIDE_SHA_LABELS" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Login to GitHub Container Registry
@@ -82,9 +95,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: git
+          context: workflow
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
-          tags: ${{ steps.confi.outputs.TAGS }}
+          tags: ${{ steps.config.outputs.TAGS }}
+          flavor: |
+            latest=false
 
       - name: Build and push Docker image
         id: push
