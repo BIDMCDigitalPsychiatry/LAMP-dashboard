@@ -34,7 +34,9 @@ jobs:
 
       - name: Download task definition
         run: |
-          export TARGET_IMAGE=ghcr.io/${{ github.repository_owner}}/${{ github.event.repository.name }}@${{ inputs.container_digest }}
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          TARGET_IMAGE=ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}@${{ inputs.container_digest }}
           aws ecs describe-task-definition \
             --task-definition ${{ vars.ECS_TASK_DEF_FAMILY }} \
             --query taskDefinition \
