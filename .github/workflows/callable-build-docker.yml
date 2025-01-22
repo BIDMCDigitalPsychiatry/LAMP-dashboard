@@ -57,9 +57,9 @@ jobs:
           # Image Tags
           SPECIFIC_TAG="type=raw,value=sha-${{ inputs.override_sha }}"
           DEFAULT_TAGS=`cat <<EOF
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
+          type=ref,event=branch
+          type=ref,event=tag
+          type=ref,event=pr
           EOF
           `
           if [[ "${{ inputs.override_sha }}" == "" ]]; then
@@ -97,8 +97,10 @@ jobs:
         with:
           context: workflow
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
-          tags: ${{ steps.config.outputs.TAGS }}
-          labels: ${{ steps.config.outputs.OVERRIDE_LABELS }}
+          tags: |
+            ${{ steps.config.outputs.TAGS }}
+          labels: |
+            ${{ steps.config.outputs.OVERRIDE_LABELS }}
           flavor: |
             latest=false
 
