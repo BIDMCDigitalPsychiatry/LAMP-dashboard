@@ -45,7 +45,7 @@ jobs:
           REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
           TARGET_IMAGE=ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}:${{ inputs.tag }}
           docker pull $TARGET_IMAGE
-          sha256sum=$(docker inspect $TARGET_IMAGE | jq '.[].RepoDigests.[]')
+          sha256sum=$(docker inspect $TARGET_IMAGE | jq '.[].RepoDigests.[]' | sed 's/^.*@//')
           echo "digest=${sha256sum}" >> "$GITHUB_OUTPUT"
   deploy:
     name: "Deploy"
