@@ -70,12 +70,12 @@ jobs:
         with:
           context: workflow
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
-          tags: |
+          tags: |-
             ${{ inputs.override_sha == '' && 'type=ref,event=branch' || '' }}
             ${{ inputs.override_sha == '' && 'type=ref,event=tag' || '' }}
             ${{ inputs.override_sha == '' && 'type=ref,event=pr' || '' }}
             ${{ inputs.override_sha == '' && '' || format('type=raw,value=sha-{0}', inputs.override_sha) }}
-          labels: |
+          labels: |-
             ${{ inputs.override_sha == '' && '' || 'org.opencontainers.image.version=unknown' }}
             ${{ inputs.override_sha == '' && '' || format('org.opencontainers.image.revision={0}', inputs.override_sha) }}
           flavor: |
