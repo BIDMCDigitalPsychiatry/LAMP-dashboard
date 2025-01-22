@@ -74,10 +74,10 @@ jobs:
             ${{ inputs.override_sha == '' && 'type=ref,event=branch' || '' }}
             ${{ inputs.override_sha == '' && 'type=ref,event=tag' || '' }}
             ${{ inputs.override_sha == '' && 'type=ref,event=pr' || '' }}
-            ${{ inputs.override_sha == '' && '' || format('type=raw,value=sha-{0}', inputs.override_sha) }}
+            ${{ inputs.override_sha == '' && '# skip raw sha' || format('type=raw,value=sha-{0}', inputs.override_sha) }}
           labels: |-
-            ${{ inputs.override_sha == '' && '' || 'org.opencontainers.image.version=unknown' }}
-            ${{ inputs.override_sha == '' && '' || format('org.opencontainers.image.revision={0}', inputs.override_sha) }}
+            ${{ inputs.override_sha != '' && 'org.opencontainers.image.version=unknown' }}
+            ${{ inputs.override_sha != '' && format('org.opencontainers.image.revision={0}', inputs.override_sha) }}
           flavor: |
             latest=false
 
