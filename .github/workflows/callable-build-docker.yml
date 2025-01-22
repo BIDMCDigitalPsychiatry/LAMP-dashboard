@@ -71,11 +71,10 @@ jobs:
           context: git
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
           tags: |
-            type=schedule
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
-            type=raw,value=sha-${{ inputs.override_sha || github.sha }}
+            type=raw,event=workflow_call,value=sha-${{ inputs.override_sha || github.sha }}
 
       - name: Build and push Docker image
         id: push
