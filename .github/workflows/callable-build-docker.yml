@@ -59,6 +59,7 @@ jobs:
           DEFAULT_TAGS=`cat <<EOF
             type=ref,event=branch
             type=ref,event=tag
+            type=ref,event=release
             type=ref,event=pr
           EOF
           `
