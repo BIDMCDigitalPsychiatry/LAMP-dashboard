@@ -54,34 +54,6 @@ jobs:
           TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
           echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
 
-          # Image Tags
-          SPECIFIC_TAG="type=raw,value=sha-${{ inputs.override_sha }}"
-          DEFAULT_TAGS=`cat <<EOF
-          type=ref,event=branch
-          type=ref,event=tag
-          type=ref,event=pr
-          EOF
-          `
-          echo $DEFAULT_TAGS
-          if [[ "${{ inputs.override_sha }}" == "" ]]; then
-            echo "TAGS=${DEFAULT_TAGS}" >> "$GITHUB_OUTPUT"
-          else
-            echo "TAGS=${SPECIFIC_TAG}" >> "$GITHUB_OUTPUT"
-          fi
-
-          # Image Labels
-          OVERRIDE_SHA_LABELS=`cat <<EOF
-          org.opencontainers.image.revision=${{ inputs.override_sha }}
-          org.opencontainers.image.version=unknown
-          EOF
-          `
-
-          if [[ "${{ inputs.override_sha }}" == "" ]]; then
-            echo "OVERRIDE_LABELS=" >> "$GITHUB_OUTPUT"
-          else
-            echo "OVERRIDE_LABELS=$OVERRIDE_SHA_LABELS" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -99,9 +71,13 @@ jobs:
           context: workflow
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
           tags: |
-            ${{ steps.config.outputs.TAGS }}
+            ${{ inputs.override_sha == '' && 'type=ref,event=branch' || '' }}
+            ${{ inputs.override_sha == '' && 'type=ref,event=tag' || '' }}
+            ${{ inputs.override_sha == '' && 'type=ref,event=pr' || '' }}
+            ${{ inputs.override_sha == '' && '' || format('type=raw,value=sha-{0}', inputs.override_sha)}}
           labels: |
-            ${{ steps.config.outputs.OVERRIDE_LABELS }}
+            ${{ inputs.override_sha == '' && '' || 'org.opencontainers.image.version=unknown' }}
+            ${{ inputs.override_sha == '' && '' || format('org.opencontainers.image.revision={0}', inputs.override_sha)}}
           flavor: |
             latest=false
 
