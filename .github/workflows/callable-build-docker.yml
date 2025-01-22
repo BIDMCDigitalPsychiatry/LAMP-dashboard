@@ -63,15 +63,15 @@ jobs:
           EOF
           `
           if [[ "${{ inputs.override_sha }}" == "" ]]; then
-            echo "TAGS=${SPECIFIC_TAG}" >> "$GITHUB_OUTPUT"
-          else
             echo "TAGS=${DEFAULT_TAGS}" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAGS=${SPECIFIC_TAG}" >> "$GITHUB_OUTPUT"
           fi
 
           # Image Labels
           OVERRIDE_SHA_LABELS=`cat <<EOF
           org.opencontainers.image.revision=${{ inputs.override_sha }}
-          org.opencontainers.image.version=""
+          org.opencontainers.image.version=unknown
           EOF
           `
 
@@ -98,6 +98,7 @@ jobs:
           context: workflow
           images: ${{ steps.config.outputs.TARGET_IMAGE }}
           tags: ${{ steps.config.outputs.TAGS }}
+          labels: ${{ steps.config.outputs.OVERRIDE_LABELS }}
           flavor: |
             latest=false
 

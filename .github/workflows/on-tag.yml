@@ -1,4 +1,4 @@
-name: On Push Tag
+name: On Release Published
 on:
   release:
     types: [published]

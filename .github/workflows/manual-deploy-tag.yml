@@ -1,4 +1,4 @@
-name: 'Manual Deploy'
+name: 'Manual Deploy: Docker Tag'
 on:
   workflow_dispatch:
     inputs:
