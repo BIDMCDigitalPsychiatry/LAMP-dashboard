@@ -26,6 +26,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Configuration
+        id: config
+        run: |
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          echo "REPOSITORY_OWNER=${REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
+
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE_W_DIGEST="${TARGET_IMAGE}@${{ inputs.container_digest }}"
+          echo "TARGET_IMAGE_W_DIGEST=${TARGET_IMAGE_W_DIGEST}" >> "$GITHUB_OUTPUT"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -34,9 +49,6 @@ jobs:
 
       - name: Download task definition
         run: |
-          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
-          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
-          TARGET_IMAGE=ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}@${{ inputs.container_digest }}
           aws ecs describe-task-definition \
             --task-definition ${{ vars.ECS_TASK_DEF_FAMILY }} \
             --query taskDefinition \
@@ -53,8 +65,7 @@ jobs:
           echo "$( jq 'del(.registeredBy)'       task.json )" > task.json
 
           # Update Image
-
-          echo "$( jq --arg image "$TARGET_IMAGE" '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= $image)' task.json )" > task.json
+          echo "$( jq --arg image "${{ steps.config.outputs.TARGET_IMAGE_W_DIGEST }}" '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= $image)' task.json )" > task.json
           cat task.json
 
 

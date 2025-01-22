@@ -16,8 +16,8 @@ concurrency:
 
 jobs:
 
-  # todo: find digest
   locate:
+    name: Find Target Image
     runs-on: ubuntu-24.04
     outputs:
       digest: ${{ steps.inspect.outputs.digest }}
@@ -25,6 +25,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Configuration
+        id: config
+        run: |
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          echo "REPOSITORY_OWNER=${REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
+
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE_W_TAG="${TARGET_IMAGE}:${{ inputs.tag }}"
+          echo "TARGET_IMAGE_W_TAG=${TARGET_IMAGE_W_TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -41,12 +56,15 @@ jobs:
         run: |
           set -e
 
-          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
-          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
-          TARGET_IMAGE=ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}:${{ inputs.tag }}
-          docker pull $TARGET_IMAGE
-          sha256sum=$(docker inspect $TARGET_IMAGE | jq '.[].RepoDigests.[]' | sed 's/^.*@//')
-          echo "digest=${sha256sum}" >> "$GITHUB_OUTPUT"
+          docker pull ${{ steps.config.outputs.TARGET_IMAGE_W_TAG }}
+          checksum=$(
+            docker inspect ${{ steps.config.outputs.TARGET_IMAGE_W_TAG }} \
+              | jq '.[].RepoDigests.[]' \
+              | tr -d '"' \
+              | sed 's/^.*@//'
+          )
+
+          echo "digest=${checksum}" >> "$GITHUB_OUTPUT"
   deploy:
     name: "Deploy"
     uses: ./.github/workflows/callable-deploy-ecs.yml

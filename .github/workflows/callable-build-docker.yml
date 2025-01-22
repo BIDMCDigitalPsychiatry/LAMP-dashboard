@@ -42,11 +42,23 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Configuration
+        id: config
+        run: |
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          echo "REPOSITORY_OWNER=${REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
+
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ steps.config.outputs.REPOSITORY_OWNER }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
@@ -57,7 +69,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           context: git
-          images: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+          images: ${{ steps.config.outputs.TARGET_IMAGE }}
           tags: |
             type=schedule
             type=ref,event=branch
@@ -79,6 +91,6 @@ jobs:
         uses: actions/attest-build-provenance@v2
         if: ${{ inputs.push }}
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
+          subject-name: ${{ steps.config.outputs.TARGET_IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: ${{ inputs.push }}
