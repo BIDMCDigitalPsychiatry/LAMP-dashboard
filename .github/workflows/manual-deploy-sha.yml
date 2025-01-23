@@ -1,0 +1,90 @@
+name: 'Manual Deploy: Git Sha'
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        type: string
+        required: true
+        description: Git sha (long format) to build and deploy
+      env:
+        type: environment
+        default: stg
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.sha }}
+  cancel-in-progress: false
+
+jobs:
+  # This job builds a new container and deploys it to the target environment. It
+  # is unsafe to deploy such arbitrary builds directly to production without
+  # first trialing them in lower environments.
+
+  validate:
+    name: "Validate sha"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify not production
+        if: ${{ inputs.env == 'prod' }}
+        run: |
+          cat << EOF
+          #---------------------------------------------------------------------------------
+          # ERROR: Cannot deploy arbitrary sha to production
+          #---------------------------------------------------------------------------------
+          # 
+          # DETAILS:
+          # 
+          # This job builds a new container and deploys it to the target environment. It
+          # is unsafe to deploy such arbitrary builds directly to production without
+          # first trialing them in lower environments.
+          # 
+          # WORKAROUND:
+          # 
+          # If you truely must release a specific sha,
+          # 
+          #   1) Use this workflow to build and deploy the sha to staging
+          #   2) Deploy the assigned tag from that deployment using the
+          #      "Manual Deploy: Docker Tag" workflow
+          #      Note: You must cite a DOCKER tag
+          #      Which should look like "sha-9e14d6f3da3c3c3f7ea73b74dec8c931365745e4"
+          # 
+          #---------------------------------------------------------------------------------
+          EOF
+          exit 1
+      - name: Verify sha is hex
+        run: |
+          if [[ ! "${{ inputs.sha }}" =~ ^[0-9A-Fa-f]+$ ]]; then
+            echo "sha must be hexidecimal"; exit 1
+          fi
+
+          length=$(expr length "${{ inputs.sha }}")
+          if [ "$length" != "40"]; then
+            echo "sha must be all 40 characters"; exit 1
+          fi
+          
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+
+      - name: Verify commit exists
+        run: |
+          git cat-file commit ${{ inputs.sha }}
+
+  build-docker:
+    name: "Build Container"
+    uses: ./.github/workflows/callable-build-docker.yml
+    secrets: inherit
+    with:
+      override_sha: ${{ inputs.sha }}
+      push: true
+    needs:
+      - validate
+
+  deploy-ecs:
+    name: "Deploy container to ECS"
+    uses: ./.github/workflows/callable-deploy-ecs.yml
+    secrets: inherit
+    with:
+      env: ${{ inputs.env }}
+      container_digest: ${{ needs.build-docker.outputs.container_image_digest }}
+    needs: 
+      - build-docker

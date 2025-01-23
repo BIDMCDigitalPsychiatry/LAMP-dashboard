@@ -5,7 +5,7 @@ on:
       tag:
         type: string
         required: true
-        description: The container tag to deploy
+        description: Tag of the DOCKER image to deploy
       env:
         type: environment
         default: stg

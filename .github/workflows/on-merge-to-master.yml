@@ -1,4 +1,4 @@
-name: On Merge or Push (to master)
+name: On Branch Update (master)
 on:
   push:
     branches:

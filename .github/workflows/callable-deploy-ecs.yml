@@ -1,4 +1,4 @@
-name: "Deploy ECS"
+name: "Task: Deploy"
 on:
   workflow_call:
     inputs:
