@@ -1,0 +1,101 @@
+name: "Task: Build"
+on:
+  workflow_call:
+    inputs:
+      override_sha:
+        description: 'Optionally force checkout of a specific sha'
+        default: ''
+        type: string
+      push:
+        description: 'To push or not to push'
+        required: true
+        type: boolean
+    outputs:
+      container_image_digest:
+        description: "The sha256 digest of the built container image"
+        value: ${{ jobs.docker.outputs.digest }}
+
+permissions:
+  packages: write
+  contents: read
+  attestations: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-24.04
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        if: ${{ inputs.override_sha != '' }}
+        with:
+          fetch-depth: 1
+          ref: ${{ inputs.override_sha }}
+
+      - uses: actions/checkout@v4
+        if: ${{ inputs.override_sha == '' }}
+        with:
+          fetch-depth: 1
+
+      - name: Configuration
+        id: config
+        run: |
+          REPOSITORY_OWNER=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.repository_owner }}")
+          echo "REPOSITORY_OWNER=${REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
+
+          REPOSITORY_NAME=$(tr "[:upper:]" "[:lower:]" <<< "${{ github.event.repository.name }}")
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+
+          TARGET_IMAGE="ghcr.io/${REPOSITORY_OWNER}/${REPOSITORY_NAME}"
+          echo "TARGET_IMAGE=${TARGET_IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ steps.config.outputs.REPOSITORY_OWNER }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          context: workflow
+          images: ${{ steps.config.outputs.TARGET_IMAGE }}
+          tags: |-
+            ${{ inputs.override_sha == '' && 'type=ref,event=branch' || '' }}
+            ${{ inputs.override_sha == '' && 'type=ref,event=tag' || '' }}
+            ${{ inputs.override_sha == '' && 'type=ref,event=pr' || '' }}
+            ${{ inputs.override_sha == '' && '# skip raw sha' || format('type=raw,value=sha-{0}', inputs.override_sha) }}
+          labels: |-
+            ${{ inputs.override_sha != '' && 'org.opencontainers.image.version=unknown' }}
+            ${{ inputs.override_sha != '' && format('org.opencontainers.image.revision={0}', inputs.override_sha) }}
+          flavor: |
+            latest=false
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ inputs.push }}
+          platforms: "linux/amd64"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        if: ${{ inputs.push }}
+        with:
+          subject-name: ${{ steps.config.outputs.TARGET_IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: ${{ inputs.push }}

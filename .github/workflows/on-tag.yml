@@ -1,0 +1,28 @@
+name: On Tag
+on:
+  push:
+    tags:
+      - "*"
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  build-docker:
+    name: "Build"
+    uses: ./.github/workflows/callable-build-docker.yml
+    secrets: inherit
+    with:
+      push: true
+
+  deploy-stg:
+    name: "Deploy Staging"
+    uses: ./.github/workflows/callable-deploy-ecs.yml
+    secrets: inherit
+    with:
+      env: stg
+      container_digest: ${{ needs.build-docker.outputs.container_image_digest }}
+    needs: 
+      - build-docker
