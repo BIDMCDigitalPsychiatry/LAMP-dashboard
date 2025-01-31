@@ -5,6 +5,7 @@
   "description": "LAMP Dashboard",
   "private": true,
   "homepage": ".",
+  "favicon": "/logo.png",
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",

@@ -234,48 +234,6 @@ export const SchemaList = () => {
         },
       },
     },
-    "lamp.funny_memory": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-          required: ["delayBeforeRecall", "numberOfTrials", "imageExposureTime"],
-          properties: {
-            delayBeforeRecall: {
-              title: i18n.t("Delay before recall"),
-              description: i18n.t("Minutes"),
-              type: "number",
-              enum: [1, 2, 3, 5],
-              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3"), i18n.t("5")],
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-            numberOfTrials: {
-              title: i18n.t("Number of Learning trials"),
-              type: "number",
-              enum: [1, 2, 3],
-              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3")],
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-            imageExposureTime: {
-              title: i18n.t("Image Exposure Time"),
-              description: i18n.t("Seconds"),
-              type: "number",
-              enum: [2, 5],
-              enumNames: [i18n.t("2"), i18n.t("5")],
-              default: 2,
-              "ui:grid": {
-                xs: 4,
-              },
-            },
-          },
-        },
-      },
-    },
     "lamp.trails_b": {
       type: "object",
       properties: {
@@ -319,6 +277,50 @@ export const SchemaList = () => {
               type: "number",
               enum: [90, 120, 180],
               enumNames: [i18n.t("90"), i18n.t("120"), i18n.t("180")],
+              default: 2,
+              "ui:grid": {
+                xs: 4,
+              },
+            },
+          },
+        },
+      },
+    },
+    "lamp.funny_memory": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["delayBeforeRecall", "numberOfTrials", "imageExposureTime"],
+          properties: {
+            delayBeforeRecall: {
+              title: i18n.t("Delay before recall"),
+              description: i18n.t("Minutes"),
+              type: "number",
+              enum: [1, 2, 3, 5],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3"), i18n.t("5")],
+              "ui:grid": {
+                xs: 4,
+              },
+              default: 1,
+            },
+            numberOfTrials: {
+              title: i18n.t("Number of Learning trials"),
+              type: "number",
+              enum: [1, 2, 3],
+              enumNames: [i18n.t("1"), i18n.t("2"), i18n.t("3")],
+              "ui:grid": {
+                xs: 4,
+              },
+              default: 1,
+            },
+            imageExposureTime: {
+              title: i18n.t("Image Exposure Time"),
+              description: i18n.t("Seconds"),
+              type: "number",
+              enum: [2, 5],
+              enumNames: [i18n.t("2"), i18n.t("5")],
               default: 2,
               "ui:grid": {
                 xs: 4,
@@ -452,6 +454,27 @@ export const SchemaList = () => {
               default: 1,
               "ui:grid": {
                 xs: 3,
+              },
+            },
+          },
+        },
+      },
+    },
+    "lamp.fragmented_letters": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          properties: {
+            startingFragmentation: {
+              title: i18n.t("Starting Fragmentation"),
+              type: "string",
+              enum: ["30%", "40%", "50%"],
+              enumNames: [i18n.t("30%"), i18n.t("40%"), , i18n.t("50%")],
+              default: "30%",
+              "ui:grid": {
+                xs: 6,
               },
             },
           },
@@ -1226,6 +1249,15 @@ export const SchemaList = () => {
       },
     },
     "lamp.dcog": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
+    "lamp.digit_span": {
       type: "object",
       properties: {
         settings: {

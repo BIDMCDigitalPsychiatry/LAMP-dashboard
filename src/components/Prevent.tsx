@@ -62,6 +62,7 @@ const localeMap = {
   "zh-HK": zhHKLocale,
 }
 import DateFnsUtils from "@date-io/date-fns"
+import { getSelfHelpAllActivityEvents } from "./Participant"
 
 export const dateInUTCformat = (val) => {
   let month =
@@ -188,7 +189,10 @@ async function getActivityEvents(
   from: number,
   to: number
 ): Promise<{ [groupName: string]: ActivityEventObj[] }> {
-  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to, null, true))
+  let original = (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+    ? await getSelfHelpAllActivityEvents(from, to)
+    : await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to, null, true)
+  )
     .map((x) => ({
       ...x,
       activity: _activities.find((y) => x.activity === y.id),

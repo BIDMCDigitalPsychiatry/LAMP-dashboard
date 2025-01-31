@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const games = [
   "lamp.jewels_a",
   "lamp.jewels_b",
+  "lamp.fragmented_letters",
   "lamp.spatial_span",
   "lamp.cats_and_dogs",
   "lamp.pop_the_bubbles",
@@ -36,6 +37,7 @@ export const games = [
   "lamp.funny_memory",
   "lamp.trails_b",
   "lamp.voice_survey",
+  "lamp.digit_span",
 ]
 
 export default function Survey({ participant, activities, showStreak, ...props }) {

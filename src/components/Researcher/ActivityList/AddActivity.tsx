@@ -144,7 +144,6 @@ export default function AddActivity({
     "lamp.cats_and_dogs": `${t("Cats and Dogs")}`,
     "lamp.jewels_a": `${t("Jewels A")}`,
     "lamp.jewels_b": `${t("Jewels B")}`,
-    "lamp.trails_b": `${t("Trails B")}`,
     "lamp.spatial_span": `${t("Spatial Span")}`,
     "lamp.pop_the_bubbles": `${t("Pop the bubbles")}`,
     "lamp.balloon_risk": `${t("Balloon Risk")}`,
@@ -160,7 +159,10 @@ export default function AddActivity({
     "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
     "lamp.dcog": `${t("D-Cog")}`,
     "lamp.funny_memory": `${t("Funny Memory Game")}`,
+    "lamp.trails_b": `${t("Trails B")}`,
     "lamp.voice_survey": `${t("Speech Recording")}`,
+    "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
+    "lamp.digit_span": `${t("Digit Span")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -178,6 +180,7 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
+      console.log(allSpecs)
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0

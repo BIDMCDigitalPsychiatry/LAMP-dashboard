@@ -163,6 +163,18 @@ class DBService {
       })
   }
 
+  getActivityEventData(tablespace: any, key: string) {
+    return userDbPromise
+      .then(async (db) => {
+        return (await db.transaction([tablespace], "readonly").objectStore(tablespace).getAll()).filter(
+          (event) => event.activity === key
+        )
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
   addData(tablespace: any, data: any) {
     return dbPromise
       .then((db) => {
@@ -183,6 +195,17 @@ class DBService {
         data.map((d) => {
           store.put(d)
         })
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  addUserDBRow(tablespace: any, data: any) {
+    return userDbPromise
+      .then((db) => {
+        let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
+        store.put(data)
       })
       .catch((error) => {
         // Do something?

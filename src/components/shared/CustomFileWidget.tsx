@@ -100,7 +100,16 @@ export default function CustomFileWidget(props) {
                 <source src={props?.value ?? ""} />
               </audio>
             ) : (
-              <img src={props?.value ?? ""} height="150" />
+              props?.value.startsWith("data:image/") && (
+                <img
+                  src={props?.value ?? ""}
+                  height="150"
+                  onError={(e) => {
+                    const image = e.target as HTMLImageElement
+                    image.style.display = "none" // Hide broken images
+                  }}
+                />
+              )
             )}
             <IconButton onClick={onClick} className={classes.closeButton}>
               <Icon className={classes.closeIcon}>close</Icon>
