@@ -111,9 +111,11 @@ export default function CustomFileWidget(props) {
                 />
               )
             )}
-            <IconButton onClick={onClick} className={classes.closeButton}>
-              <Icon className={classes.closeIcon}>close</Icon>
-            </IconButton>
+            {props?.value.startsWith("data:image/") && (
+              <IconButton onClick={onClick} className={classes.closeButton}>
+                <Icon className={classes.closeIcon}>close</Icon>
+              </IconButton>
+            )}
           </Box>
         </Box>
       )}
