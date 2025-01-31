@@ -1,0 +1,21 @@
+name: On Pull Request Update
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docker:
+    name: "Build"
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    uses: ./.github/workflows/callable-build-docker.yml
+    secrets: inherit
+    with:
+      push: false
