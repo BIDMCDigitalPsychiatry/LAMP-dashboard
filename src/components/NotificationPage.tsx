@@ -175,7 +175,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const showVisualPopup = (activity) => {
     Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
       const tag = tags[0]
-      if (typeof tag?.visualSettings === "undefined" || !!tag?.visualSettings) {
+      if ((typeof tag?.visualSettings !== "undefined" || !!tag?.visualSettings) && tag?.visualSettings?.image !== "") {
         setVisualPopup(tag?.visualSettings)
       } else {
         showStreak(participant, activity)
