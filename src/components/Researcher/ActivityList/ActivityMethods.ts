@@ -340,16 +340,30 @@ export const SchemaList = () => {
           properties: {
             bubble_count: {
               title: i18n.t("Bubble Count"),
-              description: i18n.t("Multiple bubble counts per level."),
+              description: i18n.t("Bubble counts per level."),
               type: "array",
               minItems: 3,
               maxItems: 3,
-              items: {
-                title: i18n.t("Level Count"),
-                type: "number",
-                minimum: 1,
-                default: 80,
-              },
+              items: [
+                {
+                  title: i18n.t("Level 1 Count"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+                {
+                  title: i18n.t("Level 2 Count"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+                {
+                  title: i18n.t("Level 3 Count"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+              ],
               "ui:options": {
                 addable: false,
                 removable: false,
@@ -361,16 +375,30 @@ export const SchemaList = () => {
             },
             bubble_speed: {
               title: i18n.t("Bubble Speed"),
-              description: i18n.t("Multiple bubble speeds per level."),
+              description: i18n.t("Bubble speeds per level."),
               type: "array",
               minItems: 3,
               maxItems: 3,
-              items: {
-                title: i18n.t("Level Speed"),
-                type: "number",
-                minimum: 1,
-                default: 80,
-              },
+              items: [
+                {
+                  title: i18n.t("Level 1 Speed"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+                {
+                  title: i18n.t("Level 2 Speed"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+                {
+                  title: i18n.t("Level 3 Speed"),
+                  type: "number",
+                  minimum: 1,
+                  default: 80,
+                },
+              ],
               "ui:options": {
                 addable: false,
                 removable: false,
