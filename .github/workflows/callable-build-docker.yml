@@ -34,13 +34,15 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha != '' }}
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          fetch-tags: true
           ref: ${{ inputs.override_sha }}
 
       - uses: actions/checkout@v4
         if: ${{ inputs.override_sha == '' }}
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Configuration
         id: config
