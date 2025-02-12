@@ -450,18 +450,6 @@ export const SchemaList = () => {
                 xs: 6,
               },
             },
-            // encoding_trials: {
-            //   title: i18n.t("Encoding trials"),
-            //   description: "",
-            //   type: "number",
-            //   minimum: 0,
-            //   maximum: 3,
-            //   default: 3,
-            //   readonly: true,
-            //   "ui:grid": {
-            //     xs: 3,
-            //   },
-            // },
             animation_interval: {
               title: i18n.t("Animation interval"),
               description: i18n.t("seconds"),
@@ -479,6 +467,29 @@ export const SchemaList = () => {
               type: "number",
               minimum: 1,
               maximum: 5,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            encoding_trials: {
+              title: i18n.t("Encoding trials"),
+              description: "",
+              type: "number",
+              minimum: 2,
+              maximum: 5,
+              default: 2,
+              readonly: true,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            retrieval_delay: {
+              title: i18n.t("Retrieval delay"),
+              description: i18n.t("minutes"),
+              type: "number",
+              minimum: 1,
+              maximum: 3,
               default: 1,
               "ui:grid": {
                 xs: 3,
