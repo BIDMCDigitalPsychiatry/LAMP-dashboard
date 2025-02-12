@@ -340,30 +340,16 @@ export const SchemaList = () => {
           properties: {
             bubble_count: {
               title: i18n.t("Bubble Count"),
-              description: i18n.t("Bubble counts per level."),
+              description: i18n.t("Multiple bubble counts per level."),
               type: "array",
               minItems: 3,
               maxItems: 3,
-              items: [
-                {
-                  title: i18n.t("Level 1 Count"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-                {
-                  title: i18n.t("Level 2 Count"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-                {
-                  title: i18n.t("Level 3 Count"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-              ],
+              items: {
+                title: i18n.t("Level Count"),
+                type: "number",
+                minimum: 1,
+                default: 80,
+              },
               "ui:options": {
                 addable: false,
                 removable: false,
@@ -375,30 +361,16 @@ export const SchemaList = () => {
             },
             bubble_speed: {
               title: i18n.t("Bubble Speed"),
-              description: i18n.t("Bubble speeds per level."),
+              description: i18n.t("Multiple bubble speeds per level."),
               type: "array",
               minItems: 3,
               maxItems: 3,
-              items: [
-                {
-                  title: i18n.t("Level 1 Speed"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-                {
-                  title: i18n.t("Level 2 Speed"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-                {
-                  title: i18n.t("Level 3 Speed"),
-                  type: "number",
-                  minimum: 1,
-                  default: 80,
-                },
-              ],
+              items: {
+                title: i18n.t("Level Speed"),
+                type: "number",
+                minimum: 1,
+                default: 80,
+              },
               "ui:options": {
                 addable: false,
                 removable: false,
@@ -450,18 +422,6 @@ export const SchemaList = () => {
                 xs: 6,
               },
             },
-            // encoding_trials: {
-            //   title: i18n.t("Encoding trials"),
-            //   description: "",
-            //   type: "number",
-            //   minimum: 0,
-            //   maximum: 3,
-            //   default: 3,
-            //   readonly: true,
-            //   "ui:grid": {
-            //     xs: 3,
-            //   },
-            // },
             animation_interval: {
               title: i18n.t("Animation interval"),
               description: i18n.t("seconds"),
@@ -479,6 +439,29 @@ export const SchemaList = () => {
               type: "number",
               minimum: 1,
               maximum: 5,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            encoding_trials: {
+              title: i18n.t("Encoding trials"),
+              description: "",
+              type: "number",
+              minimum: 2,
+              maximum: 5,
+              default: 2,
+              readonly: true,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            retrieval_delay: {
+              title: i18n.t("Retrieval delay"),
+              description: i18n.t("minutes"),
+              type: "number",
+              minimum: 1,
+              maximum: 3,
               default: 1,
               "ui:grid": {
                 xs: 3,
