@@ -102,7 +102,7 @@ export default function Sparkline({ ...props }) {
           },
           encoding: {
             x: { field: "x", type: "ordinal", timeUnit: "yearmonthdate" },
-            y: { field: "y", type: "ordinal" },
+            y: { field: "y", type: "quantitative", sort: "ascending" },
             strokeWidth: { value: 2 },
             tooltip: [
               {
