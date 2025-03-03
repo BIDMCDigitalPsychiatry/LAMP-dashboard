@@ -198,11 +198,11 @@ export const strategies = {
             ? 0
             : Number(x.value.replace(/\"/g, "")) || 0
         else if (!!question && !!!question.options)
-          return Math.max((question.options || []).indexOf(x.value.replace(/\"/g, "")), 0)
-        else if (typeof x?.value.replace(/\"/g, "") !== "number" && typeof x?.value.replace(/\"/g, "") !== "string") {
+          return Math.max((question.options || []).indexOf(x.value?.replace(/\"/g, "")), 0)
+        else if (typeof x?.value?.replace(/\"/g, "") !== "number" && typeof x?.value?.replace(/\"/g, "") !== "string") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
-            if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
+            if (!!x.value[val]?.value && x.value[val]?.value?.length > 0) {
               sum += (x.value[val]?.value || [])
                 .map((elt) => {
                   // assure the value can be converted into an integer
@@ -212,7 +212,7 @@ export const strategies = {
             }
           })
           return sum
-        } else return Number(x?.value.replace(/\"/g, "")) || 0
+        } else return Number(x?.value?.replace(/\"/g, "")) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.trails_b": (slices, activity, scopedItem) =>
