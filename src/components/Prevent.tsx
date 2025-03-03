@@ -407,7 +407,8 @@ export default function Prevent({
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
         activities = activities.filter(
-          (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" // && activity.spec !== "lamp.tips"
+          (activity) =>
+            activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
         )
         setActivities(activities)
         setSelectedActivities(activities.map((activity) => activity.name))
