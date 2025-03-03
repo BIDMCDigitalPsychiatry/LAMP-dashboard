@@ -196,13 +196,13 @@ export const strategies = {
             ? 1
             : ["No", "False"].includes(x.value)
             ? 0
-            : Number(x.value.replace(/\"/g, "")) || 0
+            : Number(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value) || 0
         else if (!!question && !!!question.options)
-          return Math.max((question.options || []).indexOf(x.value?.replace(/\"/g, "")), 0)
+          return Math.max((question.options || []).indexOf(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value), 0)
         else if (
           x?.value != null &&
-          typeof x?.value?.replace(/\"/g, "") !== "number" &&
-          typeof x?.value?.replace(/\"/g, "") !== "string"
+          typeof x.value !== "string" &&
+          typeof x.value !== "number"
         ) {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
@@ -216,7 +216,7 @@ export const strategies = {
             }
           })
           return sum
-        } else return Number(x?.value?.replace(/\"/g, "")) || 0
+        } else return Number(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.trails_b": (slices, activity, scopedItem) =>
