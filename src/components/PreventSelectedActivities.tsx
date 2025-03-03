@@ -199,7 +199,11 @@ export const strategies = {
             : Number(x.value.replace(/\"/g, "")) || 0
         else if (!!question && !!!question.options)
           return Math.max((question.options || []).indexOf(x.value?.replace(/\"/g, "")), 0)
-        else if (typeof x?.value?.replace(/\"/g, "") !== "number" && typeof x?.value?.replace(/\"/g, "") !== "string") {
+        else if (
+          x?.value != null &&
+          typeof x?.value?.replace(/\"/g, "") !== "number" &&
+          typeof x?.value?.replace(/\"/g, "") !== "string"
+        ) {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
             if (!!x.value[val]?.value && x.value[val]?.value?.length > 0) {
