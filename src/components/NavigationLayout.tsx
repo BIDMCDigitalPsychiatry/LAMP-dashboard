@@ -434,15 +434,6 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("https://community.lamp.digital", "_blank")
-                      }}
-                    >
-                      {`${t("LAMP Community")}`}
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
                         window.open("mailto:team@digitalpsych.org", "_blank")
                       }}
                     >
@@ -578,15 +569,6 @@ export default function NavigationLayout({
                       }}
                     >
                       <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
-                        window.open("https://community.lamp.digital", "_blank")
-                      }}
-                    >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("LAMP Community")}`}</b>
                     </MenuItem>
                     <MenuItem
                       dense
