@@ -244,15 +244,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               dense
               onClick={() => {
                 setHelpMenu(undefined)
-                window.open("https://community.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
                 window.open("mailto:team@digitalpsych.org", "_blank")
               }}
             >
