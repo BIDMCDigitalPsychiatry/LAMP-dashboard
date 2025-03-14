@@ -102,6 +102,7 @@ export default function GroupCreator({
   onSave,
   studies,
   study,
+  type,
   ...props
 }: {
   activities?: any[]
@@ -110,24 +111,32 @@ export default function GroupCreator({
   onSave?: Function
   studies: any
   study?: string
+  type?: string
 }) {
   const classes = useStyles()
   const [items, setItems] = useState(!!value ? value.settings : [])
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
-      ? activities.filter(
-          (x) =>
-            x.spec !== "lamp.group" &&
-            (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-            availableActivitySpecs.includes(x.spec)
-        )
+      ? type == "lamp.group"
+        ? activities.filter(
+            (x) =>
+              x.spec !== "lamp.group" &&
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
       : []
   )
+  console.log(type, studyActivities)
   const { t } = useTranslation()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: !!value ? value.name : undefined,
-    spec: "lamp.group",
+    spec: type,
     schedule: !!value ? value.schedule : [],
     description: !!details ? details?.description : undefined,
     photo: !!details ? details?.photo : null,
@@ -145,15 +154,18 @@ export default function GroupCreator({
   const handleChange = (details) => {
     if (!!details.studyId) {
       setStudyActivities(
-        activities.filter(
-          (x) => x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
-        )
+        type == "lamp.group"
+          ? activities.filter(
+              (x) =>
+                x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
+            )
+          : activities.filter((x) => x.study_id === details.studyId && availableActivitySpecs.includes(x.spec))
       )
     }
     setData({
       id: value?.id ?? undefined,
       name: details.text ?? "",
-      spec: "lamp.group",
+      spec: type,
       schedule: value?.schedule ?? [],
       settings: (items || []).filter((i) => i !== null),
       description: details.description,
@@ -192,7 +204,7 @@ export default function GroupCreator({
             studies={studies}
             value={value}
             details={details}
-            activitySpecId="lamp.group"
+            activitySpecId={type}
             study={data.studyID}
             onChange={handleChange}
             onTabChange={handleTabChange}
