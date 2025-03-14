@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const availableActivitySpecs = [
   "lamp.group",
+  "lamp.module",
   "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
