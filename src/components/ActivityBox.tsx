@@ -106,6 +106,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   const handleClickOpen = (y: any) => {
     LAMP.Activity.view(y.id).then((data) => {
+      console.log(data)
       setActivity(data)
       setOpen(true)
       y.spec === "lamp.dbt_diary_card"

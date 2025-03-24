@@ -247,7 +247,7 @@ export default function Activity({
               studies={studies}
               study={activity?.study_id ?? null}
               details={details ?? null}
-              type={activity?.spec ?? type}
+              type={activity?.spec ?? "lamp." + type}
             />
           ) : (!!type && type === "tips") || activity?.spec === "lamp.tips" ? (
             <Tips
