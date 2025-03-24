@@ -1260,5 +1260,16 @@
 "Back": "पीछे",
 "mindLAMP requires unrestricted battery access for collecting data effectively. Please disable battery optimization for the app to function properly.": "mindLAMP को प्रभावी ढंग से डेटा एकत्र करने के लिए अप्रतिबंधित बैटरी एक्सेस की आवश्यकता होती है। ऐप को ठीक से काम करने के लिए कृपया बैटरी ऑप्टिमाइज़ेशन अक्षम करें।",
 "Enable your device/'s location to collect Wi-Fi data effectively.": "अपने डिवाइस के स्थान को वाई-फाई डेटा को प्रभावी ढंग से एकत्रित करने में सक्षम करें।",
-"Health Connect is supported on this device, but it is either not installed or requires an update.": "इस डिवाइस पर हेल्थ कनेक्ट समर्थित है, लेकिन यह या तो इंस्टॉल नहीं है या इसे अपडेट करने की आवश्यकता है।"
+"Health Connect is supported on this device, but it is either not installed or requires an update.": "इस डिवाइस पर हेल्थ कनेक्ट समर्थित है, लेकिन यह या तो इंस्टॉल नहीं है या इसे अपडेट करने की आवश्यकता है।",
+"Show activity in the participant feed?": "प्रतिभागी फ़ीड में गतिविधि दिखाएँ?",
+"Streak popup settings": "स्ट्रीक (लगातार) पॉपअप सेटिंग्स",
+"Streak popup on": "स्ट्रीक ( लगातार) पॉपअप चालू",
+"Streak title": "स्ट्रीक (लगातार) शीर्षक",
+"Streak description": "स्ट्रीक (लगातार) विवरण",
+"Required": "आवश्यक",
+"Warnings": "चेतावनियाँ",
+"Set warnings that will be shown in a dialog to participants when the corresponding answers are submitted.": "उन चेतावनियों को सेट करें जो प्रतिभागियों को डायलॉग बॉक्स में दिखाई देंगी जब वे संबंधित उत्तर सबमिट करेंगे।",
+"Somewhat agree": "आंशिक रूप से सहमत",
+"Neutral": "निष्पक्ष",
+"Somewhat disagree": "आंशिक रूप से असहमत"
 }
