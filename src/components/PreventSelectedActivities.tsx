@@ -198,12 +198,11 @@ export const strategies = {
             ? 0
             : Number(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value) || 0
         else if (!!question && !!!question.options)
-          return Math.max((question.options || []).indexOf(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value), 0)
-        else if (
-          x?.value != null &&
-          typeof x.value !== "string" &&
-          typeof x.value !== "number"
-        ) {
+          return Math.max(
+            (question.options || []).indexOf(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value),
+            0
+          )
+        else if (x?.value != null && typeof x.value !== "string" && typeof x.value !== "number") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
             if (!!x.value[val]?.value && x.value[val]?.value?.length > 0) {
