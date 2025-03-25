@@ -190,6 +190,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function NavigationLayout({
   title,
   id,
+  name,
   authType,
   noToolbar,
   goBack,
@@ -201,6 +202,7 @@ export default function NavigationLayout({
 }: {
   title?: string
   id?: string
+  name?: string
   authType: string
   noToolbar?: boolean
   goBack?: any
@@ -363,7 +365,7 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  {`${t("Patient View")}`}: {id}
+                  {`${t("Patient View")}`}: {name} ({id})
                 </Box>
               ) : (
                 <Box>
