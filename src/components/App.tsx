@@ -858,6 +858,7 @@ function AppRouter({ ...props }) {
                 authType={state.authType}
                 id={props.match.params.id}
                 title={`User ${getParticipant(props.match.params.id).id}`}
+                name={`${getParticipant(props.match.params.id).name}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
