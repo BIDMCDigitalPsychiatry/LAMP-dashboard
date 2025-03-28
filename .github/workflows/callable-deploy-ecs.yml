@@ -69,8 +69,8 @@ jobs:
           echo "$( jq --arg image "${{ steps.config.outputs.TARGET_IMAGE_W_DIGEST }}" '.containerDefinitions |= map((select(.name == "dashboard") | .image) |= $image)' task.json )" > task.json
           cat task.json
 
-
       - name: Deploy Amazon ECS task definition
+        id: ecs-deploy
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: task.json
@@ -78,3 +78,22 @@ jobs:
           cluster: ${{ vars.ECS_CLUSTER }}
           wait-for-service-stability: true
           propagate-tags: SERVICE
+
+      - name: Verify deploy
+        id: check-deployment
+        run: |
+          TASK_DEF_EXPECTED=${{ steps.ecs-deploy.outputs.task-definition-arn }}
+          TASK_DEF_CURRENT=$(
+            aws ecs describe-services \
+              --cluster ${{ vars.ECS_CLUSTER }} \
+              --services ${{ vars.ECS_SERVICE }} \
+              --query services[0].deployments[0].taskDefinition \
+              | jq -r "."
+          )
+          echo "Task Arn - Current: $TASK_DEF_CURRENT"
+          echo "Task Arn - Expected: $TASK_DEF_EXPECTED"
+          if [ "$TASK_DEF_CURRENT" != "$TASK_DEF_EXPECTED" ]; then
+            echo "Current task arn does not match the expected task arn."
+            echo "The deployment may have been rolled back or been deposed by a more recent deployment attempt"
+            exit 1
+          fi
