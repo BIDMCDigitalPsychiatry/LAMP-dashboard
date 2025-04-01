@@ -133,7 +133,7 @@ export default function GroupCreator({
           )
       : []
   )
-  console.log(type, studyActivities)
+
   const { t } = useTranslation()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
@@ -150,7 +150,8 @@ export default function GroupCreator({
   })
 
   useEffect(() => {
-    setData({ ...data, settings: items })
+    data.settings.activities = items
+    setData(data)
   }, [items])
 
   const handleChange = (details) => {
@@ -195,9 +196,35 @@ export default function GroupCreator({
     )
   }
 
+  const [sequentialOrdering, setSquentialOrdering] = useState(false)
+  const [hideOnCompletion, setHideOnCompletion] = useState(false)
+  const [initializeOpened, setInitializeOpened] = useState(false)
+  const [hideSubActivities, setHideSubActivities] = useState(false)
+
+  useEffect(() => {
+    data.settings.sequential_ordering = sequentialOrdering
+    setData(data)
+  }, [sequentialOrdering])
+
+  useEffect(() => {
+    data.settings.hide_sub_activities = hideSubActivities
+    setData(data)
+  }, [hideSubActivities])
+
+  useEffect(() => {
+    data.settings.hide_on_completion = hideOnCompletion
+    setData(data)
+  }, [hideOnCompletion])
+
+  useEffect(() => {
+    data.settings.initialize_opened = initializeOpened
+    setData(data)
+  }, [initializeOpened])
+
   const handleTabChange = (tab) => {
     setData({ ...data, category: tab })
   }
+
   return (
     <div>
       <Container className={classes.containerWidth}>
@@ -253,25 +280,25 @@ export default function GroupCreator({
             </DragDropContext>
             <FormControlLabel
               value="sequential_ordering"
-              control={<Switch color="primary" />}
+              control={<Switch color="primary" onChange={(evt) => setSquentialOrdering(evt.target.checked)} />}
               label="Sequential Ordering"
               labelPlacement="end"
             />
             <FormControlLabel
               value="initialize_opened"
-              control={<Switch color="primary" />}
+              control={<Switch color="primary" onChange={(evt) => setInitializeOpened(evt.target.checked)} />}
               label="Initialize Opened"
               labelPlacement="end"
             />
             <FormControlLabel
               value="hide_on_completion"
-              control={<Switch color="primary" />}
+              control={<Switch color="primary" onChange={(evt) => setHideOnCompletion(evt.target.checked)} />}
               label="Hide on Completion"
               labelPlacement="end"
             />
             <FormControlLabel
-              value="hide_on_completion"
-              control={<Switch color="primary" />}
+              value="hide_sub_activities"
+              control={<Switch color="primary" onChange={(evt) => setHideSubActivities(evt.target.checked)} />}
               label="Hide Sub Activities"
               labelPlacement="end"
             />
