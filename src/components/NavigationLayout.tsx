@@ -37,6 +37,7 @@ import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
+import { useLocation } from "react-router-dom"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -230,8 +231,15 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
   const [researcherId, setResId] = useState(null)
   const [username, setName] = useState(null)
+  const location = useLocation()
+
   useEffect(() => {
-    LAMP.Type.getAttachment(id, "lamp.name").then((res: any) => setName(res?.data ?? ""))
+    LAMP.Type.getAttachment(id, "lamp.name").then((res: any) => {
+      setName(res?.data ?? "")
+    })
+  }, [location.pathname])
+
+  useEffect(() => {
     let isMounted = true
     if (isMounted) {
       if (
