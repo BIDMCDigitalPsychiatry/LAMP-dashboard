@@ -116,7 +116,8 @@ export default function GroupCreator({
   type?: string
 }) {
   const classes = useStyles()
-  const [items, setItems] = useState(!!value ? value.settings : [])
+  const [items, setItems] = useState(!!value ? value.settings.activities : [])
+  console.log(value)
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
       ? type == "lamp.group"
@@ -150,6 +151,7 @@ export default function GroupCreator({
   })
 
   useEffect(() => {
+    console.log(items)
     data.settings.activities = items
     setData(data)
   }, [items])
@@ -170,7 +172,7 @@ export default function GroupCreator({
       name: details.text ?? "",
       spec: type,
       schedule: value?.schedule ?? [],
-      settings: (items || []).filter((i) => i !== null),
+      settings: data?.settings,
       description: details.description,
       photo: details.photo,
       streak: details.streak,
