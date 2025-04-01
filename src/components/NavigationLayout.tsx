@@ -190,6 +190,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function NavigationLayout({
   title,
   id,
+  name,
   authType,
   noToolbar,
   goBack,
@@ -201,6 +202,7 @@ export default function NavigationLayout({
 }: {
   title?: string
   id?: string
+  name?: string
   authType: string
   noToolbar?: boolean
   goBack?: any
@@ -227,7 +229,9 @@ export default function NavigationLayout({
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
   const [researcherId, setResId] = useState(null)
+  const [username, setName] = useState(null)
   useEffect(() => {
+    LAMP.Type.getAttachment(id, "lamp.name").then((res: any) => setName(res?.data ?? ""))
     let isMounted = true
     if (isMounted) {
       if (
@@ -363,7 +367,7 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  {`${t("Patient View")}`}: {id}
+                  {`${t("Patient View")}`}: {username ? `${username} (${id})` : id}
                 </Box>
               ) : (
                 <Box>
