@@ -17,6 +17,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useTranslation } from "react-i18next"
@@ -249,6 +251,30 @@ export default function GroupCreator({
                 )}
               </Droppable>
             </DragDropContext>
+            <FormControlLabel
+              value="sequential_ordering"
+              control={<Switch color="primary" />}
+              label="Sequential Ordering"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="initialize_opened"
+              control={<Switch color="primary" />}
+              label="Initialize Opened"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="hide_on_completion"
+              control={<Switch color="primary" />}
+              label="Hide on Completion"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="hide_on_completion"
+              control={<Switch color="primary" />}
+              label="Hide Sub Activities"
+              labelPlacement="end"
+            />
             <ButtonGroup>
               <Button
                 variant="contained"
