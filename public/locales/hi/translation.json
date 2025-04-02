@@ -1271,5 +1271,7 @@
 "Set warnings that will be shown in a dialog to participants when the corresponding answers are submitted.": "उन चेतावनियों को सेट करें जो प्रतिभागियों को डायलॉग बॉक्स में दिखाई देंगी जब वे संबंधित उत्तर सबमिट करेंगे।",
 "Somewhat agree": "आंशिक रूप से सहमत",
 "Neutral": "निष्पक्ष",
-"Somewhat disagree": "आंशिक रूप से असहमत"
+"Somewhat disagree": "आंशिक रूप से असहमत",
+"My sleep quality was...": "मेरी नींद की गुणवत्ता थी...",
+"Neither agree nor disagree": "न सहमत न असहमत"
 }
