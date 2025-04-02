@@ -223,6 +223,16 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             noBack={false}
             tab={tab}
           />
+        ) : activity?.spec === "lamp.module" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            onComplete={(data) => {
+              showStreak(participant, activity)
+            }}
+            noBack={false}
+            tab={tab}
+          />
         ) : (
           <EmbeddedActivity
             name={activity?.name}
