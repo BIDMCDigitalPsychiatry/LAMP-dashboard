@@ -117,7 +117,7 @@ export default function GroupCreator({
 }) {
   const classes = useStyles()
   const [items, setItems] = useState(!!value ? value.settings.activities : [])
-  console.log(value)
+
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
       ? type == "lamp.group"
@@ -151,8 +151,12 @@ export default function GroupCreator({
   })
 
   useEffect(() => {
-    console.log(items)
+    console.log(data)
+  }, [data])
+
+  useEffect(() => {
     data.settings.activities = items
+    console.log(data)
     setData(data)
   }, [items])
 
@@ -172,7 +176,7 @@ export default function GroupCreator({
       name: details.text ?? "",
       spec: type,
       schedule: value?.schedule ?? [],
-      settings: data?.settings,
+      settings: data?.settings ?? {},
       description: details.description,
       photo: details.photo,
       streak: details.streak,
@@ -205,22 +209,22 @@ export default function GroupCreator({
 
   useEffect(() => {
     data.settings.sequential_ordering = sequentialOrdering
-    setData(data)
+    setData({ ...data, settings: data.settings })
   }, [sequentialOrdering])
 
   useEffect(() => {
     data.settings.hide_sub_activities = hideSubActivities
-    setData(data)
+    setData({ ...data, settings: data.settings })
   }, [hideSubActivities])
 
   useEffect(() => {
     data.settings.hide_on_completion = hideOnCompletion
-    setData(data)
+    setData({ ...data, settings: data.settings })
   }, [hideOnCompletion])
 
   useEffect(() => {
     data.settings.initialize_opened = initializeOpened
-    setData(data)
+    setData({ ...data, settings: data.settings })
   }, [initializeOpened])
 
   const handleTabChange = (tab) => {
@@ -282,7 +286,15 @@ export default function GroupCreator({
             </DragDropContext>
             <FormControlLabel
               value="sequential_ordering"
-              control={<Switch color="primary" onChange={(evt) => setSquentialOrdering(evt.target.checked)} />}
+              control={
+                <Switch
+                  color="primary"
+                  onChange={(evt) => {
+                    console.log(evt.target.checked)
+                    setSquentialOrdering(evt.target.checked)
+                  }}
+                />
+              }
               label="Sequential Ordering"
               labelPlacement="end"
             />
