@@ -16,7 +16,6 @@ import locale_lang from "../../locale_map.json"
 import validator from "@rjsf/validator-ajv8"
 
 import { zhCN, enUS, koKR, hiIN, deDE, daDK, frFR, itIT, esES, zhHK } from "@mui/material/locale"
-import SurveyContingency from "./ContigencySettingsWidget"
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
 const languageObjects = {
   "en-US": enUS,

@@ -3,7 +3,6 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
-import SurveyContingency from "../../shared/ContigencySettingsWidget"
 
 export const SchemaList = () => {
   return {
@@ -965,7 +964,62 @@ export const SchemaList = () => {
                             contigency_settings: {
                               type: "object",
                               title: "Contigency Settings",
-                              "ui:field": SurveyContingency,
+                              properties: {
+                                enable_contigency: {
+                                  type: "boolean",
+                                  title: "Enable Contigency",
+                                },
+                              },
+
+                              dependencies: {
+                                enable_contigency: {
+                                  oneOf: [
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: true },
+                                        contigency_type: {
+                                          type: "string",
+                                          enum: ["activity", "question"],
+                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                          default: "activity",
+                                        },
+                                      },
+                                      required: ["contigency_type"],
+                                    },
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: false },
+                                      },
+                                    },
+                                  ],
+                                },
+                                contigency_type: {
+                                  allOf: [
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "activity" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          activity: { type: "string", title: "Select an activity" },
+                                        },
+                                        required: ["activity"],
+                                      },
+                                    },
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "question" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          question_index: { type: "number", title: "Question number" },
+                                        },
+                                        required: ["question_index"],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
                             },
                           },
                         },
