@@ -3,6 +3,7 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
+import SurveyContingency from "../../shared/ContigencySettingsWidget"
 
 export const SchemaList = () => {
   return {
@@ -960,6 +961,11 @@ export const SchemaList = () => {
                               title: i18n.t("Option Description"),
                               type: "string",
                               default: "",
+                            },
+                            contigency_settings: {
+                              type: "object",
+                              title: "Contigency Settings",
+                              "ui:field": SurveyContingency,
                             },
                           },
                         },
