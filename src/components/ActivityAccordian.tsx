@@ -136,10 +136,15 @@ const ActivityAccordian = ({ data, type, tag, handleClickOpen, handleSubModule }
     }
   }, [data])
 
+  const accordionClicked = (index) => {
+    if (expandedModules.includes(index)) setExpandedModules(expandedModules.filter((number) => number !== index))
+    else setExpandedModules([...expandedModules, index])
+  }
+
   return (
     <div>
       {data.map((module, index) => (
-        <Accordion key={index} expanded={expandedModules.includes(index)}>
+        <Accordion key={index} onChange={() => accordionClicked(index)} expanded={expandedModules.includes(index)}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography>{module.name}</Typography>
           </AccordionSummary>
@@ -210,7 +215,7 @@ const ActivityAccordian = ({ data, type, tag, handleClickOpen, handleSubModule }
                           <Typography>{activity.name}</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <Grid container spacing={2}>
+                          <Grid container spacing={2} direction="row" wrap="wrap">
                             {activity.subModuleActivities.length > 0 && (
                               <Grid justifyContent="flex-end" container direction="row">
                                 <Grid xs={11}>
