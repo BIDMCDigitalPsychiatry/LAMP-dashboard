@@ -116,7 +116,7 @@ export default function GroupCreator({
   type?: string
 }) {
   const classes = useStyles()
-  const [items, setItems] = useState(!!value ? value.settings.activities : [])
+  const [items, setItems] = useState(!!value ? value.settings.activities ?? value.settings : [])
 
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
@@ -159,9 +159,18 @@ export default function GroupCreator({
   })
 
   useEffect(() => {
+    if (Array.isArray(data.settings)) {
+      activities = data.settings
+      data.settings = {}
+      data.settings.activities = activities
+    }
     data.settings.activities = items
     setData(data)
   }, [items])
+
+  useEffect(() => {
+    console.log(data)
+  }, [data])
 
   const handleChange = (details) => {
     if (!!details.studyId) {
@@ -209,6 +218,12 @@ export default function GroupCreator({
   const [hideOnCompletion, setHideOnCompletion] = useState(data.settings?.hide_on_completion ?? false)
   const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
   const [hideSubActivities, setHideSubActivities] = useState(data.settings?.hide_sub_activities ?? false)
+  const [trackProgress, setTrackProgress] = useState(data.settings?.track_progress ?? false)
+
+  useEffect(() => {
+    data.settings.track_progress = trackProgress
+    setData({ ...data, settings: data.settings })
+  }, [trackProgress])
 
   useEffect(() => {
     data.settings.sequential_ordering = sequentialOrdering
@@ -339,6 +354,18 @@ export default function GroupCreator({
                 />
               }
               label="Hide Sub Activities"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="track_progress"
+              control={
+                <Switch
+                  color="primary"
+                  checked={data.settings?.track_progress}
+                  onChange={(evt) => setTrackProgress(evt.target.checked)}
+                />
+              }
+              label="Track Activity Progress"
               labelPlacement="end"
             />
             <ButtonGroup>
