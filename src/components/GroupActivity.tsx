@@ -31,11 +31,12 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   const { t } = useTranslation()
   const [index, setIndex] = useState(-1)
   const [data, setResponse] = useState(null)
-
+  const [groupActivitySettings, setGroupActivitySettings] = useState()
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
+
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
@@ -60,7 +61,13 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     LAMP.Activity.view(activity.id).then((data) => {
       setIndex(-1)
-      setGroupActivities(data.settings)
+      if (Array.isArray(data.settings)) {
+        setGroupActivities(data.settings)
+      } else {
+        setGroupActivities(data.settings?.activities)
+        let { activities, ...settings } = data.settings
+        setGroupActivitySettings(settings)
+      }
     })
   }, [])
 
