@@ -168,10 +168,6 @@ export default function GroupCreator({
     setData(data)
   }, [items])
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
-
   const handleChange = (details) => {
     if (!!details.studyId) {
       setStudyActivities(

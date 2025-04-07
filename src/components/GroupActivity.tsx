@@ -20,6 +20,15 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
   },
+  activityLevel: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.2)",
+    borderRadius: "15px 0 0 0",
+    padding: "4px 7px",
+    color: "#000",
+  },
 }))
 
 export default function GroupActivity({ participant, activity, noBack, tab, ...props }) {
@@ -31,7 +40,13 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   const { t } = useTranslation()
   const [index, setIndex] = useState(-1)
   const [data, setResponse] = useState(null)
-  const [groupActivitySettings, setGroupActivitySettings] = useState()
+  const [groupActivitySettings, setGroupActivitySettings] = useState({
+    track_progress: false,
+    sequential_ordering: false,
+    hide_sub_activities: false,
+    hide_on_completion: false,
+    initialize_opened: false,
+  })
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
@@ -97,6 +112,11 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     <div style={{ height: "100%" }}>
       {!!currentActivity && (
         <Box>
+          {groupActivitySettings && !!groupActivitySettings?.track_progress && (
+            <Box className={classes.activityLevel}>
+              Activity {index + 1} of {groupActivities.length}
+            </Box>
+          )}
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
