@@ -17,6 +17,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useTranslation } from "react-i18next"
@@ -102,6 +104,8 @@ export default function GroupCreator({
   onSave,
   studies,
   study,
+  type,
+  id,
   ...props
 }: {
   activities?: any[]
@@ -110,52 +114,109 @@ export default function GroupCreator({
   onSave?: Function
   studies: any
   study?: string
+  type?: string
+  id?: string
 }) {
   const classes = useStyles()
-  const [items, setItems] = useState(!!value ? value.settings : [])
+  const [items, setItems] = useState(!!value ? value.settings.activities ?? value.settings : [])
+
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
-      ? activities.filter(
-          (x) =>
-            x.spec !== "lamp.group" &&
-            (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-            availableActivitySpecs.includes(x.spec)
-        )
+      ? type == "lamp.group"
+        ? activities.filter(
+            (x) =>
+              x.spec !== "lamp.group" &&
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec) &&
+              !!id &&
+              x.id != id
+          )
       : []
   )
+
   const { t } = useTranslation()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: !!value ? value.name : undefined,
-    spec: "lamp.group",
+    spec: type,
     schedule: !!value ? value.schedule : [],
     description: !!details ? details?.description : undefined,
     photo: !!details ? details?.photo : null,
     streak: !!details ? details?.streak : null,
     showFeed: !!details ? details?.showFeed : null,
-    settings: !!value ? value.settings : [],
+    settings: !!value
+      ? value.settings
+      : {
+          activities: [],
+          sequential_ordering: false,
+          hide_sub_activities: false,
+          hide_on_completion: false,
+          initialize_opened: false,
+        },
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
   })
 
   useEffect(() => {
-    setData({ ...data, settings: items })
+    if (Array.isArray(data.settings)) {
+      activities = data.settings
+      data.settings = {}
+      data.settings.activities = activities
+    }
+    data.settings.activities = items
+    setData(data)
   }, [items])
 
+  useEffect(() => {
+    console.log(studyActivities)
+  }, [studyActivities])
   const handleChange = (details) => {
+    console.log(
+      type == "lamp.group"
+        ? activities.filter(
+            (x) =>
+              x.spec !== "lamp.group" &&
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec) //&&
+            // (!!details?.id &&
+            // x.id != details?.id)
+          ),
+      details
+    )
     if (!!details.studyId) {
       setStudyActivities(
-        activities.filter(
-          (x) => x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
-        )
+        type == "lamp.group"
+          ? activities.filter(
+              (x) =>
+                x.spec !== "lamp.group" &&
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec)
+            )
+          : activities.filter(
+              (x) =>
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec) &&
+                !!id &&
+                x.id != id
+            )
       )
     }
     setData({
       id: value?.id ?? undefined,
       name: details.text ?? "",
-      spec: "lamp.group",
+      spec: type,
       schedule: value?.schedule ?? [],
-      settings: (items || []).filter((i) => i !== null),
+      settings: data?.settings ?? {},
       description: details.description,
       photo: details.photo,
       streak: details.streak,
@@ -181,9 +242,41 @@ export default function GroupCreator({
     )
   }
 
+  const [sequentialOrdering, setSequentialOrdering] = useState(data.settings?.sequential_ordering ?? false)
+  const [hideOnCompletion, setHideOnCompletion] = useState(data.settings?.hide_on_completion ?? false)
+  const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
+  const [hideSubActivities, setHideSubActivities] = useState(data.settings?.hide_sub_activities ?? false)
+  const [trackProgress, setTrackProgress] = useState(data.settings?.track_progress ?? false)
+
+  useEffect(() => {
+    data.settings.track_progress = trackProgress
+    setData({ ...data, settings: data.settings })
+  }, [trackProgress])
+
+  useEffect(() => {
+    data.settings.sequential_ordering = sequentialOrdering
+    setData({ ...data, settings: data.settings })
+  }, [sequentialOrdering])
+
+  useEffect(() => {
+    data.settings.hide_sub_activities = hideSubActivities
+    setData({ ...data, settings: data.settings })
+  }, [hideSubActivities])
+
+  useEffect(() => {
+    data.settings.hide_on_completion = hideOnCompletion
+    setData({ ...data, settings: data.settings })
+  }, [hideOnCompletion])
+
+  useEffect(() => {
+    data.settings.initialize_opened = initializeOpened
+    setData({ ...data, settings: data.settings })
+  }, [initializeOpened])
+
   const handleTabChange = (tab) => {
     setData({ ...data, category: tab })
   }
+
   return (
     <div>
       <Container className={classes.containerWidth}>
@@ -192,7 +285,7 @@ export default function GroupCreator({
             studies={studies}
             value={value}
             details={details}
-            activitySpecId="lamp.group"
+            activitySpecId={type}
             study={data.studyID}
             onChange={handleChange}
             onTabChange={handleTabChange}
@@ -237,6 +330,72 @@ export default function GroupCreator({
                 )}
               </Droppable>
             </DragDropContext>
+            {type !== "lamp.group" && (
+              <FormControlLabel
+                value="sequential_ordering"
+                control={
+                  <Switch
+                    color="primary"
+                    onChange={(evt) => setSequentialOrdering(evt.target.checked)}
+                    checked={data.settings?.sequential_ordering}
+                  />
+                }
+                label="Sequential Ordering"
+                labelPlacement="end"
+              />
+            )}
+            {type !== "lamp.group" && (
+              <FormControlLabel
+                value="initialize_opened"
+                control={
+                  <Switch
+                    color="primary"
+                    checked={data.settings?.initialize_opened}
+                    onChange={(evt) => setInitializeOpened(evt.target.checked)}
+                  />
+                }
+                label="Initialize Opened"
+                labelPlacement="end"
+              />
+            )}
+            {type !== "lamp.group" && (
+              <FormControlLabel
+                value="hide_on_completion"
+                control={
+                  <Switch
+                    color="primary"
+                    checked={data.settings?.hide_on_completion}
+                    onChange={(evt) => setHideOnCompletion(evt.target.checked)}
+                  />
+                }
+                label="Hide on Completion"
+                labelPlacement="end"
+              />
+            )}
+            <FormControlLabel
+              value="hide_sub_activities"
+              control={
+                <Switch
+                  color="primary"
+                  checked={data.settings?.hide_sub_activities}
+                  onChange={(evt) => setHideSubActivities(evt.target.checked)}
+                />
+              }
+              label="Hide Sub Activities"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="track_progress"
+              control={
+                <Switch
+                  color="primary"
+                  checked={data.settings?.track_progress}
+                  onChange={(evt) => setTrackProgress(evt.target.checked)}
+                />
+              }
+              label="Track Activity Progress"
+              labelPlacement="end"
+            />
             <ButtonGroup>
               <Button
                 variant="contained"
