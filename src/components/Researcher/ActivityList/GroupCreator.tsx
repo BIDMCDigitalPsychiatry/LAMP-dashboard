@@ -130,7 +130,9 @@ export default function GroupCreator({
         : activities.filter(
             (x) =>
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-              availableActivitySpecs.includes(x.spec)
+              availableActivitySpecs.includes(x.spec) &&
+              !!value?.id &&
+              x.id != value?.id
           )
       : []
   )
@@ -174,9 +176,17 @@ export default function GroupCreator({
         type == "lamp.group"
           ? activities.filter(
               (x) =>
-                x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
+                x.spec !== "lamp.group" &&
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec)
             )
-          : activities.filter((x) => x.study_id === details.studyId && availableActivitySpecs.includes(x.spec))
+          : activities.filter(
+              (x) =>
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec) &&
+                !!details?.id &&
+                x.id != details?.id
+            )
       )
     }
     setData({
