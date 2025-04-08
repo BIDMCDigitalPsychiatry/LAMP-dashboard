@@ -105,6 +105,7 @@ export default function GroupCreator({
   studies,
   study,
   type,
+  id,
   ...props
 }: {
   activities?: any[]
@@ -114,6 +115,7 @@ export default function GroupCreator({
   studies: any
   study?: string
   type?: string
+  id?: string
 }) {
   const classes = useStyles()
   const [items, setItems] = useState(!!value ? value.settings.activities ?? value.settings : [])
@@ -131,8 +133,8 @@ export default function GroupCreator({
             (x) =>
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec) &&
-              !!value?.id &&
-              x.id != value?.id
+              !!id &&
+              x.id != id
           )
       : []
   )
@@ -170,7 +172,27 @@ export default function GroupCreator({
     setData(data)
   }, [items])
 
+  useEffect(() => {
+    console.log(studyActivities)
+  }, [studyActivities])
   const handleChange = (details) => {
+    console.log(
+      type == "lamp.group"
+        ? activities.filter(
+            (x) =>
+              x.spec !== "lamp.group" &&
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec) //&&
+            // (!!details?.id &&
+            // x.id != details?.id)
+          ),
+      details
+    )
     if (!!details.studyId) {
       setStudyActivities(
         type == "lamp.group"
@@ -184,8 +206,8 @@ export default function GroupCreator({
               (x) =>
                 (!!study ? x.study_id === study : x.study_id === details.study_id) &&
                 availableActivitySpecs.includes(x.spec) &&
-                !!details?.id &&
-                x.id != details?.id
+                !!id &&
+                x.id != id
             )
       )
     }
