@@ -105,6 +105,7 @@ export default function GroupCreator({
   studies,
   study,
   type,
+  id,
   ...props
 }: {
   activities?: any[]
@@ -114,9 +115,10 @@ export default function GroupCreator({
   studies: any
   study?: string
   type?: string
+  id?: string
 }) {
   const classes = useStyles()
-  const [items, setItems] = useState(!!value ? value.settings.activities : [])
+  const [items, setItems] = useState(!!value ? value.settings.activities ?? value.settings : [])
 
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
@@ -130,7 +132,9 @@ export default function GroupCreator({
         : activities.filter(
             (x) =>
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-              availableActivitySpecs.includes(x.spec)
+              availableActivitySpecs.includes(x.spec) &&
+              !!id &&
+              x.id != id
           )
       : []
   )
@@ -159,19 +163,52 @@ export default function GroupCreator({
   })
 
   useEffect(() => {
+    if (Array.isArray(data.settings)) {
+      activities = data.settings
+      data.settings = {}
+      data.settings.activities = activities
+    }
     data.settings.activities = items
     setData(data)
   }, [items])
 
+  useEffect(() => {
+    console.log(studyActivities)
+  }, [studyActivities])
   const handleChange = (details) => {
+    console.log(
+      type == "lamp.group"
+        ? activities.filter(
+            (x) =>
+              x.spec !== "lamp.group" &&
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec)
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+              availableActivitySpecs.includes(x.spec) //&&
+            // (!!details?.id &&
+            // x.id != details?.id)
+          ),
+      details
+    )
     if (!!details.studyId) {
       setStudyActivities(
         type == "lamp.group"
           ? activities.filter(
               (x) =>
-                x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
+                x.spec !== "lamp.group" &&
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec)
             )
-          : activities.filter((x) => x.study_id === details.studyId && availableActivitySpecs.includes(x.spec))
+          : activities.filter(
+              (x) =>
+                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                availableActivitySpecs.includes(x.spec) &&
+                !!id &&
+                x.id != id
+            )
       )
     }
     setData({
@@ -209,6 +246,12 @@ export default function GroupCreator({
   const [hideOnCompletion, setHideOnCompletion] = useState(data.settings?.hide_on_completion ?? false)
   const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
   const [hideSubActivities, setHideSubActivities] = useState(data.settings?.hide_sub_activities ?? false)
+  const [trackProgress, setTrackProgress] = useState(data.settings?.track_progress ?? false)
+
+  useEffect(() => {
+    data.settings.track_progress = trackProgress
+    setData({ ...data, settings: data.settings })
+  }, [trackProgress])
 
   useEffect(() => {
     data.settings.sequential_ordering = sequentialOrdering
@@ -339,6 +382,18 @@ export default function GroupCreator({
                 />
               }
               label="Hide Sub Activities"
+              labelPlacement="end"
+            />
+            <FormControlLabel
+              value="track_progress"
+              control={
+                <Switch
+                  color="primary"
+                  checked={data.settings?.track_progress}
+                  onChange={(evt) => setTrackProgress(evt.target.checked)}
+                />
+              }
+              label="Track Activity Progress"
               labelPlacement="end"
             />
             <ButtonGroup>
