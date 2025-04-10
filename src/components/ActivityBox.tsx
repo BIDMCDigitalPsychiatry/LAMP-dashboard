@@ -111,7 +111,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     LAMP.Activity.view(y.id).then((data) => {
       if (y.spec === "lamp.module") {
         setShownActivities(shownActivities.filter((item) => item.id != y.id))
-        addActivityData(data)
+        const fromActivityList = true
+        addActivityData(data, 0, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -124,44 +125,76 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
-  const handleSubModule = async (parentModule, activity) => {
+  const handleSubModule = async (activity, level) => {
     let arr = []
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, parentModule)
+      addActivityData(data, level)
     })
   }
 
-  const addActivityData = async (data, parentModule?) => {
+  const addActivityData = async (data, level, fromActivityList = false) => {
+    // Recursive function to update nested subActivities
+    const updateSubActivities = (subActivities, itemLevel) => {
+      return subActivities.map((itm) => {
+        if (itm.id === moduleAcivityData.id && level === itemLevel && !itm.subActivities) {
+          return {
+            ...itm,
+            isHidden: true,
+            subActivities: arr, // Add the fetched data here
+            level: level + 1,
+          }
+        }
+        // Recursively update if there are nested subActivities
+        if (itm.subActivities && itm.subActivities.length > 0) {
+          return {
+            ...itm,
+            subActivities: updateSubActivities(itm.subActivities, itm.level),
+          }
+        }
+        return itm
+      })
+    }
     let arr = []
     let moduleAcivityData = { ...data }
     const ids = data?.settings?.activities
+    // Fetching data asynchronously
     await Promise.all(
       ids.map(async (id) => {
         try {
-          const data = await LAMP.Activity.view(id)
-          delete data.settings
-          arr.push(data)
+          const fetchedData = await LAMP.Activity.view(id)
+          delete fetchedData.settings // Clean up the data
+          arr.push(fetchedData)
         } catch (error) {
           console.error("Error fetching data for id:", id, error)
         }
       })
     )
+
     delete moduleAcivityData.settings
-    if (parentModule) {
-      moduleAcivityData.subModuleActivities = arr
+    // Updating the moduleData
+    if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
-        if (item.id === parentModule.id) {
-          item.subActivities.map((itm) => {
-            if (itm.id === moduleAcivityData.id) {
-              return (itm.subModuleActivities = arr)
-            }
-          })
+        if (!item.subActivities && item.id === moduleAcivityData.id && item.level === level) {
+          return {
+            ...item,
+            isHidden: true,
+            level: level + 1,
+            subActivities: arr,
+          }
+        }
+        // Check and update subActivities recursively
+        if (item.subActivities && item.subActivities.length > 0) {
+          return {
+            ...item,
+            subActivities: updateSubActivities(item.subActivities, item.level),
+          }
         }
         return item
       })
       setModuleData(updatedData)
     } else {
       moduleAcivityData.subActivities = arr
+      moduleAcivityData.level = level + 1
       setModuleData([...moduleData, moduleAcivityData])
     }
   }
@@ -178,7 +211,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     <Box>
       {moduleData.length ? (
         <ActivityAccordian
-          data={moduleData.concat({ name: "Other activities", subActivities: shownActivities })}
+          data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
           type={type}
           tag={tag}
           handleClickOpen={handleClickOpen}

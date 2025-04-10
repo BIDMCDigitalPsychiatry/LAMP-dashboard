@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme: Theme) =>
         textAlign: "center !important",
       },
     },
-    dialogtitle: { padding: 0 },
     manage: {
       padding: "10px 0",
       minHeight: 180,
@@ -110,193 +109,174 @@ const useStyles = makeStyles((theme: Theme) =>
     preventH: {
       background: "#ECF4FF !important",
     },
+    boxShadowNone: {
+      boxShadow: "none !important",
+      "& h6": {
+        fontSize: 22,
+      },
+    },
   })
 )
 
 function createSequentialArray(limit) {
-  // Create an empty array
   let arr = []
-
-  // Loop from 0 to limit-1 and push each number into the array
   for (let i = 0; i < limit; i++) {
     arr.push(i)
   }
-
   return arr
 }
 
-const ActivityAccordian = ({ data, type, tag, handleClickOpen, handleSubModule }) => {
+const renderActivities = (activities, type, tag, handleClickOpen, handleSubModule, classes, module) => {
+  return (
+    <>
+      {activities.map((activity) =>
+        !activity.isHidden ? (
+          <>
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                if (activity.spec === "lamp.module" && module.name != "Other activities") {
+                  handleSubModule(activity, module.level)
+                } else {
+                  handleClickOpen(activity)
+                }
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card
+                  className={
+                    classes.manage +
+                    " " +
+                    (type === "Manage"
+                      ? classes.manageH
+                      : type === "Assess"
+                      ? classes.assessH
+                      : type === "Learn"
+                      ? classes.learnH
+                      : classes.preventH)
+                  }
+                >
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                          ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
+                          : activity.spec === "lamp.breathe"
+                          ? `url(${BreatheIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.journal"
+                          ? `url(${JournalIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.scratch_image"
+                          ? `url(${ScratchCard}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>
+                    <ReactMarkdown
+                      children={activity.name}
+                      skipHtml={false}
+                      remarkPlugins={[gfm, emoji]}
+                      components={{ link: LinkRenderer }}
+                    />
+                  </Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          </>
+        ) : (
+          <></>
+        )
+      )}
+    </>
+  )
+}
+
+const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }) => {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [expandedModules, setExpandedModules] = useState([])
-
-  useEffect(() => {
-    if (data?.length) {
-      setExpandedModules(createSequentialArray(data?.length))
-    }
-  }, [data])
-
-  const accordionClicked = (index) => {
-    if (expandedModules.includes(index)) setExpandedModules(expandedModules.filter((number) => number !== index))
-    else setExpandedModules([...expandedModules, index])
-  }
 
   return (
     <div>
       {data.map((module, index) => (
-        <Accordion key={index} onChange={() => accordionClicked(index)} expanded={expandedModules.includes(index)}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>{module.name}</Typography>
+        <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
+          <AccordionSummary>
+            <Typography variant="h6">{module.name}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
               {module.subActivities.length ? (
-                module.subActivities.map((activity) => (
-                  <Grid
-                    item
-                    xs={6}
-                    sm={4}
-                    md={3}
-                    lg={3}
-                    onClick={() => {
-                      if (index != data?.length - 1 && activity.spec === "lamp.module") {
-                        handleSubModule(module, activity)
-                      } else handleClickOpen(activity)
-                    }}
-                    className={classes.thumbMain}
-                  >
-                    <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                      <Card
-                        className={
-                          classes.manage +
-                          " " +
-                          (type === "Manage"
-                            ? classes.manageH
-                            : type === "Assess"
-                            ? classes.assessH
-                            : type === "Learn"
-                            ? classes.learnH
-                            : classes.preventH)
-                        }
-                      >
-                        <Box mt={2} mb={1}>
-                          <Box
-                            className={classes.mainIcons}
-                            style={{
-                              margin: "auto",
-                              background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                ? `url(${
-                                    tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                  }) center center/contain no-repeat`
-                                : activity.spec === "lamp.breathe"
-                                ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.journal"
-                                ? `url(${JournalIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.scratch_image"
-                                ? `url(${ScratchCard}) center center/contain no-repeat`
-                                : `url(${InfoIcon}) center center/contain no-repeat`,
-                            }}
-                          ></Box>
-                        </Box>
-                        <Typography className={classes.cardlabel}>
-                          <ReactMarkdown
-                            children={t(activity.name)}
-                            skipHtml={false}
-                            remarkPlugins={[gfm, emoji]}
-                            components={{ link: LinkRenderer }}
-                          />
-                        </Typography>
-                      </Card>
-                    </ButtonBase>
-                    {/* Nested Accordion for Sub-Modules */}
-                    {activity.subModuleActivities && activity.subModuleActivities.length > 0 && (
-                      <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography>{activity.name}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Grid container spacing={2} direction="row" wrap="wrap">
-                            {activity.subModuleActivities.length > 0 && (
-                              <Grid justifyContent="flex-end" container direction="row">
-                                <Grid xs={11}>
-                                  <Grid container spacing={2}>
-                                    {activity.subModuleActivities.length ? (
-                                      activity.subModuleActivities.map((activity) => (
-                                        <Grid
-                                          item
-                                          xs={6}
-                                          sm={4}
-                                          md={3}
-                                          lg={3}
-                                          onClick={() => {
-                                            handleClickOpen(activity)
-                                          }}
-                                          className={classes.thumbMain}
-                                        >
-                                          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                                            <Card
-                                              className={
-                                                classes.manage +
-                                                " " +
-                                                (type === "Manage"
-                                                  ? classes.manageH + " " + classes.submodule
-                                                  : type === "Assess"
-                                                  ? classes.assessH + " " + classes.submodule
-                                                  : type === "Learn"
-                                                  ? classes.learnH + " " + classes.submodule
-                                                  : classes.preventH + " " + classes.submodule)
-                                              }
-                                            >
-                                              <Box mt={2} mb={1}>
-                                                <Box
-                                                  className={classes.subIcons}
-                                                  style={{
-                                                    margin: "auto",
-                                                    background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                                      ? `url(${
-                                                          tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                                        }) center center/contain no-repeat`
-                                                      : activity.spec === "lamp.breathe"
-                                                      ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                                      : activity.spec === "lamp.journal"
-                                                      ? `url(${JournalIcon}) center center/contain no-repeat`
-                                                      : activity.spec === "lamp.scratch_image"
-                                                      ? `url(${ScratchCard}) center center/contain no-repeat`
-                                                      : `url(${InfoIcon}) center center/contain no-repeat`,
-                                                  }}
-                                                ></Box>
-                                              </Box>
-                                              <Typography className={classes.cardlabel}>
-                                                <ReactMarkdown
-                                                  children={t(activity.name)}
-                                                  skipHtml={false}
-                                                  remarkPlugins={[gfm, emoji]}
-                                                  components={{ link: LinkRenderer }}
-                                                />
-                                              </Typography>
-                                            </Card>
-                                          </ButtonBase>
-                                        </Grid>
-                                      ))
-                                    ) : (
-                                      <></>
-                                    )}
-                                  </Grid>
-                                </Grid>
-                              </Grid>
-                            )}
-                          </Grid>
-                        </AccordionDetails>
-                      </Accordion>
-                    )}
-                  </Grid>
-                ))
+                renderActivities(module.subActivities, type, tag, handleClickOpen, handleSubModule, classes, module)
               ) : (
                 <Box display="flex" className={classes.blankMsg} ml={1}>
                   <Typography>No activities available in the module</Typography>
                 </Box>
               )}
             </Grid>
+            {module.subActivities.map((activity) => (
+              <>
+                {activity.subActivities && activity.subActivities.length > 0 && (
+                  <>
+                    <Box paddingLeft={5} display="flex" flexDirection="column">
+                      {" "}
+                      <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                        <AccordionSummary>
+                          <Typography variant="h6">{activity.name}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Grid container spacing={2} direction="row" wrap="wrap">
+                            {renderActivities(
+                              activity.subActivities,
+                              type,
+                              tag,
+                              handleClickOpen,
+                              handleSubModule,
+                              classes,
+                              activity
+                            )}
+                          </Grid>
+                          {activity.subActivities.map((subActivity) => (
+                            <>
+                              {subActivity.subActivities && subActivity.subActivities.length > 0 && (
+                                <>
+                                  <Box paddingLeft={5} display="flex" flexDirection="column">
+                                    {" "}
+                                    <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                                      <AccordionSummary>
+                                        <Typography variant="h6">{subActivity.name}</Typography>
+                                      </AccordionSummary>
+                                      <AccordionDetails>
+                                        <Grid container spacing={2} direction="row" wrap="wrap">
+                                          {renderActivities(
+                                            subActivity.subActivities,
+                                            type,
+                                            tag,
+                                            handleClickOpen,
+                                            handleSubModule,
+                                            classes,
+                                            subActivity
+                                          )}
+                                        </Grid>
+                                      </AccordionDetails>
+                                    </Accordion>
+                                  </Box>
+                                </>
+                              )}
+                            </>
+                          ))}
+                        </AccordionDetails>
+                      </Accordion>
+                    </Box>
+                  </>
+                )}
+              </>
+            ))}
           </AccordionDetails>
         </Accordion>
       ))}
@@ -304,4 +284,4 @@ const ActivityAccordian = ({ data, type, tag, handleClickOpen, handleSubModule }
   )
 }
 
-export default ActivityAccordian
+export default ActivityAccordion
