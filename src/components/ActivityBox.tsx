@@ -162,6 +162,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const addActivityData = async (data, level, fromActivityList = false) => {
     let moduleActivityData = { ...data }
     const ids = data?.settings?.activities || []
+    const sequential = data?.settings?.sequential_ordering === true
+    const hideOnCompletion = data?.settings?.hide_on_completion === true
+    const trackProgress = data?.settings?.track_progress === true
     let sequentialActivityAdded = false
 
     // Fetch activity data
@@ -170,8 +173,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         try {
           const activityEvents = await getActivityEvents(participant, id)
           const fetchedData = await LAMP.Activity.view(id)
-          const sequential = data?.settings?.sequential_ordering === true
-          const hideOnCompletion = data?.settings?.hide_on_completion === true
           delete fetchedData.settings
 
           if (activityEvents.length > 0) {
@@ -200,6 +201,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             isHidden: true,
             subActivities: arr,
             level: level + 1,
+            trackProgress: trackProgress,
           }
         }
         if (itm.subActivities?.length > 0) {
@@ -222,6 +224,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             isHidden: true,
             level: level + 1,
             subActivities: arr,
+            trackProgress: trackProgress,
           }
         }
         if (item.subActivities?.length > 0) {
@@ -236,6 +239,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     } else {
       moduleActivityData.subActivities = arr
       moduleActivityData.level = level + 1
+      if (trackProgress) {
+        moduleActivityData.trackProgress = trackProgress
+      }
       setModuleData((prev) => [...prev, moduleActivityData])
     }
 

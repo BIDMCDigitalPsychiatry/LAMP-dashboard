@@ -147,7 +147,7 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       : classes.preventH)
                   }
                 >
-                  {activity.isCompleted && (
+                  {activity.isCompleted && module.trackProgress && (
                     <Box
                       sx={{
                         position: "absolute",
@@ -219,7 +219,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary>
             <Typography variant="h6">
-              {module.name} <span>{getStatus(module)}</span>
+              {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -241,7 +241,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
                       <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
                         <AccordionSummary>
                           <Typography variant="h6">
-                            {activity.name} <span>{getStatus(activity)}</span>
+                            {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
@@ -265,7 +265,8 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
                                     <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
                                       <AccordionSummary>
                                         <Typography variant="h6">
-                                          {subActivity.name} <span>{getStatus(subActivity)}</span>
+                                          {subActivity.name}{" "}
+                                          {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
                                         </Typography>
                                       </AccordionSummary>
                                       <AccordionDetails>
