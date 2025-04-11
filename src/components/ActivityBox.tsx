@@ -13,6 +13,8 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
 import ActivityAccordian from "./ActivityAccordian"
+import { Backdrop, CircularProgress } from "@mui/material"
+import { getSelfHelpActivityEvents } from "./Participant"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -94,8 +96,29 @@ const useStyles = makeStyles((theme: Theme) =>
     preventH: {
       background: "#ECF4FF !important",
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
+
+const getActivityEvents = async (participant: any, activityId: string) => {
+  let from = new Date()
+  from.setMonth(from.getMonth() - 6)
+  let activityEvents =
+    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+      ? await getSelfHelpActivityEvents(activityId, from.getTime(), new Date().getTime())
+      : await LAMP.ActivityEvent.allByParticipant(
+          participant?.id ?? participant,
+          activityId,
+          from.getTime(),
+          new Date().getTime(),
+          null,
+          true
+        )
+  return activityEvents
+}
 
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, ...props }) {
   const classes = useStyles()
@@ -105,12 +128,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [message, setMessage] = useState("")
   const [moduleData, setModuleData] = useState<any[]>([])
   const [shownActivities, setShownActivities] = useState([])
+  const [loadingModules, setLoadingModules] = useState(true)
   const { t } = useTranslation()
 
-  const handleClickOpen = (y: any) => {
+  const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then((data) => {
       if (y.spec === "lamp.module") {
-        setShownActivities(shownActivities.filter((item) => item.id != y.id))
+        // Don't remove item if this was triggered by auto-open logic
+        if (!isAuto) {
+          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
+        }
         const fromActivityList = true
         addActivityData(data, 0, fromActivityList)
       } else {
@@ -133,19 +160,49 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const addActivityData = async (data, level, fromActivityList = false) => {
-    // Recursive function to update nested subActivities
+    let moduleActivityData = { ...data }
+    const ids = data?.settings?.activities || []
+    let sequentialActivityAdded = false
+
+    // Fetch activity data
+    const arr = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const activityEvents = await getActivityEvents(participant, id)
+          const fetchedData = await LAMP.Activity.view(id)
+          const sequential = data?.settings?.sequential_ordering === true
+          const hideOnCompletion = data?.settings?.hide_on_completion === true
+          delete fetchedData.settings
+
+          if (activityEvents.length > 0) {
+            fetchedData["isCompleted"] = true
+            if (hideOnCompletion) {
+              fetchedData["isHidden"] = true
+            }
+          } else if (sequential && !sequentialActivityAdded) {
+            sequentialActivityAdded = true
+          } else if (sequential && sequentialActivityAdded) {
+            fetchedData["isHidden"] = true
+          }
+          return fetchedData
+        } catch (error) {
+          console.error("Error fetching data for id:", id, error)
+          return null
+        }
+      })
+    ).then((results) => results.filter(Boolean))
+
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
-        if (itm.id === moduleAcivityData.id && level === itemLevel && !itm.subActivities) {
+        if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {
           return {
             ...itm,
             isHidden: true,
-            subActivities: arr, // Add the fetched data here
+            subActivities: arr,
             level: level + 1,
           }
         }
-        // Recursively update if there are nested subActivities
-        if (itm.subActivities && itm.subActivities.length > 0) {
+        if (itm.subActivities?.length > 0) {
           return {
             ...itm,
             subActivities: updateSubActivities(itm.subActivities, itm.level),
@@ -154,27 +211,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return itm
       })
     }
-    let arr = []
-    let moduleAcivityData = { ...data }
-    const ids = data?.settings?.activities
-    // Fetching data asynchronously
-    await Promise.all(
-      ids.map(async (id) => {
-        try {
-          const fetchedData = await LAMP.Activity.view(id)
-          delete fetchedData.settings // Clean up the data
-          arr.push(fetchedData)
-        } catch (error) {
-          console.error("Error fetching data for id:", id, error)
-        }
-      })
-    )
 
-    delete moduleAcivityData.settings
-    // Updating the moduleData
+    delete moduleActivityData.settings
+
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
-        if (!item.subActivities && item.id === moduleAcivityData.id && item.level === level) {
+        if (!item.subActivities && item.id === moduleActivityData.id && item.level === level) {
           return {
             ...item,
             isHidden: true,
@@ -182,8 +224,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             subActivities: arr,
           }
         }
-        // Check and update subActivities recursively
-        if (item.subActivities && item.subActivities.length > 0) {
+        if (item.subActivities?.length > 0) {
           return {
             ...item,
             subActivities: updateSubActivities(item.subActivities, item.level),
@@ -193,19 +234,41 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       })
       setModuleData(updatedData)
     } else {
-      moduleAcivityData.subActivities = arr
-      moduleAcivityData.level = level + 1
-      setModuleData([...moduleData, moduleAcivityData])
+      moduleActivityData.subActivities = arr
+      moduleActivityData.level = level + 1
+      setModuleData((prev) => [...prev, moduleActivityData])
     }
+
+    setLoadingModules(false)
   }
 
   useEffect(() => {
-    setShownActivities(savedActivities)
+    const runAsync = async () => {
+      setLoadingModules(true)
+      const activitiesList = savedActivities
+      const initializeOpenedModules = activitiesList.filter(
+        (activity) => activity.spec === "lamp.module" && activity?.settings?.initialize_opened
+      )
+
+      if (initializeOpenedModules.length > 0) {
+        for (const activity of initializeOpenedModules) {
+          await handleClickOpen(activity, true)
+        }
+
+        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b.id === a.id)))
+      } else {
+        setShownActivities(savedActivities)
+        setLoadingModules(false)
+      }
+    }
+    runAsync()
   }, [savedActivities])
 
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
+
+  console.log("moduleDtaa", moduleData)
 
   return (
     <Box>
@@ -217,7 +280,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
         />
-      ) : (
+      ) : !loadingModules ? (
         <Grid container spacing={2}>
           {savedActivities.length
             ? savedActivities.map((activity) => (
@@ -284,6 +347,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 </Box>
               )}
         </Grid>
+      ) : (
+        <Backdrop className={classes.backdrop} open={loadingModules}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       )}
       <ActivityPopup
         activity={activity}

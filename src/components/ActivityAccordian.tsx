@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
+import React from "react"
+import { Accordion, AccordionSummary, AccordionDetails, Icon } from "@mui/material"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -11,6 +10,7 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import InfoIcon from "../icons/Info.svg"
 import { useTranslation } from "react-i18next"
 import { LinkRenderer } from "./ActivityPopup"
+import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,24 +59,6 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
-    submodule: {
-      [theme.breakpoints.up("lg")]: {
-        minHeight: 200,
-      },
-    },
-
-    subIcons: {
-      width: 70,
-      height: 70,
-      [theme.breakpoints.up("lg")]: {
-        width: 110,
-        height: 110,
-      },
-      [theme.breakpoints.down("sm")]: {
-        width: 60,
-        height: 60,
-      },
-    },
     mainIcons: {
       width: 80,
       height: 80,
@@ -113,19 +95,23 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none !important",
       "& h6": {
         fontSize: 22,
+        "& span": {
+          fontSize: 18,
+          fontWeight: "normal",
+          paddingLeft: 8,
+        },
+      },
+    },
+    greentick: {
+      "& svg": {
+        width: 30,
+        height: 30,
       },
     },
   })
 )
 
-function createSequentialArray(limit) {
-  let arr = []
-  for (let i = 0; i < limit; i++) {
-    arr.push(i)
-  }
-  return arr
-}
-
+//The function to renderActivities in accordian layout
 const renderActivities = (activities, type, tag, handleClickOpen, handleSubModule, classes, module) => {
   return (
     <>
@@ -161,6 +147,22 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       : classes.preventH)
                   }
                 >
+                  {activity.isCompleted && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        fontSize: "small",
+                        top: 8,
+                        right: 8,
+                        zIndex: 1,
+                        color: "#4caf50", // Green
+                      }}
+                      className={classes.greentick}
+                    >
+                      <CheckCircleIcon fontSize="small" />
+                    </Box>
+                  )}
+
                   <Box mt={2} mb={1}>
                     <Box
                       className={classes.mainIcons}
@@ -198,16 +200,27 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
   )
 }
 
+//function to create collapsible layout when module activity is selected
 const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }) => {
   const classes = useStyles()
   const { t } = useTranslation()
+
+  const getStatus = (module) => {
+    return module.name === "Other activities"
+      ? ""
+      : module.subActivities.filter((activity) => activity.isCompleted === true).length +
+          "/" +
+          module.subActivities.length
+  }
 
   return (
     <div>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary>
-            <Typography variant="h6">{module.name}</Typography>
+            <Typography variant="h6">
+              {module.name} <span>{getStatus(module)}</span>
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
@@ -227,7 +240,9 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
                       {" "}
                       <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
                         <AccordionSummary>
-                          <Typography variant="h6">{activity.name}</Typography>
+                          <Typography variant="h6">
+                            {activity.name} <span>{getStatus(activity)}</span>
+                          </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                           <Grid container spacing={2} direction="row" wrap="wrap">
@@ -249,7 +264,9 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
                                     {" "}
                                     <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
                                       <AccordionSummary>
-                                        <Typography variant="h6">{subActivity.name}</Typography>
+                                        <Typography variant="h6">
+                                          {subActivity.name} <span>{getStatus(subActivity)}</span>
+                                        </Typography>
                                       </AccordionSummary>
                                       <AccordionDetails>
                                         <Grid container spacing={2} direction="row" wrap="wrap">
