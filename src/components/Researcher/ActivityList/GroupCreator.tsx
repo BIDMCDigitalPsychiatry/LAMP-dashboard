@@ -129,12 +129,18 @@ export default function GroupCreator({
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec)
           )
-        : activities.filter(
+        : !!id
+        ? activities.filter(
             (x) =>
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec) &&
               !!id &&
               x.id != id
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec)
           )
       : []
   )
@@ -172,42 +178,28 @@ export default function GroupCreator({
     setData(data)
   }, [items])
 
-  useEffect(() => {
-    console.log(studyActivities)
-  }, [studyActivities])
   const handleChange = (details) => {
-    console.log(
-      type == "lamp.group"
-        ? activities.filter(
-            (x) =>
-              x.spec !== "lamp.group" &&
-              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
-              availableActivitySpecs.includes(x.spec)
-          )
-        : activities.filter(
-            (x) =>
-              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
-              availableActivitySpecs.includes(x.spec) //&&
-            // (!!details?.id &&
-            // x.id != details?.id)
-          ),
-      details
-    )
     if (!!details.studyId) {
       setStudyActivities(
         type == "lamp.group"
           ? activities.filter(
               (x) =>
                 x.spec !== "lamp.group" &&
-                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
-          : activities.filter(
+          : !!id
+          ? activities.filter(
               (x) =>
-                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec) &&
                 !!id &&
                 x.id != id
+            )
+          : activities.filter(
+              (x) =>
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
+                availableActivitySpecs.includes(x.spec)
             )
       )
     }
