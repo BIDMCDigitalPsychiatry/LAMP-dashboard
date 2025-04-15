@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
-import { SchemaList } from "./ActivityMethods"
+import { SchemaList, unspliceActivity } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
@@ -93,14 +93,15 @@ export default function GameCreator({
     ) {
       const enumActivityIds = activities.map((data) => data.id)
       const enumActivityNames = activities.map((data) => data.name)
+
       schemaListObj[activitySpecId][
         "properties"
-      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigency_settings.dependencies.contigency_type.allOf[0].then.properties.activity[
+      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigencySettings.dependencies.contigency_type.allOf[0].then.properties.activity[
         "enum"
       ] = enumActivityIds
       schemaListObj[activitySpecId][
         "properties"
-      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigency_settings.dependencies.contigency_type.allOf[0].then.properties.activity[
+      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigencySettings.dependencies.contigency_type.allOf[0].then.properties.activity[
         "enumNames"
       ] = enumActivityNames
       setSchemaListObj(schemaListObj)
@@ -123,6 +124,10 @@ export default function GameCreator({
   })
 
   useEffect(() => {
+    console.log(data)
+    const { raw, tag } = unspliceActivity(data)
+    console.log(tag)
+
     validate()
   }, [data])
 
