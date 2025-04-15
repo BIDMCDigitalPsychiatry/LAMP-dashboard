@@ -3,6 +3,7 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
+import { descriptionId } from "@rjsf/utils"
 
 export const SchemaList = () => {
   return {
@@ -938,6 +939,74 @@ export const SchemaList = () => {
                       },
                     },
                   },
+                  //  {
+
+                  //   properties: {
+                  //     type: {
+                  //       enum: ["boolean"],
+                  //     },
+                  //     contigencySettings: {
+                  //       type: "object",
+                  //       title: "Contigency Settings",
+                  //       properties: {
+                  //         enable_contigency: {
+                  //           type: "boolean",
+                  //           title: "Enable Contigency",
+                  //         },
+                  //       },
+
+                  //       dependencies: {
+                  //         enable_contigency: {
+                  //           oneOf: [
+                  //             {
+                  //               properties: {
+                  //                 enable_contigency: { const: true },
+                  //                 contigency_type: {
+                  //                   type: "string",
+                  //                   enum: ["activity", "question"],
+                  //                   enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                  //                   default: "activity",
+                  //                 },
+                  //               },
+                  //               required: ["contigency_type"],
+                  //             },
+                  //             {
+                  //               properties: {
+                  //                 enable_contigency: { const: false },
+                  //               },
+                  //             },
+                  //           ],
+                  //         },
+                  //         contigency_type: {
+                  //           allOf: [
+                  //             {
+                  //               if: {
+                  //                 properties: { contigency_type: { const: "activity" } },
+                  //               },
+                  //               then: {
+                  //                 properties: {
+                  //                   activity: { type: "string", title: "Select an activity" },
+                  //                 },
+                  //                 required: ["activity"],
+                  //               },
+                  //             },
+                  //             {
+                  //               if: {
+                  //                 properties: { contigency_type: { const: "question" } },
+                  //               },
+                  //               then: {
+                  //                 properties: {
+                  //                   question_index: { type: "number", title: "Question number" },
+                  //                 },
+                  //                 required: ["question_index"],
+                  //               },
+                  //             },
+                  //           ],
+                  //         },
+                  //       },
+                  //     },
+                  //   },
+                  // },
                   {
                     properties: {
                       type: {
@@ -961,14 +1030,25 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
-                            contigency_settings: {
+                            contigencySettings: {
                               type: "object",
                               title: "Contigency Settings",
+                              required: ["enable_contigency"],
                               properties: {
                                 enable_contigency: {
                                   type: "boolean",
                                   title: "Enable Contigency",
+                                  default: false,
                                 },
+                                // contigency_type: {
+                                //   type: "string",
+                                // },
+                                // question_index: {
+                                //   type: "number"
+                                // },
+                                // activity: {
+                                //   type: "string"
+                                // }
                               },
 
                               dependencies: {
@@ -1073,6 +1153,66 @@ export const SchemaList = () => {
                               title: i18n.t("Option Description"),
                               type: "string",
                               default: "",
+                            },
+                            contigencySettings: {
+                              type: "object",
+                              title: "Contigency Settings",
+                              properties: {
+                                enable_contigency: {
+                                  type: "boolean",
+                                  title: "Enable Contigency",
+                                },
+                              },
+
+                              dependencies: {
+                                enable_contigency: {
+                                  oneOf: [
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: true },
+                                        contigency_type: {
+                                          type: "string",
+                                          enum: ["activity", "question"],
+                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                          default: "activity",
+                                        },
+                                      },
+                                      required: ["contigency_type"],
+                                    },
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: false },
+                                      },
+                                    },
+                                  ],
+                                },
+                                contigency_type: {
+                                  allOf: [
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "activity" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          activity: { type: "string", title: "Select an activity" },
+                                        },
+                                        required: ["activity"],
+                                      },
+                                    },
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "question" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          question_index: { type: "number", title: "Question number" },
+                                        },
+                                        required: ["question_index"],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
                             },
                           },
                         },
@@ -1561,6 +1701,7 @@ export const SchemaList = () => {
 
 // Splice a raw Activity object with its ActivityDescription object.
 export function spliceActivity({ raw, tag }) {
+  console.log(tag)
   return {
     id: raw.id,
     study_id: raw.study_id,
@@ -1586,9 +1727,11 @@ export function spliceActivity({ raw, tag }) {
               : question.type !== "matrix" && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
-                  description: tag?.questions?.[idx]?.options?.[idx2],
+                  description: tag?.questions?.[idx]?.options?.[idx2]?.description,
+                  contigencySettings: tag?.questions?.[idx]?.options?.[idx2]?.contigencySettings,
                 }))
               : question.options,
+
           warnings: question.warnings,
         })),
   }
@@ -1611,6 +1754,25 @@ export function unspliceTipsActivity(x) {
 
 // Un-splice an object into its raw Activity object and ActivityDescription object.
 export function unspliceActivity(x) {
+  console.log(
+    (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
+      multiselect: y?.type,
+      description: y?.description,
+      options:
+        y?.options === null
+          ? null
+          : y?.type !== "matrix" && y?.type !== "time"
+          ? y?.options?.map((z) => {
+              z?.description ?? "",
+                ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type)
+                  ? z?.contigencySettings ?? {}
+                  : {}
+            })
+          : null,
+      // contigencySettings: ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type) ?
+      //   y?.options?.map((z) => z?.contigencySettings ?? {}) : null
+    }))
+  )
   return {
     raw: {
       id: x.id,
@@ -1644,8 +1806,15 @@ export function unspliceActivity(x) {
           y?.options === null
             ? null
             : y?.type !== "matrix" && y?.type !== "time"
-            ? y?.options?.map((z) => z?.description ?? "")
+            ? y?.options?.map((z) => {
+                z?.description ?? "",
+                  ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type)
+                    ? z?.contigencySettings ?? {}
+                    : {}
+              })
             : null,
+        // contigencySettings: ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type) ?
+        //   y?.options?.map((z) => z?.contigencySettings ?? {}) : null
       })),
     },
   }
@@ -1726,6 +1895,7 @@ export async function saveCTestActivity(x) {
 
 export async function saveSurveyActivity(x) {
   const { raw, tag } = unspliceActivity(x)
+  console.log(tag, raw)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
   return newItem
