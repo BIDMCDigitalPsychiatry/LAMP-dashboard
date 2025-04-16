@@ -19,6 +19,7 @@ import {
   createStyles,
   Switch,
   FormControlLabel,
+  InputAdornment,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useTranslation } from "react-i18next"
@@ -44,10 +45,30 @@ const reorder = (list, startIndex, endIndex) => {
 function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
   const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x?.id === selected)[0] ?? null : null)
   const [anchorEl, setAnchorEl] = useState<Element>()
+  const [search, setSearch] = useState("")
+  const [filteredActivities, setFilteredActivities] = useState(activities ?? [])
+
   const { t } = useTranslation()
   useEffect(() => {
     if (_selected !== selected && _selected !== null) onSave && onSave(_selected.id)
   }, [_selected])
+
+  useEffect(() => {
+    filterActivities(search)
+  }, [search])
+  const handleSearchChange = (event: any) => {
+    setSearch(event.target.value)
+  }
+  const filterActivities = (searchVal: string) => {
+    const searchTxt = searchVal.trim().toLowerCase()
+    if (searchTxt.length > 0) {
+      const filtered = activities.filter((activity) => activity.name?.toLowerCase()?.includes(searchTxt))
+      setFilteredActivities(filtered)
+    } else {
+      setFilteredActivities(activities)
+    }
+  }
+
   return (
     <Draggable draggableId={`${index}`} index={index} {...props}>
       {(provided) => (
@@ -80,16 +101,39 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
             </ButtonGroup>
           </Tooltip>
           <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(undefined)}>
-            {activities.map((activity) => (
-              <MenuItem
-                onClick={() => {
-                  setAnchorEl(undefined)
-                  setSelected(activity)
+            <div style={{ padding: "8px" }}>
+              <TextField
+                placeholder="Search..."
+                variant="outlined"
+                size="small"
+                value={search}
+                onKeyDown={(e) => e.stopPropagation()}
+                onChange={handleSearchChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Icon>search</Icon>
+                    </InputAdornment>
+                  ),
                 }}
-              >
-                {`${t(activity.name)}`}
-              </MenuItem>
-            ))}
+                style={{ marginBottom: 10 }}
+              />
+            </div>
+            {!!filteredActivities && filteredActivities.length > 0 ? (
+              filteredActivities.map((activity) => (
+                <MenuItem
+                  key={activity.id}
+                  onClick={() => {
+                    setAnchorEl(null)
+                    setSelected(activity)
+                  }}
+                >
+                  {t(activity.name)}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>{t("No Records Found")}</MenuItem>
+            )}
           </Menu>
         </Box>
       )}
@@ -129,12 +173,18 @@ export default function GroupCreator({
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec)
           )
-        : activities.filter(
+        : !!id
+        ? activities.filter(
             (x) =>
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec) &&
               !!id &&
               x.id != id
+          )
+        : activities.filter(
+            (x) =>
+              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
+              availableActivitySpecs.includes(x.spec)
           )
       : []
   )
@@ -172,42 +222,28 @@ export default function GroupCreator({
     setData(data)
   }, [items])
 
-  useEffect(() => {
-    console.log(studyActivities)
-  }, [studyActivities])
   const handleChange = (details) => {
-    console.log(
-      type == "lamp.group"
-        ? activities.filter(
-            (x) =>
-              x.spec !== "lamp.group" &&
-              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
-              availableActivitySpecs.includes(x.spec)
-          )
-        : activities.filter(
-            (x) =>
-              (!!study ? x.study_id === study : x.study_id === details.study_id) &&
-              availableActivitySpecs.includes(x.spec) //&&
-            // (!!details?.id &&
-            // x.id != details?.id)
-          ),
-      details
-    )
     if (!!details.studyId) {
       setStudyActivities(
         type == "lamp.group"
           ? activities.filter(
               (x) =>
                 x.spec !== "lamp.group" &&
-                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
-          : activities.filter(
+          : !!id
+          ? activities.filter(
               (x) =>
-                (!!study ? x.study_id === study : x.study_id === details.study_id) &&
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec) &&
                 !!id &&
                 x.id != id
+            )
+          : activities.filter(
+              (x) =>
+                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
+                availableActivitySpecs.includes(x.spec)
             )
       )
     }
