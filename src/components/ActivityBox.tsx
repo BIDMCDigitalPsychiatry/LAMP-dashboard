@@ -103,9 +103,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const getActivityEvents = async (participant: any, activityId: string) => {
-  let from = new Date()
-  from.setMonth(from.getMonth() - 6)
+const getActivityEvents = async (participant: any, activityId: string, moduleStartTime?) => {
+  let from: Date
+  if (moduleStartTime) {
+    from = moduleStartTime
+  } else {
+    from = new Date()
+    from.setMonth(from.getMonth() - 6)
+  }
   let activityEvents =
     LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
       ? await getSelfHelpActivityEvents(activityId, from.getTime(), new Date().getTime())
@@ -132,14 +137,18 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const { t } = useTranslation()
 
   const handleClickOpen = (y: any, isAuto = false) => {
-    LAMP.Activity.view(y.id).then((data) => {
+    LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
         // Don't remove item if this was triggered by auto-open logic
         if (!isAuto) {
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        addActivityData(data, 0, fromActivityList)
+        let moduleStartTime
+        await getActivityEvents(participant, y.id).then((res) => {
+          moduleStartTime = res?.length ? new Date(res[0].timestamp) : null
+        })
+        addActivityData(data, 0, moduleStartTime, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -154,12 +163,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   const handleSubModule = async (activity, level) => {
     let arr = []
+    let moduleStartTime
+    await getActivityEvents(participant, activity.id).then((res) => {
+      moduleStartTime = new Date(res[0].timestamp)
+    })
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level)
+      addActivityData(data, level, moduleStartTime)
     })
   }
 
-  const addActivityData = async (data, level, fromActivityList = false) => {
+  const addActivityData = async (data, level, moduleStartTime, fromActivityList = false) => {
     let moduleActivityData = { ...data }
     const ids = data?.settings?.activities || []
     const sequential = data?.settings?.sequential_ordering === true
@@ -171,7 +184,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const arr = await Promise.all(
       ids.map(async (id) => {
         try {
-          const activityEvents = await getActivityEvents(participant, id)
+          const activityEvents = await getActivityEvents(participant, id, moduleStartTime)
           const fetchedData = await LAMP.Activity.view(id)
           delete fetchedData.settings
 
@@ -285,6 +298,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           tag={tag}
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
+          participant={participant}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>

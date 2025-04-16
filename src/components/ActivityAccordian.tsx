@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails, Icon } from "@mui/material"
-import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -11,6 +11,8 @@ import InfoIcon from "../icons/Info.svg"
 import { useTranslation } from "react-i18next"
 import { LinkRenderer } from "./ActivityPopup"
 import CheckCircleIcon from "@material-ui/icons/CheckCircle"
+import LAMP from "lamp-core"
+import { getSelfHelpActivityEvents } from "./Participant"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -200,8 +202,25 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
   )
 }
 
+export const getActivityEvents = async (participant: any, activityId: string) => {
+  let from = new Date()
+  from.setMonth(from.getMonth() - 6)
+  let activityEvents =
+    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+      ? await getSelfHelpActivityEvents(activityId, from.getTime(), new Date().getTime())
+      : await LAMP.ActivityEvent.allByParticipant(
+          participant?.id ?? participant,
+          activityId,
+          from.getTime(),
+          new Date().getTime(),
+          null,
+          true
+        )
+  return activityEvents
+}
+
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }) => {
+const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant }) => {
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -213,6 +232,47 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
           module.subActivities.length
   }
 
+  const checkIsBegin = async (id) => {
+    const activityEvents = await getActivityEvents(participant, id)
+    return activityEvents.length === 0
+  }
+
+  const addActivityEventForModule = async (id) => {
+    if (id) {
+      LAMP.ActivityEvent.create(participant.id ?? participant, {
+        timestamp: new Date().getTime(),
+        duration: 0,
+        activity: id,
+        static_data: {},
+      })
+      const hasBegun = await checkIsBegin(id)
+      setActivityStatus((prevState) => ({
+        ...prevState,
+        [id]: hasBegun,
+      }))
+    }
+  }
+
+  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
+
+  useEffect(() => {
+    const initializeStatus = async () => {
+      // Pre-populate the status of all activities
+      const statuses = {}
+      for (const module of data) {
+        statuses[module.id] = await checkIsBegin(module.id)
+        module?.subActivities?.forEach(async (activity) => {
+          statuses[activity.id] = await checkIsBegin(activity.id)
+          activity?.subActivities?.forEach(async (subActivity) => {
+            statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+          })
+        })
+      }
+      setActivityStatus(statuses)
+    }
+    initializeStatus()
+  }, [data])
+
   return (
     <div>
       {data.map((module, index) => (
@@ -223,6 +283,9 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
+            {module.id && activityStatus[module.id] && (
+              <Button onClick={() => addActivityEventForModule(module.id)}>{`${t("Start")}`}</Button>
+            )}
             <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(module.subActivities, type, tag, handleClickOpen, handleSubModule, classes, module)
@@ -235,63 +298,65 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule }
             {module.subActivities.map((activity) => (
               <>
                 {activity.subActivities && activity.subActivities.length > 0 && (
-                  <>
-                    <Box paddingLeft={5} display="flex" flexDirection="column">
-                      {" "}
-                      <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                        <AccordionSummary>
-                          <Typography variant="h6">
-                            {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Grid container spacing={2} direction="row" wrap="wrap">
-                            {renderActivities(
-                              activity.subActivities,
-                              type,
-                              tag,
-                              handleClickOpen,
-                              handleSubModule,
-                              classes,
-                              activity
+                  <Box paddingLeft={5} display="flex" flexDirection="column">
+                    <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                      <AccordionSummary>
+                        <Typography variant="h6">
+                          {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
+                        </Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        {activity.id && activityStatus[activity.id] && (
+                          <Button onClick={() => addActivityEventForModule(activity.id)}>{`${t("Start")}`}</Button>
+                        )}
+                        <Grid container spacing={2} direction="row" wrap="wrap">
+                          {renderActivities(
+                            activity.subActivities,
+                            type,
+                            tag,
+                            handleClickOpen,
+                            handleSubModule,
+                            classes,
+                            activity
+                          )}
+                        </Grid>
+                        {activity.subActivities.map((subActivity) => (
+                          <>
+                            {subActivity.subActivities && subActivity.subActivities.length > 0 && (
+                              <Box paddingLeft={5} display="flex" flexDirection="column">
+                                <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                                  <AccordionSummary>
+                                    <Typography variant="h6">
+                                      {subActivity.name}{" "}
+                                      {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
+                                    </Typography>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    {subActivity.id && activityStatus[subActivity.id] && (
+                                      <Button onClick={() => addActivityEventForModule(subActivity.id)}>{`${t(
+                                        "Start"
+                                      )}`}</Button>
+                                    )}
+                                    <Grid container spacing={2} direction="row" wrap="wrap">
+                                      {renderActivities(
+                                        subActivity.subActivities,
+                                        type,
+                                        tag,
+                                        handleClickOpen,
+                                        handleSubModule,
+                                        classes,
+                                        subActivity
+                                      )}
+                                    </Grid>
+                                  </AccordionDetails>
+                                </Accordion>
+                              </Box>
                             )}
-                          </Grid>
-                          {activity.subActivities.map((subActivity) => (
-                            <>
-                              {subActivity.subActivities && subActivity.subActivities.length > 0 && (
-                                <>
-                                  <Box paddingLeft={5} display="flex" flexDirection="column">
-                                    {" "}
-                                    <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                                      <AccordionSummary>
-                                        <Typography variant="h6">
-                                          {subActivity.name}{" "}
-                                          {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
-                                        </Typography>
-                                      </AccordionSummary>
-                                      <AccordionDetails>
-                                        <Grid container spacing={2} direction="row" wrap="wrap">
-                                          {renderActivities(
-                                            subActivity.subActivities,
-                                            type,
-                                            tag,
-                                            handleClickOpen,
-                                            handleSubModule,
-                                            classes,
-                                            subActivity
-                                          )}
-                                        </Grid>
-                                      </AccordionDetails>
-                                    </Accordion>
-                                  </Box>
-                                </>
-                              )}
-                            </>
-                          ))}
-                        </AccordionDetails>
-                      </Accordion>
-                    </Box>
-                  </>
+                          </>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  </Box>
                 )}
               </>
             ))}
