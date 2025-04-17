@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails, Icon } from "@mui/material"
+import { Accordion, AccordionSummary, AccordionDetails, Icon, Backdrop, CircularProgress } from "@mui/material"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -110,11 +110,23 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 30,
       },
     },
+    moduleStart: {
+      marginBottom: 40,
+      "& button": {
+        marginLeft: 24,
+        backgroundColor: "#7599FF",
+        color: "#fff",
+      },
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
 //The function to renderActivities in accordian layout
-const renderActivities = (activities, type, tag, handleClickOpen, handleSubModule, classes, module) => {
+const renderActivities = (activities, type, tag, handleClickOpen, handleSubModule, classes, module, status) => {
   return (
     <>
       {activities.map((activity) =>
@@ -127,10 +139,14 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
               md={3}
               lg={3}
               onClick={() => {
-                if (activity.spec === "lamp.module" && module.name != "Other activities") {
-                  handleSubModule(activity, module.level)
+                if (status === true) {
+                  return
                 } else {
-                  handleClickOpen(activity)
+                  if (activity.spec === "lamp.module" && module.name != "Other activities") {
+                    handleSubModule(activity, module.level)
+                  } else {
+                    handleClickOpen(activity)
+                  }
                 }
               }}
               className={classes.thumbMain}
@@ -202,7 +218,7 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
   )
 }
 
-export const getActivityEvents = async (participant: any, activityId: string) => {
+const getActivityEvents = async (participant: any, activityId: string) => {
   let from = new Date()
   from.setMonth(from.getMonth() - 6)
   let activityEvents =
@@ -223,6 +239,7 @@ export const getActivityEvents = async (participant: any, activityId: string) =>
 const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant }) => {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -238,14 +255,14 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   }
 
   const addActivityEventForModule = async (id) => {
-    if (id) {
+    if ((await checkIsBegin(id)) === true) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: 0,
         activity: id,
         static_data: {},
       })
-      const hasBegun = await checkIsBegin(id)
+      const hasBegun = false
       setActivityStatus((prevState) => ({
         ...prevState,
         [id]: hasBegun,
@@ -253,13 +270,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
     }
   }
 
-  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-
   useEffect(() => {
     const initializeStatus = async () => {
       // Pre-populate the status of all activities
       const statuses = {}
-      for (const module of data) {
+      const moduleActivities = data.filter((module) => module.name != "Other activities")
+      for (const module of moduleActivities) {
         statuses[module.id] = await checkIsBegin(module.id)
         module?.subActivities?.forEach(async (activity) => {
           statuses[activity.id] = await checkIsBegin(activity.id)
@@ -284,11 +300,25 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
           </AccordionSummary>
           <AccordionDetails>
             {module.id && activityStatus[module.id] && (
-              <Button onClick={() => addActivityEventForModule(module.id)}>{`${t("Start")}`}</Button>
+              <Box className={classes.moduleStart}>
+                Click here to start the module activity
+                <Button variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
+                  "Start"
+                )}`}</Button>
+              </Box>
             )}
             <Grid container spacing={2}>
               {module.subActivities.length ? (
-                renderActivities(module.subActivities, type, tag, handleClickOpen, handleSubModule, classes, module)
+                renderActivities(
+                  module.subActivities,
+                  type,
+                  tag,
+                  handleClickOpen,
+                  handleSubModule,
+                  classes,
+                  module,
+                  activityStatus[module.id]
+                )
               ) : (
                 <Box display="flex" className={classes.blankMsg} ml={1}>
                   <Typography>No activities available in the module</Typography>
@@ -307,7 +337,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                       </AccordionSummary>
                       <AccordionDetails>
                         {activity.id && activityStatus[activity.id] && (
-                          <Button onClick={() => addActivityEventForModule(activity.id)}>{`${t("Start")}`}</Button>
+                          <Box className={classes.moduleStart}>
+                            Click here to start the module activity
+                            <Button variant="contained" onClick={() => addActivityEventForModule(activity.id)}>{`${t(
+                              "Start"
+                            )}`}</Button>
+                          </Box>
                         )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
@@ -317,7 +352,8 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                             handleClickOpen,
                             handleSubModule,
                             classes,
-                            activity
+                            activity,
+                            activityStatus[activity.id]
                           )}
                         </Grid>
                         {activity.subActivities.map((subActivity) => (
@@ -333,9 +369,13 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                                   </AccordionSummary>
                                   <AccordionDetails>
                                     {subActivity.id && activityStatus[subActivity.id] && (
-                                      <Button onClick={() => addActivityEventForModule(subActivity.id)}>{`${t(
-                                        "Start"
-                                      )}`}</Button>
+                                      <Box className={classes.moduleStart}>
+                                        Click here to start the module activity
+                                        <Button
+                                          variant="contained"
+                                          onClick={() => addActivityEventForModule(subActivity.id)}
+                                        >{`${t("Start")}`}</Button>
+                                      </Box>
                                     )}
                                     <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
@@ -345,7 +385,8 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                                         handleClickOpen,
                                         handleSubModule,
                                         classes,
-                                        subActivity
+                                        subActivity,
+                                        activityStatus[subActivity.id]
                                       )}
                                     </Grid>
                                   </AccordionDetails>

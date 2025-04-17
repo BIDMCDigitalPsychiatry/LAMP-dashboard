@@ -146,7 +146,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const fromActivityList = true
         let moduleStartTime
         await getActivityEvents(participant, y.id).then((res) => {
-          moduleStartTime = res?.length ? new Date(res[0].timestamp) : null
+          if (res?.length) {
+            const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
+            moduleStartTime = smallestTimestamp
+          } else {
+            moduleStartTime = null
+          }
         })
         addActivityData(data, 0, moduleStartTime, fromActivityList)
       } else {
@@ -162,7 +167,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level) => {
-    let arr = []
     let moduleStartTime
     await getActivityEvents(participant, activity.id).then((res) => {
       moduleStartTime = new Date(res[0].timestamp)
@@ -170,6 +174,23 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     LAMP.Activity.view(activity.id).then((data) => {
       addActivityData(data, level, moduleStartTime)
     })
+  }
+
+  const addModuleActivityEvent = async (arr, data, moduleStartTime) => {
+    const completedActivities = arr
+    if (
+      completedActivities.filter((activity) => activity?.isCompleted === true).length === completedActivities.length
+    ) {
+      const activityEvents = await getActivityEvents(participant, data.id, moduleStartTime)
+      if ((activityEvents.length = 1)) {
+        LAMP.ActivityEvent.create(participant.id ?? participant, {
+          timestamp: new Date().getTime(),
+          duration: new Date().getTime() - moduleStartTime,
+          activity: data.id,
+          static_data: {},
+        })
+      }
+    }
   }
 
   const addActivityData = async (data, level, moduleStartTime, fromActivityList = false) => {
@@ -184,7 +205,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const arr = await Promise.all(
       ids.map(async (id) => {
         try {
-          const activityEvents = await getActivityEvents(participant, id, moduleStartTime)
+          const activityEvents =
+            moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
           const fetchedData = await LAMP.Activity.view(id)
           delete fetchedData.settings
 
@@ -205,7 +227,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       })
     ).then((results) => results.filter(Boolean))
-
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {
@@ -257,7 +278,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setModuleData((prev) => [...prev, moduleActivityData])
     }
-
+    addModuleActivityEvent(arr, data, moduleStartTime)
     setLoadingModules(false)
   }
 
@@ -286,8 +307,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
-
-  console.log("moduleDtaa", moduleData)
 
   return (
     <Box>
