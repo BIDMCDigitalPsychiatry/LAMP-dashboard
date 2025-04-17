@@ -508,7 +508,7 @@ export default function PreventSelectedActivities({
                     )} */}
                   </Typography>
                   <Box className={classes.maxw300}>
-                    {!!activityEvents?.[activity.name] && (
+                    {/* {!!activityEvents?.[activity.name] && (
                       <VegaLite
                         actions={false}
                         style={{ backgroundColor: "#00000000" }}
@@ -576,7 +576,7 @@ export default function PreventSelectedActivities({
                           },
                         }}
                       />
-                    )}
+                    )} */}
                   </Box>
                   <Typography variant="h6">
                     {activity?.name && timeAgo.format(timeSpans[activity?.name]?.timestamp)}

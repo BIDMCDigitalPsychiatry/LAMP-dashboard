@@ -150,6 +150,7 @@ export default function AddActivity({
     "lamp.recording": `${t("Voice Recording")}`,
     "lamp.survey": `${t("Survey Instrument")}`,
     "lamp.group": `${t("Activity Group")}`,
+    "lamp.module": `${t("Activity Module")}`,
     "lamp.memory_game": `${t("Memory Game")}`,
     "lamp.goals": `${t("Goals")}`,
     "lamp.medications": `${t("Medications")}`,
@@ -180,7 +181,6 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
-      console.log(allSpecs)
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
@@ -247,13 +247,13 @@ export default function AddActivity({
               </Grid>
             </Grid>
           </MenuItem>
-          {activitySpecs.filter((x) => ["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && (
+          {activitySpecs.filter((x) => ["lamp.group", "lamp.survey", "lamp.module"].includes(x.id)).length > 0 && (
             <React.Fragment>
               <MenuItem disabled divider>
                 <b>{`${t("Create a new...")}`}</b>
               </MenuItem>
               {activitySpecs
-                .filter((x) => ["lamp.group", "lamp.survey"].includes(x.id))
+                .filter((x) => ["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))
                 .map((x) => (
                   <Link
                     href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
@@ -266,12 +266,12 @@ export default function AddActivity({
                 ))}
             </React.Fragment>
           )}
-          {activitySpecs.filter((x) => !["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && [
+          {activitySpecs.filter((x) => !["lamp.group", "lamp.survey", "lamp.module"].includes(x.id)).length > 0 && [
             <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{`${t("Smartphone Cognitive Tests")}`}</b>
             </MenuItem>,
             ...activitySpecs
-              .filter((x) => !["lamp.group", "lamp.survey"].includes(x.id))
+              .filter((x) => !["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))
               .map((x) => (
                 <Link
                   href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
