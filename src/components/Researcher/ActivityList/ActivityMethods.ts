@@ -3,7 +3,12 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
-import { descriptionId } from "@rjsf/utils"
+let enumActivityIds = []
+let enumActivityNames = []
+Service.getAll("activities").then((activities) => {
+  enumActivityIds = (activities || []).map((data) => data.id)
+  enumActivityNames = (activities || []).map((data) => data.name)
+})
 
 export const SchemaList = () => {
   return {
@@ -935,78 +940,193 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "boolean", "short", "likert", "matrix"],
+                        enum: ["text", "short", "matrix"],
                       },
                     },
                   },
-                  //  {
+                  {
+                    properties: {
+                      type: {
+                        enum: ["likert"],
+                      },
+                      options: {
+                        type: "array",
+                        title: i18n.t("Response Options"),
+                        minItems: 1,
+                        items: {
+                          // type: "array",
+                          properties: {
+                            value: {
+                              Title: "Value",
+                              type: "string",
+                              enum: [3, 2, 1, 0],
+                              enumNames: [
+                                i18n.t("Nearly All the Time"),
+                                i18n.t("More than Half the Time"),
+                                i18n.t("Several Times"),
+                                i18n.t("Not at all"),
+                              ],
+                            },
+                            contigencySettings: {
+                              type: "object",
+                              title: "Contigency Settings",
+                              required: ["enable_contigency"],
+                              properties: {
+                                enable_contigency: {
+                                  type: "boolean",
+                                  title: "Enable Contigency",
+                                  default: false,
+                                },
+                              },
+                              dependencies: {
+                                enable_contigency: {
+                                  oneOf: [
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: true },
+                                        contigency_type: {
+                                          type: "string",
+                                          enum: ["activity", "question"],
+                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                          default: "activity",
+                                        },
+                                      },
+                                      required: ["contigency_type"],
+                                    },
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: false },
+                                      },
+                                    },
+                                  ],
+                                },
+                                contigency_type: {
+                                  allOf: [
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "activity" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          activity: {
+                                            type: "string",
+                                            title: "Select an activity",
+                                            enum: enumActivityIds,
+                                            enumNames: enumActivityNames,
+                                          },
+                                        },
+                                        required: ["activity"],
+                                      },
+                                    },
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "question" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          question_index: { type: "number", title: "Question number" },
+                                        },
+                                        required: ["question_index"],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  {
+                    properties: {
+                      type: {
+                        enum: ["boolean"],
+                      },
+                      options: {
+                        type: "array",
+                        title: i18n.t("Response Options"),
+                        minItems: 1,
+                        items: {
+                          properties: {
+                            value: {
+                              Title: "Value",
+                              type: "string",
+                              enum: ["Yes", "No"],
+                              enumNames: [i18n.t("Yes"), i18n.t("No")],
+                            },
+                            contigencySettings: {
+                              type: "object",
+                              title: "Contigency Settings",
+                              required: ["enable_contigency"],
+                              properties: {
+                                enable_contigency: {
+                                  type: "boolean",
+                                  title: "Enable Contigency",
+                                  default: false,
+                                },
+                              },
 
-                  //   properties: {
-                  //     type: {
-                  //       enum: ["boolean"],
-                  //     },
-                  //     contigencySettings: {
-                  //       type: "object",
-                  //       title: "Contigency Settings",
-                  //       properties: {
-                  //         enable_contigency: {
-                  //           type: "boolean",
-                  //           title: "Enable Contigency",
-                  //         },
-                  //       },
-
-                  //       dependencies: {
-                  //         enable_contigency: {
-                  //           oneOf: [
-                  //             {
-                  //               properties: {
-                  //                 enable_contigency: { const: true },
-                  //                 contigency_type: {
-                  //                   type: "string",
-                  //                   enum: ["activity", "question"],
-                  //                   enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                  //                   default: "activity",
-                  //                 },
-                  //               },
-                  //               required: ["contigency_type"],
-                  //             },
-                  //             {
-                  //               properties: {
-                  //                 enable_contigency: { const: false },
-                  //               },
-                  //             },
-                  //           ],
-                  //         },
-                  //         contigency_type: {
-                  //           allOf: [
-                  //             {
-                  //               if: {
-                  //                 properties: { contigency_type: { const: "activity" } },
-                  //               },
-                  //               then: {
-                  //                 properties: {
-                  //                   activity: { type: "string", title: "Select an activity" },
-                  //                 },
-                  //                 required: ["activity"],
-                  //               },
-                  //             },
-                  //             {
-                  //               if: {
-                  //                 properties: { contigency_type: { const: "question" } },
-                  //               },
-                  //               then: {
-                  //                 properties: {
-                  //                   question_index: { type: "number", title: "Question number" },
-                  //                 },
-                  //                 required: ["question_index"],
-                  //               },
-                  //             },
-                  //           ],
-                  //         },
-                  //       },
-                  //     },
-                  //   },
-                  // },
+                              dependencies: {
+                                enable_contigency: {
+                                  oneOf: [
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: true },
+                                        contigency_type: {
+                                          type: "string",
+                                          enum: ["activity", "question"],
+                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                          default: "activity",
+                                        },
+                                      },
+                                      required: ["contigency_type"],
+                                    },
+                                    {
+                                      properties: {
+                                        enable_contigency: { const: false },
+                                      },
+                                    },
+                                  ],
+                                },
+                                contigency_type: {
+                                  allOf: [
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "activity" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          activity: {
+                                            type: "string",
+                                            title: "Select an activity",
+                                            enum: enumActivityIds,
+                                            enumNames: enumActivityNames,
+                                          },
+                                        },
+                                        required: ["activity"],
+                                      },
+                                    },
+                                    {
+                                      if: {
+                                        properties: { contigency_type: { const: "question" } },
+                                      },
+                                      then: {
+                                        properties: {
+                                          question_index: { type: "number", title: "Question number" },
+                                        },
+                                        required: ["question_index"],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
                   {
                     properties: {
                       type: {
@@ -1017,7 +1137,7 @@ export const SchemaList = () => {
                         title: i18n.t("Response Options"),
                         minItems: 1,
                         items: {
-                          type: "object",
+                          // type: "array",
                           properties: {
                             value: {
                               title: i18n.t("Option Text"),
@@ -1081,7 +1201,12 @@ export const SchemaList = () => {
                                       },
                                       then: {
                                         properties: {
-                                          activity: { type: "string", title: "Select an activity" },
+                                          activity: {
+                                            type: "string",
+                                            title: "Select an activity",
+                                            enum: enumActivityIds,
+                                            enumNames: enumActivityNames,
+                                          },
                                         },
                                         required: ["activity"],
                                       },
@@ -1701,7 +1826,6 @@ export const SchemaList = () => {
 
 // Splice a raw Activity object with its ActivityDescription object.
 export function spliceActivity({ raw, tag }) {
-  console.log(tag)
   return {
     id: raw.id,
     study_id: raw.study_id,
@@ -1754,25 +1878,6 @@ export function unspliceTipsActivity(x) {
 
 // Un-splice an object into its raw Activity object and ActivityDescription object.
 export function unspliceActivity(x) {
-  console.log(
-    (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
-      multiselect: y?.type,
-      description: y?.description,
-      options:
-        y?.options === null
-          ? null
-          : y?.type !== "matrix" && y?.type !== "time"
-          ? y?.options?.map((z) => {
-              z?.description ?? "",
-                ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type)
-                  ? z?.contigencySettings ?? {}
-                  : {}
-            })
-          : null,
-      // contigencySettings: ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type) ?
-      //   y?.options?.map((z) => z?.contigencySettings ?? {}) : null
-    }))
-  )
   return {
     raw: {
       id: x.id,
@@ -1802,19 +1907,14 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        options:
-          y?.options === null
-            ? null
-            : y?.type !== "matrix" && y?.type !== "time"
-            ? y?.options?.map((z) => {
-                z?.description ?? "",
-                  ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type)
-                    ? z?.contigencySettings ?? {}
-                    : {}
-              })
-            : null,
-        // contigencySettings: ["slider", "list", "mutiselect", "rating", "boolean"].includes(y?.type) ?
-        //   y?.options?.map((z) => z?.contigencySettings ?? {}) : null
+        options: Array.isArray(y?.options)
+          ? y.options.map((z) => ({
+              description: z?.description ?? "",
+              contigencySettings: ["slider", "list", "multiselect", "rating", "boolean"].includes(y?.type)
+                ? z?.contigencySettings ?? {}
+                : undefined,
+            }))
+          : [],
       })),
     },
   }
@@ -1895,7 +1995,6 @@ export async function saveCTestActivity(x) {
 
 export async function saveSurveyActivity(x) {
   const { raw, tag } = unspliceActivity(x)
-  console.log(tag, raw)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
   return newItem
