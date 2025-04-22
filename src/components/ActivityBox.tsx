@@ -228,7 +228,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           delete fetchedData.settings
 
           if (activityEvents.length > 0) {
-            fetchedData["isCompleted"] = true
+            if (fetchedData.spec === "lamp.module") {
+              if (activityEvents.length > 1) {
+                fetchedData["isCompleted"] = true
+              }
+            } else {
+              fetchedData["isCompleted"] = true
+            }
             if (hideOnCompletion) {
               fetchedData["isHidden"] = true
             }
