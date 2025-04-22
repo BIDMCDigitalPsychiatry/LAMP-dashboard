@@ -13,7 +13,16 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
 import ActivityAccordian from "./ActivityAccordian"
-import { Backdrop, CircularProgress } from "@mui/material"
+import {
+  Backdrop,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -135,6 +144,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [shownActivities, setShownActivities] = useState([])
   const [loadingModules, setLoadingModules] = useState(true)
   const { t } = useTranslation()
+  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
+  const [showNotification, setShowNotification] = useState(false)
+  const [moduleNameForNotification, setModuleNameForNotification] = useState("")
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -169,7 +181,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const handleSubModule = async (activity, level) => {
     let moduleStartTime
     await getActivityEvents(participant, activity.id).then((res) => {
-      moduleStartTime = new Date(res[0].timestamp)
+      if (res?.length) {
+        const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
+        moduleStartTime = smallestTimestamp
+      } else {
+        moduleStartTime = null
+      }
     })
     LAMP.Activity.view(activity.id).then((data) => {
       addActivityData(data, level, moduleStartTime)
@@ -182,7 +199,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       completedActivities.filter((activity) => activity?.isCompleted === true).length === completedActivities.length
     ) {
       const activityEvents = await getActivityEvents(participant, data.id, moduleStartTime)
-      if ((activityEvents.length = 1)) {
+      if (activityEvents.length == 1) {
         LAMP.ActivityEvent.create(participant.id ?? participant, {
           timestamp: new Date().getTime(),
           duration: new Date().getTime() - moduleStartTime,
@@ -217,6 +234,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             }
           } else if (sequential && !sequentialActivityAdded) {
             sequentialActivityAdded = true
+            if (fetchedData.spec === "lamp.module" && !activityStatus[fetchedData.id]) {
+              setShowNotification(true)
+              setModuleNameForNotification(fetchedData.name)
+            }
           } else if (sequential && sequentialActivityAdded) {
             fetchedData["isHidden"] = true
           }
@@ -318,6 +339,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
           participant={participant}
+          activityStatus={activityStatus}
+          setActivityStatus={setActivityStatus}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>
@@ -401,6 +424,25 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         showStreak={showStreak}
         participant={participant}
       />
+      <Dialog open={showNotification} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`${t("The " + moduleNameForNotification + " module is now available for you")}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowNotification(false)
+              setModuleNameForNotification("")
+            }}
+            color="primary"
+            autoFocus
+          >
+            {`${t("OK")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

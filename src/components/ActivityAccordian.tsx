@@ -236,10 +236,18 @@ const getActivityEvents = async (participant: any, activityId: string) => {
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant }) => {
+const ActivityAccordion = ({
+  data,
+  type,
+  tag,
+  handleClickOpen,
+  handleSubModule,
+  participant,
+  activityStatus,
+  setActivityStatus,
+}) => {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -250,6 +258,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   }
 
   const checkIsBegin = async (id) => {
+    console.log("checkisbegin")
     const activityEvents = await getActivityEvents(participant, id)
     return activityEvents.length === 0
   }
@@ -278,16 +287,20 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
       for (const module of moduleActivities) {
         statuses[module.id] = await checkIsBegin(module.id)
         module?.subActivities?.forEach(async (activity) => {
-          statuses[activity.id] = await checkIsBegin(activity.id)
+          if (activity.spec === "lamp.module") {
+            statuses[activity.id] = await checkIsBegin(activity.id)
+          }
           activity?.subActivities?.forEach(async (subActivity) => {
-            statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+            if (subActivity.spec === "lamp.module") {
+              statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+            }
           })
         })
       }
       setActivityStatus(statuses)
     }
     initializeStatus()
-  }, [data])
+  }, [])
 
   return (
     <div>
