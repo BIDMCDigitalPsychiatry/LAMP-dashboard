@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
@@ -240,6 +240,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
+  const divRef = useRef()
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -275,26 +276,41 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
       // Pre-populate the status of all activities
       const statuses = {}
       const moduleActivities = data.filter((module) => module.name != "Other activities")
+
       for (const module of moduleActivities) {
         statuses[module.id] = await checkIsBegin(module.id)
-        module?.subActivities?.forEach(async (activity) => {
-          if (activity.spec === "lamp.module") {
-            statuses[activity.id] = await checkIsBegin(activity.id)
-          }
-          activity?.subActivities?.forEach(async (subActivity) => {
-            if (subActivity.spec === "lamp.module") {
-              statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+        if (module?.subActivities) {
+          for (const activity of module.subActivities) {
+            if (activity.spec === "lamp.module") {
+              statuses[activity.id] = await checkIsBegin(activity.id)
             }
-          })
-        })
+            if (activity?.subActivities) {
+              for (const subActivity of activity.subActivities) {
+                if (subActivity.spec === "lamp.module") {
+                  statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+                }
+              }
+            }
+          }
+        }
       }
       setActivityStatus(statuses)
     }
+
     initializeStatus()
-  }, [])
+  }, [data])
+
+  const scrollToElement = () => {
+    const { current } = divRef
+    if (current !== null) {
+      current.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  useEffect(scrollToElement, [])
 
   return (
-    <div>
+    <div ref={divRef}>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary>

@@ -203,7 +203,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         moduleStartTime = null
       }
     })
-
     if (moduleStartTime != null) {
       let arr = []
       let ids = data?.settings?.activities || []
@@ -216,7 +215,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
             (fetchedData.spec === "lamp.module" && activityEvents.length > 1)
           ) {
-            arr.push[id]
+            arr.push(id)
           }
         } catch (error) {
           console.error("Error fetching data for id:", id, error)
@@ -250,11 +249,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       try {
         const activityEvents = moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
         const fetchedData = await LAMP.Activity.view(id)
-        delete fetchedData.settings
         let eventCreated
         if (fetchedData.spec === "lamp.module") {
           eventCreated = await addModuleActivityEvent(fetchedData)
         }
+        delete fetchedData.settings
         if (
           (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && activityEvents.length > 1)
@@ -458,7 +457,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       <Dialog open={showNotification} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {`${t("The " + moduleNameForNotification + " module is now available for you")}`}
+            {`${t("The " + moduleNameForNotification + " module is now available for you to start")}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
