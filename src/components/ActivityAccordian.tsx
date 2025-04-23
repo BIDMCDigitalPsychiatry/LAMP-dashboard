@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails, Icon, Backdrop, CircularProgress } from "@mui/material"
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -236,18 +236,10 @@ const getActivityEvents = async (participant: any, activityId: string) => {
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({
-  data,
-  type,
-  tag,
-  handleClickOpen,
-  handleSubModule,
-  participant,
-  activityStatus,
-  setActivityStatus,
-}) => {
+const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant }) => {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -258,7 +250,6 @@ const ActivityAccordion = ({
   }
 
   const checkIsBegin = async (id) => {
-    console.log("checkisbegin")
     const activityEvents = await getActivityEvents(participant, id)
     return activityEvents.length === 0
   }
