@@ -237,7 +237,9 @@ export default function Activity({
             </Toolbar>
           </AppBar>
           <Divider className={classes.dividerHeader} />
-          {(!!type && type === "group") || activity?.spec === "lamp.group" ? (
+          {(!!type && (type === "group" || type === "module")) ||
+          activity?.spec === "lamp.group" ||
+          activity?.spec === "lamp.module" ? (
             <GroupCreator
               activities={allActivities}
               value={activity ?? null}
@@ -245,6 +247,8 @@ export default function Activity({
               studies={studies}
               study={activity?.study_id ?? null}
               details={details ?? null}
+              type={activity?.spec ?? "lamp." + type}
+              id={id}
             />
           ) : (!!type && type === "tips") || activity?.spec === "lamp.tips" ? (
             <Tips
