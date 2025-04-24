@@ -15,6 +15,8 @@ import {
   Typography,
   InputAdornment,
   useTheme,
+  ThemeProvider,
+  createTheme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -170,53 +172,65 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
         />
       )}
       {["create-new", "change-role", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          select={(!!permissions && !!title) || userType == "researcher" ? true : false}
-          label={`${t("Role")}`}
-          type="text"
-          variant="outlined"
-          // helperText={`${t(
-          //   "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
-          // )}`}
-          value={role}
-          onChange={(event) => setRole(event.target.value)}
-          style={{ marginBottom: 16 }}
-          InputProps={{
-            endAdornment: [
-              !["change-role"].includes(mode) ? undefined : (
-                <InputAdornment position="end" key="a">
-                  <Tooltip title={`${t("Save Role & Photo")}`}>
-                    <IconButton
-                      edge="end"
-                      aria-label="save role"
-                      onClick={() =>
-                        onChange({
-                          credential,
-                          photo,
-                          name,
-                          role,
-                          emailAddress,
-                          password,
-                        })
-                      }
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>check_circle</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            ],
-          }}
+        <ThemeProvider
+          theme={createTheme({
+            overrides: {
+              MuiSelect: {
+                iconOutlined: {
+                  right: 65,
+                },
+              },
+            },
+          })}
         >
-          {((!!permissions && !!title) || userType == "researcher") &&
-            roles.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-        </TextField>
+          <TextField
+            fullWidth
+            select={(!!permissions && !!title) || userType == "researcher" ? true : false}
+            label={`${t("Role")}`}
+            type="text"
+            variant="outlined"
+            // helperText={`${t(
+            //   "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+            // )}`}
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            style={{ marginBottom: 16 }}
+            InputProps={{
+              endAdornment: [
+                !["change-role"].includes(mode) ? undefined : (
+                  <InputAdornment position="end" key="a">
+                    <Tooltip title={`${t("Save Role & Photo")}`}>
+                      <IconButton
+                        edge="end"
+                        aria-label="save role"
+                        onClick={() =>
+                          onChange({
+                            credential,
+                            photo,
+                            name,
+                            role,
+                            emailAddress,
+                            password,
+                          })
+                        }
+                        onMouseDown={(event) => event.preventDefault()}
+                      >
+                        <Icon>check_circle</Icon>
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              ],
+            }}
+          >
+            {((!!permissions && !!title) || userType == "researcher") &&
+              roles.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+          </TextField>
+        </ThemeProvider>
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField

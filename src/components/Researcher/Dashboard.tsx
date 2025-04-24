@@ -29,6 +29,7 @@ import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
+import Conversations from "./Conversations/Index"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -353,6 +354,17 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={tab === "conversations"}
+                  onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/conversations`)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <DataPortalIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={`${t("Conversations")}`} />
+                </ListItem>
               </List>
             </Drawer>
             {tab === "users" && (
@@ -418,6 +430,18 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   name: researcher.name,
                 }}
                 data={LAMP.Auth}
+              />
+            )}
+            {tab === "conversations" && (
+              <Conversations
+                title={null}
+                researcherId={researcherId}
+                studies={studies}
+                upatedDataStudy={(data) => setUpdatedData(data)}
+                deletedDataStudy={(data) => setDeletedData(data)}
+                searchData={(data) => setSearch(data)}
+                newAdddeStudy={setNewStudy}
+                getAllStudies={getAllStudies}
               />
             )}
           </ResponsivePaper>
