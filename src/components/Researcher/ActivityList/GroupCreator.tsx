@@ -170,6 +170,7 @@ export default function GroupCreator({
         ? activities.filter(
             (x) =>
               x.spec !== "lamp.group" &&
+              x.spec !== "lamp.module" &&
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec)
           )
@@ -229,6 +230,7 @@ export default function GroupCreator({
           ? activities.filter(
               (x) =>
                 x.spec !== "lamp.group" &&
+                x.spec !== "lamp.module" &&
                 (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
