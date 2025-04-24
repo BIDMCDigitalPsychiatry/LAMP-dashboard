@@ -15,10 +15,13 @@ import {
   createStyles,
   Checkbox,
   Link,
+  Grid,
+  Badge,
 } from "@material-ui/core"
 // Local Imports
 import ParticipantName from "../ParticipantList/ParticipantName"
 import Credentials from "../../Credentials"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,6 +54,11 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    studyMain: { background: "#F8F8F8", borderRadius: 4 },
+    norecords: {
+      "& span": { marginRight: 5 },
+    },
+    w100: { width: "100%" },
     cardMain: {
       boxShadow: "none !important ",
       background: "#F8F8F8",
@@ -94,61 +102,32 @@ export default function ParticipantListItem({
   ...props
 }) {
   const classes = useStyles()
-  const [checked, setChecked] = React.useState(
-    selectedParticipants.filter((d) => d.id === participant.id).length > 0 ? true : false
-  )
-  const [user, setName] = useState(participant)
-  const [openSettings, setOpenSettings] = useState(false)
-
-  const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked)
-    handleSelectionChange(participant, event.target.checked)
-  }
-
-  const updateParticipant = (nameVal: string) => {
-    setName({ ...user, name: nameVal })
-  }
-
+  const [name, setName] = useState(participant.name ?? "")
   useEffect(() => {
-    setName(user)
-  }, [user])
+    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
+      setName(data[0]?.name ?? participant.id ?? "")
+    })
+  }, [participant])
 
   useEffect(() => {}, [])
 
   return (
-    <Card className={classes.cardMain}>
-      <Box display="flex" p={1}>
-        <Box>
-          <Checkbox
-            checked={checked}
-            onChange={(event) => handleChange(participant, event)}
-            classes={{ checked: classes.checkboxActive }}
-            inputProps={{ "aria-label": "primary checkbox" }}
-          />
-        </Box>
-        <Box flexGrow={1}>
-          <CardHeader
-            title={
-              <ParticipantName participant={user} updateParticipant={updateParticipant} openSettings={openSettings} />
-            }
-            subheader={<Typography variant="overline">{participant.study_name}</Typography>}
-            className={classes.participantHeader}
-          />
-        </Box>
-        <Box>
-          <CardActions>
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                onParticipantSelect(participant.id)
-              }}
-            >
-              <Icon>arrow_forward</Icon>
+    <Grid item lg={6} xs={12}>
+      <Badge badgeContent="2" color="error" className={classes.w100}>
+        <Box display="flex" p={2} className={classes.studyMain} width={1}>
+          <Box flexGrow={1} display="flex" alignItems="center">
+            <Box>
+              <Typography>{participant.id}</Typography>
+              {participant.id != name && <Typography variant="subtitle2">{name}</Typography>}
+            </Box>
+          </Box>
+          <Box display="flex" alignItems="center">
+            <Fab size="small" color="primary" className={classes.btnWhite}>
+              <Icon>chevron_right</Icon>
             </Fab>
-          </CardActions>
+          </Box>
         </Box>
-      </Box>
-    </Card>
+      </Badge>
+    </Grid>
   )
 }

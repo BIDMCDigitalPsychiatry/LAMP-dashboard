@@ -24,6 +24,7 @@ import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
 import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
+import { ReactComponent as Conversation } from "../../icons/Conversation.svg"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
@@ -359,9 +360,10 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   button
                   selected={tab === "conversations"}
                   onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/conversations`)}
+                  disableGutters
                 >
                   <ListItemIcon className={classes.menuIcon}>
-                    <DataPortalIcon />
+                    <Conversation />
                   </ListItemIcon>
                   <ListItemText primary={`${t("Conversations")}`} />
                 </ListItem>
@@ -435,13 +437,16 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
             {tab === "conversations" && (
               <Conversations
                 title={null}
+                onParticipantSelect={onParticipantSelect}
                 researcherId={researcherId}
                 studies={studies}
-                upatedDataStudy={(data) => setUpdatedData(data)}
-                deletedDataStudy={(data) => setDeletedData(data)}
-                searchData={(data) => setSearch(data)}
-                newAdddeStudy={setNewStudy}
+                notificationColumn={notificationColumn}
+                selectedStudies={selectedStudies}
+                setSelectedStudies={setSelectedStudies}
                 getAllStudies={getAllStudies}
+                mode={mode}
+                setOrder={() => setOrder(!order)}
+                order={order}
               />
             )}
           </ResponsivePaper>

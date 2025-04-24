@@ -70,7 +70,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">{`${t("Groups")}`}</Typography>
+          <Typography variant="h5">{`${t("Conversations")}`}</Typography>
         </Box>
         <Box>
           <SearchBox searchData={searchData} />
