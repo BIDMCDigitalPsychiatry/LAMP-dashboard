@@ -240,7 +240,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-  const divRef = useRef()
+  const divRef = useRef<HTMLDivElement | null>(null)
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -301,9 +301,8 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   }, [data])
 
   const scrollToElement = () => {
-    const { current } = divRef
-    if (current !== null) {
-      current.scrollIntoView({ behavior: "smooth" })
+    if (divRef.current) {
+      divRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }
 
