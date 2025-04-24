@@ -236,11 +236,10 @@ const getActivityEvents = async (participant: any, activityId: string) => {
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant }) => {
+const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant, divRef }) => {
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-  const divRef = useRef<HTMLDivElement | null>(null)
 
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -299,14 +298,6 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
 
     initializeStatus()
   }, [data])
-
-  const scrollToElement = () => {
-    if (divRef.current) {
-      divRef.current.scrollIntoView({ behavior: "smooth" })
-    }
-  }
-
-  useEffect(scrollToElement, [])
 
   return (
     <div ref={divRef}>
