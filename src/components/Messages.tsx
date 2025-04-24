@@ -187,6 +187,7 @@ export default function Messages({
     var seconds = Math.floor(delta % 60)
     return seconds + (seconds > 1 ? "sec" : "secs")
   }
+
   const refreshMessages = async () => {
     console.log("Fetching messages...")
     setConversations(

@@ -61,7 +61,7 @@ const checkPasswordRule = async (value: string) => {
     return true
   }
 }
-export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions }) {
+export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions, userType }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
   const [name, setName] = useState(credential?.name ?? "")
@@ -101,8 +101,14 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     window.location.href.split("#")[0] +
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
+  console.log(title)
   const roles =
-    title === "User Administrator"
+    userType == "researcher"
+      ? [
+          { value: "investigator", label: "Investigator" },
+          { value: "message_coordinator", label: "Message Coordinator" },
+        ]
+      : title === "User Administrator"
       ? [
           { value: "edit", label: "User Administrator" },
           { value: "view", label: "Practice Lead" },
@@ -166,7 +172,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
       {["create-new", "change-role", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
-          select={!!permissions && !!title ? true : false}
+          select={(!!permissions && !!title) || userType == "researcher" ? true : false}
           label={`${t("Role")}`}
           type="text"
           variant="outlined"
@@ -204,8 +210,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             ],
           }}
         >
-          {!!permissions &&
-            !!title &&
+          {((!!permissions && !!title) || userType == "researcher") &&
             roles.map((option) => (
               <MenuItem key={option.value} value={option.value}>
                 {option.label}
@@ -375,7 +380,8 @@ export const CredentialManager: React.FunctionComponent<{
   credential?: any
   mode?: string
   type?: string
-}> = ({ id, onComplete, credential, mode, type, ...props }) => {
+  userType?: string
+}> = ({ id, onComplete, credential, mode, type, userType, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
@@ -627,6 +633,7 @@ export const CredentialManager: React.FunctionComponent<{
           onChange={(data) => _submitCredential(data)}
           title={type ?? null}
           permissions={permissions}
+          userType={userType}
         />
       )}
     </Box>
