@@ -170,7 +170,7 @@ export default function Activity({
     } else {
       x["id"] = newItem["data"]
       updateDb(x)
-      if (x.spec === "lamp.module") addHideSubactivities(x.settings, x["id"], x.studyID)
+      if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"], x.studyID)
       setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
@@ -208,7 +208,7 @@ export default function Activity({
     else {
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
-        if (x.spec === "lamp.module") addHideSubactivities(x.settings, x["id"], x.studyID)
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"], x.studyID)
 
         addActivity(x, studies)
         enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
@@ -216,7 +216,7 @@ export default function Activity({
         })
         history.back()
       } else {
-        if (x.spec === "lamp.module") addHideSubactivities(x.settings, x.id, x.studyID)
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x.id, x.studyID)
         x["study_id"] = x.studyID
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]
