@@ -170,11 +170,25 @@ export default function Activity({
     } else {
       x["id"] = newItem["data"]
       updateDb(x)
+      if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"], x.studyID)
       setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
       })
       history.back()
+    }
+  }
+
+  const addHideSubactivities = async (settings, id, studyID) => {
+    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+      !!y.error ? undefined : y.data
+    )[0]
+    let hidden = (tag || []).filter((t) => t.moduleId !== id)
+    if (!!settings.hide_sub_activities) {
+      hidden.push({ moduleId: id, activities: settings?.activities })
+      await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
+    } else {
+      await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
     }
   }
 
@@ -194,12 +208,15 @@ export default function Activity({
     else {
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"], x.studyID)
+
         addActivity(x, studies)
         enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
           variant: "success",
         })
         history.back()
       } else {
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x.id, x.studyID)
         x["study_id"] = x.studyID
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]

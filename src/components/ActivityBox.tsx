@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
@@ -146,6 +146,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const { t } = useTranslation()
   const [showNotification, setShowNotification] = useState(false)
   const [moduleNameForNotification, setModuleNameForNotification] = useState("")
+  const divRef = useRef<HTMLDivElement | null>(null)
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -164,6 +165,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             moduleStartTime = null
           }
         })
+        scrollToElement()
         addActivityData(data, 0, moduleStartTime, fromActivityList)
       } else {
         setActivity(data)
@@ -357,6 +359,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     runAsync()
   }, [savedActivities])
 
+  const scrollToElement = () => {
+    if (divRef.current) {
+      divRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
@@ -371,6 +379,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
           participant={participant}
+          divRef={divRef}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>
@@ -457,7 +466,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       <Dialog open={showNotification} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {`${t("The " + moduleNameForNotification + " module is now available for you to start")}`}
+            {`${t("The " + moduleNameForNotification + " module is now available for you to start.")}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
