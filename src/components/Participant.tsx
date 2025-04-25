@@ -204,7 +204,15 @@ export default function Participant({
   useEffect(() => {
     setLoading(true)
     LAMP.Activity.allByParticipant(participant.id, null, false).then((activities) => {
-      setActivities(activities)
+      ;(async () => {
+        let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        const hiddenActivities = tag.flatMap((module) => module.activities)
+        const updatedActivities = activities.filter((activity) => !hiddenActivities.includes(activity.id))
+        setActivities(updatedActivities)
+      })()
+
       props.activeTab(tab, participant.id)
       let language = !!localStorage.getItem("LAMP_user_" + participant.id)
         ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
