@@ -36,6 +36,7 @@ export const games = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
