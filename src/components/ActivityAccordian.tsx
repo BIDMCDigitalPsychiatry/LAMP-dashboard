@@ -180,7 +180,6 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       <CheckCircleIcon fontSize="small" />
                     </Box>
                   )}
-
                   <Box mt={2} mb={1}>
                     <Box
                       className={classes.mainIcons}
@@ -236,7 +235,16 @@ const getActivityEvents = async (participant: any, activityId: string) => {
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, participant, divRef }) => {
+const ActivityAccordion = ({
+  data,
+  type,
+  tag,
+  handleClickOpen,
+  handleSubModule,
+  participant,
+  moduleForNotification,
+  setIsParentModuleLoaded,
+}) => {
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
@@ -278,21 +286,27 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
 
   useEffect(() => {
     const initializeStatus = async () => {
-      // Pre-populate the status of all activities
       const statuses = {}
-      const moduleActivities = data.filter((module) => module.name != "Other activities")
+      const moduleActivities = data.filter((module) => module.name !== "Other activities")
 
+      const checkAndNotify = async (moduleId) => {
+        const status = await checkIsBegin(moduleId)
+        statuses[moduleId] = status
+        if (moduleForNotification?.id != null && moduleId === moduleForNotification?.id) {
+          setIsParentModuleLoaded(true)
+        }
+      }
       for (const module of moduleActivities) {
-        statuses[module.id] = await checkIsBegin(module.id)
+        await checkAndNotify(module.id)
         if (module?.subActivities) {
           for (const activity of module.subActivities) {
             if (activity.spec === "lamp.module") {
-              statuses[activity.id] = await checkIsBegin(activity.id)
+              await checkAndNotify(activity.id)
             }
             if (activity?.subActivities) {
               for (const subActivity of activity.subActivities) {
                 if (subActivity.spec === "lamp.module") {
-                  statuses[subActivity.id] = await checkIsBegin(subActivity.id)
+                  await checkAndNotify(subActivity.id)
                 }
               }
             }
@@ -306,7 +320,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
   }, [data])
 
   return (
-    <div ref={divRef}>
+    <div>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary>
@@ -318,12 +332,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
             {module.id && activityStatus[module.id] && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity
-                <Button id={module.id} variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
+                <Button variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
                   "Start"
                 )}`}</Button>
               </Box>
             )}
-            <Grid container spacing={2}>
+            <Grid id={module.id} container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
                   module.subActivities,
@@ -355,14 +369,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                         {activity.id && activityStatus[activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
-                            <Button
-                              id={activity.id}
-                              variant="contained"
-                              onClick={() => addActivityEventForModule(activity.id)}
-                            >{`${t("Start")}`}</Button>
+                            <Button variant="contained" onClick={() => addActivityEventForModule(activity.id)}>{`${t(
+                              "Start"
+                            )}`}</Button>
                           </Box>
                         )}
-                        <Grid container spacing={2} direction="row" wrap="wrap">
+                        <Grid container spacing={2} direction="row" wrap="wrap" id={activity.id}>
                           {renderActivities(
                             activity.subActivities,
                             type,
@@ -390,13 +402,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                                       <Box className={classes.moduleStart}>
                                         Click here to start the module activity
                                         <Button
-                                          id={subActivity.id}
                                           variant="contained"
                                           onClick={() => addActivityEventForModule(subActivity.id)}
                                         >{`${t("Start")}`}</Button>
                                       </Box>
                                     )}
-                                    <Grid container spacing={2} direction="row" wrap="wrap">
+                                    <Grid container spacing={2} direction="row" wrap="wrap" id={subActivity.id}>
                                       {renderActivities(
                                         subActivity.subActivities,
                                         type,

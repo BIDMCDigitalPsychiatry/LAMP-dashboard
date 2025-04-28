@@ -163,7 +163,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [parentModuleLevel, setParentModuleLevel] = useState(0)
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
-  const divRef = useRef<HTMLDivElement | null>(null)
+  const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -270,12 +270,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     return activityEventCreated
   }
 
-  useEffect(() => {
-    if (moduleForNotification != null) {
-      setTimeout(() => setShowNotification(true), 1000)
-    }
-  }, [moduleForNotification])
-
   const addActivityData = async (data, level, fromActivityList = false) => {
     let moduleActivityData = { ...data }
     let moduleStartTime = await getModuleStartTime(data.id)
@@ -344,9 +338,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return itm
       })
     }
-
     delete moduleActivityData.settings
-
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
         if (!item.subActivities && item.id === moduleActivityData.id && item.level === level) {
@@ -387,6 +379,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
     setLoadingModules(false)
   }
+
+  useEffect(() => {
+    if (!!moduleForNotification && isParentModuleLoaded) {
+      setTimeout(() => {
+        setShowNotification(true)
+      }, 300)
+    }
+  }, [moduleForNotification, isParentModuleLoaded])
 
   useEffect(() => {
     const runAsync = async () => {
@@ -432,7 +432,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
           participant={participant}
-          divRef={divRef}
+          moduleForNotification={moduleForNotification}
+          setIsParentModuleLoaded={setIsParentModuleLoaded}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>
@@ -516,27 +517,34 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         showStreak={showStreak}
         participant={participant}
       />
-      <Dialog open={showNotification} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t("The " + moduleForNotification?.name + " module is now available for you to start.")}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              handleSubModule(moduleForNotification, parentModuleLevel)
-              setShowNotification(false)
-              setModuleForNotification(null)
-              scrollToElement(moduleForNotification?.id)
-            }}
-            color="primary"
-            autoFocus
-          >
-            {`${t("OK")}`}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {!!moduleForNotification && (
+        <Dialog
+          open={showNotification}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {`${t("The " + moduleForNotification?.name + " module is now available for you to start.")}`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleSubModule(moduleForNotification, parentModuleLevel)
+                setShowNotification(false)
+                setModuleForNotification(null)
+                scrollToElement(moduleForNotification?.id)
+                setIsParentModuleLoaded(false)
+              }}
+              color="primary"
+              autoFocus
+            >
+              {`${t("OK")}`}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   )
 }
