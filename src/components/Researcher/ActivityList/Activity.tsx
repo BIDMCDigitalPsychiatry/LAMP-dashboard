@@ -92,6 +92,7 @@ export default function Activity({
   const [studies, setStudies] = useState(null)
   const [allActivities, setAllActivities] = useState(null)
   const [details, setDetails] = useState(null)
+  const [subActivities, setSubActivities] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -119,6 +120,9 @@ export default function Activity({
         if (!(lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")) {
           let data = await LAMP.Activity.view(activity.id)
           activity.settings = data.settings
+        }
+        if (activity.spec === "lamp.module") {
+          setSubActivities(activity.settings?.activities)
         }
         if (activity.spec === "lamp.survey") {
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
@@ -192,6 +196,16 @@ export default function Activity({
     }
   }
 
+  const checkAndSetCompleted = async (settings, id) => {
+    if (subActivities != settings.activities) {
+      let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+        !!y.error ? undefined : y.data
+      )[0]
+      let newSet = (tag || []).filter((t) => t.moduleId !== id)
+      await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", newSet)
+    }
+  }
+
   const updateDb = (x) => {
     addActivity(x, studies)
     setLoading(false)
@@ -217,6 +231,8 @@ export default function Activity({
         history.back()
       } else {
         if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x.id, x.studyID)
+        if (x.spec === "lamp.module") checkAndSetCompleted(x.settings, x.id)
+
         x["study_id"] = x.studyID
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]
