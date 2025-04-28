@@ -267,6 +267,12 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
         ...prevState,
         [id]: hasBegun,
       }))
+    } else {
+      const hasBegun = true
+      setActivityStatus((prevState) => ({
+        ...prevState,
+        [id]: hasBegun,
+      }))
     }
   }
 
@@ -312,7 +318,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
             {module.id && activityStatus[module.id] && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity
-                <Button variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
+                <Button id={module.id} variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
                   "Start"
                 )}`}</Button>
               </Box>
@@ -349,9 +355,11 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                         {activity.id && activityStatus[activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
-                            <Button variant="contained" onClick={() => addActivityEventForModule(activity.id)}>{`${t(
-                              "Start"
-                            )}`}</Button>
+                            <Button
+                              id={activity.id}
+                              variant="contained"
+                              onClick={() => addActivityEventForModule(activity.id)}
+                            >{`${t("Start")}`}</Button>
                           </Box>
                         )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
@@ -382,6 +390,7 @@ const ActivityAccordion = ({ data, type, tag, handleClickOpen, handleSubModule, 
                                       <Box className={classes.moduleStart}>
                                         Click here to start the module activity
                                         <Button
+                                          id={subActivity.id}
                                           variant="contained"
                                           onClick={() => addActivityEventForModule(subActivity.id)}
                                         >{`${t("Start")}`}</Button>
