@@ -302,6 +302,17 @@ export async function sensorEventUpdate(val: string, participantId: string, acti
       },
     })
   }
+  if (LAMP.Auth._type === "researcher") {
+    return await LAMP.SensorEvent.create(participantId, {
+      timestamp: timestamp ?? new Date().getTime(),
+      sensor: "lamp.analytics",
+      data: {
+        type: "open_page",
+        page: val,
+        activity: activityId,
+      },
+    })
+  }
 }
 
 export default function BottomMenu({ ...props }) {
