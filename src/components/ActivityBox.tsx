@@ -21,7 +21,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
 
@@ -112,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const getActivityEvents = async (participant: any, activityId: string, moduleStartTime?) => {
+const getActivityEvents = async (participant: any, activityId, moduleStartTime?) => {
   let from: Date
   if (moduleStartTime) {
     from = moduleStartTime
@@ -134,6 +133,23 @@ const getActivityEvents = async (participant: any, activityId: string, moduleSta
   return activityEvents
 }
 
+const sortModulesByCompletion = (modules) => {
+  if (!Array.isArray(modules)) return []
+  return modules
+    .map((module) => {
+      const processedSubActivities = Array.isArray(module.subActivities)
+        ? sortModulesByCompletion(module.subActivities)
+        : []
+      return {
+        ...module,
+        subActivities: module.sequentialOrdering
+          ? module.subActivities // keep original order if sequentialOrdering is true
+          : processedSubActivities.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0)),
+      }
+    })
+    .sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0))
+}
+
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -144,29 +160,20 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [shownActivities, setShownActivities] = useState([])
   const [loadingModules, setLoadingModules] = useState(true)
   const { t } = useTranslation()
+  const [parentModuleLevel, setParentModuleLevel] = useState(0)
   const [showNotification, setShowNotification] = useState(false)
-  const [moduleNameForNotification, setModuleNameForNotification] = useState("")
-  const divRef = useRef<HTMLDivElement | null>(null)
+  const [moduleForNotification, setModuleForNotification] = useState(null)
+  const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
-        // Don't remove item if this was triggered by auto-open logic
         if (!isAuto) {
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        let moduleStartTime
-        await getActivityEvents(participant, y.id).then((res) => {
-          if (res?.length) {
-            const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
-            moduleStartTime = smallestTimestamp
-          } else {
-            moduleStartTime = null
-          }
-        })
-        scrollToElement()
-        addActivityData(data, 0, moduleStartTime, fromActivityList)
+        scrollToElement(y.id)
+        addActivityData(data, 0, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -180,8 +187,40 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level) => {
+    LAMP.Activity.view(activity.id).then((data) => {
+      addActivityData(data, level)
+    })
+  }
+
+  const checkIsModuleCompleted = async (id) => {
+    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+      !!y.error ? undefined : y.data
+    )[0]
+    const isCompleted = (tag || []).filter((t) => t.moduleId === id && t.participants.includes(participant.id))
+    return isCompleted.length > 0 ? true : false
+  }
+
+  const createCompletedAttachment = async (id) => {
+    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+      !!y.error ? undefined : y.data
+    )[0]
+    let checkIsModule = (tag || []).filter((t) => t.moduleId === id)
+    let checkNotModule = (tag || []).filter((t) => t.moduleId !== id)
+    if (!checkIsModule.length) {
+      checkNotModule.push({ moduleId: id, participants: [participant?.id] })
+    } else {
+      checkIsModule.forEach((item) => {
+        if (!item.participants.includes(participant?.id)) {
+          item.participants.push(participant?.id)
+        }
+      })
+    }
+    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", checkNotModule.concat(checkIsModule))
+  }
+
+  const getModuleStartTime = async (id) => {
     let moduleStartTime
-    await getActivityEvents(participant, activity.id).then((res) => {
+    await getActivityEvents(participant, id).then((res) => {
       if (res?.length) {
         const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
         moduleStartTime = smallestTimestamp
@@ -189,22 +228,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         moduleStartTime = null
       }
     })
-    LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime)
-    })
+    return moduleStartTime
   }
 
   const addModuleActivityEvent = async (data) => {
     let activityEventCreated = false
-    let moduleStartTime
-    await getActivityEvents(participant, data.id).then((res) => {
-      if (res?.length && res.length < 2) {
-        const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
-        moduleStartTime = smallestTimestamp
-      } else {
-        moduleStartTime = null
-      }
-    })
+    let moduleStartTime = await getModuleStartTime(data.id)
     if (moduleStartTime != null) {
       let arr = []
       let ids = data?.settings?.activities || []
@@ -215,7 +244,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
           if (
             (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
-            (fetchedData.spec === "lamp.module" && activityEvents.length > 1)
+            (fetchedData.spec === "lamp.module" && (await addModuleActivityEvent(fetchedData)))
           ) {
             arr.push(id)
           }
@@ -224,73 +253,79 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
       if (arr.length === ids.length) {
-        LAMP.ActivityEvent.create(participant.id ?? participant, {
-          timestamp: new Date().getTime(),
-          duration: new Date().getTime() - moduleStartTime,
-          activity: data.id,
-          static_data: {},
-        })
-        activityEventCreated = true
+        if (await checkIsModuleCompleted(data.id)) {
+          activityEventCreated = true
+        } else {
+          LAMP.ActivityEvent.create(participant.id ?? participant, {
+            timestamp: new Date().getTime(),
+            duration: new Date().getTime() - moduleStartTime,
+            activity: data.id,
+            static_data: {},
+          })
+          createCompletedAttachment(data.id)
+          activityEventCreated = true
+        }
       }
     }
-
     return activityEventCreated
   }
 
-  const addActivityData = async (data, level, moduleStartTime, fromActivityList = false) => {
+  const addActivityData = async (data, level, fromActivityList = false) => {
     let moduleActivityData = { ...data }
+    let moduleStartTime = await getModuleStartTime(data.id)
     const ids = data?.settings?.activities || []
     const sequential = data?.settings?.sequential_ordering === true
     const hideOnCompletion = data?.settings?.hide_on_completion === true
     const trackProgress = data?.settings?.track_progress === true
     let sequentialActivityAdded = false
-    // Fetch activity data
-    const arr = []
-
-    for (const id of ids) {
+    let isModuleCompleted = await addModuleActivityEvent(data)
+    const activityPromises = ids.map(async (id, index) => {
       try {
-        const activityEvents = moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
-        const fetchedData = await LAMP.Activity.view(id)
-        let eventCreated
-        if (fetchedData.spec === "lamp.module") {
-          eventCreated = await addModuleActivityEvent(fetchedData)
-        }
+        const [activityEvents, fetchedData] = await Promise.all([
+          moduleStartTime === null ? [] : getActivityEvents(participant, id, moduleStartTime),
+          LAMP.Activity.view(id),
+        ])
+        const eventCreated = fetchedData.spec === "lamp.module" ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
+
         if (
           (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
-          (fetchedData.spec === "lamp.module" && activityEvents.length > 1)
+          (fetchedData.spec === "lamp.module" && eventCreated)
         ) {
           fetchedData["isCompleted"] = true
           if (hideOnCompletion) {
             fetchedData["isHidden"] = true
           }
-        } else if (eventCreated === true) {
-          fetchedData["isCompleted"] = true
         } else {
           if (sequential && !sequentialActivityAdded) {
             sequentialActivityAdded = true
             if (fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
-              setShowNotification(true)
-              setModuleNameForNotification(fetchedData.name)
+              setModuleForNotification(fetchedData)
             }
           } else if (sequential && sequentialActivityAdded) {
             fetchedData["isHidden"] = true
           }
         }
-
-        arr.push(fetchedData)
+        return { index, fetchedData }
       } catch (error) {
         console.error("Error fetching data for id:", id, error)
+        return { index, fetchedData: null }
       }
-    }
+    })
+    const results = await Promise.all(activityPromises)
+    const sortedResults = results.sort((a, b) => a.index - b.index).map((result) => result.fetchedData)
+    const filteredArr = sortedResults.filter(Boolean)
+
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {
+          setParentModuleLevel(level + 1)
           return {
             ...itm,
             isHidden: true,
-            subActivities: arr,
+            subActivities: filteredArr,
             level: level + 1,
+            sequentialOrdering: sequential,
             trackProgress: trackProgress,
           }
         }
@@ -303,17 +338,17 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return itm
       })
     }
-
     delete moduleActivityData.settings
-
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
         if (!item.subActivities && item.id === moduleActivityData.id && item.level === level) {
+          setParentModuleLevel(level + 1)
           return {
             ...item,
             isHidden: true,
             level: level + 1,
-            subActivities: arr,
+            subActivities: filteredArr,
+            sequentialOrdering: sequential,
             trackProgress: trackProgress,
           }
         }
@@ -325,17 +360,33 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
         return item
       })
-      setModuleData(updatedData)
+      const sortedData = sortModulesByCompletion(updatedData)
+      setModuleData(sortedData)
     } else {
-      moduleActivityData.subActivities = arr
+      moduleActivityData.subActivities = filteredArr
       moduleActivityData.level = level + 1
       if (trackProgress) {
         moduleActivityData.trackProgress = trackProgress
       }
-      setModuleData((prev) => [...prev, moduleActivityData])
+      if (isModuleCompleted) {
+        moduleActivityData.isCompleted = true
+      }
+      if (sequential) {
+        moduleActivityData.sequentialOrdering = true
+      }
+      setParentModuleLevel(level + 1)
+      setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
     setLoadingModules(false)
   }
+
+  useEffect(() => {
+    if (!!moduleForNotification && isParentModuleLoaded) {
+      setTimeout(() => {
+        setShowNotification(true)
+      }, 300)
+    }
+  }, [moduleForNotification, isParentModuleLoaded])
 
   useEffect(() => {
     const runAsync = async () => {
@@ -359,10 +410,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     runAsync()
   }, [savedActivities])
 
-  const scrollToElement = () => {
-    if (divRef.current) {
-      divRef.current.scrollIntoView({ behavior: "smooth" })
-    }
+  const scrollToElement = (id) => {
+    setTimeout(() => {
+      if (document.getElementById(id)) {
+        document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
+      }
+    }, 4000)
   }
 
   useEffect(() => {
@@ -379,7 +432,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
           participant={participant}
-          divRef={divRef}
+          moduleForNotification={moduleForNotification}
+          setIsParentModuleLoaded={setIsParentModuleLoaded}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>
@@ -463,25 +517,34 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         showStreak={showStreak}
         participant={participant}
       />
-      <Dialog open={showNotification} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t("The " + moduleNameForNotification + " module is now available for you to start.")}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setShowNotification(false)
-              setModuleNameForNotification("")
-            }}
-            color="primary"
-            autoFocus
-          >
-            {`${t("OK")}`}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {!!moduleForNotification && (
+        <Dialog
+          open={showNotification}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {`${t("The " + moduleForNotification?.name + " module is now available for you to start.")}`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                handleSubModule(moduleForNotification, parentModuleLevel)
+                setShowNotification(false)
+                setModuleForNotification(null)
+                scrollToElement(moduleForNotification?.id)
+                setIsParentModuleLoaded(false)
+              }}
+              color="primary"
+              autoFocus
+            >
+              {`${t("OK")}`}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   )
 }
