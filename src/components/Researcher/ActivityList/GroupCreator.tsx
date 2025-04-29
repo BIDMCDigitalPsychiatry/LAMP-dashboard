@@ -397,7 +397,7 @@ export default function GroupCreator({
                 labelPlacement="end"
               />
             )}
-            {type !== "lamp.group" && (
+            {/* {type !== "lamp.group" && (
               <FormControlLabel
                 value="hide_on_completion"
                 control={
@@ -410,7 +410,7 @@ export default function GroupCreator({
                 label="Hide on Completion"
                 labelPlacement="end"
               />
-            )}
+            )} */}
             <FormControlLabel
               value="hide_sub_activities"
               control={
