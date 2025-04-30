@@ -311,7 +311,7 @@ const ActivityAccordion = ({
     <div>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
-          <AccordionSummary>
+          <AccordionSummary id={module.id}>
             <Typography variant="h6">
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
             </Typography>
@@ -323,7 +323,7 @@ const ActivityAccordion = ({
                 <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
               </Box>
             )}
-            <Grid id={module.id} container spacing={2}>
+            <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
                   module.subActivities,
@@ -346,7 +346,7 @@ const ActivityAccordion = ({
                 {activity.subActivities && activity.subActivities.length > 0 && (
                   <Box paddingLeft={5} display="flex" flexDirection="column">
                     <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                      <AccordionSummary>
+                      <AccordionSummary id={activity.id}>
                         <Typography variant="h6">
                           {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
                         </Typography>
@@ -360,7 +360,7 @@ const ActivityAccordion = ({
                             )}`}</Button>
                           </Box>
                         )}
-                        <Grid container spacing={2} direction="row" wrap="wrap" id={activity.id}>
+                        <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
                             activity.subActivities,
                             type,
@@ -377,7 +377,7 @@ const ActivityAccordion = ({
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
                               <Box paddingLeft={5} display="flex" flexDirection="column">
                                 <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                                  <AccordionSummary>
+                                  <AccordionSummary id={subActivity.id}>
                                     <Typography variant="h6">
                                       {subActivity.name}{" "}
                                       {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
@@ -394,7 +394,7 @@ const ActivityAccordion = ({
                                           >{`${t("Start")}`}</Button>
                                         </Box>
                                       )}
-                                    <Grid container spacing={2} direction="row" wrap="wrap" id={subActivity.id}>
+                                    <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
                                         subActivity.subActivities,
                                         type,

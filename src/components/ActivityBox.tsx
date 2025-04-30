@@ -283,8 +283,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     return activityEventCreated
   }
 
-  console.log("moduleData", moduleData)
-
   const addActivityData = async (data, level, startTime, fromActivityList = false) => {
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
