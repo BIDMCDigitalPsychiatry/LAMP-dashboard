@@ -111,7 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const getActivityEvents = async (participant: any, activityId, moduleStartTime?) => {
+export const getActivityEvents = async (participant: any, activityId, moduleStartTime?) => {
   let from: Date
   if (moduleStartTime) {
     from = moduleStartTime
@@ -137,13 +137,13 @@ const sortModulesByCompletion = (modules) => {
   if (!Array.isArray(modules)) return []
   return modules
     .map((module) => {
-      const processedSubActivities = Array.isArray(module.subActivities)
-        ? sortModulesByCompletion(module.subActivities)
+      const processedSubActivities = Array.isArray(module?.subActivities)
+        ? sortModulesByCompletion(module?.subActivities)
         : []
       return {
         ...module,
-        subActivities: module.sequentialOrdering
-          ? module.subActivities // keep original order if sequentialOrdering is true
+        subActivities: module?.sequentialOrdering
+          ? module?.subActivities // keep original order if sequentialOrdering is true
           : processedSubActivities.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0)),
       }
     })
@@ -173,7 +173,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
         const fromActivityList = true
         scrollToElement(y.id)
-        addActivityData(data, 0, fromActivityList)
+        const moduleStartTime = await getModuleStartTime(y.id)
+        addActivityData(data, 0, moduleStartTime, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -187,8 +188,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level) => {
+    const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level)
+      addActivityData(data, level, moduleStartTime)
     })
   }
 
@@ -218,9 +220,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", checkNotModule.concat(checkIsModule))
   }
 
-  const getModuleStartTime = async (id) => {
+  const getModuleStartTime = async (id, startTime = null) => {
     let moduleStartTime
-    await getActivityEvents(participant, id).then((res) => {
+    await getActivityEvents(participant, id, startTime).then((res) => {
       if (res?.length) {
         const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
         moduleStartTime = smallestTimestamp
@@ -233,13 +235,25 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   const addModuleActivityEvent = async (data) => {
     let activityEventCreated = false
-    let moduleStartTime = await getModuleStartTime(data.id)
+    let moduleStartTime = null
+    if (data?.startTime) {
+      moduleStartTime = await getModuleStartTime(data.id, data?.startTime)
+    } else {
+      moduleStartTime = await getModuleStartTime(data.id)
+    }
     if (moduleStartTime != null) {
       let arr = []
       let ids = data?.settings?.activities || []
+      let validIds = []
       for (const id of ids) {
         try {
           const fetchedData = await LAMP.Activity.view(id)
+          if (fetchedData != null) {
+            validIds.push(id)
+          }
+          if (fetchedData.spec === "lamp.module") {
+            fetchedData["startTime"] = moduleStartTime
+          }
           const activityEvents =
             moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
           if (
@@ -252,7 +266,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           console.error("Error fetching data for id:", id, error)
         }
       }
-      if (arr.length === ids.length) {
+      if (arr.length === validIds.length) {
         if (await checkIsModuleCompleted(data.id)) {
           activityEventCreated = true
         } else {
@@ -270,26 +284,34 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     return activityEventCreated
   }
 
-  const addActivityData = async (data, level, fromActivityList = false) => {
+  const addActivityData = async (data, level, startTime, fromActivityList = false) => {
     let moduleActivityData = { ...data }
-    let moduleStartTime = await getModuleStartTime(data.id)
+    let moduleStartTime = startTime
+    let moduleStarted = moduleStartTime != null
     const ids = data?.settings?.activities || []
     const sequential = data?.settings?.sequential_ordering === true
     const hideOnCompletion = data?.settings?.hide_on_completion === true
     const trackProgress = data?.settings?.track_progress === true
     let sequentialActivityAdded = false
     let isModuleCompleted = await addModuleActivityEvent(data)
-    const activityPromises = ids.map(async (id, index) => {
+    const arr = []
+    for (const id of ids) {
       try {
         const [activityEvents, fetchedData] = await Promise.all([
           moduleStartTime === null ? [] : getActivityEvents(participant, id, moduleStartTime),
           LAMP.Activity.view(id),
         ])
-        const eventCreated = fetchedData.spec === "lamp.module" ? await addModuleActivityEvent(fetchedData) : false
+
+        if (fetchedData.spec === "lamp.module") {
+          fetchedData["startTime"] = moduleStartTime
+        }
+
+        const eventCreated =
+          fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
 
         if (
-          (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
         ) {
           fetchedData["isCompleted"] = true
@@ -306,16 +328,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             fetchedData["isHidden"] = true
           }
         }
-        return { index, fetchedData }
+
+        arr.push(fetchedData)
       } catch (error) {
         console.error("Error fetching data for id:", id, error)
-        return { index, fetchedData: null }
+        arr.push(null)
       }
-    })
-    const results = await Promise.all(activityPromises)
-    const sortedResults = results.sort((a, b) => a.index - b.index).map((result) => result.fetchedData)
-    const filteredArr = sortedResults.filter(Boolean)
-
+    }
+    const filteredArr = arr.filter((item) => item != null)
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {

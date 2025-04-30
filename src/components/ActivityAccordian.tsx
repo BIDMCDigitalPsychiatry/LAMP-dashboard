@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next"
 import { LinkRenderer } from "./ActivityPopup"
 import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import LAMP from "lamp-core"
-import { getSelfHelpActivityEvents } from "./Participant"
+import { getActivityEvents } from "./ActivityBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -165,7 +165,7 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       : classes.preventH)
                   }
                 >
-                  {activity.isCompleted && module.trackProgress && (
+                  {activity?.isCompleted && module?.trackProgress && (
                     <Box
                       sx={{
                         position: "absolute",
@@ -217,23 +217,6 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
   )
 }
 
-const getActivityEvents = async (participant: any, activityId: string) => {
-  let from = new Date()
-  from.setMonth(from.getMonth() - 6)
-  let activityEvents =
-    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
-      ? await getSelfHelpActivityEvents(activityId, from.getTime(), new Date().getTime())
-      : await LAMP.ActivityEvent.allByParticipant(
-          participant?.id ?? participant,
-          activityId,
-          from.getTime(),
-          new Date().getTime(),
-          null,
-          true
-        )
-  return activityEvents
-}
-
 //function to create collapsible layout when module activity is selected
 const ActivityAccordion = ({
   data,
@@ -257,31 +240,35 @@ const ActivityAccordion = ({
           module.subActivities.length
   }
 
-  const checkIsBegin = async (id) => {
-    const activityEvents = await getActivityEvents(participant, id)
+  const checkIsBegin = async (module) => {
+    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
     return activityEvents.length === 0
   }
 
-  const addActivityEventForModule = async (id) => {
-    if ((await checkIsBegin(id)) === true) {
+  const addActivityEventForModule = async (module) => {
+    if ((await checkIsBegin(module)) === true) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: 0,
-        activity: id,
+        activity: module.id,
         static_data: {},
       })
       const hasBegun = false
       setActivityStatus((prevState) => ({
         ...prevState,
-        [id]: hasBegun,
+        [module.id]: hasBegun,
       }))
     } else {
       const hasBegun = true
       setActivityStatus((prevState) => ({
         ...prevState,
-        [id]: hasBegun,
+        [module.id]: hasBegun,
       }))
     }
+  }
+
+  const getCompositeKey = (module, parentIds = []) => {
+    return [...parentIds, module.id].join(">")
   }
 
   useEffect(() => {
@@ -289,24 +276,25 @@ const ActivityAccordion = ({
       const statuses = {}
       const moduleActivities = data.filter((module) => module.name !== "Other activities")
 
-      const checkAndNotify = async (moduleId) => {
-        const status = await checkIsBegin(moduleId)
-        statuses[moduleId] = status
-        if (moduleForNotification?.id != null && moduleId === moduleForNotification?.id) {
+      const checkAndNotify = async (module, parentIds = []) => {
+        const status = await checkIsBegin(module)
+        const compositeKey = getCompositeKey(module, parentIds)
+        statuses[compositeKey] = status
+        if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
           setIsParentModuleLoaded(true)
         }
       }
       for (const module of moduleActivities) {
-        await checkAndNotify(module.id)
+        await checkAndNotify(module)
         if (module?.subActivities) {
           for (const activity of module.subActivities) {
             if (activity.spec === "lamp.module") {
-              await checkAndNotify(activity.id)
+              await checkAndNotify(activity, [module.id])
             }
             if (activity?.subActivities) {
               for (const subActivity of activity.subActivities) {
                 if (subActivity.spec === "lamp.module") {
-                  await checkAndNotify(subActivity.id)
+                  await checkAndNotify(subActivity, [module.id, activity.id])
                 }
               }
             }
@@ -323,7 +311,7 @@ const ActivityAccordion = ({
     <div>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
-          <AccordionSummary>
+          <AccordionSummary id={module.id}>
             <Typography variant="h6">
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
             </Typography>
@@ -332,12 +320,10 @@ const ActivityAccordion = ({
             {module.id && activityStatus[module.id] && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity
-                <Button variant="contained" onClick={() => addActivityEventForModule(module.id)}>{`${t(
-                  "Start"
-                )}`}</Button>
+                <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
               </Box>
             )}
-            <Grid id={module.id} container spacing={2}>
+            <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
                   module.subActivities,
@@ -360,21 +346,21 @@ const ActivityAccordion = ({
                 {activity.subActivities && activity.subActivities.length > 0 && (
                   <Box paddingLeft={5} display="flex" flexDirection="column">
                     <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                      <AccordionSummary>
+                      <AccordionSummary id={activity.id}>
                         <Typography variant="h6">
                           {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {activity.id && activityStatus[activity.id] && (
+                        {activity.id && activityStatus[module.id + ">" + activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
-                            <Button variant="contained" onClick={() => addActivityEventForModule(activity.id)}>{`${t(
+                            <Button variant="contained" onClick={() => addActivityEventForModule(activity)}>{`${t(
                               "Start"
                             )}`}</Button>
                           </Box>
                         )}
-                        <Grid container spacing={2} direction="row" wrap="wrap" id={activity.id}>
+                        <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
                             activity.subActivities,
                             type,
@@ -391,23 +377,24 @@ const ActivityAccordion = ({
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
                               <Box paddingLeft={5} display="flex" flexDirection="column">
                                 <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                                  <AccordionSummary>
+                                  <AccordionSummary id={subActivity.id}>
                                     <Typography variant="h6">
                                       {subActivity.name}{" "}
                                       {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
                                     </Typography>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {subActivity.id && activityStatus[subActivity.id] && (
-                                      <Box className={classes.moduleStart}>
-                                        Click here to start the module activity
-                                        <Button
-                                          variant="contained"
-                                          onClick={() => addActivityEventForModule(subActivity.id)}
-                                        >{`${t("Start")}`}</Button>
-                                      </Box>
-                                    )}
-                                    <Grid container spacing={2} direction="row" wrap="wrap" id={subActivity.id}>
+                                    {subActivity.id &&
+                                      activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
+                                        <Box className={classes.moduleStart}>
+                                          Click here to start the module activity
+                                          <Button
+                                            variant="contained"
+                                            onClick={() => addActivityEventForModule(subActivity)}
+                                          >{`${t("Start")}`}</Button>
+                                        </Box>
+                                      )}
+                                    <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
                                         subActivity.subActivities,
                                         type,
