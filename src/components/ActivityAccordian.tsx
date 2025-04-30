@@ -165,7 +165,7 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       : classes.preventH)
                   }
                 >
-                  {activity.isCompleted && module.trackProgress && (
+                  {activity?.isCompleted && module?.trackProgress && (
                     <Box
                       sx={{
                         position: "absolute",

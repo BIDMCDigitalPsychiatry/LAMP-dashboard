@@ -137,13 +137,13 @@ const sortModulesByCompletion = (modules) => {
   if (!Array.isArray(modules)) return []
   return modules
     .map((module) => {
-      const processedSubActivities = Array.isArray(module.subActivities)
-        ? sortModulesByCompletion(module.subActivities)
+      const processedSubActivities = Array.isArray(module?.subActivities)
+        ? sortModulesByCompletion(module?.subActivities)
         : []
       return {
         ...module,
-        subActivities: module.sequentialOrdering
-          ? module.subActivities // keep original order if sequentialOrdering is true
+        subActivities: module?.sequentialOrdering
+          ? module?.subActivities // keep original order if sequentialOrdering is true
           : processedSubActivities.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0)),
       }
     })
@@ -188,8 +188,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level) => {
+    const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, activity?.startTime)
+      addActivityData(data, level, moduleStartTime)
     })
   }
 
@@ -310,7 +311,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         delete fetchedData.settings
 
         if (
-          (moduleStartTime && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
         ) {
           fetchedData["isCompleted"] = true
@@ -334,7 +335,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         arr.push(null)
       }
     }
-    const filteredArr = arr
+    const filteredArr = arr.filter((item) => item != null)
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {
