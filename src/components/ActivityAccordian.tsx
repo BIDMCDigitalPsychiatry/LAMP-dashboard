@@ -254,13 +254,13 @@ const ActivityAccordion = ({
         duration: 0,
         activity: module.id,
         static_data: {},
+      }).then((a) => {
+        setActivityStatus((prevState) => ({
+          ...prevState,
+          [compositeKey]: true,
+        }))
+        updateModuleStartTime(module, new Date())
       })
-      const hasBegun = false
-      setActivityStatus((prevState) => ({
-        ...prevState,
-        [compositeKey]: hasBegun,
-      }))
-      updateModuleStartTime(module, new Date())
     } else {
       const hasBegun = true
       setActivityStatus((prevState) => ({
