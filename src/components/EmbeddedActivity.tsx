@@ -204,6 +204,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+      })
       setSettings({
         ...settings,
         activity: currentActivity,
@@ -212,7 +219,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         noBack: noBack,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      if (activitySpec?.executable?.startsWith("data:")) {
+      console.log(activitySpec)
+      if (currentActivity.spec == "lamp.survey") {
+        console.log("asd")
+        response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      } else if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
         response = atob(await (await fetch(activitySpec.executable)).text())
@@ -232,7 +243,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      console.log(currentActivity.spec)
+      // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+
       if (currentActivity.spec == "lamp.survey") {
+        console.log("asd")
         return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else {
         return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())

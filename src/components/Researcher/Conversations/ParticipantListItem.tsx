@@ -7,6 +7,7 @@ import { Service } from "../../DBService/DBService"
 import MessageDialog from "../ParticipantList/Profile/MessageDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -97,19 +98,30 @@ export default function ParticipantListItem({
   const [name, setName] = useState(participant.name ?? "")
   const [conversations, setConversations] = useState({})
 
+  useInterval(
+    () => {
+      refreshMessages()
+    },
+    10 * 1000,
+    true
+  )
+
   useEffect(() => {
     Service.getDataByKey("participants", [participant.id], "id").then((data) => {
       setName(data[0]?.name ?? participant.id ?? "")
     })
-    setMsgCount(getMessageCount())
     refresh()
+
+    setMsgCount(getMessageCount())
   }, [participant])
 
   const refresh = () => {
     if (sensorData === null) {
+      console.log("sd")
       ;(async () => {
         let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
         data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+        console.log(data)
         setSensorData(!!data ? data[0] : [])
       })()
     }
