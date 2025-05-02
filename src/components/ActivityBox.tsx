@@ -174,7 +174,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
         const fromActivityList = true
         const moduleStartTime = await getModuleStartTime(y.id)
-        addActivityData(data, 0, moduleStartTime, null, fromActivityList)
+        const initializeOpenedModule = isAuto ? true : false
+        addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -187,10 +188,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
+  const handleInitializeOpenedModules = (y: any, isAuto = false) => {
+    return LAMP.Activity.view(y.id).then(async (data) => {
+      if (y.spec === "lamp.module") {
+        if (!isAuto) {
+          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
+        }
+        const fromActivityList = true
+        const moduleStartTime = await getModuleStartTime(y.id)
+        const initializeOpenedModule = isAuto ? true : false
+        await addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
+      }
+    })
+  }
+
   const handleSubModule = async (activity, level) => {
     const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime, activity?.parentModule)
+      addActivityData(data, level, moduleStartTime, activity?.parentModule, false)
     })
   }
 
@@ -323,7 +338,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
-  const addActivityData = async (data, level, startTime, parent, fromActivityList = false) => {
+  const addActivityData = async (data, level, startTime, parent, initializeOpenedModule, fromActivityList = false) => {
     setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
@@ -448,8 +463,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setParentModuleLevel(level + 1)
       setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
-    setLoadingModules(false)
-    scrollToElement(data.id)
+    if (!initializeOpenedModule) {
+      scrollToElement(data.id)
+      setLoadingModules(false)
+    }
   }
 
   useEffect(() => {
@@ -462,17 +479,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   useEffect(() => {
     const runAsync = async () => {
-      setLoadingModules(true)
       const activitiesList = savedActivities
       const initializeOpenedModules = activitiesList.filter(
         (activity) => activity.spec === "lamp.module" && activity?.settings?.initialize_opened
       )
 
       if (initializeOpenedModules.length > 0) {
+        setLoadingModules(true)
+        const tasks = []
         for (const activity of initializeOpenedModules) {
-          await handleClickOpen(activity, true)
+          tasks.push(handleInitializeOpenedModules(activity, true))
         }
-
+        try {
+          await Promise.all(tasks)
+        } catch (err) {
+          console.error("Error:", err)
+        } finally {
+          setLoadingModules(false) // Reset loader
+        }
         setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b.id === a.id)))
       } else {
         setShownActivities(savedActivities)
