@@ -23,6 +23,7 @@ import {
   DialogContentText,
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
+import { ITEMS_KEY } from "@rjsf/utils"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -174,7 +175,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const fromActivityList = true
         scrollToElement(y.id)
         const moduleStartTime = await getModuleStartTime(y.id)
-        addActivityData(data, 0, moduleStartTime, fromActivityList)
+        addActivityData(data, 0, moduleStartTime, null, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -190,7 +191,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const handleSubModule = async (activity, level) => {
     const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime)
+      addActivityData(data, level, moduleStartTime, activity?.parentModule)
     })
   }
 
@@ -284,7 +285,45 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     return activityEventCreated
   }
 
-  const addActivityData = async (data, level, startTime, fromActivityList = false) => {
+  const updateModuleStartTime = (module, startTime) => {
+    const updatedData = moduleData.map((item) => {
+      if (item.id === module.id && item.parentModule == module.parentModule) {
+        return {
+          ...item,
+          subActivities: updateTime(module, item.subActivities, startTime),
+        }
+      }
+      if (item.subActivities?.length > 0) {
+        return {
+          ...item,
+          subActivities: updateTime(module, item.subActivities, startTime),
+        }
+      }
+      return item
+    })
+    const sortedData = sortModulesByCompletion(updatedData)
+    setModuleData(sortedData)
+  }
+
+  const updateTime = (module, subActivities, startTime) => {
+    return subActivities.map((itm) => {
+      if (itm.parentModule === module.id && itm.spec === "lamp.module") {
+        return {
+          ...itm,
+          startTime: startTime,
+        }
+      }
+      if (itm.subActivities?.length > 0) {
+        return {
+          ...itm,
+          subActivities: updateTime(module, itm.subActivities, startTime),
+        }
+      }
+      return itm
+    })
+  }
+
+  const addActivityData = async (data, level, startTime, parent, fromActivityList = false) => {
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null
@@ -304,6 +343,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
+          fetchedData["parentModule"] = data.id
         }
 
         const eventCreated =
@@ -321,7 +361,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         } else {
           if (sequential && !sequentialActivityAdded) {
             sequentialActivityAdded = true
-            if (fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
+            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
               setModuleForNotification(fetchedData)
             }
           } else if (sequential && sequentialActivityAdded) {
@@ -338,7 +378,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const filteredArr = arr.filter((item) => item != null)
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
-        if (itm.id === moduleActivityData.id && level === itemLevel && !itm.subActivities) {
+        if (
+          itm.id === moduleActivityData.id &&
+          level === itemLevel &&
+          !itm.subActivities &&
+          itm.parentModule === parent
+        ) {
           setParentModuleLevel(level + 1)
           return {
             ...itm,
@@ -361,7 +406,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
-        if (!item.subActivities && item.id === moduleActivityData.id && item.level === level) {
+        if (
+          !item.subActivities &&
+          item.id === moduleActivityData.id &&
+          item.level === level &&
+          item.parentModule === parent
+        ) {
           setParentModuleLevel(level + 1)
           return {
             ...item,
@@ -454,6 +504,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           participant={participant}
           moduleForNotification={moduleForNotification}
           setIsParentModuleLoaded={setIsParentModuleLoaded}
+          updateModuleStartTime={updateModuleStartTime}
         />
       ) : !loadingModules ? (
         <Grid container spacing={2}>
@@ -558,7 +609,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 setIsParentModuleLoaded(false)
               }}
               color="primary"
-              autoFocus
             >
               {`${t("OK")}`}
             </Button>

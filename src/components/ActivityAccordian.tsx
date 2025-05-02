@@ -227,11 +227,11 @@ const ActivityAccordion = ({
   participant,
   moduleForNotification,
   setIsParentModuleLoaded,
+  updateModuleStartTime,
 }) => {
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
@@ -245,7 +245,8 @@ const ActivityAccordion = ({
     return activityEvents.length === 0
   }
 
-  const addActivityEventForModule = async (module) => {
+  const addActivityEventForModule = async (module, parentIds = []) => {
+    const compositeKey = getCompositeKey(module, parentIds)
     if ((await checkIsBegin(module)) === true) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
@@ -256,13 +257,14 @@ const ActivityAccordion = ({
       const hasBegun = false
       setActivityStatus((prevState) => ({
         ...prevState,
-        [module.id]: hasBegun,
+        [compositeKey]: hasBegun,
       }))
+      updateModuleStartTime(module, new Date())
     } else {
       const hasBegun = true
       setActivityStatus((prevState) => ({
         ...prevState,
-        [module.id]: hasBegun,
+        [compositeKey]: hasBegun,
       }))
     }
   }
@@ -271,39 +273,38 @@ const ActivityAccordion = ({
     return [...parentIds, module.id].join(">")
   }
 
-  useEffect(() => {
-    const initializeStatus = async () => {
-      const statuses = {}
-      const moduleActivities = data.filter((module) => module.name !== "Other activities")
+  const initializeStatus = async () => {
+    const statuses = {}
+    const moduleActivities = data.filter((module) => module.name !== "Other activities")
 
-      const checkAndNotify = async (module, parentIds = []) => {
-        const status = await checkIsBegin(module)
-        const compositeKey = getCompositeKey(module, parentIds)
-        statuses[compositeKey] = status
-        if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
-          setIsParentModuleLoaded(true)
-        }
+    const checkAndNotify = async (module, parentIds = []) => {
+      const status = await checkIsBegin(module)
+      const compositeKey = getCompositeKey(module, parentIds)
+      statuses[compositeKey] = status
+      if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
+        setIsParentModuleLoaded(true)
       }
-      for (const module of moduleActivities) {
-        await checkAndNotify(module)
-        if (module?.subActivities) {
-          for (const activity of module.subActivities) {
-            if (activity.spec === "lamp.module") {
-              await checkAndNotify(activity, [module.id])
-            }
-            if (activity?.subActivities) {
-              for (const subActivity of activity.subActivities) {
-                if (subActivity.spec === "lamp.module") {
-                  await checkAndNotify(subActivity, [module.id, activity.id])
-                }
+    }
+    for (const module of moduleActivities) {
+      await checkAndNotify(module)
+      if (module?.subActivities) {
+        for (const activity of module.subActivities) {
+          if (activity.spec === "lamp.module") {
+            await checkAndNotify(activity, [module.id])
+          }
+          if (activity?.subActivities) {
+            for (const subActivity of activity.subActivities) {
+              if (subActivity.spec === "lamp.module") {
+                await checkAndNotify(subActivity, [module.id, activity.id])
               }
             }
           }
         }
       }
-      setActivityStatus(statuses)
     }
-
+    setActivityStatus(statuses)
+  }
+  useEffect(() => {
     initializeStatus()
   }, [data])
 
@@ -355,9 +356,10 @@ const ActivityAccordion = ({
                         {activity.id && activityStatus[module.id + ">" + activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
-                            <Button variant="contained" onClick={() => addActivityEventForModule(activity)}>{`${t(
-                              "Start"
-                            )}`}</Button>
+                            <Button
+                              variant="contained"
+                              onClick={() => addActivityEventForModule(activity, [module.id])}
+                            >{`${t("Start")}`}</Button>
                           </Box>
                         )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
@@ -390,7 +392,9 @@ const ActivityAccordion = ({
                                           Click here to start the module activity
                                           <Button
                                             variant="contained"
-                                            onClick={() => addActivityEventForModule(subActivity)}
+                                            onClick={() =>
+                                              addActivityEventForModule(subActivity, [module.id, activity.id])
+                                            }
                                           >{`${t("Start")}`}</Button>
                                         </Box>
                                       )}
