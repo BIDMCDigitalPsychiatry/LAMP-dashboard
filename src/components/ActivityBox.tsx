@@ -173,7 +173,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        scrollToElement(y.id)
         const moduleStartTime = await getModuleStartTime(y.id)
         addActivityData(data, 0, moduleStartTime, null, fromActivityList)
       } else {
@@ -286,6 +285,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const updateModuleStartTime = (module, startTime) => {
+    setLoadingModules(true)
     const updatedData = moduleData.map((item) => {
       if (item.id === module.id && item.parentModule == module.parentModule) {
         return {
@@ -301,8 +301,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       return item
     })
-    const sortedData = sortModulesByCompletion(updatedData)
-    setModuleData(sortedData)
+    setModuleData(updatedData)
+    setLoadingModules(false)
   }
 
   const updateTime = (module, subActivities, startTime) => {
@@ -324,6 +324,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const addActivityData = async (data, level, startTime, parent, fromActivityList = false) => {
+    setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null
@@ -448,6 +449,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
     setLoadingModules(false)
+    scrollToElement(data.id)
   }
 
   useEffect(() => {
@@ -485,7 +487,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       if (document.getElementById(id)) {
         document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       }
-    }, 4000)
+    }, 1000)
   }
 
   useEffect(() => {
@@ -494,6 +496,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   return (
     <Box>
+      {loadingModules && (
+        <Backdrop className={classes.backdrop} open={loadingModules}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
       {moduleData.length ? (
         <ActivityAccordian
           data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
@@ -506,7 +513,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setIsParentModuleLoaded={setIsParentModuleLoaded}
           updateModuleStartTime={updateModuleStartTime}
         />
-      ) : !loadingModules ? (
+      ) : (
         <Grid container spacing={2}>
           {savedActivities.length
             ? savedActivities.map((activity) => (
@@ -573,10 +580,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 </Box>
               )}
         </Grid>
-      ) : (
-        <Backdrop className={classes.backdrop} open={loadingModules}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
       )}
       <ActivityPopup
         activity={activity}
@@ -605,7 +608,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleSubModule(moduleForNotification, parentModuleLevel)
                 setShowNotification(false)
                 setModuleForNotification(null)
-                scrollToElement(moduleForNotification?.id)
                 setIsParentModuleLoaded(false)
               }}
               color="primary"

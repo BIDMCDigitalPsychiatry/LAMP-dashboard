@@ -232,6 +232,7 @@ const ActivityAccordion = ({
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
+  const [statusLoaded, setStatusLoaded] = useState(false)
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
@@ -274,9 +275,8 @@ const ActivityAccordion = ({
   }
 
   const initializeStatus = async () => {
+    setStatusLoaded(false)
     const statuses = {}
-    const moduleActivities = data.filter((module) => module.name !== "Other activities")
-
     const checkAndNotify = async (module, parentIds = []) => {
       const status = await checkIsBegin(module)
       const compositeKey = getCompositeKey(module, parentIds)
@@ -285,27 +285,34 @@ const ActivityAccordion = ({
         setIsParentModuleLoaded(true)
       }
     }
-    for (const module of moduleActivities) {
-      await checkAndNotify(module)
+    const tasks = []
+    for (const module of data.filter((m) => m.name !== "Other activities")) {
+      tasks.push(checkAndNotify(module))
       if (module?.subActivities) {
         for (const activity of module.subActivities) {
           if (activity.spec === "lamp.module") {
-            await checkAndNotify(activity, [module.id])
+            tasks.push(checkAndNotify(activity, [module.id]))
           }
           if (activity?.subActivities) {
             for (const subActivity of activity.subActivities) {
               if (subActivity.spec === "lamp.module") {
-                await checkAndNotify(subActivity, [module.id, activity.id])
+                tasks.push(checkAndNotify(subActivity, [module.id, activity.id]))
               }
             }
           }
         }
       }
     }
+    await Promise.all(tasks)
     setActivityStatus(statuses)
+    return true
   }
+
   useEffect(() => {
-    initializeStatus()
+    const status = initializeStatus()
+    if (status) {
+      setStatusLoaded(true)
+    }
   }, [data])
 
   return (
@@ -318,7 +325,7 @@ const ActivityAccordion = ({
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            {module.id && activityStatus[module.id] && (
+            {statusLoaded && module.id && activityStatus[module.id] === true && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity
                 <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
@@ -353,7 +360,7 @@ const ActivityAccordion = ({
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {activity.id && activityStatus[module.id + ">" + activity.id] && (
+                        {statusLoaded && activity.id && activityStatus[module.id + ">" + activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
                             <Button
@@ -386,7 +393,8 @@ const ActivityAccordion = ({
                                     </Typography>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {subActivity.id &&
+                                    {statusLoaded &&
+                                      subActivity.id &&
                                       activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
                                         <Box className={classes.moduleStart}>
                                           Click here to start the module activity
