@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
-import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
+import {
+  Typography,
+  Grid,
+  Card,
+  Box,
+  ButtonBase,
+  makeStyles,
+  Theme,
+  createStyles,
+  Button,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -233,6 +245,8 @@ const ActivityAccordion = ({
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
   const [statusLoaded, setStatusLoaded] = useState(false)
+  const [loading, setLoading] = useState(false)
+
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
@@ -249,6 +263,7 @@ const ActivityAccordion = ({
   const addActivityEventForModule = async (module, parentIds = []) => {
     const compositeKey = getCompositeKey(module, parentIds)
     if ((await checkIsBegin(module)) === true) {
+      setLoading(true)
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: 0,
@@ -260,6 +275,7 @@ const ActivityAccordion = ({
           [compositeKey]: true,
         }))
         updateModuleStartTime(module, new Date())
+        setLoading(false)
       })
     } else {
       const hasBegun = true
@@ -317,6 +333,9 @@ const ActivityAccordion = ({
 
   return (
     <div>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary id={module.id}>
