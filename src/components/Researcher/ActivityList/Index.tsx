@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const availableActivitySpecs = [
   "lamp.group",
+  "lamp.module",
   "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
@@ -65,6 +66,7 @@ export const availableActivitySpecs = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -84,6 +86,7 @@ export const games = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export default function ActivityList({
   researcherId,
