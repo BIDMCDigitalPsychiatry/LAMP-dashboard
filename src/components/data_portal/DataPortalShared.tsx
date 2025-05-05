@@ -54,11 +54,10 @@ export function ajaxRequest(parameters) {
 //jsonata fetch
 export const jsonataFetch = async (query, access_key, secret_key, server) => {
   try {
-    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
     let res = await fetch(`https://${server}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${userToken.accessToken}`,
+        Authorization: `Basic ${access_key}:${secret_key}`,
       },
       body: query,
     })

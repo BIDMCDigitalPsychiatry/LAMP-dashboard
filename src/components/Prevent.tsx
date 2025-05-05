@@ -197,7 +197,7 @@ async function getActivityEvents(
       ...x,
       activity: _activities.find((y) => x.activity === y.id),
     }))
-    .filter((x) => (!!x.activity ? !_hidden?.includes(`${x.timestamp}/${x.activity.id}`) : true))
+    .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
     .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
     .map((x) => ({
       ...x,
