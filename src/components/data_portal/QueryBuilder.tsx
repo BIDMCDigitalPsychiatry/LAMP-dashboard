@@ -125,6 +125,7 @@ export default function QueryBuilder(props) {
   const [tagsLoading, setTagLoadingStatus] = React.useState(false)
   const [tagObject, setTagObject] = React.useState({})
   const [checkedCategories, setCheckedCategories] = React.useState([])
+  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
   //when the list of available tags change,
   //we update a tag variable to display info
   React.useEffect(() => {
@@ -176,7 +177,7 @@ export default function QueryBuilder(props) {
       let tagSending = {
         method: "POST",
         url: `https://${props.token.server}/`,
-        headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
+        headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
         data: testQuery,
         callback: function (res) {
           setTags(JSON.parse(res))
@@ -192,7 +193,7 @@ export default function QueryBuilder(props) {
         let sharedSending = {
           method: "POST",
           url: `https://${props.token.server}/`,
-          headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
+          headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
           data: sharedQuery,
           callback: function (res) {
             let tagList = JSON.parse(res)
@@ -229,7 +230,7 @@ export default function QueryBuilder(props) {
       let sending = {
         method: "POST",
         url: `https://${props.token.server}/`,
-        headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
+        headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
         data: tagQuery,
         callback: function (res) {
           props.setLoadingGraphs(false)
@@ -383,7 +384,7 @@ export default function QueryBuilder(props) {
           let sending = {
             method: "POST",
             url: `https://${props.token.server}/`,
-            headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
+            headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
             data: tagQuery,
             callback: function (res) {
               //as we are no longer loading data, we set this to false

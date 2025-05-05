@@ -28,6 +28,7 @@ export default function SignIn({ onSubmit, ...props }) {
   const [isLoading, setLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const { t } = useTranslation()
+  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
   function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
@@ -56,7 +57,7 @@ export default function SignIn({ onSubmit, ...props }) {
             //@ts-ignore: This property will be created by the form (see line 37)
             url: `https://${data.server}/researcher/me`,
             //@ts-ignore: This property will be created by the form (see line 37)
-            headers: [["Authorization", `Basic ${data.username}:${data.password}`]],
+            headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
             callback: readyUser,
           }
           ajaxRequest(sending)
@@ -96,7 +97,7 @@ export default function SignIn({ onSubmit, ...props }) {
       //@ts-ignore: This property will be created by the form (see line 37)
       url: `https://${data.server}/type/me/parent`,
       //@ts-ignore: This property will be created by the form (see line 37)
-      headers: [["Authorization", `Basic ${data.username}:${data.password}`]],
+      headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
       callback: setUser,
       alternateCallback: testAdmin,
     }
