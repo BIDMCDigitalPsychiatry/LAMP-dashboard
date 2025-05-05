@@ -157,10 +157,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   //let's define our function we'll use to ping the api
   const getData = async (query) => {
     try {
+      const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
       let res = await fetch(`https://${token.server}`, {
         method: "POST",
         headers: {
-          Authorization: `Basic ${token.username}:${token.password}`,
+          Authorization: `Bearer ${userToken.accessToken}`,
         },
         body: query,
       })

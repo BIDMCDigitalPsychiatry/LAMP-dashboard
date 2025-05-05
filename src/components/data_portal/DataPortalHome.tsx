@@ -44,10 +44,11 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const runQuery = async () => {
     try {
       jsonata(query)["errors"] // check for errors first (change from .errors() made for TSX compliance)
+      const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
       let res = await fetch(`https://${token.server}`, {
         method: "POST",
         headers: {
-          Authorization: `Basic ${token.username}:${token.password}`,
+          Authorization: `Bearer ${userToken.accessToken}`,
         },
         body: query,
       })

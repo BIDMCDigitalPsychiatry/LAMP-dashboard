@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { HashRouter, Route, Redirect, Switch, useLocation, useParams } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
@@ -24,8 +24,6 @@ import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
-import demo_db from "../demo_db.json"
-import self_help_db from "../self_help_db.json"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -91,8 +89,21 @@ export const changeCase = (text) => {
 }
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
+  const location: any = useLocation()
 
+  useEffect(() => {
+    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    if (
+      LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
+      location?.pathname === "/" &&
+      !userToken?.accessToken
+    ) {
+      //window.location.href = "/#/"
+      reset()
+    }
+  }, [location?.pathname])
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
     if (window.location.href.indexOf("participant") >= 0) {
@@ -128,14 +139,9 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
-  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital"]
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "localhost:3006", "lamp-api.zcodemo.com"]
 
   useEffect(() => {
-    if (localStorage.getItem("demo_mode") === "try_it") {
-      LAMP.initializeDemoDB(demo_db)
-    } else if (localStorage.getItem("demo_mode") === "self_help") {
-      LAMP.initializeDemoDB(self_help_db)
-    }
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -157,7 +163,7 @@ function AppRouter({ ...props }) {
         serverAddress:
           x.length > 2 && typeof x[2] !== "undefined"
             ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-            : "api.lamp.digital",
+            : "localhost:3006",
       }).then((x) => {
         window.location.href = query[0]
       })
@@ -174,7 +180,6 @@ function AppRouter({ ...props }) {
           : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any)?.id, null)
       }
     })
-
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 
@@ -190,7 +195,7 @@ function AppRouter({ ...props }) {
     })
   }
 
-  const getAdminType = () => {
+  const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (res?.data) {
         let checked = false
@@ -245,11 +250,13 @@ function AppRouter({ ...props }) {
     if (typeof localStorage.getItem("verified") !== undefined) {
       status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
     }
+
     if (
       !!state.identity &&
       (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
-      !status
+      !status &&
+      isAuthenticated
     ) {
       window.location.href = "/#/2fa"
     }
@@ -284,9 +291,8 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    if (identity?.id != "selfHelp@demo.lamp.digital") {
-      Service.deleteUserDB()
-    }
+    localStorage.removeItem("tokenInfo")
+    Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
@@ -300,12 +306,14 @@ function AppRouter({ ...props }) {
         },
       } as any).then((res) => console.dir(res))
     }
+
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(`${t("Invalid id or password.")}`, {
         variant: "error",
       })
       return
     })
+
     if (!!identity) {
       getAdminType()
       let type = {
@@ -322,9 +330,9 @@ function AppRouter({ ...props }) {
         auth: null,
         authType: null,
         activeTab: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
+        lastDomain: ["localhost:3006", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
           ? undefined
-          : state.auth.serverAddress,
+          : state?.auth?.serverAddress,
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       window.location.href = "/#/"
@@ -421,6 +429,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (
@@ -448,6 +457,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : state.authType === "participant" ? (
@@ -479,6 +489,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (
@@ -505,6 +516,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -539,6 +551,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -574,6 +587,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -608,6 +622,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -644,6 +659,7 @@ function AppRouter({ ...props }) {
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
+                  setAuthenticated={setAuthenticated}
                 />
               </React.Fragment>
             ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -686,6 +702,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -734,6 +751,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -797,6 +815,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -822,7 +841,7 @@ function AppRouter({ ...props }) {
                 token={{
                   username: LAMP.Auth._auth.id,
                   password: LAMP.Auth._auth.password,
-                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "localhost:3006",
                   type: state.authType === "admin" ? "Administrator" : "Researcher",
                   //@ts-ignore: state.identity will have an id param if not admin
                   id: state.authType === "admin" ? null : state.identity.id,
@@ -847,6 +866,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -858,11 +878,11 @@ function AppRouter({ ...props }) {
                 authType={state.authType}
                 id={props.match.params.id}
                 title={`User ${getParticipant(props.match.params.id).id}`}
-                name={
-                  getParticipant(props.match.params.id)?.alias ||
-                  getParticipant(props.match.params.id)?.name ||
-                  getParticipant(props.match.params.id)?.id
-                }
+                // name={
+                //   getParticipant(props.match.params.id)?.alias ||
+                //   getParticipant(props.match.params.id)?.name ||
+                //   getParticipant(props.match.params.id)?.id
+                // }
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
@@ -894,6 +914,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -922,6 +943,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
