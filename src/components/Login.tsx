@@ -30,6 +30,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+
 type SuggestedUrlOption = {
   label: string
 }
@@ -60,13 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: {
-      color: "#6083E7",
-      fontWeight: "bold",
-      cursor: "pointer",
-      marginRight: "20px",
-      "&:hover": { textDecoration: "underline" },
-    },
+    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
     loginDisabled: {
@@ -87,6 +82,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
+  const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -130,6 +126,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
+  const generateTokens = async (args: { id: string; password: string }) => {
+    const userName = args?.id?.trim()
+    const password = args?.password?.trim()
+    if (userName && password) {
+      try {
+        await LAMP.Credential.login(userName, password).then((res) => {
+          localStorage.setItem(
+            userTokenKey,
+            JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+          )
+          props?.setAuthenticated(true)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
@@ -151,6 +165,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
       .then((res) => {
+        if (!mode) {
+          generateTokens(res?.auth)
+        }
+
         if (res.authType === "participant") {
           localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
           LAMP.SensorEvent.create(res.identity.id, {
@@ -185,7 +203,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           })
         )
         ;(async () => {
-          await Service.deleteDB()
           if (mode != "selfHelp") {
             await Service.deleteUserDB()
           }
@@ -239,6 +256,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               }}
             >
               <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://community.lamp.digital", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -389,11 +415,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     <Link
                       underline="none"
                       className={classes.linkBlue}
-                      onClick={(event) => {
-                        LAMP.initializeDemoDB(demo_db)
-                        localStorage.setItem("demo_mode", "try_it")
-                        setTryitMenu(event.currentTarget)
-                      }}
+                      onClick={(event) => setTryitMenu(event.currentTarget)}
                     >
                       {`${t("Try it")}`}
                     </Link>
@@ -406,14 +428,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     >
                       {`${t("Self Help")}`}
                     </Link>
-                    {/* <br />
-                  <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                  >
-                    {`${t("Research studies using mindLAMP")}`}
-                  </Link> */}
+                    <br />
+                    <Link
+                      underline="none"
+                      className={classes.linkBlue}
+                      onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
+                    >
+                      {`${t("Research studies using mindLAMP")}`}
+                    </Link>
                     <Menu
                       keepMounted
                       open={Boolean(tryitMenu)}
