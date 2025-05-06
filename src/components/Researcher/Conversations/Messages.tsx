@@ -159,6 +159,9 @@ export default function Messages({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const { t } = useTranslation()
+  useEffect(() => {
+    refreshMessages()
+  }, [])
 
   useInterval(
     () => {
@@ -206,11 +209,20 @@ export default function Messages({
   }
 
   useEffect(() => {
+    console.log(conversations)
+
     getMessages()
+    console.log(
+      getMessages()
+      // .filter(
+      //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
+      // )
+    )
   }, [conversations])
 
   const getMessages = () => {
     let x = (conversations || {})[participant || ""] || []
+    console.log(x)
     return !Array.isArray(x) ? [] : x
   }
 
@@ -226,6 +238,7 @@ export default function Messages({
       date: new Date(),
       text: msg,
     })
+    console.log(all)
     LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
     setAddMsg(false)
@@ -236,9 +249,9 @@ export default function Messages({
     return (
       <Box>
         {getMessages()
-          .filter(
-            (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
-          )
+          // .filter(
+          //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
+          // )
           .map((x) => (
             <Box
               className={classes.innerMessage}
@@ -343,7 +356,7 @@ export default function Messages({
           </AppBar>
           <Container className={classes.containerWidth}>
             <Box px={2} style={{ marginTop: "20px" }}>
-              {messageSection(1)}
+              {messageSection(0)}
             </Box>
           </Container>
         </ResponsiveDialog>

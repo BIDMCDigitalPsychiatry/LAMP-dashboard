@@ -103,7 +103,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     window.location.href.split("#")[0] +
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-  console.log(title)
+
   const roles =
     userType == "researcher"
       ? [

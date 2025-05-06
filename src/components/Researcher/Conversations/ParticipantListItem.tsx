@@ -111,17 +111,17 @@ export default function ParticipantListItem({
       setName(data[0]?.name ?? participant.id ?? "")
     })
     refresh()
-
-    setMsgCount(getMessageCount())
   }, [participant])
+
+  useEffect(() => {
+    setMsgCount(getMessageCount())
+  }, [conversations])
 
   const refresh = () => {
     if (sensorData === null) {
-      console.log("sd")
       ;(async () => {
         let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
         data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
-        console.log(data)
         setSensorData(!!data ? data[0] : [])
       })()
     }
@@ -133,7 +133,7 @@ export default function ParticipantListItem({
       Object.fromEntries(
         (
           await Promise.all(
-            [researcherId || ""].map(async (x) => [
+            [participant.id || ""].map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
@@ -150,7 +150,8 @@ export default function ParticipantListItem({
   }, [sensorData])
 
   const getMessageCount = () => {
-    let x = (conversations || {})[researcherId || ""] || []
+    console.log(sensorData)
+    let x = (conversations || {})[participant.id || ""] || []
     return !Array.isArray(x)
       ? 0
       : x.filter((a) => a.from === "participant" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
@@ -162,12 +163,9 @@ export default function ParticipantListItem({
     await sensorEventUpdate("conversations", researcherId, null)
     let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
     data = (data || []).filter((d) => d.data.page === "conversations")
+    console.log(data)
     setSensorData(data ? data[0] : [])
   }
-
-  useEffect(() => {
-    console.log("asd", dialogOpen)
-  }, [dialogOpen])
 
   return (
     <>
@@ -187,7 +185,15 @@ export default function ParticipantListItem({
               updateAnalytics()
             }}
           >
-            <Fab size="small" color="primary" className={classes.btnWhite} onClick={() => setDialogOpen(true)}>
+            <Fab
+              size="small"
+              color="primary"
+              className={classes.btnWhite}
+              onClick={() => {
+                updateAnalytics()
+                setDialogOpen(true)
+              }}
+            >
               <Icon style={{ color: "#7599FF" }}>comment</Icon>
             </Fab>
           </Badge>

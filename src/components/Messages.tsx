@@ -237,9 +237,9 @@ export default function Messages({
     return (
       <Box>
         {getMessages()
-          .filter(
-            (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
-          )
+          // .filter(
+          //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
+          // )
           .map((x) => (
             <Box
               className={classes.innerMessage}
