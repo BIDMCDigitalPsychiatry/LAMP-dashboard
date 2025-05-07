@@ -202,6 +202,24 @@ function AppRouter({ ...props }) {
     })
   }
 
+  const INACTIVITY_LIMIT = 15 * 60 * 1000 // 15 mins
+
+  let inactivityTimer: ReturnType<typeof setTimeout>
+
+  const resetInactivityTimer = () => {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = setTimeout(() => {
+      localStorage.removeItem("tokenInfo")
+      alert("You were inactive for too long. Please log in again.")
+      window.location.href = "/#/"
+    }, INACTIVITY_LIMIT)
+  }
+
+  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+
+  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+  resetInactivityTimer()
+
   const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (res?.data) {
