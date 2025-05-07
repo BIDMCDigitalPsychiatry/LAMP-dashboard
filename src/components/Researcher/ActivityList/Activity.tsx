@@ -11,6 +11,7 @@ import {
   addActivity,
   spliceActivity,
   updateActivityData,
+  unspliceActivity,
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -142,6 +143,7 @@ export default function Activity({
             !!y.error ? undefined : y.data
           )[0]
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
+          console.log(tag)
           setActivity(dataActivity)
           setDetails(tag ?? [])
         } else if (activity.spec === "lamp.tips") {
@@ -214,6 +216,7 @@ export default function Activity({
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
     setLoading(true)
+    console.log(activity)
     let result = await updateActivityData(x, isDuplicated, activity)
     if (!!result.error)
       enqueueSnackbar(`${t("Encountered an error: .")}` + result?.error, {

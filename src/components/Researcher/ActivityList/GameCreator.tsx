@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
-import { SchemaList } from "./ActivityMethods"
+import { SchemaList, unspliceActivity } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
@@ -86,25 +86,6 @@ export default function GameCreator({
         }
       })
     }
-    if (
-      typeof !!schemaListObj[activitySpecId] != "undefined" &&
-      !!schemaListObj[activitySpecId] &&
-      (value?.spec == "lamp.survey" || activitySpecId == "lamp.survey")
-    ) {
-      const enumActivityIds = activities.map((data) => data.id)
-      const enumActivityNames = activities.map((data) => data.name)
-      schemaListObj[activitySpecId][
-        "properties"
-      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigency_settings.dependencies.contigency_type.allOf[0].then.properties.activity[
-        "enum"
-      ] = enumActivityIds
-      schemaListObj[activitySpecId][
-        "properties"
-      ].settings.items.dependencies.type.oneOf[1].properties.options.items.properties.contigency_settings.dependencies.contigency_type.allOf[0].then.properties.activity[
-        "enumNames"
-      ] = enumActivityNames
-      setSchemaListObj(schemaListObj)
-    }
   }, [schemaListObj])
 
   const [data, setData] = useState({
@@ -157,7 +138,28 @@ export default function GameCreator({
             : optionsArray.push(0)
         })
       }
-
+      ;(questions || []).map((x, idx) => {
+        ;(questions[idx].options || []).map((i) => {
+          if (!!value?.id && !!i.contigencySettings.activity && i.contigencySettings.activity === value?.id) {
+            optionsArray.push(1)
+            enqueueSnackbar(
+              `${t("The selected activity in the contingency settings must differ from the activity being edited.")}`,
+              {
+                variant: "error",
+              }
+            )
+          }
+          if (
+            !!i.contigencySettings.question_index &&
+            i.contigencySettings.question_index > (questions || []).length + 1
+          ) {
+            optionsArray.push(1)
+            enqueueSnackbar(`${t("The specified question number does not exist.")}`, {
+              variant: "error",
+            })
+          }
+        })
+      })
       if (optionsArray.filter((val) => val !== 0).length > 0) {
         status = 1
         return false
