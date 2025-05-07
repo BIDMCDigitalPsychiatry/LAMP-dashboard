@@ -133,6 +133,21 @@ const useStyles = makeStyles((theme) => ({
   composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
+const fetchCoordinators = async () => {
+  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+  let result = await (
+    await fetch(`${baseUrl}/coordinators`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + userToken.accessToken,
+      },
+    })
+  ).json()
+  return result
+}
+
 export default function Messages({
   refresh,
   participant,
@@ -158,8 +173,13 @@ export default function Messages({
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [confirmationDialog, setConfirmationDialog] = useState(!!participantOnly)
-
+  const [coordinators, setCoordinators] = useState([])
+  const [selectedCoordinator, setSelectedCoordinator] = useState()
   const { t } = useTranslation()
+
+  useEffect(() => {
+    fetchCoordinators().then((coordinators) => setCoordinators(coordinators))
+  }, [])
 
   useInterval(
     () => {
@@ -222,7 +242,7 @@ export default function Messages({
     await refreshMessages()
     let all = getMessages()
     all.push({
-      from: !!participantOnly ? "participant" : "researcher",
+      from: !!participantOnly ? "participant" : selectedCoordinator.email,
       type: msgOpen ? "note" : "message",
       date: new Date(),
       text: msg,
@@ -306,6 +326,7 @@ export default function Messages({
     setConfirmationDialog(false)
   }
 
+  const openMessage = (coordinator) => {}
   if (msgOpen) {
     return (
       <Container>
@@ -339,53 +360,11 @@ export default function Messages({
           </Toolbar>
         </AppBar>
         <Container className={classes.containerWidth}>
-          <Box>
-            {getMessages().filter(
-              (x) =>
-                x.type === "message" &&
-                ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-            ).length > 0 ? (
-              getMessages()
-                .filter(
-                  (x) =>
-                    x.type === "message" &&
-                    ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-                )
-                .map((x) => (
-                  <Box
-                    border={0}
-                    className={classes.conversationStyle}
-                    mx={2}
-                    onClick={() => {
-                      refreshMessages()
-                      setSender(x.from)
-                      setOpen(true)
-                    }}
-                    style={{
-                      background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
-                      border: x.status === 0 ? "0" : "1px solid #C6C6C6",
-                    }}
-                  >
-                    <Grid container>
-                      <Grid item xs>
-                        <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
-                          {x.from}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs className={classes.conversationtime} justifyContent="space-between">
-                        <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
-                      </Grid>
-                    </Grid>
-                    <Box width={1}>
-                      <Typography>{x.text}</Typography>
-                    </Box>
-                  </Box>
-                ))[0]
-            ) : (
-              <Box style={{ marginTop: "20px" }}>{messageSection(1)}</Box>
-            )}
-          </Box>
-
+          {coordinators.map((coordinator) => (
+            <Box onClick={() => openMessage(coordinator)}>
+              <Typography variant="h6">{coordinator.name}</Typography>
+            </Box>
+          ))}
           <ResponsiveDialog
             transient={false}
             animate
