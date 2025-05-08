@@ -10,13 +10,14 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
-import { DialogContentText, DialogTitle } from "@mui/material"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -81,11 +82,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSettings(null)
     setActivityTimestamp(0)
     setIframe(null)
-    if (activity?.id === "mxgtg41sx8w77qn2b9mn") {
-      setTimeout(() => {
-        setResponseActivity("y2y3p4hdd7dy8d59s55h")
-      }, 1000)
-    }
   }, [activity])
 
   useEffect(() => {
@@ -93,12 +89,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       LAMP.Activity.view(responseActivity)
         .then((data: any) => {
           if (!!data) {
-            if (data.spec === "lamp.group") {
-              setShowPopUp(true)
-            } else {
-              const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-              window.open(url, "_blank") // Open in a new tab or window
-            }
+            setShowPopUp(true)
           }
         })
         .catch((e) => {
@@ -115,31 +106,35 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [currentActivity])
 
   const handleSubmit = (e) => {
-    localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
-    let warnings = []
-    if (e.data !== null) {
-      try {
-        const data = JSON.parse(e.data)
-        currentActivity.settings.map((setting, index) => {
-          if (!!setting.warnings && !!data["temporal_slices"][index]) {
-            setting.warnings.map((warning) => {
-              if (warning.answer === data["temporal_slices"][index].value) {
-                warnings.push(warning)
-              }
-            })
-          }
-        })
-      } catch {}
-    }
-
-    if (warnings.length > 0) {
-      setWarningsDialogState({
-        warnings,
-        activitySubmitEvent: e,
-      })
+    if (e?.data && e?.data?.type === "OPEN_ACTIVITY") {
+      setResponseActivity(e?.data?.activityId)
     } else {
-      setWarningsDialogState(null)
-      handleSaveData(e)
+      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      let warnings = []
+      if (e.data !== null) {
+        try {
+          const data = JSON.parse(e.data)
+          currentActivity.settings.map((setting, index) => {
+            if (!!setting.warnings && !!data["temporal_slices"][index]) {
+              setting.warnings.map((warning) => {
+                if (warning.answer === data["temporal_slices"][index].value) {
+                  warnings.push(warning)
+                }
+              })
+            }
+          })
+        } catch {}
+      }
+
+      if (warnings.length > 0) {
+        setWarningsDialogState({
+          warnings,
+          activitySubmitEvent: e,
+        })
+      } else {
+        setWarningsDialogState(null)
+        handleSaveData(e)
+      }
     }
   }
 
@@ -231,6 +226,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+      })
       setSettings({
         ...settings,
         activity: currentActivity,
@@ -239,7 +241,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         noBack: noBack,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      if (activitySpec?.executable?.startsWith("data:")) {
+      console.log(activitySpec)
+      if (currentActivity.spec == "lamp.survey") {
+        console.log("asd")
+        response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      } else if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
         response = atob(await (await fetch(activitySpec.executable)).text())
@@ -259,7 +265,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      console.log(currentActivity.spec)
+      // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+
       if (currentActivity.spec == "lamp.survey") {
+        console.log("asd")
         return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else {
         return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -276,7 +286,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   return (
-    <div style={{ display: "flex", width: "100%", height: "100vh", flexDirection: "column", overflow: "hidden" }}>
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        height: "100vh",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       {embeddedActivity !== "" && (
         <iframe
           ref={(e) => {
@@ -334,22 +352,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{`${t("Proceed to Group Activity")}`}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{`${t("Activity")}`}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {`${t("As per your response you are requested to complete a group activity. Would you like to proceed?")}`}
+            {`${t(
+              "There is an activity based on your response. Would you like to proceed to it or go back to the survey?"
+            )}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => {
-              setShowPopUp(false)
-              setResponseActivity(null)
-            }}
-            color="secondary"
-          >
-            {`${t("Go Back")}`}
-          </Button>
           <Button
             onClick={() => {
               setShowPopUp(false)
@@ -360,6 +371,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             autoFocus
           >
             {`${t("Proceed")}`}
+          </Button>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+              setResponseActivity(null)
+            }}
+            color="secondary"
+          >
+            {`${t("Go Back")}`}
           </Button>
         </DialogActions>
       </Dialog>
