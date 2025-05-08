@@ -16,6 +16,7 @@ import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
+import { DialogContentText, DialogTitle } from "@mui/material"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -69,6 +70,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [timestamp, setTimestamp] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [warningsDialogState, setWarningsDialogState] = useState(null)
+  const [responseActivity, setResponseActivity] = useState(null)
+  const [showPopup, setShowPopUp] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -78,7 +81,31 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSettings(null)
     setActivityTimestamp(0)
     setIframe(null)
+    if (activity?.id === "mxgtg41sx8w77qn2b9mn") {
+      setTimeout(() => {
+        setResponseActivity("y2y3p4hdd7dy8d59s55h")
+      }, 1000)
+    }
   }, [activity])
+
+  useEffect(() => {
+    if (!!responseActivity) {
+      LAMP.Activity.view(responseActivity)
+        .then((data: any) => {
+          if (!!data) {
+            if (data.spec === "lamp.group") {
+              setShowPopUp(true)
+            } else {
+              const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
+              window.open(url, "_blank") // Open in a new tab or window
+            }
+          }
+        })
+        .catch((e) => {
+          console.log("url cannot be opened")
+        })
+    }
+  }, [responseActivity])
 
   useEffect(() => {
     if (currentActivity !== null && !!currentActivity?.spec) {
@@ -295,6 +322,44 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }}
           >
             {t("Ok")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={!!showPopup}
+        onClose={() => {
+          setShowPopUp(false)
+          setResponseActivity(null)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{`${t("Proceed to Group Activity")}`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`${t("As per your response you are requested to complete a group activity. Would you like to proceed?")}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+              setResponseActivity(null)
+            }}
+            color="secondary"
+          >
+            {`${t("Go Back")}`}
+          </Button>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+              const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
+              window.open(url, "_blank") // Open in a new tab or window
+            }}
+            color="primary"
+            autoFocus
+          >
+            {`${t("Proceed")}`}
           </Button>
         </DialogActions>
       </Dialog>
