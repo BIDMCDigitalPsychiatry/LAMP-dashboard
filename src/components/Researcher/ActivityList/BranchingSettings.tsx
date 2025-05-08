@@ -96,6 +96,7 @@ export default function BranchingSettings({ ...props }) {
           </Grid>
         )}
       </Grid>
+      <Divider classes={{ root: classes.dividerRoot }} />
     </Grid>
   )
 }
