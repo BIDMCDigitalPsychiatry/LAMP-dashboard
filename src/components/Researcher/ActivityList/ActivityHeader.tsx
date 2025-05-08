@@ -17,6 +17,7 @@ import { useDropzone } from "react-dropzone"
 import ActivityTab from "./ActivityTab"
 import ActivityStreak from "./ActivityStreak"
 import ActivityImage from "./ActivityImage"
+import BranchingSettings from "./BranchingSettings"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -69,6 +70,9 @@ export default function ActivityHeader({
   const [showFeed, setShowFeed] = useState(
     typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
   )
+  const [branchingSettings, setBranchingSettings] = useState(
+    details?.branchingSettings ? details?.branchingSettings : null
+  )
 
   useEffect(() => {
     onChange({
@@ -79,8 +83,9 @@ export default function ActivityHeader({
       streak,
       showFeed,
       visualSettings,
+      branchingSettings,
     })
-  }, [text, description, photo, studyId, streak, showFeed, visualSettings])
+  }, [text, description, photo, studyId, streak, showFeed, visualSettings, branchingSettings])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -211,6 +216,9 @@ export default function ActivityHeader({
         />
       )}
       <Divider />
+      {activitySpecId === "lamp.survey" && (
+        <BranchingSettings branching_settings={branchingSettings} onChange={(val) => setBranchingSettings(val)} />
+      )}
     </Grid>
   )
 }

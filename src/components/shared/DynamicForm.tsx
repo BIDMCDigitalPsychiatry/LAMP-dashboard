@@ -293,8 +293,6 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
     languageObjects[getSelectedLanguage()]
   )
 
-  console.log("schema", JSON.stringify(_extract(schema)))
-
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form
