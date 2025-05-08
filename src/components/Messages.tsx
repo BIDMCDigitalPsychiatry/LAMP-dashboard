@@ -242,7 +242,7 @@ export default function Messages({
     await refreshMessages()
     let all = getMessages()
     all.push({
-      from: !!participantOnly ? "participant" : selectedCoordinator.email,
+      from: !!participantOnly ? "participant" : "researcher",
       type: msgOpen ? "note" : "message",
       date: new Date(),
       text: msg,
@@ -253,12 +253,12 @@ export default function Messages({
     setConversations({ ...(conversations || {}), [participant]: all })
   }
 
-  const messageSection = (type: number) => {
+  const messageSection = () => {
     return (
       <Box>
         {getMessages()
           // .filter(
-          //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
+          //   // (x) => (x.from = "") //&&  x.from === sender - to be replaced with different senders
           // )
           .map((x) => (
             <Box
@@ -326,11 +326,14 @@ export default function Messages({
     setConfirmationDialog(false)
   }
 
-  const openMessage = (coordinator) => {}
+  const openMessage = (coordinator) => {
+    setSelectedCoordinator(coordinator)
+    setOpen(true)
+  }
   if (msgOpen) {
     return (
       <Container>
-        <Box>{messageSection(0)}</Box>
+        <Box>{messageSection()}</Box>
       </Container>
     )
   } else {
@@ -392,7 +395,7 @@ export default function Messages({
             </AppBar>
             <Container className={classes.containerWidth}>
               <Box px={2} style={{ marginTop: "20px" }}>
-                {messageSection(1)}
+                {messageSection()}
               </Box>
             </Container>
           </ResponsiveDialog>

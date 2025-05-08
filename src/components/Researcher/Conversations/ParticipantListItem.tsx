@@ -176,15 +176,16 @@ export default function ParticipantListItem({
             {participant.id != name && <Typography variant="subtitle2">{name}</Typography>}
           </Box>
         </Box>
-        <Box display="flex" alignItems="center">
-          <Badge
-            color="error"
-            badgeContent={msgCount > 0 ? msgCount : undefined}
-            onClick={() => {
-              localStorage.setItem("lastTab" + researcherId, JSON.stringify(new Date().getTime()))
-              updateAnalytics()
-            }}
-          >
+        <Box
+          display="flex"
+          alignItems="center"
+          onClick={() => {
+            console.log("sddfg")
+            localStorage.setItem("lastTab" + researcherId, JSON.stringify(new Date().getTime()))
+            updateAnalytics()
+          }}
+        >
+          <Badge color="error" badgeContent={msgCount > 0 ? msgCount : undefined}>
             <Fab
               size="small"
               color="primary"
