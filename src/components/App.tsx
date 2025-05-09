@@ -202,23 +202,34 @@ function AppRouter({ ...props }) {
     })
   }
 
-  const INACTIVITY_LIMIT = 15 * 60 * 1000 // 15 mins
+  //   const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
 
-  let inactivityTimer: ReturnType<typeof setTimeout>
+  // let inactivityTimer: ReturnType<typeof setTimeout>
 
-  const resetInactivityTimer = () => {
-    clearTimeout(inactivityTimer)
-    inactivityTimer = setTimeout(() => {
-      localStorage.removeItem("tokenInfo")
-      alert("You were inactive for too long. Please log in again.")
-      window.location.href = "/#/"
-    }, INACTIVITY_LIMIT)
-  }
+  // const resetInactivityTimer = () => {
+  //   clearTimeout(inactivityTimer)
+  //   inactivityTimer = setTimeout(() => {
+  //     localStorage.removeItem("tokenInfo")
+  //     alert("You were inactive for too long. Please log in again.")
+  //     window.location.href = "/#/"
+  //   }, INACTIVITY_LIMIT)
+  // }
 
-  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+  // const activityEvents = [
+  //   "mousemove",
+  //   "mousedown",
+  //   "mouseup",
+  //   "wheel",
+  //   "keydown",
+  //   "scroll",
+  //   "touchstart",
+  // ]
 
-  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
-  resetInactivityTimer()
+  // activityEvents.forEach(event =>
+  //   window.addEventListener(event, resetInactivityTimer)
+  // )
+
+  // resetInactivityTimer()
 
   const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
@@ -316,10 +327,11 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    localStorage.removeItem("tokenInfo")
+    // localStorage.removeItem("tokenInfo")
     if (identity?.id != "selfHelp@demo.lamp.digital") {
       Service.deleteUserDB()
     }
+    Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
@@ -331,7 +343,7 @@ function AppRouter({ ...props }) {
           device_type: "Dashboard",
           user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
         },
-      } as any).then((res) => console.dir(res))
+      } as any).then((res) => localStorage.removeItem("tokenInfo"))
     }
 
     await LAMP.Auth.set_identity(identity).catch((e) => {
