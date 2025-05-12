@@ -166,7 +166,7 @@ export default function Messages({
   msgOpen?: boolean
 }) {
   const classes = useStyles()
-  const [open, setOpen] = useState(msgOpen ?? false)
+  const [open, setOpen] = useState(true)
   const [conversations, setConversations] = useState({})
   const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
@@ -330,77 +330,58 @@ export default function Messages({
     setSelectedCoordinator(coordinator)
     setOpen(true)
   }
-  if (msgOpen) {
-    return (
-      <Container>
-        <Box>{messageSection()}</Box>
-      </Container>
-    )
-  } else {
-    return (
-      <Box>
-        <ConfirmationDialog
-          open={confirmationDialog}
-          onClose={() => setConfirmationDialog(false)}
-          confirmAction={confirmAction}
-          okText={"Okay"}
-          cancelText={"Take me back"}
-          confirmationMsg={`${t("This chat is not monitored and should not be used for urgent matters.")}`}
-        />
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => history.back()} color="default" aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography
-              variant="h5"
-              style={{
-                marginLeft: supportsSidebar ? 0 : undefined,
-              }}
-            >
-              {`${t("Conversations")}`}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Container className={classes.containerWidth}>
-          {coordinators.map((coordinator) => (
-            <Box onClick={() => openMessage(coordinator)}>
-              <Typography variant="h6">{coordinator.name}</Typography>
-            </Box>
-          ))}
-          <ResponsiveDialog
-            transient={false}
-            animate
-            fullScreen
-            open={open}
-            onClose={() => {
-              setOpen(false)
-            }}
-          >
-            <AppBar position="static" className={classes.inlineHeader}>
-              <Toolbar className={classes.toolbardashboard}>
-                <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
-                  <Icon>arrow_back</Icon>
-                </IconButton>
 
-                <Typography
+  return (
+    <Box>
+      <Container className={classes.containerWidth}>
+        <ResponsiveDialog
+          transient={false}
+          animate
+          fullScreen
+          open={open}
+          onClose={() => {
+            // setDialogOpen(false)
+            setOpen(false)
+          }}
+        >
+          <AppBar position="static" className={classes.inlineHeader}>
+            <Toolbar className={classes.toolbardashboard}>
+              <IconButton
+                onClick={() => {
+                  // setDialogOpen(false)
+                  setOpen(false)
+                  window.history.back()
+                }}
+                color="default"
+                aria-label="Menu"
+              >
+                <Icon>arrow_back</Icon>
+              </IconButton>
+              <Typography
+                variant="h5"
+                style={{
+                  marginLeft: supportsSidebar ? 0 : undefined,
+                }}
+              >
+                {`${t("Conversations")}`}
+              </Typography>
+              {/* <Typography
                   variant="h5"
                   style={{
                     marginLeft: supportsSidebar ? 0 : undefined,
                   }}
                 >
                   {sender}
-                </Typography>
-              </Toolbar>
-            </AppBar>
-            <Container className={classes.containerWidth}>
-              <Box px={2} style={{ marginTop: "20px" }}>
-                {messageSection()}
-              </Box>
-            </Container>
-          </ResponsiveDialog>
-        </Container>
-      </Box>
-    )
-  }
+                </Typography> */}
+            </Toolbar>
+          </AppBar>
+          <Container className={classes.containerWidth}>
+            <Box px={2} style={{ marginTop: "20px" }}>
+              {messageSection()}
+            </Box>
+          </Container>
+        </ResponsiveDialog>
+      </Container>
+    </Box>
+  )
 }

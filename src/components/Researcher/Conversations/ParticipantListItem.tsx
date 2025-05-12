@@ -149,8 +149,14 @@ export default function ParticipantListItem({
     if (sensorData !== null) refreshMessages()
   }, [sensorData])
 
+  // const getMessageCount = () => {
+  //   let x = (conversations || {})[id || ""] || []
+  //   return !Array.isArray(x)
+  //     ? 0
+  //     : x.filter((a) => a.from === "researcher" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
+  // }
+
   const getMessageCount = () => {
-    console.log(sensorData)
     let x = (conversations || {})[participant.id || ""] || []
     return !Array.isArray(x)
       ? 0
@@ -163,7 +169,6 @@ export default function ParticipantListItem({
     await sensorEventUpdate("conversations", researcherId, null)
     let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
     data = (data || []).filter((d) => d.data.page === "conversations")
-    console.log(data)
     setSensorData(data ? data[0] : [])
   }
 
@@ -180,7 +185,6 @@ export default function ParticipantListItem({
           display="flex"
           alignItems="center"
           onClick={() => {
-            console.log("sddfg")
             localStorage.setItem("lastTab" + researcherId, JSON.stringify(new Date().getTime()))
             updateAnalytics()
           }}

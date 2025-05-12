@@ -478,6 +478,8 @@ function AppRouter({ ...props }) {
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly
+                // setDialogOpen={setDialogOpen}
+
                 participant={getParticipant(props.match.params.id)?.id ?? null}
               />
             </React.Fragment>
