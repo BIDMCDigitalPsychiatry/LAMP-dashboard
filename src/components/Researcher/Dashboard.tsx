@@ -48,8 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "inline-block",
       textAlign: "center",
       color: "rgba(0, 0, 0, 0.4)",
-      paddingTop: 25,
-      paddingBottom: 25,
+      paddingTop: 24,
+      paddingBottom: 24,
       [theme.breakpoints.down("sm")]: {
         paddingTop: 16,
         paddingBottom: 9,
@@ -121,6 +121,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         borderBottom: "#7599FF solid 5px",
         borderRight: "#7599FF solid 5px",
+        borderLeft: "#7599FF solid 5px",
       },
     },
     btnCursor: {
