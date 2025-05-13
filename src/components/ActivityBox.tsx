@@ -134,7 +134,7 @@ export const getActivityEvents = async (participant: any, activityId, moduleStar
   return activityEvents
 }
 
-const sortModulesByCompletion = (modules) => {
+export const sortModulesByCompletion = (modules) => {
   if (!Array.isArray(modules)) return []
   return modules
     .map((module) => {
@@ -173,9 +173,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        scrollToElement(y.id)
         const moduleStartTime = await getModuleStartTime(y.id)
-        addActivityData(data, 0, moduleStartTime, null, fromActivityList)
+        const initializeOpenedModule = isAuto ? true : false
+        addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
       } else {
         setActivity(data)
         setOpen(true)
@@ -188,10 +188,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
+  const handleInitializeOpenedModules = (y: any, isAuto = false) => {
+    return LAMP.Activity.view(y.id).then(async (data) => {
+      if (y.spec === "lamp.module") {
+        if (!isAuto) {
+          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
+        }
+        const fromActivityList = true
+        const moduleStartTime = await getModuleStartTime(y.id)
+        const initializeOpenedModule = isAuto ? true : false
+        await addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
+      }
+    })
+  }
+
   const handleSubModule = async (activity, level) => {
     const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime, activity?.parentModule)
+      addActivityData(data, level, moduleStartTime, activity?.parentModule, false)
     })
   }
 
@@ -286,6 +300,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const updateModuleStartTime = (module, startTime) => {
+    setLoadingModules(true)
     const updatedData = moduleData.map((item) => {
       if (item.id === module.id && item.parentModule == module.parentModule) {
         return {
@@ -301,8 +316,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       return item
     })
-    const sortedData = sortModulesByCompletion(updatedData)
-    setModuleData(sortedData)
+    setModuleData(updatedData)
+    setLoadingModules(false)
   }
 
   const updateTime = (module, subActivities, startTime) => {
@@ -323,7 +338,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
-  const addActivityData = async (data, level, startTime, parent, fromActivityList = false) => {
+  const addActivityData = async (data, level, startTime, parent, initializeOpenedModule, fromActivityList = false) => {
+    setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null
@@ -378,12 +394,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const filteredArr = arr.filter((item) => item != null)
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
-        if (
-          itm.id === moduleActivityData.id &&
-          level === itemLevel &&
-          !itm.subActivities &&
-          itm.parentModule === parent
-        ) {
+        if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
           setParentModuleLevel(level + 1)
           return {
             ...itm,
@@ -406,12 +417,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
-        if (
-          !item.subActivities &&
-          item.id === moduleActivityData.id &&
-          item.level === level &&
-          item.parentModule === parent
-        ) {
+        if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
           setParentModuleLevel(level + 1)
           return {
             ...item,
@@ -447,7 +453,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setParentModuleLevel(level + 1)
       setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
-    setLoadingModules(false)
+    if (!initializeOpenedModule) {
+      scrollToElement(data.id)
+      setLoadingModules(false)
+    }
   }
 
   useEffect(() => {
@@ -460,17 +469,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   useEffect(() => {
     const runAsync = async () => {
-      setLoadingModules(true)
       const activitiesList = savedActivities
       const initializeOpenedModules = activitiesList.filter(
         (activity) => activity.spec === "lamp.module" && activity?.settings?.initialize_opened
       )
 
       if (initializeOpenedModules.length > 0) {
+        setLoadingModules(true)
+        const tasks = []
         for (const activity of initializeOpenedModules) {
-          await handleClickOpen(activity, true)
+          tasks.push(handleInitializeOpenedModules(activity, true))
         }
-
+        try {
+          await Promise.all(tasks)
+        } catch (err) {
+          console.error("Error:", err)
+        } finally {
+          setLoadingModules(false) // Reset loader
+        }
         setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b.id === a.id)))
       } else {
         setShownActivities(savedActivities)
@@ -485,7 +501,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       if (document.getElementById(id)) {
         document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       }
-    }, 4000)
+    }, 1000)
   }
 
   useEffect(() => {
@@ -494,6 +510,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   return (
     <Box>
+      {loadingModules && (
+        <Backdrop className={classes.backdrop} open={loadingModules}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
       {moduleData.length ? (
         <ActivityAccordian
           data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
@@ -506,7 +527,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setIsParentModuleLoaded={setIsParentModuleLoaded}
           updateModuleStartTime={updateModuleStartTime}
         />
-      ) : !loadingModules ? (
+      ) : (
         <Grid container spacing={2}>
           {savedActivities.length
             ? savedActivities.map((activity) => (
@@ -573,10 +594,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 </Box>
               )}
         </Grid>
-      ) : (
-        <Backdrop className={classes.backdrop} open={loadingModules}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
       )}
       <ActivityPopup
         activity={activity}
@@ -605,7 +622,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleSubModule(moduleForNotification, parentModuleLevel)
                 setShowNotification(false)
                 setModuleForNotification(null)
-                scrollToElement(moduleForNotification?.id)
                 setIsParentModuleLoaded(false)
               }}
               color="primary"

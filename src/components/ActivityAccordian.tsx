@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
-import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Button } from "@material-ui/core"
+import {
+  Typography,
+  Grid,
+  Card,
+  Box,
+  ButtonBase,
+  makeStyles,
+  Theme,
+  createStyles,
+  Button,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -185,8 +197,10 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       className={classes.mainIcons}
                       style={{
                         margin: "auto",
-                        background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                          ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
+                        background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                          ? `url(${
+                              tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                            }) center center/contain no-repeat`
                           : activity.spec === "lamp.breathe"
                           ? `url(${BreatheIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.journal"
@@ -232,10 +246,13 @@ const ActivityAccordion = ({
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
+  const [statusLoaded, setStatusLoaded] = useState(false)
+  const [loading, setLoading] = useState(false)
+
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
-      : module.subActivities.filter((activity) => activity.isCompleted === true).length +
+      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
           "/" +
           module.subActivities.length
   }
@@ -248,18 +265,20 @@ const ActivityAccordion = ({
   const addActivityEventForModule = async (module, parentIds = []) => {
     const compositeKey = getCompositeKey(module, parentIds)
     if ((await checkIsBegin(module)) === true) {
+      setLoading(true)
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: 0,
         activity: module.id,
         static_data: {},
+      }).then((a) => {
+        setActivityStatus((prevState) => ({
+          ...prevState,
+          [compositeKey]: true,
+        }))
+        updateModuleStartTime(module, new Date())
+        setLoading(false)
       })
-      const hasBegun = false
-      setActivityStatus((prevState) => ({
-        ...prevState,
-        [compositeKey]: hasBegun,
-      }))
-      updateModuleStartTime(module, new Date())
     } else {
       const hasBegun = true
       setActivityStatus((prevState) => ({
@@ -274,9 +293,8 @@ const ActivityAccordion = ({
   }
 
   const initializeStatus = async () => {
+    setStatusLoaded(false)
     const statuses = {}
-    const moduleActivities = data.filter((module) => module.name !== "Other activities")
-
     const checkAndNotify = async (module, parentIds = []) => {
       const status = await checkIsBegin(module)
       const compositeKey = getCompositeKey(module, parentIds)
@@ -285,31 +303,41 @@ const ActivityAccordion = ({
         setIsParentModuleLoaded(true)
       }
     }
-    for (const module of moduleActivities) {
-      await checkAndNotify(module)
+    const tasks = []
+    for (const module of data?.filter((m) => m.name !== "Other activities")) {
+      tasks.push(checkAndNotify(module))
       if (module?.subActivities) {
         for (const activity of module.subActivities) {
           if (activity.spec === "lamp.module") {
-            await checkAndNotify(activity, [module.id])
+            tasks.push(checkAndNotify(activity, [module.id]))
           }
           if (activity?.subActivities) {
             for (const subActivity of activity.subActivities) {
               if (subActivity.spec === "lamp.module") {
-                await checkAndNotify(subActivity, [module.id, activity.id])
+                tasks.push(checkAndNotify(subActivity, [module.id, activity.id]))
               }
             }
           }
         }
       }
     }
+    await Promise.all(tasks)
     setActivityStatus(statuses)
+    return true
   }
+
   useEffect(() => {
-    initializeStatus()
+    const status = initializeStatus()
+    if (status) {
+      setStatusLoaded(true)
+    }
   }, [data])
 
   return (
     <div>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
           <AccordionSummary id={module.id}>
@@ -318,7 +346,7 @@ const ActivityAccordion = ({
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
-            {module.id && activityStatus[module.id] && (
+            {statusLoaded && module.id && activityStatus[module.id] === true && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity
                 <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
@@ -353,7 +381,7 @@ const ActivityAccordion = ({
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {activity.id && activityStatus[module.id + ">" + activity.id] && (
+                        {statusLoaded && activity.id && activityStatus[module.id + ">" + activity.id] && (
                           <Box className={classes.moduleStart}>
                             Click here to start the module activity
                             <Button
@@ -386,7 +414,8 @@ const ActivityAccordion = ({
                                     </Typography>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {subActivity.id &&
+                                    {statusLoaded &&
+                                      subActivity.id &&
                                       activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
                                         <Box className={classes.moduleStart}>
                                           Click here to start the module activity

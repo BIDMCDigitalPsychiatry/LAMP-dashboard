@@ -149,13 +149,6 @@ export default function ParticipantListItem({
     if (sensorData !== null) refreshMessages()
   }, [sensorData])
 
-  // const getMessageCount = () => {
-  //   let x = (conversations || {})[id || ""] || []
-  //   return !Array.isArray(x)
-  //     ? 0
-  //     : x.filter((a) => a.from === "researcher" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
-  // }
-
   const getMessageCount = () => {
     let x = (conversations || {})[participant.id || ""] || []
     return !Array.isArray(x)

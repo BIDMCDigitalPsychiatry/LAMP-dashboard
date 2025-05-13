@@ -221,8 +221,8 @@ export default function ActivityPopup({
               className={classes.topicon}
               style={{
                 margin: "auto",
-                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                  ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
+                background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                  ? `url(${tag?.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
                   : activity?.spec === "lamp.breathe"
                   ? `url(${BreatheIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.journal"
@@ -266,7 +266,7 @@ export default function ActivityPopup({
             <ReactMarkdown
               children={
                 activity?.spec !== "lamp.dbt_diary_card"
-                  ? t(tag.filter((x) => x.id === activity?.id)[0]?.description ?? null)
+                  ? t(tag?.filter((x) => x.id === activity?.id)[0]?.description ?? null)
                   : `${t("Daily log of events and related feelings. Track target behaviors and use of skills.")}`
               }
               skipHtml={false}
