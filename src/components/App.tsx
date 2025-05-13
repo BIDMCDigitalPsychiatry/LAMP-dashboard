@@ -452,6 +452,20 @@ function AppRouter({ ...props }) {
     }
   }
 
+  useEffect(() => {
+    const key = "ModuleActivityClosed"
+    const interval = 5000
+    const checkAndReload = () => {
+      const value = localStorage.getItem(key)
+      if (value) {
+        localStorage.removeItem(key)
+        window.location.reload()
+      }
+    }
+    const intervalId = setInterval(checkAndReload, interval)
+    return () => clearInterval(intervalId)
+  }, [])
+
   return (
     <Switch>
       <Route

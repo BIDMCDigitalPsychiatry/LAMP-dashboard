@@ -73,6 +73,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [warningsDialogState, setWarningsDialogState] = useState(null)
   const [responseActivity, setResponseActivity] = useState(null)
   const [showPopup, setShowPopUp] = useState(false)
+  const [secondaryActivity, setSecondaryActivity] = useState(null)
+  const [surveyResponse, setSurveyResponse] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -89,6 +91,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       LAMP.Activity.view(responseActivity)
         .then((data: any) => {
           if (!!data) {
+            setSecondaryActivity(data)
             setShowPopUp(true)
           }
         })
@@ -98,6 +101,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [responseActivity])
 
+  console.log("currentActibity", currentActivity)
+
   useEffect(() => {
     if (currentActivity !== null && !!currentActivity?.spec) {
       setLoading(true)
@@ -106,14 +111,27 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [currentActivity])
 
   const handleSubmit = (e) => {
-    if (e?.data && e?.data?.type === "OPEN_ACTIVITY") {
+    if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
       setResponseActivity(e?.data?.activityId)
     } else {
+      let skipSaveActivity = false
       localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
       let warnings = []
       if (e.data !== null) {
         try {
           const data = JSON.parse(e.data)
+          const isSurvey = currentActivity?.spec === "lamp.survey"
+          const branchingSettings = currentActivity?.branchingSettings
+          const totalScore = data?.static_data?.totalScore
+          if (isSurvey && branchingSettings) {
+            const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
+            const hasActivityId = !!branchingSettings.activityId
+            if (meetsScoreThreshold && hasActivityId) {
+              setResponseActivity(branchingSettings.activityId)
+              setSurveyResponse(e)
+              skipSaveActivity = true
+            }
+          }
           currentActivity.settings.map((setting, index) => {
             if (!!setting.warnings && !!data["temporal_slices"][index]) {
               setting.warnings.map((warning) => {
@@ -133,7 +151,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         })
       } else {
         setWarningsDialogState(null)
-        handleSaveData(e)
+        if (!skipSaveActivity) {
+          handleSaveData(e)
+        }
       }
     }
   }
@@ -226,13 +246,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,
@@ -241,7 +254,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         noBack: noBack,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      console.log(activitySpec)
       if (currentActivity.spec == "lamp.survey") {
         console.log("asd")
         response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -265,7 +277,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      console.log(currentActivity.spec)
       // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
 
       if (currentActivity.spec == "lamp.survey") {
@@ -364,8 +375,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           <Button
             onClick={() => {
               setShowPopUp(false)
-              const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-              window.open(url, "_blank") // Open in a new tab or window
+              if (secondaryActivity.spec === "lamp.module") {
+                const url = `/#/participant/${participant}/module/${responseActivity}?mode=responseActivity`
+                window.open(url, "_blank") // Open in a new tab or window
+                // localStorage.setItem("activityFromModule", responseActivity)
+                localStorage.setItem("lastActiveTab", tab)
+              } else {
+                const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
+                window.open(url, "_blank") // Open in a new tab or window
+              }
+              if (surveyResponse) {
+                handleSaveData(surveyResponse)
+              }
             }}
             color="primary"
             autoFocus

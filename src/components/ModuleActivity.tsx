@@ -44,6 +44,17 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleId, participant])
 
   useEffect(() => {
+    const handleTabClose = (event) => {
+      localStorage.setItem("ModuleActivityClosed", "true")
+    }
+
+    window.addEventListener("beforeunload", handleTabClose)
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!!moduleForNotification && isParentModuleLoaded) {
       setTimeout(() => {
         setShowNotification(true)
@@ -344,7 +355,12 @@ const ModuleActivity = ({ ...props }) => {
           <Button
             onClick={() => {
               localStorage.removeItem("activityFromModule")
-              setTimeout(() => history.back(), 100)
+              setTimeout(() => {
+                const tab = localStorage.getItem("lastActiveTab")
+                if (tab === null || typeof tab === "undefined")
+                  window.location.href = `/#/participant/${participant?.id}/assess `
+                else if (!!tab) window.location.href = `/#/participant/${participant?.id}/${tab}`
+              }, 100)
             }}
             color="secondary"
           >
