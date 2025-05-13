@@ -66,6 +66,7 @@ export const availableActivitySpecs = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -85,6 +86,7 @@ export const games = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export default function ActivityList({
   researcherId,

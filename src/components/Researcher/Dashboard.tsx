@@ -164,13 +164,7 @@ export const sortData = (data, studies, key) => {
   })
   return [...new Map(result.map((item) => [item["id"], item])).values()]
 }
-// export interface Study {
-//   id?: string
-//   name?: string
-//   participant_count?: number
-//   activity_count?: number
-//   sensor_count?: number
-// }
+
 export default function Dashboard({ onParticipantSelect, researcherId, mode, tab, ...props }) {
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)

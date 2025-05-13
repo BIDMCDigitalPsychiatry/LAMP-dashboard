@@ -145,7 +145,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
 
   let handleLogin = async (event: any, mode?: string) => {
-    console.log("mode", mode)
     event.preventDefault()
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })

@@ -54,6 +54,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   }, [_selected])
 
   useEffect(() => {
+    console.log(activities)
     filterActivities(search)
   }, [search])
   const handleSearchChange = (event: any) => {
@@ -170,6 +171,7 @@ export default function GroupCreator({
         ? activities.filter(
             (x) =>
               x.spec !== "lamp.group" &&
+              x.spec !== "lamp.module" &&
               (!!study ? x.study_id === study : x.study_id === value.study_id) &&
               availableActivitySpecs.includes(x.spec)
           )
@@ -229,6 +231,7 @@ export default function GroupCreator({
           ? activities.filter(
               (x) =>
                 x.spec !== "lamp.group" &&
+                x.spec !== "lamp.module" &&
                 (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
@@ -394,7 +397,7 @@ export default function GroupCreator({
                 labelPlacement="end"
               />
             )}
-            {type !== "lamp.group" && (
+            {/* {type !== "lamp.group" && (
               <FormControlLabel
                 value="hide_on_completion"
                 control={
@@ -407,7 +410,7 @@ export default function GroupCreator({
                 label="Hide on Completion"
                 labelPlacement="end"
               />
-            )}
+            )} */}
             <FormControlLabel
               value="hide_sub_activities"
               control={
