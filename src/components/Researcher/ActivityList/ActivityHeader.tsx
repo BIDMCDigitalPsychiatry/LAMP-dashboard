@@ -217,7 +217,11 @@ export default function ActivityHeader({
       )}
       <Divider />
       {activitySpecId === "lamp.survey" && (
-        <BranchingSettings branching_settings={branchingSettings} onChange={(val) => setBranchingSettings(val)} />
+        <BranchingSettings
+          studyId={studyId}
+          branching_settings={branchingSettings}
+          onChange={(val) => setBranchingSettings(val)}
+        />
       )}
     </Grid>
   )

@@ -50,14 +50,23 @@ export default function BranchingSettings({ ...props }) {
   const [enumGrpActivities, setEnumGrpActivities] = useState([])
 
   useEffect(() => {
+    updateActivityList()
+  }, [])
+  useEffect(() => {
+    updateActivityList()
+  }, [props.studyId])
+
+  const updateActivityList = () => {
     Service.getAll("activities").then((activities) => {
       setEnumGrpActivities(
         (activities || [])
-          .filter((data) => data.spec === "lamp.group" || data.spec === "lamp.module")
+          .filter(
+            (data) => data.study_id == props.studyId && (data.spec === "lamp.group" || data.spec === "lamp.module")
+          )
           .map((data) => ({ id: data.id, name: data.name }))
       )
     })
-  }, [])
+  }
 
   return (
     <Grid item lg={12} md={12} xs={12}>
