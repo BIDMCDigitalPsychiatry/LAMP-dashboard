@@ -355,7 +355,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
-                {(role == null || role == "message_coordinator") && (
+                {role == "message_coordinator" && (
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
