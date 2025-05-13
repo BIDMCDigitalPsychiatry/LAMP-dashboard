@@ -63,7 +63,16 @@ const checkPasswordRule = async (value: string) => {
     return true
   }
 }
-export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions, userType }) {
+export function CredentialEditor({
+  credential,
+  auxData,
+  mode,
+  onChange,
+  title,
+  permissions,
+  userType,
+  fromParticipant,
+}) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
   const [name, setName] = useState(credential?.name ?? "")
@@ -79,6 +88,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     setPhoto(auxData.photo)
     setRole(auxData.role)
   }, [auxData])
+
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)
@@ -104,7 +114,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
   const roles =
-    userType == "researcher"
+    userType == "researcher" && !fromParticipant
       ? [
           { value: "investigator", label: "Investigator" },
           { value: "message_coordinator", label: "Message Coordinator" },
@@ -222,7 +232,8 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
               ],
             }}
           >
-            {((!!permissions && !!title) || userType == "researcher") &&
+            {roles.length > 0 &&
+              ((!!permissions && !!title && !fromParticipant) || (userType == "researcher" && !fromParticipant)) &&
               roles.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
@@ -394,7 +405,8 @@ export const CredentialManager: React.FunctionComponent<{
   mode?: string
   type?: string
   userType?: string
-}> = ({ id, onComplete, credential, mode, type, userType, ...props }) => {
+  fromParticipant: boolean
+}> = ({ id, onComplete, credential, mode, type, userType, fromParticipant, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
@@ -640,6 +652,7 @@ export const CredentialManager: React.FunctionComponent<{
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}
       {!!selected.mode && (
         <CredentialEditor
+          fromParticipant={fromParticipant}
           credential={selected.credential}
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
           mode={selected.mode}

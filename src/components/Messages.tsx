@@ -133,11 +133,11 @@ const useStyles = makeStyles((theme) => ({
   composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
-const fetchCoordinators = async () => {
+const fetchCoordinators = async (participant) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
   const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
   let result = await (
-    await fetch(`${baseUrl}/coordinators`, {
+    await fetch(`${baseUrl}/${participant}/cordinators`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -178,7 +178,9 @@ export default function Messages({
   const { t } = useTranslation()
 
   useEffect(() => {
-    fetchCoordinators().then((coordinators) => setCoordinators(coordinators))
+    fetchCoordinators(participant).then((coordinators) => {
+      setCoordinators(coordinators.cordinators)
+    })
   }, [])
 
   useInterval(
@@ -379,6 +381,7 @@ export default function Messages({
             <Box px={2} style={{ marginTop: "20px" }}>
               {messageSection()}
             </Box>
+            {coordinators.length == 0 && <Box>{`${t("No Coach or Support staff are available for messaging.")}`}</Box>}
           </Container>
         </ResponsiveDialog>
       </Container>
