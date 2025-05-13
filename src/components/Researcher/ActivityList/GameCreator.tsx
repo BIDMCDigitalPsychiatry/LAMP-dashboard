@@ -105,6 +105,8 @@ export default function GameCreator({
   })
 
   useEffect(() => {
+    console.log(data.studyID)
+    localStorage.setItem("studyId", data.studyID)
     validate()
   }, [data])
 

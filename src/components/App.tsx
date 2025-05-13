@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { HashRouter, Route, Redirect, Switch, useLocation, useParams } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
@@ -92,8 +92,21 @@ export const changeCase = (text) => {
 }
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
+  const location: any = useLocation()
 
+  useEffect(() => {
+    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    if (
+      LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
+      location?.pathname === "/" &&
+      !userToken?.accessToken
+    ) {
+      //window.location.href = "/#/"
+      reset()
+    }
+  }, [location?.pathname])
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
     if (window.location.href.indexOf("participant") >= 0) {
@@ -135,7 +148,7 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
-  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital"]
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
 
   useEffect(() => {
     if (localStorage.getItem("demo_mode") === "try_it") {
@@ -181,7 +194,6 @@ function AppRouter({ ...props }) {
           : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any)?.id, null)
       }
     })
-
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 
@@ -197,7 +209,26 @@ function AppRouter({ ...props }) {
     })
   }
 
-  const getAdminType = () => {
+  // const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+
+  // let inactivityTimer: ReturnType<typeof setTimeout>
+
+  // const resetInactivityTimer = () => {
+  //   clearTimeout(inactivityTimer)
+  //   inactivityTimer = setTimeout(() => {
+  //     localStorage.removeItem("tokenInfo")
+  //     alert("You were inactive for too long. Please log in again.")
+  //     window.location.href = "/#/"
+  //   }, INACTIVITY_LIMIT)
+  // }
+
+  // const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+
+  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+
+  // resetInactivityTimer()
+
+  const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (res?.data) {
         let checked = false
@@ -252,11 +283,13 @@ function AppRouter({ ...props }) {
     if (typeof localStorage.getItem("verified") !== undefined) {
       status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
     }
+
     if (
       !!state.identity &&
       (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
-      !status
+      !status &&
+      isAuthenticated
     ) {
       window.location.href = "/#/2fa"
     }
@@ -291,9 +324,11 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    // localStorage.removeItem("tokenInfo")
     if (identity?.id != "selfHelp@demo.lamp.digital") {
       Service.deleteUserDB()
     }
+    Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
@@ -305,14 +340,16 @@ function AppRouter({ ...props }) {
           device_type: "Dashboard",
           user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
         },
-      } as any).then((res) => console.dir(res))
+      } as any).then((res) => localStorage.removeItem("tokenInfo"))
     }
+
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(`${t("Invalid id or password.")}`, {
         variant: "error",
       })
       return
     })
+
     if (!!identity) {
       getAdminType()
       let type = {
@@ -329,9 +366,9 @@ function AppRouter({ ...props }) {
         auth: null,
         authType: null,
         activeTab: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
+        lastDomain: ["api.lamp.digital", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
           ? undefined
-          : state.auth.serverAddress,
+          : state?.auth?.serverAddress,
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       window.location.href = "/#/"
@@ -428,6 +465,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (
@@ -455,6 +493,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : state.authType === "participant" ? (
@@ -486,6 +525,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (
@@ -512,6 +552,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -546,6 +587,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -581,6 +623,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -615,6 +658,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -651,6 +695,7 @@ function AppRouter({ ...props }) {
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
+                  setAuthenticated={setAuthenticated}
                 />
               </React.Fragment>
             ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -693,6 +738,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -741,6 +787,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -804,6 +851,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -854,6 +902,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -865,11 +914,11 @@ function AppRouter({ ...props }) {
                 authType={state.authType}
                 id={props.match.params.id}
                 title={`User ${getParticipant(props.match.params.id).id}`}
-                name={
-                  getParticipant(props.match.params.id)?.alias ||
-                  getParticipant(props.match.params.id)?.name ||
-                  getParticipant(props.match.params.id)?.id
-                }
+                // name={
+                //   getParticipant(props.match.params.id)?.alias ||
+                //   getParticipant(props.match.params.id)?.name ||
+                //   getParticipant(props.match.params.id)?.id
+                // }
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
@@ -901,6 +950,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -971,6 +1021,7 @@ function AppRouter({ ...props }) {
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -988,6 +1039,26 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
+  const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+
+  let inactivityTimer: ReturnType<typeof setTimeout>
+  const isOnLoginPage = window.location.hash === "#/"
+  const resetInactivityTimer = () => {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = setTimeout(() => {
+      localStorage.removeItem("tokenInfo")
+      if (!isOnLoginPage) {
+        alert("You were inactive for too long. Please log in again.")
+        window.location.href = "/#/"
+      }
+    }, INACTIVITY_LIMIT)
+  }
+
+  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+
+  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+
+  resetInactivityTimer()
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider

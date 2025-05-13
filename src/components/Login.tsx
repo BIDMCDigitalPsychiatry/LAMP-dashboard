@@ -30,6 +30,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+
 type SuggestedUrlOption = {
   label: string
 }
@@ -60,13 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: {
-      color: "#6083E7",
-      fontWeight: "bold",
-      cursor: "pointer",
-      marginRight: "20px",
-      "&:hover": { textDecoration: "underline" },
-    },
+    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
     loginDisabled: {
@@ -87,6 +82,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
+  const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -130,7 +126,25 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  let handleLogin = (event: any, mode?: string): void => {
+  const generateTokens = async (args: { id: string; password: string }) => {
+    const userName = args?.id?.trim()
+    const password = args?.password?.trim()
+    if (userName && password) {
+      try {
+        await LAMP.Credential.login(userName, password).then((res) => {
+          localStorage.setItem(
+            userTokenKey,
+            JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+          )
+          props?.setAuthenticated(true)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
@@ -145,69 +159,68 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
-    setIdentity({
+    const res = await setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
-      .then((res) => {
-        if (res.authType === "participant") {
-          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
-          LAMP.SensorEvent.create(res.identity.id, {
-            timestamp: Date.now(),
-            sensor: "lamp.analytics",
-            data: {
-              type: "login",
-              device_type: "Dashboard",
-              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-            },
-          } as any).then((res) => console.dir(res))
-          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
-        }
-        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
-          let studiesSelected =
-            localStorage.getItem("studies_" + res.identity.id) !== null
-              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
-              : []
-          if (studiesSelected.length === 0) {
-            let studiesList = [res.identity.name]
-            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
-            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
-          }
-        }
-        process.env.REACT_APP_LATEST_LAMP === "true"
-          ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
-          : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
-        localStorage.setItem(
-          "LAMP_user_" + res.identity.id,
-          JSON.stringify({
-            language: selectedLanguage,
-          })
-        )
-        ;(async () => {
-          await Service.deleteDB()
-          if (mode != "selfHelp") {
-            await Service.deleteUserDB()
-          }
-        })()
-        setLoginClick(false)
-        onComplete()
-      })
-      .catch((err) => {
-        // console.warn("error with auth request", err)
-        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
-          variant: "error",
-        })
-        if (!srcLocked)
-          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-        setLoginClick(false)
-      })
-  }
+    if (res) {
+      await generateTokens(res.auth)
+    }
+    // .then((res) => {
+    //   console.log("res", res)
+    //   if (!mode) {
+    //     generateTokens(res?.auth)
+    //   }
 
-  const handleSubmit = () => {
-    LAMP.initializeDemoDB(self_help_db)
-    localStorage.setItem("demo_mode", "self_help")
-    handleLogin(event, "selfHelp")
+    if (res.authType === "participant") {
+      await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
+      await LAMP.SensorEvent.create(res.identity.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "login",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
+      await LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
+    }
+    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+      let studiesSelected =
+        localStorage.getItem("studies_" + res.identity.id) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+          : []
+      if (studiesSelected.length === 0) {
+        let studiesList = [res.identity.name]
+        localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+        localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+      }
+    }
+    process.env.REACT_APP_LATEST_LAMP === "true"
+      ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
+      : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
+    localStorage.setItem(
+      "LAMP_user_" + res.identity.id,
+      JSON.stringify({
+        language: selectedLanguage,
+      })
+    )
+    ;(async () => {
+      await Service.deleteDB()
+      await Service.deleteUserDB()
+    })()
+    setLoginClick(false)
+    onComplete()
+    // .catch((err) => {
+    //   // console.warn("error with auth request", err)
+    //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+    //     variant: "error",
+    //   })
+    //   if (!srcLocked)
+    //     enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
+    //   setLoginClick(false)
+    // })
   }
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -215,257 +228,244 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
 
   return (
-    <>
-      <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-        <ResponsiveMargin>
-          <IconButton
-            style={{ position: "fixed", top: 8, right: 8 }}
-            onClick={(event) => setHelpMenu(event.currentTarget)}
+    <Slide direction="right" in={true} mountOnEnter unmountOnExit>
+      <ResponsiveMargin>
+        <IconButton
+          style={{ position: "fixed", top: 8, right: 8 }}
+          onClick={(event) => setHelpMenu(event.currentTarget)}
+        >
+          <Icon>help</Icon>
+        </IconButton>
+        <Menu
+          id="simple-menu"
+          anchorEl={helpMenu}
+          keepMounted
+          open={Boolean(helpMenu)}
+          onClose={() => setHelpMenu(undefined)}
+        >
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://docs.lamp.digital", "_blank")
+            }}
           >
-            <Icon>help</Icon>
-          </IconButton>
-          <Menu
-            id="simple-menu"
-            anchorEl={helpMenu}
-            keepMounted
-            open={Boolean(helpMenu)}
-            onClose={() => setHelpMenu(undefined)}
+            <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://community.lamp.digital", "_blank")
+            }}
           >
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("mailto:team@digitalpsych.org", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital/privacy/", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
-            </MenuItem>
-          </Menu>
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            className={classes.loginContainer}
+            <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("mailto:team@digitalpsych.org", "_blank")
+            }}
           >
-            <Grid item className={classes.loginInner}>
-              <form onSubmit={(e) => handleLogin(e)}>
-                <Box>
-                  <Box className={classes.logoLogin}>
-                    <Logo />
-                  </Box>
-                  <Box className={classes.logoText}>
-                    <Logotext />
-                    <div
-                      style={{
-                        height: 6,
-                        marginBottom: 30,
-                        background:
-                          "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
-                      }}
+            <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://docs.lamp.digital/privacy/", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+          </MenuItem>
+        </Menu>
+        <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
+          <Grid item className={classes.loginInner}>
+            <form onSubmit={(e) => handleLogin(e)}>
+              <Box>
+                <Box className={classes.logoLogin}>
+                  <Logo />
+                </Box>
+                <Box className={classes.logoText}>
+                  <Logotext />
+                  <div
+                    style={{
+                      height: 6,
+                      marginBottom: 30,
+                      background:
+                        "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                    }}
+                  />
+                </Box>
+                <TextField
+                  select
+                  label={`${t("Select Language")}`}
+                  style={{ width: "100%" }}
+                  onChange={(event) => {
+                    setSelectedLanguage(event.target.value)
+                  }}
+                  variant="filled"
+                  value={selectedLanguage || "en-US"}
+                >
+                  {Object.keys(locale_lang).map((key, value) => {
+                    if (userLanguages.includes(key)) {
+                      return (
+                        <MenuItem key={key} value={key}>
+                          {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+                        </MenuItem>
+                      )
+                    }
+                  })}
+                </TextField>
+                <Autocomplete
+                  freeSolo={true}
+                  id="serever-selector"
+                  options={options}
+                  sx={{ width: "100%", marginTop: "12px" }}
+                  value={state.serverAddress || ""}
+                  onChange={(event, value) => handleServerInput(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="serverAddress"
+                      variant="filled"
+                      value={state.serverAddress || ""}
+                      onChange={(event) => handleServerInput(event.target.value)}
+                      InputProps={{ ...params.InputProps, disableUnderline: true }}
+                      label={t("Server Address")}
+                      helperText={t("Don't enter a domain if you're not sure what this option does.")}
                     />
-                  </Box>
-                  <TextField
-                    select
-                    label={`${t("Select Language")}`}
-                    style={{ width: "100%" }}
-                    onChange={(event) => {
-                      setSelectedLanguage(event.target.value)
-                    }}
-                    variant="filled"
-                    value={selectedLanguage || "en-US"}
+                  )}
+                />
+                <TextField
+                  required
+                  name="id"
+                  type="email"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50 }}
+                  placeholder={`${t("my.email@address.com")}`}
+                  value={state.id || ""}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                    autoCapitalize: "off",
+                  }}
+                />
+
+                <TextField
+                  required
+                  name="password"
+                  type="password"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50, marginBottom: 40 }}
+                  placeholder="•••••••••"
+                  value={state.password || ""}
+                  onChange={handleChange}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                  }}
+                />
+
+                <Box className={classes.buttonNav} width={1} textAlign="center">
+                  <Fab
+                    variant="extended"
+                    type="submit"
+                    style={{ background: "#7599FF", color: "White" }}
+                    onClick={handleLogin}
+                    className={loginClick ? classes.loginDisabled : ""}
                   >
-                    {Object.keys(locale_lang).map((key, value) => {
-                      if (userLanguages.includes(key)) {
-                        return (
-                          <MenuItem key={key} value={key}>
-                            {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
-                          </MenuItem>
-                        )
-                      }
-                    })}
-                  </TextField>
-                  <Autocomplete
-                    freeSolo={true}
-                    id="serever-selector"
-                    options={options}
-                    sx={{ width: "100%", marginTop: "12px" }}
-                    value={state.serverAddress || ""}
-                    onChange={(event, value) => handleServerInput(value)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="serverAddress"
-                        variant="filled"
-                        value={state.serverAddress || ""}
-                        onChange={(event) => handleServerInput(event.target.value)}
-                        InputProps={{ ...params.InputProps, disableUnderline: true }}
-                        label={t("Server Address")}
-                        helperText={t("Don't enter a domain if you're not sure what this option does.")}
-                      />
-                    )}
-                  />
-                  <TextField
-                    required
-                    name="id"
-                    type="email"
-                    margin="normal"
-                    variant="outlined"
-                    style={{ width: "100%", height: 50 }}
-                    placeholder={`${t("my.email@address.com")}`}
-                    value={state.id || ""}
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                    InputProps={{
-                      classes: {
-                        root: classes.textfieldStyle,
-                      },
-                      autoCapitalize: "off",
-                    }}
-                  />
-
-                  <TextField
-                    required
-                    name="password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    style={{ width: "100%", height: 50, marginBottom: 40 }}
-                    placeholder="•••••••••"
-                    value={state.password || ""}
-                    onChange={handleChange}
-                    InputProps={{
-                      classes: {
-                        root: classes.textfieldStyle,
-                      },
-                    }}
-                  />
-
-                  <Box className={classes.buttonNav} width={1} textAlign="center">
-                    <Fab
-                      variant="extended"
+                    {`${t("Login")}`}
+                    <input
                       type="submit"
-                      style={{ background: "#7599FF", color: "White" }}
-                      onClick={handleLogin}
-                      className={loginClick ? classes.loginDisabled : ""}
-                    >
-                      {`${t("Login")}`}
-                      <input
-                        type="submit"
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          left: 0,
-                          width: "100%",
-                          opacity: 0,
-                        }}
-                        disabled={loginClick}
-                      />
-                    </Fab>
-                  </Box>
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        width: "100%",
+                        opacity: 0,
+                      }}
+                      disabled={loginClick}
+                    />
+                  </Fab>
+                </Box>
 
-                  <Box textAlign="center" width={1} mt={4} mb={4}>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        LAMP.initializeDemoDB(demo_db)
-                        localStorage.setItem("demo_mode", "try_it")
-                        setTryitMenu(event.currentTarget)
-                      }}
-                    >
-                      {`${t("Try it")}`}
-                    </Link>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        setOpen(true)
-                      }}
-                    >
-                      {`${t("Self Help")}`}
-                    </Link>
-                    {/* <br />
+                <Box textAlign="center" width={1} mt={4} mb={4}>
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => setTryitMenu(event.currentTarget)}
+                  >
+                    {`${t("Try it")}`}
+                  </Link>
+                  <br />
                   <Link
                     underline="none"
                     className={classes.linkBlue}
                     onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
                   >
                     {`${t("Research studies using mindLAMP")}`}
-                  </Link> */}
-                    <Menu
-                      keepMounted
-                      open={Boolean(tryitMenu)}
-                      anchorPosition={tryitMenu?.getBoundingClientRect()}
-                      anchorReference="anchorPosition"
-                      onClose={() => setTryitMenu(undefined)}
+                  </Link>
+                  <Menu
+                    keepMounted
+                    open={Boolean(tryitMenu)}
+                    anchorPosition={tryitMenu?.getBoundingClientRect()}
+                    anchorReference="anchorPosition"
+                    onClose={() => setTryitMenu(undefined)}
+                  >
+                    <MenuItem disabled divider>
+                      <b>{`${t("Try mindLAMP out as a...")}`}</b>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "researcher")
+                      }}
                     >
-                      <MenuItem disabled divider>
-                        <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "researcher")
-                        }}
-                      >
-                        {`${t("Researcher")}`}
-                      </MenuItem>
-                      <MenuItem
-                        divider
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "clinician")
-                        }}
-                      >
-                        {`${t("Clinician")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "participant")
-                        }}
-                      >
-                        {`${t("Participant")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "patient")
-                        }}
-                      >
-                        {`${t("User")}`}
-                      </MenuItem>
-                    </Menu>
-                  </Box>
+                      {`${t("Researcher")}`}
+                    </MenuItem>
+                    <MenuItem
+                      divider
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "clinician")
+                      }}
+                    >
+                      {`${t("Clinician")}`}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "participant")
+                      }}
+                    >
+                      {`${t("Participant")}`}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "patient")
+                      }}
+                    >
+                      {`${t("User")}`}
+                    </MenuItem>
+                  </Menu>
                 </Box>
-              </form>
-            </Grid>
+              </Box>
+            </form>
           </Grid>
-        </ResponsiveMargin>
-      </Slide>
-      <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
-    </>
+        </Grid>
+      </ResponsiveMargin>
+    </Slide>
   )
 }

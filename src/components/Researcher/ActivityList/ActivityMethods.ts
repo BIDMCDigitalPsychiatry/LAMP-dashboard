@@ -3,12 +3,16 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
-import BranchingSettings from "./BranchingSettings"
 let enumActivityIds = []
 let enumActivityNames = []
 Service.getAll("activities").then((activities) => {
-  enumActivityIds = (activities || []).map((data) => data.id)
-  enumActivityNames = (activities || []).map((data) => data.name)
+  const studyID = localStorage.getItem("studyId")
+  enumActivityIds = (activities || [])
+    .filter((data) => data.study_id == studyID && (data.spec !== "lamp.group" || data.spec !== "lamp.module"))
+    .map((data) => data.id)
+  enumActivityNames = (activities || [])
+    .filter((data) => data.study_id == studyID && (data.spec !== "lamp.group" || data.spec !== "lamp.module"))
+    .map((data) => data.name)
 })
 
 export const SchemaList = () => {
