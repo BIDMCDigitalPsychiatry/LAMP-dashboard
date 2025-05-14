@@ -165,7 +165,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
     if (res) {
-      await generateTokens(res.auth)
+      if (!mode) {
+        await generateTokens(res.auth)
+      }
     }
     // .then((res) => {
     //   console.log("res", res)
@@ -210,6 +212,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       await Service.deleteDB()
       await Service.deleteUserDB()
     })()
+    if (!srcLocked)
+      enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
     setLoginClick(false)
     onComplete()
     // .catch((err) => {
@@ -222,250 +226,278 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     //   setLoginClick(false)
     // })
   }
+  const handleSubmit = () => {
+    LAMP.initializeDemoDB(self_help_db)
+    localStorage.setItem("demo_mode", "self_help")
+    handleLogin(event, "selfHelp")
+  }
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
   }
 
   return (
-    <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-      <ResponsiveMargin>
-        <IconButton
-          style={{ position: "fixed", top: 8, right: 8 }}
-          onClick={(event) => setHelpMenu(event.currentTarget)}
-        >
-          <Icon>help</Icon>
-        </IconButton>
-        <Menu
-          id="simple-menu"
-          anchorEl={helpMenu}
-          keepMounted
-          open={Boolean(helpMenu)}
-          onClose={() => setHelpMenu(undefined)}
-        >
-          <MenuItem
-            dense
-            onClick={() => {
-              setHelpMenu(undefined)
-              window.open("https://docs.lamp.digital", "_blank")
-            }}
+    <>
+      <Slide direction="right" in={true} mountOnEnter unmountOnExit>
+        <ResponsiveMargin>
+          <IconButton
+            style={{ position: "fixed", top: 8, right: 8 }}
+            onClick={(event) => setHelpMenu(event.currentTarget)}
           >
-            <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-          </MenuItem>
-          <MenuItem
-            dense
-            onClick={() => {
-              setHelpMenu(undefined)
-              window.open("https://community.lamp.digital", "_blank")
-            }}
+            <Icon>help</Icon>
+          </IconButton>
+          <Menu
+            id="simple-menu"
+            anchorEl={helpMenu}
+            keepMounted
+            open={Boolean(helpMenu)}
+            onClose={() => setHelpMenu(undefined)}
           >
-            <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
-          </MenuItem>
-          <MenuItem
-            dense
-            onClick={() => {
-              setHelpMenu(undefined)
-              window.open("mailto:team@digitalpsych.org", "_blank")
-            }}
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://docs.lamp.digital", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://community.lamp.digital", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("mailto:team@digitalpsych.org", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://docs.lamp.digital/privacy/", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+            </MenuItem>
+          </Menu>
+          <Grid
+            container
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            className={classes.loginContainer}
           >
-            <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
-          </MenuItem>
-          <MenuItem
-            dense
-            onClick={() => {
-              setHelpMenu(undefined)
-              window.open("https://docs.lamp.digital/privacy/", "_blank")
-            }}
-          >
-            <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
-          </MenuItem>
-        </Menu>
-        <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
-          <Grid item className={classes.loginInner}>
-            <form onSubmit={(e) => handleLogin(e)}>
-              <Box>
-                <Box className={classes.logoLogin}>
-                  <Logo />
-                </Box>
-                <Box className={classes.logoText}>
-                  <Logotext />
-                  <div
-                    style={{
-                      height: 6,
-                      marginBottom: 30,
-                      background:
-                        "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+            <Grid item className={classes.loginInner}>
+              <form onSubmit={(e) => handleLogin(e)}>
+                <Box>
+                  <Box className={classes.logoLogin}>
+                    <Logo />
+                  </Box>
+                  <Box className={classes.logoText}>
+                    <Logotext />
+                    <div
+                      style={{
+                        height: 6,
+                        marginBottom: 30,
+                        background:
+                          "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                      }}
+                    />
+                  </Box>
+                  <TextField
+                    select
+                    label={`${t("Select Language")}`}
+                    style={{ width: "100%" }}
+                    onChange={(event) => {
+                      setSelectedLanguage(event.target.value)
+                    }}
+                    variant="filled"
+                    value={selectedLanguage || "en-US"}
+                  >
+                    {Object.keys(locale_lang).map((key, value) => {
+                      if (userLanguages.includes(key)) {
+                        return (
+                          <MenuItem key={key} value={key}>
+                            {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+                          </MenuItem>
+                        )
+                      }
+                    })}
+                  </TextField>
+                  <Autocomplete
+                    freeSolo={true}
+                    id="serever-selector"
+                    options={options}
+                    sx={{ width: "100%", marginTop: "12px" }}
+                    value={state.serverAddress || ""}
+                    onChange={(event, value) => handleServerInput(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="serverAddress"
+                        variant="filled"
+                        value={state.serverAddress || ""}
+                        onChange={(event) => handleServerInput(event.target.value)}
+                        InputProps={{ ...params.InputProps, disableUnderline: true }}
+                        label={t("Server Address")}
+                        helperText={t("Don't enter a domain if you're not sure what this option does.")}
+                      />
+                    )}
+                  />
+                  <TextField
+                    required
+                    name="id"
+                    type="email"
+                    margin="normal"
+                    variant="outlined"
+                    style={{ width: "100%", height: 50 }}
+                    placeholder={`${t("my.email@address.com")}`}
+                    value={state.id || ""}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{
+                      classes: {
+                        root: classes.textfieldStyle,
+                      },
+                      autoCapitalize: "off",
                     }}
                   />
-                </Box>
-                <TextField
-                  select
-                  label={`${t("Select Language")}`}
-                  style={{ width: "100%" }}
-                  onChange={(event) => {
-                    setSelectedLanguage(event.target.value)
-                  }}
-                  variant="filled"
-                  value={selectedLanguage || "en-US"}
-                >
-                  {Object.keys(locale_lang).map((key, value) => {
-                    if (userLanguages.includes(key)) {
-                      return (
-                        <MenuItem key={key} value={key}>
-                          {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
-                        </MenuItem>
-                      )
-                    }
-                  })}
-                </TextField>
-                <Autocomplete
-                  freeSolo={true}
-                  id="serever-selector"
-                  options={options}
-                  sx={{ width: "100%", marginTop: "12px" }}
-                  value={state.serverAddress || ""}
-                  onChange={(event, value) => handleServerInput(value)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      name="serverAddress"
-                      variant="filled"
-                      value={state.serverAddress || ""}
-                      onChange={(event) => handleServerInput(event.target.value)}
-                      InputProps={{ ...params.InputProps, disableUnderline: true }}
-                      label={t("Server Address")}
-                      helperText={t("Don't enter a domain if you're not sure what this option does.")}
-                    />
-                  )}
-                />
-                <TextField
-                  required
-                  name="id"
-                  type="email"
-                  margin="normal"
-                  variant="outlined"
-                  style={{ width: "100%", height: 50 }}
-                  placeholder={`${t("my.email@address.com")}`}
-                  value={state.id || ""}
-                  onChange={handleChange}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                    autoCapitalize: "off",
-                  }}
-                />
 
-                <TextField
-                  required
-                  name="password"
-                  type="password"
-                  margin="normal"
-                  variant="outlined"
-                  style={{ width: "100%", height: 50, marginBottom: 40 }}
-                  placeholder="•••••••••"
-                  value={state.password || ""}
-                  onChange={handleChange}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                  }}
-                />
+                  <TextField
+                    required
+                    name="password"
+                    type="password"
+                    margin="normal"
+                    variant="outlined"
+                    style={{ width: "100%", height: 50, marginBottom: 40 }}
+                    placeholder="•••••••••"
+                    value={state.password || ""}
+                    onChange={handleChange}
+                    InputProps={{
+                      classes: {
+                        root: classes.textfieldStyle,
+                      },
+                    }}
+                  />
 
-                <Box className={classes.buttonNav} width={1} textAlign="center">
-                  <Fab
-                    variant="extended"
-                    type="submit"
-                    style={{ background: "#7599FF", color: "White" }}
-                    onClick={handleLogin}
-                    className={loginClick ? classes.loginDisabled : ""}
-                  >
-                    {`${t("Login")}`}
-                    <input
+                  <Box className={classes.buttonNav} width={1} textAlign="center">
+                    <Fab
+                      variant="extended"
                       type="submit"
-                      style={{
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        left: 0,
-                        width: "100%",
-                        opacity: 0,
-                      }}
-                      disabled={loginClick}
-                    />
-                  </Fab>
-                </Box>
+                      style={{ background: "#7599FF", color: "White" }}
+                      onClick={handleLogin}
+                      className={loginClick ? classes.loginDisabled : ""}
+                    >
+                      {`${t("Login")}`}
+                      <input
+                        type="submit"
+                        style={{
+                          cursor: "pointer",
+                          position: "absolute",
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          width: "100%",
+                          opacity: 0,
+                        }}
+                        disabled={loginClick}
+                      />
+                    </Fab>
+                  </Box>
 
-                <Box textAlign="center" width={1} mt={4} mb={4}>
-                  <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => setTryitMenu(event.currentTarget)}
-                  >
-                    {`${t("Try it")}`}
-                  </Link>
-                  <br />
-                  <Link
+                  <Box textAlign="center" width={1} mt={4} mb={4}>
+                    <Link
+                      underline="none"
+                      className={classes.linkBlue}
+                      onClick={(event) => {
+                        LAMP.initializeDemoDB(demo_db)
+                        localStorage.setItem("demo_mode", "try_it")
+                        setTryitMenu(event.currentTarget)
+                      }}
+                      // setTryitMenu(event.currentTarget)}
+                    >
+                      {`${t("Try it")}`}
+                    </Link>
+                    <br />
+                    <Link
+                      underline="none"
+                      className={classes.linkBlue}
+                      onClick={(event) => {
+                        setOpen(true)
+                      }}
+                    >
+                      {`${t("Self Help")}`}
+                    </Link>
+                    {/* <Link
                     underline="none"
                     className={classes.linkBlue}
                     onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
                   >
                     {`${t("Research studies using mindLAMP")}`}
-                  </Link>
-                  <Menu
-                    keepMounted
-                    open={Boolean(tryitMenu)}
-                    anchorPosition={tryitMenu?.getBoundingClientRect()}
-                    anchorReference="anchorPosition"
-                    onClose={() => setTryitMenu(undefined)}
-                  >
-                    <MenuItem disabled divider>
-                      <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "researcher")
-                      }}
+                  </Link> */}
+                    <Menu
+                      keepMounted
+                      open={Boolean(tryitMenu)}
+                      anchorPosition={tryitMenu?.getBoundingClientRect()}
+                      anchorReference="anchorPosition"
+                      onClose={() => setTryitMenu(undefined)}
                     >
-                      {`${t("Researcher")}`}
-                    </MenuItem>
-                    <MenuItem
-                      divider
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "clinician")
-                      }}
-                    >
-                      {`${t("Clinician")}`}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "participant")
-                      }}
-                    >
-                      {`${t("Participant")}`}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "patient")
-                      }}
-                    >
-                      {`${t("User")}`}
-                    </MenuItem>
-                  </Menu>
+                      <MenuItem disabled divider>
+                        <b>{`${t("Try mindLAMP out as a...")}`}</b>
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "researcher")
+                        }}
+                      >
+                        {`${t("Researcher")}`}
+                      </MenuItem>
+                      <MenuItem
+                        divider
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "clinician")
+                        }}
+                      >
+                        {`${t("Clinician")}`}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "participant")
+                        }}
+                      >
+                        {`${t("Participant")}`}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "patient")
+                        }}
+                      >
+                        {`${t("User")}`}
+                      </MenuItem>
+                    </Menu>
+                  </Box>
                 </Box>
-              </Box>
-            </form>
+              </form>
+            </Grid>
           </Grid>
-        </Grid>
-      </ResponsiveMargin>
-    </Slide>
+        </ResponsiveMargin>
+      </Slide>
+      <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
+    </>
   )
 }
