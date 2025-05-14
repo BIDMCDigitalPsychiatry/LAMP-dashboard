@@ -358,20 +358,20 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
-                {/* {role == "message_coordinator" && ( */}
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={tab === "conversations"}
-                  onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/conversations`)}
-                  disableGutters
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Conversation />
-                  </ListItemIcon>
-                  <ListItemText primary={`${t("Conversations")}`} />
-                </ListItem>
-                {/* )}  */}
+                {role == "message_coordinator" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={tab === "conversations"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/conversations`)}
+                    disableGutters
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Conversation />
+                    </ListItemIcon>
+                    <ListItemText primary={`${t("Conversations")}`} />
+                  </ListItem>
+                )}
               </List>
             </Drawer>
             {tab === "users" && (
