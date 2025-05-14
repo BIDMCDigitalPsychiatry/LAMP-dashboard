@@ -21,6 +21,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "./ConfirmationDialog"
+import { Alert } from "@mui/material"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -293,6 +294,11 @@ export default function Messages({
           ))}
 
         <Divider />
+        {(coordinators || []).length == 0 && (
+          <Box>
+            <Alert severity="warning">{`${t("No Coach or Support staff are available for messaging.")}`}</Alert>
+          </Box>
+        )}
         <Box my={2} display="flex" className={classes.composeMsg}>
           <Box width="100%" className={classes.composeTextarea}>
             <TextareaAutosize
@@ -381,7 +387,6 @@ export default function Messages({
             <Box px={2} style={{ marginTop: "20px" }}>
               {messageSection()}
             </Box>
-            {coordinators.length == 0 && <Box>{`${t("No Coach or Support staff are available for messaging.")}`}</Box>}
           </Container>
         </ResponsiveDialog>
       </Container>

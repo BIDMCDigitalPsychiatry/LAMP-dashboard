@@ -186,7 +186,7 @@ export function CredentialEditor({
             overrides: {
               MuiSelect: {
                 iconOutlined: {
-                  right: 65,
+                  right: ["create-new"].includes(mode) ? 2 : 65,
                 },
               },
             },
