@@ -46,6 +46,7 @@ const ModuleActivity = ({ ...props }) => {
   useEffect(() => {
     const handleTabClose = (event) => {
       localStorage.setItem("ModuleActivityClosed", "true")
+      localStorage.removeItem("activityFromModule")
     }
 
     window.addEventListener("beforeunload", handleTabClose)

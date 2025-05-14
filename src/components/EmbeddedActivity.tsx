@@ -101,8 +101,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [responseActivity])
 
-  console.log("currentActibity", currentActivity)
-
   useEffect(() => {
     if (currentActivity !== null && !!currentActivity?.spec) {
       setLoading(true)
@@ -396,6 +394,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onClick={() => {
               setShowPopUp(false)
               setResponseActivity(null)
+              if (surveyResponse) {
+                handleSaveData(surveyResponse)
+              }
             }}
             color="secondary"
           >
