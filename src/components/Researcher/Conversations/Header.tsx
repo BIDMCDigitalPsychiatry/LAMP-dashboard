@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Popover,
@@ -10,12 +10,18 @@ import {
   Theme,
   createStyles,
   FormControlLabel,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
 import SearchBox from "../../SearchBox"
 import Switch, { SwitchProps } from "@mui/material/Switch"
 import { styled } from "@mui/material/styles"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,11 +78,11 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    toggleSwitch: {
-      "& .MuiSwitch-track": {
-        backgroundColor: "#7599FF !important",
-      },
-    },
+    // toggleSwitch: {
+    //   "& .MuiSwitch-track": {
+    //     backgroundColor: "#7599FF !important",
+    //   },
+    // },
   })
 )
 
@@ -94,7 +100,7 @@ const IOSSwitch = styled((props: SwitchProps) => (
       transform: "translateX(16px)",
       color: "#fff",
       "& + .MuiSwitch-track": {
-        backgroundColor: "#65C466",
+        backgroundColor: "#1976d2",
         opacity: 1,
         border: 0,
         ...theme.applyStyles("dark", {
@@ -139,9 +145,28 @@ const IOSSwitch = styled((props: SwitchProps) => (
     }),
   },
 }))
+
 export default function Header({ studies, researcherId, searchData, setParticipants, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [enabled, setEnabled] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [initial, setInitial] = useState(true)
+
+  useEffect(() => {
+    LAMP.Type.getAttachment(researcherId, "lamp.dashboard.conversation_enabled").then((result: any) => {
+      setEnabled(result.data)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!!enabled && !initial) {
+      setOpen(true)
+    }
+    if (!initial) {
+      LAMP.Type.setAttachment(researcherId, "me", "lamp.dashboard.conversation_enabled", enabled)
+    }
+  }, [enabled])
 
   return (
     <Box>
@@ -150,13 +175,41 @@ export default function Header({ studies, researcherId, searchData, setParticipa
           <Typography variant="h5">{`${t("Conversations")}`}</Typography>
           <Box pl={2}>
             <FormControlLabel
-              className={classes.toggleSwitch}
-              control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-              label="Enabled"
+              control={
+                <IOSSwitch
+                  sx={{ m: 1 }}
+                  checked={enabled}
+                  onChange={(e) => {
+                    setInitial(false)
+                    setEnabled(e.target.checked)
+                  }}
+                />
+              }
+              label={enabled ? "Enabled" : "Disabled"}
             />
           </Box>
         </Box>
-
+        <Dialog
+          open={!!open}
+          onClose={() => {
+            setOpen(false)
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {`${t(
+                "mindLAMP does not monitor messages. All communication is your responsibility. Do not share or solicit Personal Health Information (PHI) through this system."
+              )}`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)} color="secondary">
+              {`${t("Ok")}`}
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Box>
           <SearchBox searchData={searchData} />
         </Box>

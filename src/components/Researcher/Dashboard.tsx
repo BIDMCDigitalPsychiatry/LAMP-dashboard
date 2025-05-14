@@ -371,7 +371,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   </ListItemIcon>
                   <ListItemText primary={`${t("Conversations")}`} />
                 </ListItem>
-                {/* )} */}
+                {/* )}  */}
               </List>
             </Drawer>
             {tab === "users" && (

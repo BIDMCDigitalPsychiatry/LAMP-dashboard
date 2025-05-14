@@ -10,19 +10,16 @@ import {
   CircularProgress,
   makeStyles,
   createStyles,
-  Fab,
   AppBar,
   Toolbar,
   Icon,
   Link,
-  IconButton,
   Divider,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import UpdateCredential from "./UpdateCredential"
-import MessageDialog from "./MessageDialog"
 import Activities from "./Activities"
 import Sensors from "./Sensors"
 import { Service } from "../../../DBService/DBService"
@@ -220,7 +217,6 @@ export default function PatientProfile({
           </Grid>
         </Container>
       </Box>
-      {!!participant && <MessageDialog participant={participant} />}
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
