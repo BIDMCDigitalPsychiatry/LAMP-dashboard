@@ -319,15 +319,16 @@ function AppRouter({ ...props }) {
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
-      await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
-        timestamp: Date.now(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "logout",
-          device_type: "Dashboard",
-          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-        },
-      } as any).then((res) => localStorage.removeItem("tokenInfo"))
+      !!(state.identity as any)?.id &&
+        (await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
+          timestamp: Date.now(),
+          sensor: "lamp.analytics",
+          data: {
+            type: "logout",
+            device_type: "Dashboard",
+            user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+          },
+        } as any).then((res) => localStorage.removeItem("tokenInfo")))
     }
 
     await LAMP.Auth.set_identity(identity).catch((e) => {
