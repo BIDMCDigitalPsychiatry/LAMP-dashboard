@@ -97,19 +97,6 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
-    const hasRoleFlag = localStorage.getItem("isParticipant")
-
-    if (userToken && !hasRoleFlag) {
-      const firstPath = window.location.hash
-      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
-
-      if (participantRegex.test(firstPath)) {
-        localStorage.setItem("isParticipant", "true")
-      } else {
-        localStorage.setItem("isParticipant", "false")
-      }
-    }
-
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
       location?.pathname === "/" &&
@@ -986,9 +973,9 @@ function AppRouter({ ...props }) {
 
 export default function App({ ...props }) {
   const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+
   let inactivityTimer: ReturnType<typeof setTimeout>
   const isOnLoginPage = window.location.hash === "#/"
-
   const resetInactivityTimer = () => {
     clearTimeout(inactivityTimer)
     inactivityTimer = setTimeout(() => {
