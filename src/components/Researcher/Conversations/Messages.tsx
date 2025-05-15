@@ -209,15 +209,7 @@ export default function Messages({
   }
 
   useEffect(() => {
-    console.log(conversations)
-
     getMessages()
-    console.log(
-      getMessages()
-      // .filter(
-      //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
-      // )
-    )
   }, [conversations])
 
   const getMessages = () => {
@@ -237,7 +229,6 @@ export default function Messages({
       date: new Date(),
       text: msg,
     })
-    console.log(all)
     LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
     setAddMsg(false)

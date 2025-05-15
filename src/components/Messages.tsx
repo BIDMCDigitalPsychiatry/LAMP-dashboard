@@ -21,6 +21,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "./ConfirmationDialog"
+import { Alert } from "@mui/material"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -133,6 +134,21 @@ const useStyles = makeStyles((theme) => ({
   composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
+const fetchCoordinators = async (participant) => {
+  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+  let result = await (
+    await fetch(`${baseUrl}/${participant}/cordinators`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + userToken.accessToken,
+      },
+    })
+  ).json()
+  return result
+}
+
 export default function Messages({
   refresh,
   participant,
@@ -151,15 +167,22 @@ export default function Messages({
   msgOpen?: boolean
 }) {
   const classes = useStyles()
-  const [open, setOpen] = useState(msgOpen ?? false)
+  const [open, setOpen] = useState(true)
   const [conversations, setConversations] = useState({})
   const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [confirmationDialog, setConfirmationDialog] = useState(!!participantOnly)
-
+  const [coordinators, setCoordinators] = useState([])
+  const [selectedCoordinator, setSelectedCoordinator] = useState()
   const { t } = useTranslation()
+
+  useEffect(() => {
+    fetchCoordinators(participant).then((coordinators) => {
+      setCoordinators(coordinators.cordinators)
+    })
+  }, [])
 
   useInterval(
     () => {
@@ -187,6 +210,7 @@ export default function Messages({
     var seconds = Math.floor(delta % 60)
     return seconds + (seconds > 1 ? "sec" : "secs")
   }
+
   const refreshMessages = async () => {
     console.log("Fetching messages...")
     setConversations(
@@ -232,13 +256,13 @@ export default function Messages({
     setConversations({ ...(conversations || {}), [participant]: all })
   }
 
-  const messageSection = (type: number) => {
+  const messageSection = () => {
     return (
       <Box>
         {getMessages()
-          .filter(
-            (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
-          )
+          // .filter(
+          //   // (x) => (x.from = "") //&&  x.from === sender - to be replaced with different senders
+          // )
           .map((x) => (
             <Box
               className={classes.innerMessage}
@@ -270,6 +294,11 @@ export default function Messages({
           ))}
 
         <Divider />
+        {(coordinators || []).length == 0 && (
+          <Box>
+            <Alert severity="warning">{`${t("No Coach or Support staff are available for messaging.")}`}</Alert>
+          </Box>
+        )}
         <Box my={2} display="flex" className={classes.composeMsg}>
           <Box width="100%" className={classes.composeTextarea}>
             <TextareaAutosize
@@ -305,119 +334,62 @@ export default function Messages({
     setConfirmationDialog(false)
   }
 
-  if (msgOpen) {
-    return (
-      <Container>
-        <Box>{messageSection(0)}</Box>
-      </Container>
-    )
-  } else {
-    return (
-      <Box>
-        <ConfirmationDialog
-          open={confirmationDialog}
-          onClose={() => setConfirmationDialog(false)}
-          confirmAction={confirmAction}
-          okText={"Okay"}
-          cancelText={"Take me back"}
-          confirmationMsg={`${t("This chat is not monitored and should not be used for urgent matters.")}`}
-        />
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => history.back()} color="default" aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography
-              variant="h5"
-              style={{
-                marginLeft: supportsSidebar ? 0 : undefined,
-              }}
-            >
-              {`${t("Conversations")}`}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Container className={classes.containerWidth}>
-          <Box>
-            {getMessages().filter(
-              (x) =>
-                x.type === "message" &&
-                ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-            ).length > 0 ? (
-              getMessages()
-                .filter(
-                  (x) =>
-                    x.type === "message" &&
-                    ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-                )
-                .map((x) => (
-                  <Box
-                    border={0}
-                    className={classes.conversationStyle}
-                    mx={2}
-                    onClick={() => {
-                      refreshMessages()
-                      setSender(x.from)
-                      setOpen(true)
-                    }}
-                    style={{
-                      background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
-                      border: x.status === 0 ? "0" : "1px solid #C6C6C6",
-                    }}
-                  >
-                    <Grid container>
-                      <Grid item xs>
-                        <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
-                          {x.from}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs className={classes.conversationtime} justifyContent="space-between">
-                        <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
-                      </Grid>
-                    </Grid>
-                    <Box width={1}>
-                      <Typography>{x.text}</Typography>
-                    </Box>
-                  </Box>
-                ))[0]
-            ) : (
-              <Box style={{ marginTop: "20px" }}>{messageSection(1)}</Box>
-            )}
-          </Box>
+  const openMessage = (coordinator) => {
+    setSelectedCoordinator(coordinator)
+    setOpen(true)
+  }
 
-          <ResponsiveDialog
-            transient={false}
-            animate
-            fullScreen
-            open={open}
-            onClose={() => {
-              setOpen(false)
-            }}
-          >
-            <AppBar position="static" className={classes.inlineHeader}>
-              <Toolbar className={classes.toolbardashboard}>
-                <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
-                  <Icon>arrow_back</Icon>
-                </IconButton>
-
-                <Typography
+  return (
+    <Box>
+      <Container className={classes.containerWidth}>
+        <ResponsiveDialog
+          transient={false}
+          animate
+          fullScreen
+          open={open}
+          onClose={() => {
+            // setDialogOpen(false)
+            setOpen(false)
+          }}
+        >
+          <AppBar position="static" className={classes.inlineHeader}>
+            <Toolbar className={classes.toolbardashboard}>
+              <IconButton
+                onClick={() => {
+                  // setDialogOpen(false)
+                  setOpen(false)
+                  window.history.back()
+                }}
+                color="default"
+                aria-label="Menu"
+              >
+                <Icon>arrow_back</Icon>
+              </IconButton>
+              <Typography
+                variant="h5"
+                style={{
+                  marginLeft: supportsSidebar ? 0 : undefined,
+                }}
+              >
+                {`${t("Conversations")}`}
+              </Typography>
+              {/* <Typography
                   variant="h5"
                   style={{
                     marginLeft: supportsSidebar ? 0 : undefined,
                   }}
                 >
                   {sender}
-                </Typography>
-              </Toolbar>
-            </AppBar>
-            <Container className={classes.containerWidth}>
-              <Box px={2} style={{ marginTop: "20px" }}>
-                {messageSection(1)}
-              </Box>
-            </Container>
-          </ResponsiveDialog>
-        </Container>
-      </Box>
-    )
-  }
+                </Typography> */}
+            </Toolbar>
+          </AppBar>
+          <Container className={classes.containerWidth}>
+            <Box px={2} style={{ marginTop: "20px" }}>
+              {messageSection()}
+            </Box>
+          </Container>
+        </ResponsiveDialog>
+      </Container>
+    </Box>
+  )
 }

@@ -33,8 +33,8 @@ export default function Credentials({ participant, ...props }) {
       <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => setOpenPasswordReset(participant.id)}>
         <Icon>vpn_key</Icon>
       </Fab>
-      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
-        <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
+      <ResponsiveDialog open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
+        <CredentialManager fromParticipant={true} style={{ margin: 16 }} id={openPasswordReset} />
       </ResponsiveDialog>
     </Box>
   )

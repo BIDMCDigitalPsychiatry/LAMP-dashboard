@@ -33,7 +33,7 @@ export default function UpdateCredential({ participant, allRoles, ext, ...props 
       </Link>
       <Dialog open={showCredentials} onClose={() => setShowCredentials(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={participant.id} style={{ margin: 16 }} />
+          <CredentialManager id={participant.id} fromParticipant={true} style={{ margin: 16 }} />
         </DialogContent>
       </Dialog>
     </Box>

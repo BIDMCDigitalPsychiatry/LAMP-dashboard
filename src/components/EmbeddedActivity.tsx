@@ -253,7 +253,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {
-        console.log("asd")
         response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])

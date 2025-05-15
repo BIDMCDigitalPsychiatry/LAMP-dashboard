@@ -54,7 +54,6 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   }, [_selected])
 
   useEffect(() => {
-    console.log(activities)
     filterActivities(search)
   }, [search])
   const handleSearchChange = (event: any) => {
