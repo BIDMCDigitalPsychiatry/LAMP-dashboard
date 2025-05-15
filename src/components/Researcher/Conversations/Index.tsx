@@ -246,6 +246,7 @@ export default function Conversations({
     localStorage.setItem("participants", JSON.stringify({ page: page, rowCount: rowCount }))
     setLoading(false)
   }
+  const [enabled, setEnabled] = useState(false)
 
   return (
     <React.Fragment>
@@ -264,6 +265,7 @@ export default function Conversations({
         mode={mode}
         setOrder={setOrder}
         order={order}
+        setEnabled={setEnabled}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
@@ -279,6 +281,7 @@ export default function Conversations({
                     handleSelectionChange={handleChange}
                     selectedParticipants={selectedParticipants}
                     researcherId={researcherId}
+                    enabled={enabled}
                   />
                 </Grid>
               ))}

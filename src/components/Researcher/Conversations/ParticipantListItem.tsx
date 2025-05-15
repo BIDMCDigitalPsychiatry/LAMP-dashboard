@@ -97,6 +97,17 @@ export default function ParticipantListItem({
   const [sensorData, setSensorData] = useState(null)
   const [name, setName] = useState(participant.name ?? "")
   const [conversations, setConversations] = useState({})
+  const [enabled, setEnabled] = useState(false)
+
+  useEffect(() => {
+    LAMP.Type.getAttachment(researcherId, "lamp.dashboard.conversation_enabled").then((result: any) => {
+      setEnabled(result.data)
+    })
+  }, [])
+
+  useEffect(() => {
+    setEnabled(props.enabled)
+  }, [props.enabled])
 
   useInterval(
     () => {
@@ -174,28 +185,30 @@ export default function ParticipantListItem({
             {participant.id != name && <Typography variant="subtitle2">{name}</Typography>}
           </Box>
         </Box>
-        <Box
-          display="flex"
-          alignItems="center"
-          onClick={() => {
-            localStorage.setItem("lastTab" + researcherId, JSON.stringify(new Date().getTime()))
-            updateAnalytics()
-          }}
-        >
-          <Badge color="error" badgeContent={msgCount > 0 ? msgCount : undefined}>
-            <Fab
-              size="small"
-              color="primary"
-              className={classes.btnWhite}
-              onClick={() => {
-                updateAnalytics()
-                setDialogOpen(true)
-              }}
-            >
-              <Icon style={{ color: "#7599FF" }}>comment</Icon>
-            </Fab>
-          </Badge>
-        </Box>
+        {!!enabled && (
+          <Box
+            display="flex"
+            alignItems="center"
+            onClick={() => {
+              localStorage.setItem("lastTab" + researcherId, JSON.stringify(new Date().getTime()))
+              updateAnalytics()
+            }}
+          >
+            <Badge color="error" badgeContent={msgCount > 0 ? msgCount : undefined}>
+              <Fab
+                size="small"
+                color="primary"
+                className={classes.btnWhite}
+                onClick={() => {
+                  updateAnalytics()
+                  setDialogOpen(true)
+                }}
+              >
+                <Icon style={{ color: "#7599FF" }}>comment</Icon>
+              </Fab>
+            </Badge>
+          </Box>
+        )}
       </Box>
       {/* <Dialog
         classes={{ paper: classes.popWidth }}
@@ -204,7 +217,7 @@ export default function ParticipantListItem({
         open={dialogOpen}
       >
         <div className={classes.padding20}> */}
-      {!!dialogOpen && (
+      {!!enabled && !!dialogOpen && (
         <Messages
           setDialogOpen={setDialogOpen}
           refresh

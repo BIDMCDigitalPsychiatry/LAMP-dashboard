@@ -146,10 +146,10 @@ const IOSSwitch = styled((props: SwitchProps) => (
   },
 }))
 
-export default function Header({ studies, researcherId, searchData, setParticipants, ...props }) {
+export default function Header({ studies, researcherId, searchData, setParticipants, setEnabled, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [enabled, setEnabled] = useState(false)
+  const [enabled, setCEnabled] = useState(false)
   const [open, setOpen] = useState(false)
   const [initial, setInitial] = useState(true)
 
@@ -164,6 +164,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
       setOpen(true)
     }
     if (!initial) {
+      setEnabled(enabled)
       LAMP.Type.setAttachment(researcherId, "me", "lamp.dashboard.conversation_enabled", enabled)
     }
   }, [enabled])
@@ -181,7 +182,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
                   checked={enabled}
                   onChange={(e) => {
                     setInitial(false)
-                    setEnabled(e.target.checked)
+                    setCEnabled(e.target.checked)
                   }}
                 />
               }
