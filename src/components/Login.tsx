@@ -439,13 +439,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     >
                       {`${t("Self Help")}`}
                     </Link>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                    >
-                      {`${t("Research studies using mindLAMP")}`}
-                    </Link>
+                    {/* <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
+                  >
+                    {`${t("Research studies using mindLAMP")}`}
+                  </Link> */}
                     <Menu
                       keepMounted
                       open={Boolean(tryitMenu)}
