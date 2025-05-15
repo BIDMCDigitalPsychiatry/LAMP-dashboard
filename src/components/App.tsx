@@ -97,6 +97,19 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    const hasRoleFlag = localStorage.getItem("isParticipant")
+
+    if (userToken && !hasRoleFlag) {
+      const firstPath = window.location.hash
+      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
+
+      if (participantRegex.test(firstPath)) {
+        localStorage.setItem("isParticipant", "true")
+      } else {
+        localStorage.setItem("isParticipant", "false")
+      }
+    }
+
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
       location?.pathname === "/" &&
@@ -202,7 +215,7 @@ function AppRouter({ ...props }) {
     })
   }
 
-  //   const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+  // const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
 
   // let inactivityTimer: ReturnType<typeof setTimeout>
 
@@ -215,19 +228,9 @@ function AppRouter({ ...props }) {
   //   }, INACTIVITY_LIMIT)
   // }
 
-  // const activityEvents = [
-  //   "mousemove",
-  //   "mousedown",
-  //   "mouseup",
-  //   "wheel",
-  //   "keydown",
-  //   "scroll",
-  //   "touchstart",
-  // ]
+  // const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
 
-  // activityEvents.forEach(event =>
-  //   window.addEventListener(event, resetInactivityTimer)
-  // )
+  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
 
   // resetInactivityTimer()
 
@@ -328,6 +331,7 @@ function AppRouter({ ...props }) {
 
   let reset = async (identity?: any) => {
     // localStorage.removeItem("tokenInfo")
+    localStorage.removeItem("isParticipant")
     if (identity?.id != "selfHelp@demo.lamp.digital") {
       Service.deleteUserDB()
     }
@@ -478,6 +482,8 @@ function AppRouter({ ...props }) {
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly
+                // setDialogOpen={setDialogOpen}
+
                 participant={getParticipant(props.match.params.id)?.id ?? null}
               />
             </React.Fragment>
@@ -1000,6 +1006,26 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
+  const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+  let inactivityTimer: ReturnType<typeof setTimeout>
+  const isOnLoginPage = window.location.hash === "#/"
+
+  const resetInactivityTimer = () => {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = setTimeout(() => {
+      localStorage.removeItem("tokenInfo")
+      if (!isOnLoginPage) {
+        alert("You were inactive for too long. Please log in again.")
+        window.location.href = "/#/"
+      }
+    }, INACTIVITY_LIMIT)
+  }
+
+  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+
+  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+
+  resetInactivityTimer()
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider

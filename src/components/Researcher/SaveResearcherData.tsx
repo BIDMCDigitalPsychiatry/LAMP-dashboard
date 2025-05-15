@@ -45,16 +45,16 @@ const saveStudiesAndParticipants = (result, studies, researcherId) => {
   let activities = []
   let sensors = []
   let studiesList = []
-  if(Array.isArray(result.studies)) {
-  result.studies.map((study) => {
-    participants = participants.concat(study.participants)
-    activities = activities.concat(study.activities)
-    sensors = sensors.concat(study.sensors)
-  })
-  studies.map((study) => {
-    studiesList = studiesList.concat(study.name)
-  })
-}
+  if (Array.isArray(result.studies)) {
+    result.studies.map((study) => {
+      participants = participants.concat(study.participants)
+      activities = activities.concat(study.activities)
+      sensors = sensors.concat(study.sensors)
+    })
+    studies.map((study) => {
+      studiesList = studiesList.concat(study.name)
+    })
+  }
   let studiesSelected =
     localStorage.getItem("studies_" + researcherId) !== null
       ? JSON.parse(localStorage.getItem("studies_" + researcherId))

@@ -183,7 +183,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
@@ -196,13 +196,13 @@ export default function Researchers({ history, updateStore, adminType, ...props 
     setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
-      if (search.trim().length > 0) {
+      if (search?.trim()?.length > 0) {
         data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
         setResearchers(data)
       } else {
         setResearchers(data)
       }
-      setPaginatedResearchers(data.slice(0, rowCount))
+      setPaginatedResearchers(data?.slice(0, rowCount))
     })
   }
 
@@ -223,7 +223,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   const handleChangePage = (page: number, rowCount: number) => {
     setPage(page)
     setRowCount(rowCount)
-    setPaginatedResearchers(researchers.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedResearchers(researchers?.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -236,9 +236,9 @@ export default function Researchers({ history, updateStore, adminType, ...props 
       />
       <Box className={classes.tableContainer} mt={4}>
         <Grid container spacing={3}>
-          {researchers.length > 0 ? (
+          {researchers?.length > 0 ? (
             <Grid container spacing={3}>
-              {(paginatedResearchers ?? []).map((item, index) => (
+              {(paginatedResearchers ?? [])?.map((item, index) => (
                 <Grid item lg={6} xs={12} key={item.id}>
                   <ResearcherRow
                     researcher={item}

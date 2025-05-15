@@ -11,6 +11,7 @@ import {
   addActivity,
   spliceActivity,
   updateActivityData,
+  unspliceActivity,
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -36,6 +37,7 @@ export const games = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -68,6 +70,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+export const addHideSubactivities = async (settings, id) => {
+  let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+    !!y.error ? undefined : y.data
+  )[0]
+  let hidden = (tag || []).filter((t) => t.moduleId !== id)
+  if (!!settings.hide_sub_activities) {
+    hidden.push({ moduleId: id, activities: settings?.activities })
+    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
+  } else {
+    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
+  }
+}
 
 const toBinary = (string) => {
   const codeUnits = new Uint16Array(string.length)
@@ -92,6 +106,7 @@ export default function Activity({
   const [studies, setStudies] = useState(null)
   const [allActivities, setAllActivities] = useState(null)
   const [details, setDetails] = useState(null)
+  const [subActivities, setSubActivities] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -119,6 +134,9 @@ export default function Activity({
         if (!(lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")) {
           let data = await LAMP.Activity.view(activity.id)
           activity.settings = data.settings
+        }
+        if (activity.spec === "lamp.module") {
+          setSubActivities(activity.settings?.activities)
         }
         if (activity.spec === "lamp.survey") {
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
@@ -170,11 +188,22 @@ export default function Activity({
     } else {
       x["id"] = newItem["data"]
       updateDb(x)
+      if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"])
       setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
       })
       history.back()
+    }
+  }
+
+  const checkAndSetCompleted = async (settings, id) => {
+    if (subActivities != settings.activities) {
+      let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+        !!y.error ? undefined : y.data
+      )[0]
+      let newSet = (tag || []).filter((t) => t.moduleId !== id)
+      await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", newSet)
     }
   }
 
@@ -194,12 +223,17 @@ export default function Activity({
     else {
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"])
+
         addActivity(x, studies)
         enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
           variant: "success",
         })
         history.back()
       } else {
+        if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x.id)
+        if (x.spec === "lamp.module") checkAndSetCompleted(x.settings, x.id)
+
         x["study_id"] = x.studyID
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]

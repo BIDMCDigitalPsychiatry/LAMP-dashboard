@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import locale_lang from "../locale_map.json"
 import VisualPopup from "./VisualPopup"
+import BranchingSettings from "./Researcher/ActivityList/BranchingSettings"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -204,7 +205,15 @@ export default function Participant({
   useEffect(() => {
     setLoading(true)
     LAMP.Activity.allByParticipant(participant.id, null, false).then((activities) => {
-      setActivities(activities)
+      ;(async () => {
+        let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        const hiddenActivities = (tag || []).flatMap((module) => module.activities)
+        const updatedActivities = activities.filter((activity) => !hiddenActivities.includes(activity.id))
+        setActivities(updatedActivities)
+      })()
+
       props.activeTab(tab, participant.id)
       let language = !!localStorage.getItem("LAMP_user_" + participant.id)
         ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
@@ -237,6 +246,7 @@ export default function Participant({
                 streak: img?.streak ?? null,
                 questions: img?.questions ?? null,
                 visualSettings: img?.visualSettings ?? null,
+                branchingSettings: img?.branchingSettings ?? null,
               })
               if (count === activities.length - 1) {
                 Service.addUserData("activitytags", data, true).then(() => {

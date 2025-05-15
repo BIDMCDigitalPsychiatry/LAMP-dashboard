@@ -147,7 +147,13 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   }, [activityId])
 
   const returnResult = () => {
+    const activityFromModule = localStorage.getItem("activityFromModule")
     if (mode === null) setResponse(true)
+    else if (mode === "responseActivity") {
+      window.opener = null
+      window.open("", "_self")
+      window.close()
+    } else if (!!activityFromModule) window.location.href = `/#/participant/${participant}/module/${activityFromModule}`
     else if (tab === null || typeof tab === "undefined") window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) window.location.href = `/#/participant/${participant}/${tab}`
   }

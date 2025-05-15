@@ -15,6 +15,8 @@ import {
   Typography,
   InputAdornment,
   useTheme,
+  ThemeProvider,
+  createTheme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -61,7 +63,16 @@ const checkPasswordRule = async (value: string) => {
     return true
   }
 }
-export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions }) {
+export function CredentialEditor({
+  credential,
+  auxData,
+  mode,
+  onChange,
+  title,
+  permissions,
+  userType,
+  fromParticipant,
+}) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
   const [name, setName] = useState(credential?.name ?? "")
@@ -77,6 +88,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     setPhoto(auxData.photo)
     setRole(auxData.role)
   }, [auxData])
+
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)
@@ -102,7 +114,12 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
   const roles =
-    title === "User Administrator"
+    userType == "researcher" && !fromParticipant
+      ? [
+          { value: "investigator", label: "Investigator" },
+          { value: "message_coordinator", label: "Message Coordinator" },
+        ]
+      : title === "User Administrator"
       ? [
           { value: "edit", label: "User Administrator" },
           { value: "view", label: "Practice Lead" },
@@ -164,54 +181,66 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
         />
       )}
       {["create-new", "change-role", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          select={!!permissions && !!title ? true : false}
-          label={`${t("Role")}`}
-          type="text"
-          variant="outlined"
-          // helperText={`${t(
-          //   "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
-          // )}`}
-          value={role}
-          onChange={(event) => setRole(event.target.value)}
-          style={{ marginBottom: 16 }}
-          InputProps={{
-            endAdornment: [
-              !["change-role"].includes(mode) ? undefined : (
-                <InputAdornment position="end" key="a">
-                  <Tooltip title={`${t("Save Role & Photo")}`}>
-                    <IconButton
-                      edge="end"
-                      aria-label="save role"
-                      onClick={() =>
-                        onChange({
-                          credential,
-                          photo,
-                          name,
-                          role,
-                          emailAddress,
-                          password,
-                        })
-                      }
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>check_circle</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            ],
-          }}
+        <ThemeProvider
+          theme={createTheme({
+            overrides: {
+              MuiSelect: {
+                iconOutlined: {
+                  right: ["create-new"].includes(mode) ? 2 : 65,
+                },
+              },
+            },
+          })}
         >
-          {!!permissions &&
-            !!title &&
-            roles.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-        </TextField>
+          <TextField
+            fullWidth
+            select={(!!permissions && !!title) || userType == "researcher" ? true : false}
+            label={`${t("Role")}`}
+            type="text"
+            variant="outlined"
+            // helperText={`${t(
+            //   "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+            // )}`}
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            style={{ marginBottom: 16 }}
+            InputProps={{
+              endAdornment: [
+                !["change-role"].includes(mode) ? undefined : (
+                  <InputAdornment position="end" key="a">
+                    <Tooltip title={`${t("Save Role & Photo")}`}>
+                      <IconButton
+                        edge="end"
+                        aria-label="save role"
+                        onClick={() =>
+                          onChange({
+                            credential,
+                            photo,
+                            name,
+                            role,
+                            emailAddress,
+                            password,
+                          })
+                        }
+                        onMouseDown={(event) => event.preventDefault()}
+                      >
+                        <Icon>check_circle</Icon>
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              ],
+            }}
+          >
+            {roles.length > 0 &&
+              ((!!permissions && !!title && !fromParticipant) || (userType == "researcher" && !fromParticipant)) &&
+              roles.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+          </TextField>
+        </ThemeProvider>
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
@@ -375,7 +404,9 @@ export const CredentialManager: React.FunctionComponent<{
   credential?: any
   mode?: string
   type?: string
-}> = ({ id, onComplete, credential, mode, type, ...props }) => {
+  userType?: string
+  fromParticipant: boolean
+}> = ({ id, onComplete, credential, mode, type, userType, fromParticipant, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
@@ -621,12 +652,14 @@ export const CredentialManager: React.FunctionComponent<{
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}
       {!!selected.mode && (
         <CredentialEditor
+          fromParticipant={fromParticipant}
           credential={selected.credential}
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
           mode={selected.mode}
           onChange={(data) => _submitCredential(data)}
           title={type ?? null}
           permissions={permissions}
+          userType={userType}
         />
       )}
     </Box>
