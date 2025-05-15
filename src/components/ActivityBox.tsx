@@ -497,9 +497,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }, [savedActivities])
 
   const scrollToElement = (id) => {
+    const el = document.getElementById(id)
     setTimeout(() => {
-      if (document.getElementById(id)) {
-        document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
+      if (el) {
+        el.style.scrollMarginTop = "80px"
+        el.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       }
     }, 1000)
   }
