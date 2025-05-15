@@ -24,6 +24,8 @@ import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
+import demo_db from "../demo_db.json"
+import self_help_db from "../self_help_db.json"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -95,6 +97,19 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    const hasRoleFlag = localStorage.getItem("isParticipant")
+
+    if (userToken && !hasRoleFlag) {
+      const firstPath = window.location.hash
+      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
+
+      if (participantRegex.test(firstPath)) {
+        localStorage.setItem("isParticipant", "true")
+      } else {
+        localStorage.setItem("isParticipant", "false")
+      }
+    }
+
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
       location?.pathname === "/" &&
@@ -139,9 +154,14 @@ function AppRouter({ ...props }) {
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
-  const serverAddressFro2FA = ["api-staging.lamp.digital", "localhost:3006", "lamp-api.zcodemo.com"]
+  const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
 
   useEffect(() => {
+    if (localStorage.getItem("demo_mode") === "try_it") {
+      LAMP.initializeDemoDB(demo_db)
+    } else if (localStorage.getItem("demo_mode") === "self_help") {
+      LAMP.initializeDemoDB(self_help_db)
+    }
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -163,7 +183,7 @@ function AppRouter({ ...props }) {
         serverAddress:
           x.length > 2 && typeof x[2] !== "undefined"
             ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-            : "localhost:3006",
+            : "api.lamp.digital",
       }).then((x) => {
         window.location.href = query[0]
       })
@@ -291,7 +311,11 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    localStorage.removeItem("tokenInfo")
+    // localStorage.removeItem("tokenInfo")
+    localStorage.removeItem("isParticipant")
+    if (identity?.id != "selfHelp@demo.lamp.digital") {
+      Service.deleteUserDB()
+    }
     Service.deleteUserDB()
     Service.deleteDB()
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
@@ -304,7 +328,7 @@ function AppRouter({ ...props }) {
           device_type: "Dashboard",
           user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
         },
-      } as any).then((res) => console.dir(res))
+      } as any).then((res) => localStorage.removeItem("tokenInfo"))
     }
 
     await LAMP.Auth.set_identity(identity).catch((e) => {
@@ -330,7 +354,7 @@ function AppRouter({ ...props }) {
         auth: null,
         authType: null,
         activeTab: null,
-        lastDomain: ["localhost:3006", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
+        lastDomain: ["api.lamp.digital", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
           ? undefined
           : state?.auth?.serverAddress,
       }))
@@ -841,7 +865,7 @@ function AppRouter({ ...props }) {
                 token={{
                   username: LAMP.Auth._auth.id,
                   password: LAMP.Auth._auth.password,
-                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "localhost:3006",
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
                   type: state.authType === "admin" ? "Administrator" : "Researcher",
                   //@ts-ignore: state.identity will have an id param if not admin
                   id: state.authType === "admin" ? null : state.identity.id,
@@ -961,6 +985,25 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
+  const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+  let inactivityTimer: ReturnType<typeof setTimeout>
+  const isOnLoginPage = window.location.hash === "#/"
+
+  const resetInactivityTimer = () => {
+    clearTimeout(inactivityTimer)
+    inactivityTimer = setTimeout(() => {
+      localStorage.removeItem("tokenInfo")
+      if (!isOnLoginPage || localStorage.getItem("isParticipant") === "false") {
+        alert("You were inactive for too long. Please log in again.")
+        window.location.href = "/#/"
+      }
+      localStorage.removeItem("isParticipant")
+    }, INACTIVITY_LIMIT)
+  }
+  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+
+  resetInactivityTimer()
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider
