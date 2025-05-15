@@ -408,7 +408,10 @@ export default function Prevent({
         setActivityCounts(activityEventCount)
         activities = activities.filter(
           (activity) =>
-            activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
+            activityEventCount[activity.name] > 0 &&
+            activity.spec !== "lamp.group" &&
+            activity.spec !== "lamp.tips" &&
+            activity.spec !== "lamp.module"
         )
         setActivities(activities)
         setSelectedActivities(activities.map((activity) => activity.name))

@@ -134,7 +134,7 @@ export const getActivityEvents = async (participant: any, activityId, moduleStar
   return activityEvents
 }
 
-const sortModulesByCompletion = (modules) => {
+export const sortModulesByCompletion = (modules) => {
   if (!Array.isArray(modules)) return []
   return modules
     .map((module) => {
@@ -394,12 +394,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const filteredArr = arr.filter((item) => item != null)
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
-        if (
-          itm.id === moduleActivityData.id &&
-          level === itemLevel &&
-          !itm.subActivities &&
-          itm.parentModule === parent
-        ) {
+        if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
           setParentModuleLevel(level + 1)
           return {
             ...itm,
@@ -422,12 +417,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
-        if (
-          !item.subActivities &&
-          item.id === moduleActivityData.id &&
-          item.level === level &&
-          item.parentModule === parent
-        ) {
+        if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
           setParentModuleLevel(level + 1)
           return {
             ...item,

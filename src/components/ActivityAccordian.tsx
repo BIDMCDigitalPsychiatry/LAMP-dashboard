@@ -197,8 +197,10 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
                       className={classes.mainIcons}
                       style={{
                         margin: "auto",
-                        background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                          ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
+                        background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                          ? `url(${
+                              tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                            }) center center/contain no-repeat`
                           : activity.spec === "lamp.breathe"
                           ? `url(${BreatheIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.journal"
@@ -250,7 +252,7 @@ const ActivityAccordion = ({
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
-      : module.subActivities.filter((activity) => activity.isCompleted === true).length +
+      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
           "/" +
           module.subActivities.length
   }
@@ -302,7 +304,7 @@ const ActivityAccordion = ({
       }
     }
     const tasks = []
-    for (const module of data.filter((m) => m.name !== "Other activities")) {
+    for (const module of data?.filter((m) => m.name !== "Other activities")) {
       tasks.push(checkAndNotify(module))
       if (module?.subActivities) {
         for (const activity of module.subActivities) {

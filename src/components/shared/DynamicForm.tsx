@@ -7,6 +7,7 @@ import {
   DescriptionFieldProps,
   ArrayFieldTemplateProps,
   RegistryWidgetsType,
+  RegistryFieldsType,
 } from "@rjsf/utils"
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
@@ -207,6 +208,16 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   )
 }
 
+// Helper function to recursively extract dependencies (can be objects or arrays)
+function _extractDependencies(dependencies) {
+  if (Array.isArray(dependencies)) {
+    return dependencies.map((dep) => _extract(dep))
+  } else if (typeof dependencies === "object") {
+    return Object.fromEntries(Object.entries(dependencies).map(([key, value]) => [key, _extract(value)]))
+  }
+  return dependencies // In case it's not an object or array, return as-is
+}
+
 // By default, the React-JSONSchema-Form does not link correctly to the main UI theme, so declare it here.
 // This function recursively extracts all "ui:"-prefixed properties within the JSONSchema.
 // These are passed to the JSONSchemaForm as a single nested uiSchema object.
@@ -219,6 +230,18 @@ function _extract(schema) {
     ...(!!schema.items?.properties ? {
       items: Object.fromEntries(Object.entries(schema.items.properties).map(([k, v]) => [k, _extract(v)])),
     } : {}),
+    // Handle "dependencies" (which can be an object or an array of schemas)
+    ...(schema.items?.dependencies ? { dependencies: _extractDependencies(schema.items?.dependencies) } : {}),
+    // Handle "oneOf", "allOf", and "anyOf" (arrays of schemas)
+    ...(schema.oneOf ? { oneOf: schema.oneOf.map(_extract) } : {}),
+    ...(schema.allOf ? { allOf: schema.allOf.map(_extract) } : {}),
+    ...(schema.anyOf ? { anyOf: schema.anyOf.map(_extract) } : {}),
+     // Handle "enum" if it's present in the schema (to process enums)
+     ...(schema.enum ? { enum: schema.enum.map(e => e) } : {}),
+    
+     // Handle "title", "description", etc.
+     ...(schema.title ? { title: schema.title } : {}),
+     ...(schema.description ? { description: schema.description } : {}),
   }
 }
 

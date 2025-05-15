@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import locale_lang from "../locale_map.json"
 import VisualPopup from "./VisualPopup"
+import BranchingSettings from "./Researcher/ActivityList/BranchingSettings"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -245,6 +246,7 @@ export default function Participant({
                 streak: img?.streak ?? null,
                 questions: img?.questions ?? null,
                 visualSettings: img?.visualSettings ?? null,
+                branchingSettings: img?.branchingSettings ?? null,
               })
               if (count === activities.length - 1) {
                 Service.addUserData("activitytags", data, true).then(() => {
