@@ -926,7 +926,6 @@ export const SchemaList = () => {
           },
           items: {
             required: ["text", "type"],
-
             type: "object",
             dependencies: {
               type: {
@@ -1842,6 +1841,7 @@ export function spliceActivity({ raw, tag }) {
     photo: tag?.photo,
     streak: tag?.streak,
     visualSettings: tag?.visualSettings,
+    branchingSettings: tag?.branchingSettings,
     showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
@@ -1910,6 +1910,7 @@ export function unspliceActivity(x) {
       photo: x.photo,
       streak: x.streak,
       showFeed: x.showFeed,
+      branchingSettings: x.branchingSettings,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
