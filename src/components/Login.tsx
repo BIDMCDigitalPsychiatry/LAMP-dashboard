@@ -203,7 +203,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
       : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
     localStorage.setItem(
-      "LAMP_user_" + res.identity.id,
+      "LAMP_user_" + res?.identity?.id,
       JSON.stringify({
         language: selectedLanguage,
       })

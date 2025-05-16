@@ -23,6 +23,7 @@ import { SchemaList, unspliceActivity } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,8 +106,23 @@ export default function GameCreator({
   })
 
   useEffect(() => {
-    console.log(data.studyID)
-    localStorage.setItem("studyId", data.studyID)
+    const studyID = localStorage.getItem("studyId")
+    if (studyID != data.studyID) {
+      localStorage.setItem("studyId", data.studyID)
+      let enumActivityIds = []
+      let enumActivityNames = []
+      Service.getAll("activities").then((activities) => {
+        enumActivityIds = (activities || [])
+          .filter((d) => d.study_id == data.studyID && d.spec !== "lamp.group" && d.spec !== "lamp.module")
+          .map((d) => d.id)
+        enumActivityNames = (activities || [])
+          .filter((d) => d.study_id == data.studyID && d.spec !== "lamp.group" && d.spec !== "lamp.module")
+          .map((d) => d.name)
+        localStorage.setItem("enumIds", JSON.stringify(enumActivityIds))
+        localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
+        setSchemaListObj(SchemaList())
+      })
+    }
     validate()
   }, [data])
 

@@ -3,17 +3,6 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
-let enumActivityIds = []
-let enumActivityNames = []
-Service.getAll("activities").then((activities) => {
-  const studyID = localStorage.getItem("studyId")
-  enumActivityIds = (activities || [])
-    .filter((data) => data.study_id == studyID && (data.spec !== "lamp.group" || data.spec !== "lamp.module"))
-    .map((data) => data.id)
-  enumActivityNames = (activities || [])
-    .filter((data) => data.study_id == studyID && (data.spec !== "lamp.group" || data.spec !== "lamp.module"))
-    .map((data) => data.name)
-})
 
 export const SchemaList = () => {
   return {
@@ -937,6 +926,7 @@ export const SchemaList = () => {
           },
           items: {
             required: ["text", "type"],
+
             type: "object",
             dependencies: {
               type: {
@@ -1015,8 +1005,12 @@ export const SchemaList = () => {
                                           activity: {
                                             type: "string",
                                             title: "Select an activity",
-                                            enum: enumActivityIds,
-                                            enumNames: enumActivityNames,
+                                            enum: localStorage.getItem("enumIds")
+                                              ? JSON.parse(localStorage.getItem("enumIds"))
+                                              : [],
+                                            enumNames: localStorage.getItem("enumNames")
+                                              ? JSON.parse(localStorage.getItem("enumNames"))
+                                              : [],
                                           },
                                         },
                                         required: ["activity"],
@@ -1104,8 +1098,12 @@ export const SchemaList = () => {
                                           activity: {
                                             type: "string",
                                             title: "Select an activity",
-                                            enum: enumActivityIds,
-                                            enumNames: enumActivityNames,
+                                            enum: localStorage.getItem("enumIds")
+                                              ? JSON.parse(localStorage.getItem("enumIds"))
+                                              : [],
+                                            enumNames: localStorage.getItem("enumNames")
+                                              ? JSON.parse(localStorage.getItem("enumNames"))
+                                              : [],
                                           },
                                         },
                                         required: ["activity"],
@@ -1208,8 +1206,12 @@ export const SchemaList = () => {
                                           activity: {
                                             type: "string",
                                             title: "Select an activity",
-                                            enum: enumActivityIds,
-                                            enumNames: enumActivityNames,
+                                            enum: localStorage.getItem("enumIds")
+                                              ? JSON.parse(localStorage.getItem("enumIds"))
+                                              : [],
+                                            enumNames: localStorage.getItem("enumNames")
+                                              ? JSON.parse(localStorage.getItem("enumNames"))
+                                              : [],
                                           },
                                         },
                                         required: ["activity"],
@@ -1840,7 +1842,6 @@ export function spliceActivity({ raw, tag }) {
     photo: tag?.photo,
     streak: tag?.streak,
     visualSettings: tag?.visualSettings,
-    branchingSettings: tag?.branchingSettings,
     showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
@@ -1909,7 +1910,6 @@ export function unspliceActivity(x) {
       photo: x.photo,
       streak: x.streak,
       showFeed: x.showFeed,
-      branchingSettings: x.branchingSettings,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
