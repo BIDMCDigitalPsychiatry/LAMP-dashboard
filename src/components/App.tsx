@@ -311,7 +311,6 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    // localStorage.removeItem("tokenInfo")
     if (identity?.id != "selfHelp@demo.lamp.digital") {
       Service.deleteUserDB()
     }
@@ -386,9 +385,11 @@ function AppRouter({ ...props }) {
   }
 
   let getParticipant = (id) => {
+    console.log(state)
     if (id === "me" && state.authType === "participant" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }
+    console.log(id)
     if (!id || id === "me") {
       return null //props.history.replace(`/`)
     }
@@ -431,7 +432,8 @@ function AppRouter({ ...props }) {
   }
 
   const updateStore = (id: string) => {
-    if (!!store.researchers[id]) {
+    console.log(IDBDatabase)
+    if (!!store?.researchers[id]) {
       LAMP.Researcher.view(id).then((x) => {
         setStore({
           researchers: { ...store.researchers, [id]: x },

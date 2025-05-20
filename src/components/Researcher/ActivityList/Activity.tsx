@@ -11,7 +11,6 @@ import {
   addActivity,
   spliceActivity,
   updateActivityData,
-  unspliceActivity,
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"

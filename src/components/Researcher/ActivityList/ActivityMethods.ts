@@ -960,76 +960,79 @@ export const SchemaList = () => {
                                 i18n.t("Not at all"),
                               ],
                             },
-                            contigencySettings: {
-                              type: "object",
-                              title: "Contigency Settings",
-                              required: ["enable_contigency"],
-                              properties: {
-                                enable_contigency: {
-                                  type: "boolean",
-                                  title: "Enable Contigency",
-                                  default: false,
-                                },
-                              },
-                              dependencies: {
-                                enable_contigency: {
-                                  oneOf: [
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: true },
-                                        contigency_type: {
-                                          type: "string",
-                                          enum: ["activity", "question"],
-                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                                          default: "activity",
-                                        },
-                                      },
-                                      required: ["contigency_type"],
-                                    },
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: false },
+                            contigencySettings:
+                              JSON.parse(localStorage.getItem("enumIds")).length > 0
+                                ? {
+                                    type: "object",
+                                    title: "Contigency Settings",
+                                    required: ["enable_contigency"],
+                                    properties: {
+                                      enable_contigency: {
+                                        type: "boolean",
+                                        title: "Enable Contigency",
+                                        default: false,
                                       },
                                     },
-                                  ],
-                                },
-                                contigency_type: {
-                                  allOf: [
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "activity" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          activity: {
-                                            type: "string",
-                                            title: "Select an activity",
-                                            enum: localStorage.getItem("enumIds")
-                                              ? JSON.parse(localStorage.getItem("enumIds"))
-                                              : [],
-                                            enumNames: localStorage.getItem("enumNames")
-                                              ? JSON.parse(localStorage.getItem("enumNames"))
-                                              : [],
+                                    dependencies: {
+                                      enable_contigency: {
+                                        oneOf: [
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: true },
+                                              contigency_type: {
+                                                type: "string",
+                                                enum: ["activity", "question"],
+                                                enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                                default: "activity",
+                                              },
+                                            },
+                                            required: ["contigency_type"],
                                           },
-                                        },
-                                        required: ["activity"],
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: false },
+                                            },
+                                          },
+                                        ],
+                                      },
+                                      contigency_type: {
+                                        allOf: [
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "activity" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                activity: {
+                                                  type: "string",
+                                                  title: "Select an activity",
+                                                  enum: localStorage.getItem("enumIds")
+                                                    ? JSON.parse(localStorage.getItem("enumIds"))
+                                                    : [],
+                                                  enumNames: localStorage.getItem("enumNames")
+                                                    ? JSON.parse(localStorage.getItem("enumNames"))
+                                                    : [],
+                                                },
+                                              },
+                                              required: ["activity"],
+                                            },
+                                          },
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "question" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                question_index: { type: "number", title: "Question number" },
+                                              },
+                                              required: ["question_index"],
+                                            },
+                                          },
+                                        ],
                                       },
                                     },
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "question" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          question_index: { type: "number", title: "Question number" },
-                                        },
-                                        required: ["question_index"],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                                  }
+                                : {},
                           },
                         },
                       },
@@ -1052,77 +1055,80 @@ export const SchemaList = () => {
                               enum: ["Yes", "No"],
                               enumNames: [i18n.t("Yes"), i18n.t("No")],
                             },
-                            contigencySettings: {
-                              type: "object",
-                              title: "Contigency Settings",
-                              required: ["enable_contigency"],
-                              properties: {
-                                enable_contigency: {
-                                  type: "boolean",
-                                  title: "Enable Contigency",
-                                  default: false,
-                                },
-                              },
+                            contigencySettings:
+                              JSON.parse(localStorage.getItem("enumIds")).length > 0
+                                ? {
+                                    type: "object",
+                                    title: "Contigency Settings",
+                                    required: ["enable_contigency"],
+                                    properties: {
+                                      enable_contigency: {
+                                        type: "boolean",
+                                        title: "Enable Contigency",
+                                        default: false,
+                                      },
+                                    },
 
-                              dependencies: {
-                                enable_contigency: {
-                                  oneOf: [
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: true },
-                                        contigency_type: {
-                                          type: "string",
-                                          enum: ["activity", "question"],
-                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                                          default: "activity",
-                                        },
-                                      },
-                                      required: ["contigency_type"],
-                                    },
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: false },
-                                      },
-                                    },
-                                  ],
-                                },
-                                contigency_type: {
-                                  allOf: [
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "activity" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          activity: {
-                                            type: "string",
-                                            title: "Select an activity",
-                                            enum: localStorage.getItem("enumIds")
-                                              ? JSON.parse(localStorage.getItem("enumIds"))
-                                              : [],
-                                            enumNames: localStorage.getItem("enumNames")
-                                              ? JSON.parse(localStorage.getItem("enumNames"))
-                                              : [],
+                                    dependencies: {
+                                      enable_contigency: {
+                                        oneOf: [
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: true },
+                                              contigency_type: {
+                                                type: "string",
+                                                enum: ["activity", "question"],
+                                                enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                                default: "activity",
+                                              },
+                                            },
+                                            required: ["contigency_type"],
                                           },
-                                        },
-                                        required: ["activity"],
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: false },
+                                            },
+                                          },
+                                        ],
+                                      },
+                                      contigency_type: {
+                                        allOf: [
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "activity" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                activity: {
+                                                  type: "string",
+                                                  title: "Select an activity",
+                                                  enum: localStorage.getItem("enumIds")
+                                                    ? JSON.parse(localStorage.getItem("enumIds"))
+                                                    : [],
+                                                  enumNames: localStorage.getItem("enumNames")
+                                                    ? JSON.parse(localStorage.getItem("enumNames"))
+                                                    : [],
+                                                },
+                                              },
+                                              required: ["activity"],
+                                            },
+                                          },
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "question" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                question_index: { type: "number", title: "Question number" },
+                                              },
+                                              required: ["question_index"],
+                                            },
+                                          },
+                                        ],
                                       },
                                     },
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "question" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          question_index: { type: "number", title: "Question number" },
-                                        },
-                                        required: ["question_index"],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                                  }
+                                : {},
                           },
                         },
                       },
@@ -1151,86 +1157,80 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
-                            contigencySettings: {
-                              type: "object",
-                              title: "Contigency Settings",
-                              required: ["enable_contigency"],
-                              properties: {
-                                enable_contigency: {
-                                  type: "boolean",
-                                  title: "Enable Contigency",
-                                  default: false,
-                                },
-                                // contigency_type: {
-                                //   type: "string",
-                                // },
-                                // question_index: {
-                                //   type: "number"
-                                // },
-                                // activity: {
-                                //   type: "string"
-                                // }
-                              },
+                            contigencySettings:
+                              JSON.parse(localStorage.getItem("enumIds")).length > 0
+                                ? {
+                                    type: "object",
+                                    title: "Contigency Settings",
+                                    required: ["enable_contigency"],
+                                    properties: {
+                                      enable_contigency: {
+                                        type: "boolean",
+                                        title: "Enable Contigency",
+                                        default: false,
+                                      },
+                                    },
 
-                              dependencies: {
-                                enable_contigency: {
-                                  oneOf: [
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: true },
-                                        contigency_type: {
-                                          type: "string",
-                                          enum: ["activity", "question"],
-                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                                          default: "activity",
-                                        },
-                                      },
-                                      required: ["contigency_type"],
-                                    },
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: false },
-                                      },
-                                    },
-                                  ],
-                                },
-                                contigency_type: {
-                                  allOf: [
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "activity" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          activity: {
-                                            type: "string",
-                                            title: "Select an activity",
-                                            enum: localStorage.getItem("enumIds")
-                                              ? JSON.parse(localStorage.getItem("enumIds"))
-                                              : [],
-                                            enumNames: localStorage.getItem("enumNames")
-                                              ? JSON.parse(localStorage.getItem("enumNames"))
-                                              : [],
+                                    dependencies: {
+                                      enable_contigency: {
+                                        oneOf: [
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: true },
+                                              contigency_type: {
+                                                type: "string",
+                                                enum: ["activity", "question"],
+                                                enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                                default: "activity",
+                                              },
+                                            },
+                                            required: ["contigency_type"],
                                           },
-                                        },
-                                        required: ["activity"],
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: false },
+                                            },
+                                          },
+                                        ],
+                                      },
+                                      contigency_type: {
+                                        allOf: [
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "activity" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                activity: {
+                                                  type: "string",
+                                                  title: "Select an activity",
+                                                  enum: localStorage.getItem("enumIds")
+                                                    ? JSON.parse(localStorage.getItem("enumIds"))
+                                                    : [],
+                                                  enumNames: localStorage.getItem("enumNames")
+                                                    ? JSON.parse(localStorage.getItem("enumNames"))
+                                                    : [],
+                                                },
+                                              },
+                                              required: ["activity"],
+                                            },
+                                          },
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "question" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                question_index: { type: "number", title: "Question number" },
+                                              },
+                                              required: ["question_index"],
+                                            },
+                                          },
+                                        ],
                                       },
                                     },
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "question" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          question_index: { type: "number", title: "Question number" },
-                                        },
-                                        required: ["question_index"],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                                  }
+                                : {},
                           },
                         },
                       },
@@ -1284,66 +1284,69 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
-                            contigencySettings: {
-                              type: "object",
-                              title: "Contigency Settings",
-                              properties: {
-                                enable_contigency: {
-                                  type: "boolean",
-                                  title: "Enable Contigency",
-                                },
-                              },
+                            contigencySettings:
+                              JSON.parse(localStorage.getItem("enumIds")).length > 0
+                                ? {
+                                    type: "object",
+                                    title: "Contigency Settings",
+                                    properties: {
+                                      enable_contigency: {
+                                        type: "boolean",
+                                        title: "Enable Contigency",
+                                      },
+                                    },
 
-                              dependencies: {
-                                enable_contigency: {
-                                  oneOf: [
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: true },
-                                        contigency_type: {
-                                          type: "string",
-                                          enum: ["activity", "question"],
-                                          enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                                          default: "activity",
-                                        },
+                                    dependencies: {
+                                      enable_contigency: {
+                                        oneOf: [
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: true },
+                                              contigency_type: {
+                                                type: "string",
+                                                enum: ["activity", "question"],
+                                                enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                                                default: "activity",
+                                              },
+                                            },
+                                            required: ["contigency_type"],
+                                          },
+                                          {
+                                            properties: {
+                                              enable_contigency: { const: false },
+                                            },
+                                          },
+                                        ],
                                       },
-                                      required: ["contigency_type"],
+                                      contigency_type: {
+                                        allOf: [
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "activity" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                activity: { type: "string", title: "Select an activity" },
+                                              },
+                                              required: ["activity"],
+                                            },
+                                          },
+                                          {
+                                            if: {
+                                              properties: { contigency_type: { const: "question" } },
+                                            },
+                                            then: {
+                                              properties: {
+                                                question_index: { type: "number", title: "Question number" },
+                                              },
+                                              required: ["question_index"],
+                                            },
+                                          },
+                                        ],
+                                      },
                                     },
-                                    {
-                                      properties: {
-                                        enable_contigency: { const: false },
-                                      },
-                                    },
-                                  ],
-                                },
-                                contigency_type: {
-                                  allOf: [
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "activity" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          activity: { type: "string", title: "Select an activity" },
-                                        },
-                                        required: ["activity"],
-                                      },
-                                    },
-                                    {
-                                      if: {
-                                        properties: { contigency_type: { const: "question" } },
-                                      },
-                                      then: {
-                                        properties: {
-                                          question_index: { type: "number", title: "Question number" },
-                                        },
-                                        required: ["question_index"],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                                  }
+                                : {},
                           },
                         },
                       },
