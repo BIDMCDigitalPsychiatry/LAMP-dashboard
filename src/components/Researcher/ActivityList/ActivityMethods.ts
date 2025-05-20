@@ -1023,7 +1023,11 @@ export const SchemaList = () => {
                                             },
                                             then: {
                                               properties: {
-                                                question_index: { type: "number", title: "Question number" },
+                                                question_index: {
+                                                  type: "number",
+                                                  title: "Question number",
+                                                  minimum: 1,
+                                                },
                                               },
                                               required: ["question_index"],
                                             },
@@ -1119,7 +1123,11 @@ export const SchemaList = () => {
                                             },
                                             then: {
                                               properties: {
-                                                question_index: { type: "number", title: "Question number" },
+                                                question_index: {
+                                                  type: "number",
+                                                  title: "Question number",
+                                                  minimum: 1,
+                                                },
                                               },
                                               required: ["question_index"],
                                             },
@@ -1221,7 +1229,11 @@ export const SchemaList = () => {
                                             },
                                             then: {
                                               properties: {
-                                                question_index: { type: "number", title: "Question number" },
+                                                question_index: {
+                                                  type: "number",
+                                                  title: "Question number",
+                                                  minimum: 1,
+                                                },
                                               },
                                               required: ["question_index"],
                                             },
@@ -1337,7 +1349,11 @@ export const SchemaList = () => {
                                             },
                                             then: {
                                               properties: {
-                                                question_index: { type: "number", title: "Question number" },
+                                                question_index: {
+                                                  type: "number",
+                                                  title: "Question number",
+                                                  minimum: 1,
+                                                },
                                               },
                                               required: ["question_index"],
                                             },
