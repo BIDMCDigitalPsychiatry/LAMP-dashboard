@@ -79,6 +79,7 @@ export default function BranchingSettings({ ...props }) {
             value={branchingSettings?.total_score?.toString()}
             variant="filled"
             type="number"
+            inputProps={{ min: 0 }}
             onChange={(e) => {
               setBranchingSettings({ total_score: parseInt(e.target.value) })
             }}

@@ -67,10 +67,12 @@ export default function GameCreator({
   const breatheFileLimit = 10
 
   useEffect(() => {
+    console.log(localStorage.getItem("enumIds"))
     setSchemaListObj(SchemaList())
   }, [])
 
   useEffect(() => {
+    console.log(schemaListObj)
     if (
       Object.keys(schemaListObj).length > 0 &&
       !(
@@ -159,7 +161,7 @@ export default function GameCreator({
       }
       ;(questions || []).map((x, idx) => {
         ;(questions[idx].options || []).map((i) => {
-          if (!!value?.id && !!i.contigencySettings.activity && i.contigencySettings.activity === value?.id) {
+          if (!!value?.id && !!i?.contigencySettings?.activity && i?.contigencySettings?.activity === value?.id) {
             optionsArray.push(1)
             enqueueSnackbar(
               `${t("The selected activity in the contingency settings must differ from the activity being edited.")}`,
@@ -169,8 +171,8 @@ export default function GameCreator({
             )
           }
           if (
-            !!i.contigencySettings.question_index &&
-            i.contigencySettings.question_index > (questions || []).length + 1
+            !!i?.contigencySettings?.question_index &&
+            i?.contigencySettings?.question_index > (questions || []).length + 1
           ) {
             optionsArray.push(1)
             enqueueSnackbar(`${t("The specified question number does not exist.")}`, {

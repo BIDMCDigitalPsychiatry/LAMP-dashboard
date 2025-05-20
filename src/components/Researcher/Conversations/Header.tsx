@@ -155,7 +155,8 @@ export default function Header({ studies, researcherId, searchData, setParticipa
 
   useEffect(() => {
     LAMP.Type.getAttachment(researcherId, "lamp.dashboard.conversation_enabled").then((result: any) => {
-      setEnabled(result.data)
+      setCEnabled(result.data)
+      setInitial(false)
     })
   }, [])
 
