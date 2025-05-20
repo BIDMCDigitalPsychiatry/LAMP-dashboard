@@ -185,7 +185,7 @@ export default function Participant({
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const [visualPopup, setVisualPopup] = useState(null)
@@ -228,7 +228,6 @@ export default function Participant({
   }, [])
 
   useEffect(() => {
-    setLoading(true)
     if (activities !== null) {
       Service.getAllTags("activitytags").then((result) => {
         if ((result || []).length == 0) {
@@ -313,7 +312,7 @@ export default function Participant({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={activities == null || loading}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       {activities !== null && !loading && (
