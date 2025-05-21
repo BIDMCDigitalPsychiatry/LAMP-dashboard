@@ -385,6 +385,7 @@ function AppRouter({ ...props }) {
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       localStorage.removeItem("tokenInfo")
+      // LAMP.Credential.logout()
       window.location.href = "/#/"
     }
   }
