@@ -961,6 +961,8 @@ export const SchemaList = () => {
                               ],
                             },
                             contigencySettings:
+                              typeof localStorage.getItem("enumIds") != "undefined" &&
+                              localStorage.getItem("enumIds") != null &&
                               JSON.parse(localStorage.getItem("enumIds")).length > 0
                                 ? {
                                     type: "object",
@@ -1060,6 +1062,8 @@ export const SchemaList = () => {
                               enumNames: [i18n.t("Yes"), i18n.t("No")],
                             },
                             contigencySettings:
+                              typeof localStorage.getItem("enumIds") != "undefined" &&
+                              localStorage.getItem("enumIds") != null &&
                               JSON.parse(localStorage.getItem("enumIds")).length > 0
                                 ? {
                                     type: "object",
@@ -1166,6 +1170,8 @@ export const SchemaList = () => {
                               default: "",
                             },
                             contigencySettings:
+                              typeof localStorage.getItem("enumIds") != "undefined" &&
+                              localStorage.getItem("enumIds") != null &&
                               JSON.parse(localStorage.getItem("enumIds")).length > 0
                                 ? {
                                     type: "object",
@@ -1297,6 +1303,8 @@ export const SchemaList = () => {
                               default: "",
                             },
                             contigencySettings:
+                              typeof localStorage.getItem("enumIds") != "undefined" &&
+                              localStorage.getItem("enumIds") != null &&
                               JSON.parse(localStorage.getItem("enumIds")).length > 0
                                 ? {
                                     type: "object",

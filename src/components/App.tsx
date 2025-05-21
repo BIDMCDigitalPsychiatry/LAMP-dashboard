@@ -95,6 +95,8 @@ function AppRouter({ ...props }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
   const location: any = useLocation()
+  const isLoginPage = location.pathname === "/"
+  localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
@@ -221,25 +223,6 @@ function AppRouter({ ...props }) {
       }))
     })
   }
-
-  // const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
-
-  // let inactivityTimer: ReturnType<typeof setTimeout>
-
-  // const resetInactivityTimer = () => {
-  //   clearTimeout(inactivityTimer)
-  //   inactivityTimer = setTimeout(() => {
-  //     localStorage.removeItem("tokenInfo")
-  //     alert("You were inactive for too long. Please log in again.")
-  //     window.location.href = "/#/"
-  //   }, INACTIVITY_LIMIT)
-  // }
-
-  // const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
-
-  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
-
-  // resetInactivityTimer()
 
   const getAdminType = async () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
@@ -385,6 +368,8 @@ function AppRouter({ ...props }) {
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       localStorage.removeItem("tokenInfo")
+      localStorage.removeItem("isParticipant")
+      localStorage.removeItem("isLoginPage")
       window.location.href = "/#/"
     }
   }
@@ -1071,24 +1056,25 @@ function AppRouter({ ...props }) {
 
 export default function App({ ...props }) {
   const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+  let inactivityTimer: ReturnType<typeof setTimeout> | null = null
 
-  let inactivityTimer: ReturnType<typeof setTimeout>
-  const isOnLoginPage = window.location.hash === "#/"
   const resetInactivityTimer = () => {
     clearTimeout(inactivityTimer)
     inactivityTimer = setTimeout(() => {
-      localStorage.removeItem("tokenInfo")
-      if (!isOnLoginPage && localStorage.getItem("isParticipant") === "false") {
+      localStorage.getItem("isParticipant") === "false"
+      if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
         alert("You were inactive for too long. Please log in again.")
         window.location.href = "/#/"
+        localStorage.removeItem("isParticipant")
+        localStorage.removeItem("tokenInfo")
       }
-      localStorage.removeItem("isParticipant")
     }, INACTIVITY_LIMIT)
   }
-  const activityEvents = ["mousemove", "mousedown", "mouseup", "wheel", "keydown", "scroll", "touchstart"]
+  const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart"]
   activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
 
   resetInactivityTimer()
+
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider
