@@ -132,7 +132,7 @@ export default function Activity({
 
         if (!(lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")) {
           let data = await LAMP.Activity.view(activity.id)
-          activity.settings = data.settings
+          activity.settings = data?.settings ?? {}
         }
         if (activity.spec === "lamp.module") {
           setSubActivities(activity.settings?.activities)

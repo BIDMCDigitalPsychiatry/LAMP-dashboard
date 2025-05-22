@@ -67,12 +67,10 @@ export default function GameCreator({
   const breatheFileLimit = 10
 
   useEffect(() => {
-    console.log(localStorage.getItem("enumIds"))
     setSchemaListObj(SchemaList())
   }, [])
 
   useEffect(() => {
-    console.log(schemaListObj)
     if (
       Object.keys(schemaListObj).length > 0 &&
       !(
@@ -537,7 +535,9 @@ export default function GameCreator({
             x.type === "list" ||
             x.type === "multiselect" ||
             x.type === "slider" ||
-            x.type === "rating"
+            x.type === "rating" ||
+            x.type === "boolean" ||
+            x.type === "likert"
           ) &&
           typeof x.options !== "undefined"
         ) {

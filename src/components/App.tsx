@@ -1055,7 +1055,7 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
-  const INACTIVITY_LIMIT = 5 * 60 * 1000 // 5 minutes
+  const INACTIVITY_LIMIT = 30 * 60 * 1000 // 5 minutes
   let inactivityTimer: ReturnType<typeof setTimeout> | null = null
 
   const resetInactivityTimer = () => {
