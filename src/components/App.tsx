@@ -397,11 +397,9 @@ function AppRouter({ ...props }) {
   }
 
   let getParticipant = (id) => {
-    console.log(state)
     if (id === "me" && state.authType === "participant" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }
-    console.log(id)
     if (!id || id === "me") {
       return null //props.history.replace(`/`)
     }
@@ -1064,7 +1062,7 @@ export default function App({ ...props }) {
     inactivityTimer = setTimeout(() => {
       localStorage.getItem("isParticipant") === "false"
       if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
-        alert("You were inactive for too long. Please log in again.")
+        alert("Your session has expired. Please login again to continue.")
         window.location.href = "/#/"
         localStorage.removeItem("isParticipant")
         localStorage.removeItem("tokenInfo")

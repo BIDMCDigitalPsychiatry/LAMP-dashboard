@@ -198,7 +198,12 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   useEffect(() => {
     if (LAMP.Auth._auth.id != "admin") {
       LAMP.Type.getAttachment(researcherId, "lamp.dashboard.credential_roles").then((data: any) => {
-        setRole(!!data.error ? null : data?.data[LAMP?.Auth?._auth?.id]?.role)
+        if (data?.error || !data?.data || !LAMP?.Auth?._auth?.id) {
+          setRole(null)
+        } else {
+          const userRole = data.data[LAMP.Auth._auth.id]?.role
+          setRole(userRole ?? null)
+        }
       })
     }
     LAMP.Researcher.view(researcherId).then(setResearcher)
