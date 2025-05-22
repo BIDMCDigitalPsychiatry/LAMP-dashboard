@@ -88,6 +88,12 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 0,
       },
     },
+    backMain: {
+      width: 40,
+      height: 40,
+      marginTop: -8,
+      background: "#fff",
+    },
     thumbContainer: {
       maxWidth: 1055,
       left: 0,
@@ -518,6 +524,25 @@ export default function NavigationLayout({
                           : undefined,
                     }}
                   >
+                    {activeTab === "Module Activity" && (
+                      <Fab
+                        onClick={() => {
+                          localStorage.removeItem("activityFromModule")
+                          setTimeout(() => {
+                            const tab = localStorage.getItem("lastActiveTab")
+                            if (tab === null || typeof tab === "undefined")
+                              window.location.href = `/#/participant/${id}/assess `
+                            else if (!!tab) window.location.href = `/#/participant/${id}/${tab}`
+                          }, 100)
+                        }}
+                        color="default"
+                        className={classes.backMain}
+                      >
+                        <IconButton className={classes.backbtn} color="default" aria-label="Menu">
+                          <Icon>arrow_back</Icon>
+                        </IconButton>
+                      </Fab>
+                    )}{" "}
                     {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
                   </Typography>
                 </Container>

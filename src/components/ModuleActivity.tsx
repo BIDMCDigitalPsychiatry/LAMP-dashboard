@@ -4,7 +4,7 @@ import LAMP from "lamp-core"
 import { getActivityEvents, sortModulesByCompletion } from "./ActivityBox"
 import { useTranslation } from "react-i18next"
 import ActivityPopup from "./ActivityPopup"
-import { Box, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { makeStyles, Theme, createStyles } from "@material-ui/core"
 import {
   Backdrop,
   Button,
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-    thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    thumbContainer: { maxWidth: 1055, margin: "0 auto", paddingLeft: 8, paddingRight: 5 },
   })
 )
 const ModuleActivity = ({ ...props }) => {
@@ -352,21 +352,6 @@ const ModuleActivity = ({ ...props }) => {
       </Backdrop>
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
-          {" "}
-          <Button
-            onClick={() => {
-              localStorage.removeItem("activityFromModule")
-              setTimeout(() => {
-                const tab = localStorage.getItem("lastActiveTab")
-                if (tab === null || typeof tab === "undefined")
-                  window.location.href = `/#/participant/${participant?.id}/assess `
-                else if (!!tab) window.location.href = `/#/participant/${participant?.id}/${tab}`
-              }, 100)
-            }}
-            color="secondary"
-          >
-            {`${t("Go Back")}`}
-          </Button>
           <ActivityAccordian
             data={moduleData}
             type={null}

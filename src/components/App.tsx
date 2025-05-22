@@ -370,6 +370,7 @@ function AppRouter({ ...props }) {
       localStorage.removeItem("tokenInfo")
       localStorage.removeItem("isParticipant")
       localStorage.removeItem("isLoginPage")
+      // LAMP.Credential.logout()
       window.location.href = "/#/"
     }
   }
