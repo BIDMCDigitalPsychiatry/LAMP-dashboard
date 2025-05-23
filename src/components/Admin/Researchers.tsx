@@ -208,7 +208,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
 
   useEffect(() => {
     refreshResearchers()
-  }, [search])
+  }, [search, localStorage.getItem("tokenInfo")])
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id

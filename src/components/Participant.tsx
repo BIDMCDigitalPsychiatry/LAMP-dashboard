@@ -202,7 +202,7 @@ export default function Participant({
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
-  useEffect(() => {
+  const loadData = () => {
     setLoading(true)
     LAMP.Activity.allByParticipant(participant.id, null, false).then((activities) => {
       ;(async () => {
@@ -225,6 +225,13 @@ export default function Participant({
     })
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
+  }
+  useEffect(() => {
+    loadData()
+  }, [localStorage.getItem("tokenInfo")])
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   useEffect(() => {

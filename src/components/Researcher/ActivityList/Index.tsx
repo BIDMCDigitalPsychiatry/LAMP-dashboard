@@ -137,7 +137,7 @@ export default function ActivityList({
       setActivities([])
       setLoading(false)
     }
-  }, [selected])
+  }, [selected, localStorage.getItem("tokenInfo")])
 
   const handleChange = (activity, checked) => {
     if (checked) {

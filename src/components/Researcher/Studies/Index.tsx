@@ -91,7 +91,7 @@ export default function StudiesList({
 
   useEffect(() => {
     searchFilterStudies()
-  }, [search])
+  }, [search, localStorage.getItem("tokenInfo")])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)

@@ -98,7 +98,7 @@ export default function SensorsList({
       setSensors([])
       setLoading(false)
     }
-  }, [selected])
+  }, [selected, localStorage.getItem("tokenInfo")])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {

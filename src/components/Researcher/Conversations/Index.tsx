@@ -191,7 +191,7 @@ export default function Conversations({
       setParticipants([])
       setLoading(false)
     }
-  }, [selected])
+  }, [selected, localStorage.getItem("tokenInfo")])
 
   const handleChange = (participant, checked) => {
     if (checked) {

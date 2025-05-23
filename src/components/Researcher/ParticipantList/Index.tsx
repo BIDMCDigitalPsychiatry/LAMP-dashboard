@@ -192,7 +192,7 @@ export default function ParticipantList({
       setParticipants([])
       setLoading(false)
     }
-  }, [selected])
+  }, [selected, localStorage.getItem("tokenInfo")])
 
   const handleChange = (participant, checked) => {
     if (checked) {
