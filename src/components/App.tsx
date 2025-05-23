@@ -403,6 +403,7 @@ function AppRouter({ ...props }) {
     if (!id || id === "me") {
       return null //props.history.replace(`/`)
     }
+    console.log(id)
     if (!!store.participants[id]) {
       return store.participants[id]
     } else if (!storeRef.current.includes(id)) {
