@@ -212,9 +212,9 @@ export default function Participant({
         const hiddenActivities = (tag || []).flatMap((module) => module.activities)
         const updatedActivities = activities.filter((activity) => !hiddenActivities.includes(activity.id))
         setActivities(updatedActivities)
+        props.activeTab(tab, participant.id)
       })()
 
-      props.activeTab(tab, participant.id)
       let language = !!localStorage.getItem("LAMP_user_" + participant.id)
         ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
         : getSelectedLanguage()
@@ -228,6 +228,7 @@ export default function Participant({
   }, [])
 
   useEffect(() => {
+    props.activeTab(tab, participant.id)
     if (activities !== null) {
       Service.getAllTags("activitytags").then((result) => {
         if ((result || []).length == 0) {

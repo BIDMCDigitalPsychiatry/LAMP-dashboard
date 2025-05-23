@@ -371,7 +371,6 @@ function AppRouter({ ...props }) {
       localStorage.removeItem("tokenInfo")
       localStorage.removeItem("isParticipant")
       localStorage.removeItem("isLoginPage")
-      // LAMP.Credential.logout()
       window.location.href = "/#/"
     }
   }
@@ -443,7 +442,6 @@ function AppRouter({ ...props }) {
   }
 
   const updateStore = (id: string) => {
-    console.log(IDBDatabase)
     if (!!store?.researchers[id]) {
       LAMP.Researcher.view(id).then((x) => {
         setStore({
@@ -942,7 +940,7 @@ function AppRouter({ ...props }) {
                 <Participant
                   participant={getParticipant(props.match.params.id)}
                   activeTab={activeTab}
-                  tabValue={props.match.params.tab}
+                  tabValue={props.match.params.tab ?? "assess"}
                   surveyDone={state.surveyDone}
                   submitSurvey={submitSurvey}
                   setShowDemoMessage={(val) => {
@@ -1102,7 +1100,7 @@ export default function App({ ...props }) {
   useEffect(() => {
     if (confirmSession) {
       const timeout = setTimeout(() => {
-        console.log("No response: Logging out")
+        setConfirmSession(false)
         goBackToHome()
       }, 60 * 1000)
 
