@@ -27,6 +27,7 @@ import TwoFA from "./TwoFA"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import ModuleActivity from "./ModuleActivity"
+import ConfirmModal from "./shared/ConfirmModal"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -100,18 +101,18 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
-    const hasRoleFlag = localStorage.getItem("isParticipant")
+    // const hasRoleFlag = localStorage.getItem("isParticipant")
 
-    if (userToken && !hasRoleFlag) {
-      const firstPath = window.location.hash
-      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
+    // if (userToken && !hasRoleFlag) {
+    //   const firstPath = window.location.hash
+    //   const participantRegex = /^#\/participant\/[^\/]+\/assess$/
 
-      if (participantRegex.test(firstPath)) {
-        localStorage.setItem("isParticipant", "true")
-      } else {
-        localStorage.setItem("isParticipant", "false")
-      }
-    }
+    //   if (participantRegex.test(firstPath)) {
+    //     localStorage.setItem("isParticipant", "true")
+    //   } else {
+    //     localStorage.setItem("isParticipant", "false")
+    //   }
+    // }
 
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
@@ -1054,25 +1055,67 @@ function AppRouter({ ...props }) {
 }
 
 export default function App({ ...props }) {
-  const INACTIVITY_LIMIT = 30 * 60 * 1000 // 5 minutes
-  let inactivityTimer: ReturnType<typeof setTimeout> | null = null
+  // const INACTIVITY_LIMIT = 30 * 60 * 1000 // 5 minutes
+  // let inactivityTimer: ReturnType<typeof setTimeout> | null = null
 
-  const resetInactivityTimer = () => {
-    clearTimeout(inactivityTimer)
-    inactivityTimer = setTimeout(() => {
-      localStorage.getItem("isParticipant") === "false"
-      if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
-        alert("Your session has expired. Please login again to continue.")
-        window.location.href = "/#/"
-        localStorage.removeItem("isParticipant")
-        localStorage.removeItem("tokenInfo")
-      }
-    }, INACTIVITY_LIMIT)
+  // const resetInactivityTimer = () => {
+  //   clearTimeout(inactivityTimer)
+  //   inactivityTimer = setTimeout(() => {
+  //     localStorage.getItem("isParticipant") === "false"
+  //     if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
+  //       alert("Your session has expired. Please login again to continue.")
+  //       window.location.href = "/#/"
+  //       localStorage.removeItem("isParticipant")
+  //       localStorage.removeItem("tokenInfo")
+  //     }
+  //   }, INACTIVITY_LIMIT)
+  // }
+  // const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart"]
+  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
+
+  // resetInactivityTimer()
+
+  const [confirmSession, setConfirmSession] = useState(false)
+
+  const onMouseMove = () => {
+    localStorage.setItem("mousemoved", JSON.stringify(Date.now()))
   }
-  const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart"]
-  activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
 
-  resetInactivityTimer()
+  useEffect(() => {
+    window.addEventListener("mousemove", onMouseMove)
+    return () => window.removeEventListener("mousemove", onMouseMove)
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const moved = parseInt(localStorage.getItem("mousemoved") || "0")
+      const now = Date.now()
+      const inactiveMinutes = (now - moved) / 60000
+      if (inactiveMinutes > 15 && !confirmSession) {
+        setConfirmSession(true)
+      }
+    }, 60 * 1000)
+
+    return () => clearInterval(interval)
+  }, [confirmSession])
+
+  useEffect(() => {
+    if (confirmSession) {
+      const timeout = setTimeout(() => {
+        console.log("No response: Logging out")
+        goBackToHome()
+      }, 60 * 1000)
+
+      return () => clearTimeout(timeout)
+    }
+  }, [confirmSession])
+
+  const goBackToHome = () => {
+    setConfirmSession(false)
+    localStorage.removeItem("tokenInfo")
+    localStorage.removeItem("expiry")
+    window.location.href = "/#/"
+  }
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -1135,6 +1178,19 @@ export default function App({ ...props }) {
         <CssBaseline />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <SnackbarProvider>
+            <ConfirmModal
+              confirm={confirmSession}
+              title="Confirm Session"
+              text="Your session has expired. Do you want to continue or logout?"
+              confirmText="Continue"
+              cancelText="Logout"
+              handleConfirm={() => {
+                localStorage.setItem("mousemoved", JSON.stringify(Date.now()))
+                setConfirmSession(false)
+              }}
+              onCancel={goBackToHome}
+              onClose={() => setConfirmSession(false)}
+            />
             <HashRouter>
               <AppRouter {...props} />
             </HashRouter>
