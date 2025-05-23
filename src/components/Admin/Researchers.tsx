@@ -207,7 +207,15 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   }
 
   useEffect(() => {
-    refreshResearchers()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      refreshResearchers()
+    } else {
+      window.location.href = "/#/"
+    }
   }, [search, localStorage.getItem("tokenInfo")])
 
   useEffect(() => {

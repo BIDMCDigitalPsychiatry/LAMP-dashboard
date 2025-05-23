@@ -90,7 +90,15 @@ export default function StudiesList({
   }, [allStudies])
 
   useEffect(() => {
-    searchFilterStudies()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      searchFilterStudies()
+    } else {
+      window.location.href = "/#/"
+    }
   }, [search, localStorage.getItem("tokenInfo")])
 
   const handleUpdatedStudyObject = (data) => {

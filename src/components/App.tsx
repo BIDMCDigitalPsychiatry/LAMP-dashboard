@@ -403,16 +403,19 @@ function AppRouter({ ...props }) {
     if (!id || id === "me") {
       return null //props.history.replace(`/`)
     }
-    console.log(id)
     if (!!store.participants[id]) {
       return store.participants[id]
     } else if (!storeRef.current.includes(id)) {
-      LAMP.Participant.view(id).then((x) =>
-        setStore({
-          researchers: store.researchers,
-          participants: { ...store.participants, [id]: x },
-        })
-      )
+      LAMP.Participant.view(id).then((x) => {
+        if (typeof x == "undefined") {
+          window.location.reload()
+        } else {
+          setStore({
+            researchers: store.researchers,
+            participants: { ...store.participants, [id]: x },
+          })
+        }
+      })
       storeRef.current = [...storeRef.current, id]
     }
     return null

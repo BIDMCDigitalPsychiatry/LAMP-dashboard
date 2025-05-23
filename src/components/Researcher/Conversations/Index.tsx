@@ -18,6 +18,7 @@ import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -185,11 +186,19 @@ export default function Conversations({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchParticipants()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      if ((selected || []).length > 0) {
+        searchParticipants()
+      } else {
+        setParticipants([])
+        setLoading(false)
+      }
     } else {
-      setParticipants([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
   }, [selected, localStorage.getItem("tokenInfo")])
 
@@ -248,6 +257,12 @@ export default function Conversations({
   }
   const [enabled, setEnabled] = useState(false)
 
+  useEffect(() => {
+    LAMP.Type.getAttachment(researcherId, "lamp.dashboard.conversation_enabled").then((result: any) => {
+      setEnabled(result.data)
+    })
+  }, [])
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading || participants === null}>
@@ -265,7 +280,10 @@ export default function Conversations({
         mode={mode}
         setOrder={setOrder}
         order={order}
-        setEnabled={setEnabled}
+        setEnabled={(x) => {
+          console.log(x)
+          setEnabled(x)
+        }}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

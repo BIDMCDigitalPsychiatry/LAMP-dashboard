@@ -92,11 +92,19 @@ export default function SensorsList({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchFilterSensors()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      if ((selected || []).length > 0) {
+        searchFilterSensors()
+      } else {
+        setSensors([])
+        setLoading(false)
+      }
     } else {
-      setSensors([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
   }, [selected, localStorage.getItem("tokenInfo")])
 

@@ -131,11 +131,19 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchActivities()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      if ((selected || []).length > 0) {
+        searchActivities()
+      } else {
+        setActivities([])
+        setLoading(false)
+      }
     } else {
-      setActivities([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
   }, [selected, localStorage.getItem("tokenInfo")])
 

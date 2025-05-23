@@ -227,7 +227,15 @@ export default function Participant({
     tempHideCareTeam(participant).then(setHideCareTeam)
   }
   useEffect(() => {
-    loadData()
+    const userToken: any =
+      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
+        ? JSON.parse(localStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken) {
+      loadData()
+    } else {
+      window.location.href = "/#/"
+    }
   }, [localStorage.getItem("tokenInfo")])
 
   useEffect(() => {

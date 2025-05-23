@@ -165,6 +165,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
       setOpen(true)
     }
     if (!initial) {
+      console.log(enabled)
       setEnabled(enabled)
       LAMP.Type.setAttachment(researcherId, "me", "lamp.dashboard.conversation_enabled", enabled)
     }
