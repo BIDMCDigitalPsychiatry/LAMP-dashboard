@@ -190,7 +190,7 @@ export default function Conversations({
       typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
         ? JSON.parse(localStorage.getItem("tokenInfo"))
         : null
-    if (!!userToken) {
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchParticipants()
       } else {

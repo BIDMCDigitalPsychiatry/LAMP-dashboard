@@ -231,7 +231,7 @@ export default function Participant({
       typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
         ? JSON.parse(localStorage.getItem("tokenInfo"))
         : null
-    if (!!userToken) {
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       loadData()
     } else {
       window.location.href = "/#/"

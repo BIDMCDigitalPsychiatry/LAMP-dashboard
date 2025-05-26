@@ -6,6 +6,7 @@ import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
 import { Service } from "../../DBService/DBService"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -94,7 +95,7 @@ export default function StudiesList({
       typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
         ? JSON.parse(localStorage.getItem("tokenInfo"))
         : null
-    if (!!userToken) {
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       searchFilterStudies()
     } else {
       window.location.href = "/#/"

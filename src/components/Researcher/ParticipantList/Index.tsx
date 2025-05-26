@@ -18,6 +18,7 @@ import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -190,7 +191,7 @@ export default function ParticipantList({
       typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
         ? JSON.parse(localStorage.getItem("tokenInfo"))
         : null
-    if (!!userToken) {
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchParticipants()
       } else {
