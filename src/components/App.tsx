@@ -408,7 +408,9 @@ function AppRouter({ ...props }) {
     } else if (!storeRef.current.includes(id)) {
       LAMP.Participant.view(id).then((x) => {
         if (typeof x == "undefined") {
-          window.location.reload()
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
         } else {
           setStore({
             researchers: store.researchers,
