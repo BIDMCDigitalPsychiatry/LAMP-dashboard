@@ -101,18 +101,18 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
-    // const hasRoleFlag = localStorage.getItem("isParticipant")
+    const hasRoleFlag = localStorage.getItem("isParticipant")
 
-    // if (userToken && !hasRoleFlag) {
-    //   const firstPath = window.location.hash
-    //   const participantRegex = /^#\/participant\/[^\/]+\/assess$/
+    if (userToken && !hasRoleFlag) {
+      const firstPath = window.location.hash
+      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
 
-    //   if (participantRegex.test(firstPath)) {
-    //     localStorage.setItem("isParticipant", "true")
-    //   } else {
-    //     localStorage.setItem("isParticipant", "false")
-    //   }
-    // }
+      if (participantRegex.test(firstPath)) {
+        localStorage.setItem("isParticipant", "true")
+      } else {
+        localStorage.setItem("isParticipant", "false")
+      }
+    }
 
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
@@ -1095,7 +1095,12 @@ export default function App({ ...props }) {
       const moved = parseInt(localStorage.getItem("mousemoved") || "0")
       const now = Date.now()
       const inactiveMinutes = (now - moved) / 60000
-      if (inactiveMinutes > 15 && !confirmSession) {
+      if (
+        inactiveMinutes > 15 &&
+        !confirmSession &&
+        localStorage.getItem("isLoginPage") === "false" &&
+        localStorage.getItem("isParticipant") === "false"
+      ) {
         setConfirmSession(true)
       }
     }, 60 * 1000)
