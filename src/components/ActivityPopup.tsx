@@ -171,6 +171,7 @@ export default function ActivityPopup({
   type,
   participant,
   showStreak,
+  updateLocalStorage,
   ...props
 }: {
   activity: any
@@ -179,6 +180,7 @@ export default function ActivityPopup({
   type: string
   participant: any
   showStreak: Function
+  updateLocalStorage: Function
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -279,6 +281,7 @@ export default function ActivityPopup({
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
+              onClick={() => updateLocalStorage()}
               underline="none"
               className={classnames(
                 classes.btngreen,

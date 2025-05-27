@@ -23,7 +23,7 @@ import {
   DialogContentText,
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
-import { ITEMS_KEY } from "@rjsf/utils"
+import { extractIdsWithHierarchy } from "./helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -115,7 +115,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const getActivityEvents = async (participant: any, activityId, moduleStartTime?) => {
   let from: Date
   if (moduleStartTime) {
-    from = moduleStartTime
+    from = new Date(moduleStartTime)
   } else {
     from = new Date()
     from.setMonth(from.getMonth() - 6)
@@ -126,7 +126,7 @@ export const getActivityEvents = async (participant: any, activityId, moduleStar
       : await LAMP.ActivityEvent.allByParticipant(
           participant?.id ?? participant,
           activityId,
-          from.getTime(),
+          from?.getTime(),
           new Date().getTime(),
           null,
           true
@@ -155,6 +155,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [open, setOpen] = useState(false)
+  const moduleDataFromStore = localStorage.getItem("moduleData")
   const [questionCount, setQuestionCount] = React.useState(0)
   const [message, setMessage] = useState("")
   const [moduleData, setModuleData] = useState<any[]>([])
@@ -165,6 +166,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
+  const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
+  const [pendingSubModules, setPendingSubModules] = useState(null)
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -177,6 +180,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const initializeOpenedModule = isAuto ? true : false
         addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
       } else {
+        localStorage.setItem("parentModuleOfActivity", y.parentModule)
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -359,9 +363,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
-          fetchedData["parentModule"] = data.id
         }
-
+        fetchedData["parentModule"] = data.id
         const eventCreated =
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
@@ -467,6 +470,55 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
   }, [moduleForNotification, isParentModuleLoaded])
 
+  function moduleDataIsReady() {
+    if (moduleData?.length > 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  useEffect(() => {
+    if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
+      processSubModules(pendingSubModules)
+      setPendingSubModules(null) // Clear it after processing
+    }
+  }, [moduleData, pendingSubModules])
+
+  async function processActivities(data) {
+    setLoadingModules(true)
+    const tasks = []
+    for (const activity of data) {
+      tasks.push(handleInitializeOpenedModules({ spec: "lamp.module", id: activity.id }, true))
+    }
+    try {
+      await Promise.all(tasks)
+    } catch (err) {
+      console.error("Error:", err)
+    } finally {
+      const subModules = data
+        .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
+        .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
+        .flat()
+      setPendingSubModules(subModules)
+    }
+  }
+
+  function processSubModules(subActivities) {
+    subActivities
+      .filter((item) => item.spec === "lamp.module")
+      .forEach(async (sub) => {
+        if (sub.spec === "lamp.module") {
+          const startTime = new Date(sub.startTime).toString()
+          await handleSubModule({ id: sub.id, startTime: startTime, parentModule: sub.parentModule }, sub.level - 1)
+        }
+        // If there are nested subActivities, go deeper
+        if (sub.subActivities) {
+          processSubModules(sub.subActivities)
+        }
+      })
+  }
+
   useEffect(() => {
     const runAsync = async () => {
       const activitiesList = savedActivities
@@ -493,8 +545,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         setLoadingModules(false)
       }
     }
-    runAsync()
-  }, [savedActivities])
+
+    if (!moduleDataLoadedFromStore && savedActivities && savedActivities.length > 0) {
+      if (!moduleDataFromStore) runAsync()
+      else {
+        const data = JSON.parse(moduleDataFromStore)
+        processActivities(data)
+        setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
+        localStorage.removeItem("moduleData")
+        // scrollToElement(localStorage.getItem("parentModuleOfActivity"))
+        setModuleDataLoadedFromStore(true)
+        setLoadingModules(false)
+      }
+    } else if (savedActivities && savedActivities.length === 0) {
+      // Handle case when savedActivities is empty
+      setShownActivities([])
+      setLoadingModules(false)
+    }
+  }, [savedActivities, moduleDataFromStore])
 
   const scrollToElement = (id) => {
     const el = document.getElementById(id)
@@ -509,6 +577,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
+
+  const updateLocalStorage = () => {
+    localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
+  }
 
   return (
     <Box>
@@ -601,6 +673,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         activity={activity}
         tag={tag}
         questionCount={questionCount}
+        updateLocalStorage={updateLocalStorage}
         open={open}
         onClose={() => setOpen(false)}
         type={type}
