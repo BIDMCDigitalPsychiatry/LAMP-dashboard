@@ -131,13 +131,12 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     const password = args?.password?.trim()
     if (userName && password) {
       try {
-        await LAMP.Credential.login(userName, password).then((res) => {
-          localStorage.setItem(
-            userTokenKey,
-            JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-          )
-          props?.setAuthenticated(true)
-        })
+        const res = await LAMP.Credential.login(userName, password)
+        localStorage.setItem(
+          userTokenKey,
+          JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+        )
+        props?.setAuthenticated(true)
       } catch (error) {
         console.log(error)
       }
@@ -159,21 +158,28 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
+    await LAMP.Auth.set_identity({
+      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+      password: !!mode ? "demo" : state.password,
+      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+    }).catch((e) => {
+      enqueueSnackbar(`${t("Invalid id or password.")}`, {
+        variant: "error",
+      })
+      return
+    })
+    if (!mode) {
+      console.log("sdfs")
+      await generateTokens({
+        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+        password: !!mode ? "demo" : state.password,
+      })
+    }
     const res = await setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
-    if (res) {
-      if (!mode) {
-        await generateTokens(res.auth)
-      }
-    }
-    // .then((res) => {
-    //   console.log("res", res)
-    //   if (!mode) {
-    //     generateTokens(res?.auth)
-    //   }
 
     if (res.authType === "participant") {
       await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))

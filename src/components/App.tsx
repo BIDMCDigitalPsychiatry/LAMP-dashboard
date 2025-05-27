@@ -113,13 +113,11 @@ function AppRouter({ ...props }) {
         localStorage.setItem("isParticipant", "false")
       }
     }
-
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
       location?.pathname === "/" &&
       !userToken?.accessToken
     ) {
-      //window.location.href = "/#/"
       reset()
     }
   }, [location?.pathname])
@@ -320,6 +318,17 @@ function AppRouter({ ...props }) {
     }
   }, [state])
 
+  const logout = async () => {
+    const token = localStorage.getItem("tokenInfo")
+    try {
+      await LAMP.Credential.logout(token)
+    } catch (err) {
+      console.error("Logout failed:", err)
+    } finally {
+      await reset()
+    }
+  }
+
   let reset = async (identity?: any) => {
     if (identity?.id != "selfHelp@demo.lamp.digital") {
       Service.deleteUserDB()
@@ -407,16 +416,10 @@ function AppRouter({ ...props }) {
       return store.participants[id]
     } else if (!storeRef.current.includes(id)) {
       LAMP.Participant.view(id).then((x) => {
-        if (typeof x == "undefined") {
-          setTimeout(() => {
-            window.location.reload()
-          }, 1000)
-        } else {
-          setStore({
-            researchers: store.researchers,
-            participants: { ...store.participants, [id]: x },
-          })
-        }
+        setStore({
+          researchers: store.researchers,
+          participants: { ...store.participants, [id]: x },
+        })
       })
       storeRef.current = [...storeRef.current, id]
     }
@@ -427,6 +430,13 @@ function AppRouter({ ...props }) {
     setState((state) => ({
       ...state,
       surveyDone: true,
+    }))
+  }
+
+  const setServerAddress = (address) => {
+    setState((state) => ({
+      ...state,
+      lastDomain: true,
     }))
   }
 
@@ -482,7 +492,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -510,7 +520,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -522,7 +532,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -542,7 +552,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {t("Login")}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -569,7 +579,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -581,7 +591,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -604,7 +614,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -616,7 +626,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -640,7 +650,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -652,7 +662,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -675,7 +685,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -687,7 +697,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -712,7 +722,7 @@ function AppRouter({ ...props }) {
               <React.Fragment>
                 <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
                 <Login
-                  setIdentity={async (identity) => await reset(identity)}
+                  setIdentity={async (identity) => !!identity && (await reset(identity))}
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
                   setAuthenticated={setAuthenticated}
@@ -725,7 +735,7 @@ function AppRouter({ ...props }) {
               <React.Fragment>
                 <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
                 <TwoFA
-                  onLogout={() => reset()}
+                  onLogout={() => logout()}
                   onComplete={() => {
                     state.authType === "admin"
                       ? props.history.replace("/researcher")
@@ -755,7 +765,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -767,7 +777,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -788,7 +798,7 @@ function AppRouter({ ...props }) {
                     : "User Administrator"
                 }
                 goBack={props.history.goBack}
-                onLogout={() => reset()}
+                onLogout={() => logout()}
               >
                 <Root {...props} updateStore={updateStore} adminType={state.adminType} />
               </NavigationLayout>
@@ -804,7 +814,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -816,7 +826,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   state.authType === "admin"
                     ? props.history.replace("/researcher")
@@ -834,7 +844,7 @@ function AppRouter({ ...props }) {
                 id={props.match.params.id}
                 title={`${getResearcher(props.match.params.id).name}`}
                 goBack={props.history.goBack}
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 activeTab="Researcher"
                 sameLineTitle={true}
                 changeResearcherType={changeResearcherType}
@@ -868,7 +878,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
                 setAuthenticated={setAuthenticated}
@@ -880,7 +890,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
               <TwoFA
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 onComplete={() => {
                   localStorage.setItem("verified", JSON.stringify({ value: true }))
                   state.authType === "admin"
@@ -904,7 +914,7 @@ function AppRouter({ ...props }) {
                   //@ts-ignore: state.identity will have an name param if not admin
                   name: state.authType === "admin" ? "Administrator" : state.identity.name,
                 }}
-                onLogout={() => reset()}
+                onLogout={() => logout()}
               />
             </React.Fragment>
           )
@@ -919,7 +929,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -940,7 +950,7 @@ function AppRouter({ ...props }) {
                 //   getParticipant(props.match.params.id)?.id
                 // }
                 goBack={props.history.goBack}
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 activeTab={state.activeTab}
               >
                 <Participant
@@ -967,7 +977,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -996,7 +1006,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
               />
@@ -1016,7 +1026,7 @@ function AppRouter({ ...props }) {
                   getParticipant(props.match.params.id)?.id
                 }
                 goBack={props.history.goBack}
-                onLogout={() => reset()}
+                onLogout={() => logout()}
                 activeTab={"Module Activity"}
               >
                 <ModuleActivity
@@ -1038,7 +1048,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
-                setIdentity={async (identity) => await reset(identity)}
+                setIdentity={async (identity) => !!identity && (await reset(identity))}
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
