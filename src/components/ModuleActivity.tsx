@@ -15,6 +15,7 @@ import {
   DialogContentText,
   Grid,
 } from "@mui/material"
+import { extractIdsWithHierarchy } from "./helper"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -37,11 +38,25 @@ const ModuleActivity = ({ ...props }) => {
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
+  const moduleDataFromStore = localStorage.getItem("moduleData")
+  const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
+  const [pendingSubModules, setPendingSubModules] = useState(null)
 
   useEffect(() => {
-    if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
-    localStorage.removeItem("activityFromModule")
-  }, [moduleId, participant])
+    if (!moduleDataLoadedFromStore) {
+      if (moduleDataFromStore) {
+        const data = JSON.parse(moduleDataFromStore)
+        processActivities(data)
+        localStorage.removeItem("moduleData")
+        scrollToElement(localStorage.getItem("parentModuleOfActivity"))
+        setModuleDataLoadedFromStore(true)
+        setLoadingModules(false)
+      } else {
+        if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
+        localStorage.removeItem("activityFromModule")
+      }
+    }
+  }, [moduleId, participant, moduleDataFromStore])
 
   useEffect(() => {
     const handleTabClose = (event) => {
@@ -83,6 +98,8 @@ const ModuleActivity = ({ ...props }) => {
         addActivityData(data, 0, moduleStartTime, null)
       } else {
         localStorage.setItem("activityFromModule", moduleId)
+        localStorage.setItem("parentModuleOfActivity", y.parentModule)
+
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -217,6 +234,54 @@ const ModuleActivity = ({ ...props }) => {
     })
   }
 
+  function moduleDataIsReady() {
+    if (moduleData?.length > 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  useEffect(() => {
+    if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
+      processSubModules(pendingSubModules)
+      setPendingSubModules(null)
+    }
+  }, [moduleData, pendingSubModules])
+
+  async function processActivities(data) {
+    setLoadingModules(true)
+    const tasks = []
+    for (const activity of data) {
+      tasks.push(handleClickOpen({ spec: "lamp.module", id: activity.id }))
+    }
+    try {
+      await Promise.all(tasks)
+    } catch (err) {
+      console.error("Error:", err)
+    } finally {
+      const subModules = data
+        .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
+        .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
+        .flat()
+      setPendingSubModules(subModules)
+    }
+  }
+
+  function processSubModules(subActivities) {
+    subActivities
+      .filter((item) => item.spec === "lamp.module")
+      .forEach(async (sub) => {
+        if (sub.spec === "lamp.module") {
+          const startTime = new Date(sub.startTime).toString()
+          await handleSubModule({ id: sub.id, startTime: startTime, parentModule: sub.parentModule }, sub.level - 1)
+        }
+        if (sub.subActivities) {
+          processSubModules(sub.subActivities)
+        }
+      })
+  }
+
   const addActivityData = async (data, level, startTime, parent) => {
     setLoadingModules(true)
     let moduleActivityData = { ...data }
@@ -239,8 +304,8 @@ const ModuleActivity = ({ ...props }) => {
 
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
-          fetchedData["parentModule"] = data.id
         }
+        fetchedData["parentModule"] = data.id
 
         const eventCreated =
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
@@ -345,6 +410,10 @@ const ModuleActivity = ({ ...props }) => {
     }, 1000)
   }
 
+  const updateLocalStorage = () => {
+    localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
+  }
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={loadingModules}>
@@ -368,6 +437,7 @@ const ModuleActivity = ({ ...props }) => {
             tag={null}
             questionCount={questionCount}
             open={open}
+            updateLocalStorage={updateLocalStorage}
             onClose={() => setOpen(false)}
             type={null}
             showStreak={null}

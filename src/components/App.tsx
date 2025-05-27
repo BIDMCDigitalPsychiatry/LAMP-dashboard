@@ -460,15 +460,22 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     const key = "ModuleActivityClosed"
+    const sessionKey = "ReloadedThisSession"
     const interval = 5000
+
     const checkAndReload = () => {
       const value = localStorage.getItem(key)
-      if (value) {
+      const alreadyReloaded = sessionStorage.getItem(sessionKey)
+
+      if (value && !alreadyReloaded) {
         localStorage.removeItem(key)
+        sessionStorage.setItem(sessionKey, "true")
         window.location.reload()
       }
     }
+
     const intervalId = setInterval(checkAndReload, interval)
+
     return () => clearInterval(intervalId)
   }, [])
 
