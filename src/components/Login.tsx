@@ -158,17 +158,19 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
-    await LAMP.Auth.set_identity({
-      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-      password: !!mode ? "demo" : state.password,
-      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-    }).catch((e) => {
-      enqueueSnackbar(`${t("Invalid id or password.")}`, {
-        variant: "error",
-      })
-      return
-    })
+    console.log(mode)
+
     if (!mode) {
+      await LAMP.Auth.set_identity({
+        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+        password: !!mode ? "demo" : state.password,
+        serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+      }).catch((e) => {
+        enqueueSnackbar(`${t("Invalid id or password.")}`, {
+          variant: "error",
+        })
+        return
+      })
       console.log("sdfs")
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
