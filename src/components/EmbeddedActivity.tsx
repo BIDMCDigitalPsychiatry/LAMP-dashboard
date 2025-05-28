@@ -372,14 +372,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           <Button
             onClick={() => {
               setShowPopUp(false)
+              localStorage.setItem("SurveyId", currentActivity?.id)
               if (secondaryActivity.spec === "lamp.module") {
                 const url = `/#/participant/${participant}/module/${responseActivity}?mode=responseActivity`
                 window.open(url, "_blank") // Open in a new tab or window
-                // localStorage.setItem("activityFromModule", responseActivity)
                 localStorage.setItem("lastActiveTab", tab)
               } else {
                 const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-                window.open(url, "_blank") // Open in a new tab or window
+                // window.open(url, "_blank") // Open in a new tab or window
+                window.location.href = url
               }
               if (surveyResponse) {
                 handleSaveData(surveyResponse)

@@ -129,7 +129,7 @@ export function CredentialEditor({
           { value: "edit", label: "User Administrator" },
           { value: "view", label: "Practice Lead" },
         ]
-
+  console.log(roles)
   useEffect(() => {
     ;(async () => {
       const valid = await checkPasswordRule(password)
@@ -233,7 +233,9 @@ export function CredentialEditor({
             }}
           >
             {roles.length > 0 &&
-              ((!!permissions && !!title && !fromParticipant) || (userType == "researcher" && !fromParticipant)) &&
+              ((typeof userType === "undefined" && title == "Administrator") ||
+                (!!permissions && !!title && !fromParticipant) ||
+                (userType == "researcher" && !fromParticipant)) &&
               roles.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
