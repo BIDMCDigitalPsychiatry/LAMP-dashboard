@@ -297,9 +297,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-
       if (currentActivity.spec == "lamp.survey") {
         return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else {
