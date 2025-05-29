@@ -607,7 +607,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   useEffect(() => {
     if (favorites.length > 0) {
-      setTab("favorites")
+      setTab("favorite")
     } else {
       setTab("all")
     }
