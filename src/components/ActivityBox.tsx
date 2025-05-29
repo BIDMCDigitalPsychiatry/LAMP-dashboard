@@ -530,12 +530,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       })
   }
-  const [activities, setActivities] = useState([])
   const [favorites, setFavorites] = useState([])
-
-  useEffect(() => {
-    console.log(activities, favorites)
-  }, [activities, favorites])
 
   useEffect(() => {
     ;(async () => {
@@ -543,9 +538,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         [await LAMP.Type.getAttachment(null, "lamp.dashboard.favorite_activities")].map((y: any) =>
           !!y.error ? undefined : y.data
         )[0] ?? []
-      console.log(tags_object)
       setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
-      setActivities(savedActivities.filter((activity) => !tag.includes(activity.id)))
     })()
 
     const runAsync = async () => {
@@ -610,86 +603,99 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
   }
 
-  const [tab, setTab] = useState("favorite")
+  const [tab, setTab] = useState("all")
+
+  useEffect(() => {
+    if (favorites.length > 0) {
+      setTab("favorites")
+    } else {
+      setTab("all")
+    }
+  }, [favorites])
+
   return (
     <Box>
       <TabContext value={tab}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <TabList onChange={(e, val) => setTab(val)}>
-            <Tab label="Favorites" value="favorite" />
-            {/* <Tab label="Modules" value="module" /> */}
-            <Tab label="All" value="all" />
-          </TabList>
-        </Box>
-        <TabPanel value="favorite">
-          <Grid container spacing={2}>
-            {favorites.length
-              ? favorites.map((activity) => (
-                  <Grid
-                    item
-                    xs={6}
-                    sm={4}
-                    md={3}
-                    lg={3}
-                    onClick={() => {
-                      handleClickOpen(activity)
-                    }}
-                    className={classes.thumbMain}
-                  >
-                    <Icon className={classes.favstar}>star_rounded</Icon>
-                    <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                      <Card
-                        className={
-                          classes.manage +
-                          " " +
-                          (type === "Manage"
-                            ? classes.manageH
-                            : type === "Assess"
-                            ? classes.assessH
-                            : type === "Learn"
-                            ? classes.learnH
-                            : classes.preventH)
-                        }
-                      >
-                        <Box mt={2} mb={1}>
-                          <Box
-                            className={classes.mainIcons}
-                            style={{
-                              margin: "auto",
-                              background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                ? `url(${
-                                    tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                  }) center center/contain no-repeat`
-                                : activity.spec === "lamp.breathe"
-                                ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.journal"
-                                ? `url(${JournalIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.scratch_image"
-                                ? `url(${ScratchCard}) center center/contain no-repeat`
-                                : `url(${InfoIcon}) center center/contain no-repeat`,
-                            }}
-                          ></Box>
-                        </Box>
-                        <Typography className={classes.cardlabel}>
-                          <ReactMarkdown
-                            children={t(activity.name)}
-                            skipHtml={false}
-                            remarkPlugins={[gfm, emoji]}
-                            components={{ link: LinkRenderer }}
-                          />
-                        </Typography>
-                      </Card>
-                    </ButtonBase>
-                  </Grid>
-                ))
-              : type !== "Portal" && (
-                  <Box display="flex" className={classes.blankMsg} ml={1}>
-                    <Icon>info</Icon>
-                    <p>{`${t(message)}`}</p>
-                  </Box>
-                )}
-          </Grid>
-        </TabPanel>
+        {favorites.length > 0 && (
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <TabList onChange={(e, val) => setTab(val)}>
+              <Tab label="Favorites" value="favorite" />
+              {/* <Tab label="Modules" value="module" />  */}
+              <Tab label="All" value="all" />
+            </TabList>
+          </Box>
+        )}
+        {favorites.length > 0 && (
+          <TabPanel value="favorite">
+            <Grid container spacing={2}>
+              {favorites.length
+                ? favorites.map((activity) => (
+                    <Grid
+                      item
+                      xs={6}
+                      sm={4}
+                      md={3}
+                      lg={3}
+                      onClick={() => {
+                        handleClickOpen(activity)
+                      }}
+                      className={classes.thumbMain}
+                    >
+                      <Icon className={classes.favstar}>star_rounded</Icon>
+                      <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                        <Card
+                          className={
+                            classes.manage +
+                            " " +
+                            (type === "Manage"
+                              ? classes.manageH
+                              : type === "Assess"
+                              ? classes.assessH
+                              : type === "Learn"
+                              ? classes.learnH
+                              : classes.preventH)
+                          }
+                        >
+                          <Box mt={2} mb={1}>
+                            <Box
+                              className={classes.mainIcons}
+                              style={{
+                                margin: "auto",
+                                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                  ? `url(${
+                                      tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                    }) center center/contain no-repeat`
+                                  : activity.spec === "lamp.breathe"
+                                  ? `url(${BreatheIcon}) center center/contain no-repeat`
+                                  : activity.spec === "lamp.journal"
+                                  ? `url(${JournalIcon}) center center/contain no-repeat`
+                                  : activity.spec === "lamp.scratch_image"
+                                  ? `url(${ScratchCard}) center center/contain no-repeat`
+                                  : `url(${InfoIcon}) center center/contain no-repeat`,
+                              }}
+                            ></Box>
+                          </Box>
+                          <Typography className={classes.cardlabel}>
+                            <ReactMarkdown
+                              children={t(activity.name)}
+                              skipHtml={false}
+                              remarkPlugins={[gfm, emoji]}
+                              components={{ link: LinkRenderer }}
+                            />
+                          </Typography>
+                        </Card>
+                      </ButtonBase>
+                    </Grid>
+                  ))
+                : type !== "Portal" && (
+                    <Box display="flex" className={classes.blankMsg} ml={1}>
+                      <Icon>info</Icon>
+                      <p>{`${t(message)}`}</p>
+                    </Box>
+                  )}
+            </Grid>
+          </TabPanel>
+        )}
         <TabPanel value="all">
           {moduleData.length ? (
             <ActivityAccordian
