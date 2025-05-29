@@ -212,6 +212,23 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             activityTimestamp
           )
           setCurrentActivity(null)
+          ;(async () => {
+            if (typeof data?.static_data?.is_favorite !== undefined) {
+              let tag =
+                [await LAMP.Type.getAttachment(null, "lamp.dashboard.favorite_activities")].map((y: any) =>
+                  !!y.error ? undefined : y.data
+                )[0] ?? []
+              if (!!data?.static_data?.is_favorite) {
+                if ((tag || []).filter((t) => t == data.activity).length === 0) {
+                  tag.push(data.activity)
+                }
+              } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
+                tag = (tag || []).filter((t) => t !== data.activity)
+              }
+              LAMP.Type.setAttachment(null, "me", "lamp.dashboard.favorite_activities", tag)
+              delete data.static_data.is_favorite
+            }
+          })()
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
@@ -244,13 +261,19 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+      let tag =
+        [await LAMP.Type.getAttachment(null, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
       setSettings({
         ...settings,
         activity: currentActivity,
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
+        is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
       })
+
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {
         response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -275,9 +298,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
       // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
 
       if (currentActivity.spec == "lamp.survey") {
-        console.log("asd")
         return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else {
         return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
