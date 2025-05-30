@@ -43,9 +43,10 @@ const ModuleActivity = ({ ...props }) => {
   const [pendingSubModules, setPendingSubModules] = useState(null)
 
   useEffect(() => {
+    console.log("moduleDataFromStore", moduleDataFromStore)
     if (!moduleDataLoadedFromStore) {
-      if (moduleDataFromStore) {
-        const data = JSON.parse(moduleDataFromStore)
+      const data = JSON.parse(moduleDataFromStore)
+      if (data && data?.length > 0) {
         processActivities(data)
         localStorage.removeItem("moduleData")
         setModuleDataLoadedFromStore(true)
