@@ -129,7 +129,6 @@ export function CredentialEditor({
           { value: "edit", label: "User Administrator" },
           { value: "view", label: "Practice Lead" },
         ]
-  console.log(roles)
   useEffect(() => {
     ;(async () => {
       const valid = await checkPasswordRule(password)

@@ -18,6 +18,8 @@ import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
+import ResponsiveDialog from "./ResponsiveDialog"
+import ModuleActivity from "./ModuleActivity"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -254,13 +256,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-      })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {
         response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -287,7 +282,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       // return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
 
       if (currentActivity.spec == "lamp.survey") {
-        console.log("asd")
         return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
       } else {
         return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -302,6 +296,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const warningTextSet = new Set(warningTexts)
     return Array.from(warningTextSet)
   }
+  const [open, setOpen] = useState(false)
 
   return (
     <div
@@ -361,6 +356,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           </Button>
         </DialogActions>
       </Dialog>
+      <ResponsiveDialog open={!!open} transient animate fullScreen onClose={() => setOpen(false)}>
+        <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+      </ResponsiveDialog>
       <Dialog
         open={!!showPopup}
         onClose={() => {
@@ -384,11 +382,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               setShowPopUp(false)
               localStorage.setItem("SurveyId", currentActivity?.id)
               if (secondaryActivity.spec === "lamp.module") {
-                const url = `/#/participant/${participant}/module/${responseActivity}?mode=responseActivity`
-                window.open(url, "_blank") // Open in a new tab or window
+                setOpen(true)
               } else {
                 const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-                // window.open(url, "_blank") // Open in a new tab or window
                 window.location.href = url
               }
               if (surveyResponse) {

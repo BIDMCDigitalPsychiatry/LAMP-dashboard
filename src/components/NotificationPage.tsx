@@ -140,6 +140,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           }
         })
         .catch((e) => {
+          console.log(e)
           setOpenNotFound(true)
           setLoading(false)
         })

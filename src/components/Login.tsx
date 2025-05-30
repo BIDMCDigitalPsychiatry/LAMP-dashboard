@@ -209,7 +209,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
-    console.log(mode)
 
     if (!mode) {
       await LAMP.Auth.set_identity({
@@ -222,7 +221,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         })
         return
       })
-      console.log("sdfs")
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
