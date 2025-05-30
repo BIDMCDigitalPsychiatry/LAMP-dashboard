@@ -43,7 +43,6 @@ const ModuleActivity = ({ ...props }) => {
   const [pendingSubModules, setPendingSubModules] = useState(null)
 
   useEffect(() => {
-    console.log("moduleDataFromStore", moduleDataFromStore)
     if (!moduleDataLoadedFromStore) {
       const data = JSON.parse(moduleDataFromStore)
       if (data && data?.length > 0) {
