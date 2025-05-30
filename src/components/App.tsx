@@ -131,9 +131,9 @@ function AppRouter({ ...props }) {
       } else {
         setState((state) => ({
           ...state,
-          activeTab: newTab,
+          activeTab: newTab ?? "assess",
         }))
-        window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+        window.location.href = `/#/participant/${participantId}/${(newTab ?? "assess").toLowerCase()}`
       }
     }
   }

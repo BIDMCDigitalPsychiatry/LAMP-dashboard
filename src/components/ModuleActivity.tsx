@@ -43,6 +43,7 @@ const ModuleActivity = ({ ...props }) => {
   const [pendingSubModules, setPendingSubModules] = useState(null)
 
   useEffect(() => {
+    console.log(moduleId, moduleDataLoadedFromStore, moduleDataFromStore)
     if (!moduleDataLoadedFromStore) {
       if (moduleDataFromStore) {
         const data = JSON.parse(moduleDataFromStore)
@@ -52,6 +53,7 @@ const ModuleActivity = ({ ...props }) => {
         setModuleDataLoadedFromStore(true)
         setLoadingModules(false)
       } else {
+        console.log(participant)
         if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
         localStorage.removeItem("activityFromModule")
       }
@@ -59,6 +61,7 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleId, participant, moduleDataFromStore])
 
   useEffect(() => {
+    console.log("module")
     const handleTabClose = (event) => {
       localStorage.setItem("ModuleActivityClosed", "true")
       localStorage.removeItem("activityFromModule")
@@ -92,6 +95,7 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClickOpen = (y: any) => {
+    console.log(y)
     LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
         const moduleStartTime = await getModuleStartTime(y.id)
@@ -255,6 +259,7 @@ const ModuleActivity = ({ ...props }) => {
     for (const activity of data) {
       tasks.push(handleClickOpen({ spec: "lamp.module", id: activity.id }))
     }
+    console.log(tasks)
     try {
       await Promise.all(tasks)
     } catch (err) {
@@ -264,6 +269,7 @@ const ModuleActivity = ({ ...props }) => {
         .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
         .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
         .flat()
+      console.log(subModules)
       setPendingSubModules(subModules)
     }
   }
@@ -284,6 +290,7 @@ const ModuleActivity = ({ ...props }) => {
 
   const addActivityData = async (data, level, startTime, parent) => {
     setLoadingModules(true)
+    console.log(data)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null

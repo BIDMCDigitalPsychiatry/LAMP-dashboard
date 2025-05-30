@@ -78,6 +78,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
+    localStorage.removeItem("lastUrl")
+    localStorage.removeItem("lastActiveTab")
     setCurrentActivity(activity)
     setSaved(true)
     setEmbeddedActivity("")
@@ -110,6 +112,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const handleSubmit = (e) => {
     if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
+      localStorage.setItem("lastUrl", window.location.href)
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
@@ -245,6 +248,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     try {
       setSaved(false)
       setSettings({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+      })
+      console.log({
         ...settings,
         activity: currentActivity,
         configuration: { language: i18n.language },

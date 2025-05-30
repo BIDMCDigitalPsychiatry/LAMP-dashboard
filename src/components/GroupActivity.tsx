@@ -70,6 +70,10 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [index])
 
   useEffect(() => {
+    console.log(currentActivity)
+  }, [currentActivity])
+
+  useEffect(() => {
     if (groupActivities.length > 0) setIndex(0)
   }, [groupActivities])
 
