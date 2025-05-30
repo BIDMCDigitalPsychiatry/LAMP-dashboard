@@ -126,12 +126,53 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
+  function str2ab(base64) {
+    const binary = atob(base64)
+    const len = binary.length
+    const bytes = new Uint8Array(len)
+    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
+    return bytes.buffer
+  }
+  async function importPublicKey(pem) {
+    if (!pem || typeof pem !== "string") {
+      throw new Error("Public key PEM is undefined or not a string.")
+    }
+    const binaryDer = str2ab(
+      pem
+        .replace(/-----BEGIN PUBLIC KEY-----/, "")
+        .replace(/-----END PUBLIC KEY-----/, "")
+        .replace(/\s/g, "")
+    )
+
+    return await window.crypto.subtle.importKey(
+      "spki",
+      binaryDer,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+      },
+      true,
+      ["encrypt"]
+    )
+  }
+
   const generateTokens = async (args: { id: string; password: string }) => {
     const userName = args?.id?.trim()
     const password = args?.password?.trim()
+    const response = await LAMP.Credential.publicKey()
+    const key = await importPublicKey(response)
+    const encrypted = await window.crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      key,
+      new TextEncoder().encode(password)
+    )
+
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
     if (userName && password) {
       try {
-        const res = await LAMP.Credential.login(userName, password)
+        const res = await LAMP.Credential.login(userName, base64)
         localStorage.setItem(
           userTokenKey,
           JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
