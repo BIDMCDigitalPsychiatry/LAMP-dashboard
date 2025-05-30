@@ -134,26 +134,31 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return bytes.buffer
   }
   async function importPublicKey(pem) {
-    if (!pem || typeof pem !== "string") {
-      throw new Error("Public key PEM is undefined or not a string.")
-    }
-    const binaryDer = str2ab(
-      pem
-        .replace(/-----BEGIN PUBLIC KEY-----/, "")
-        .replace(/-----END PUBLIC KEY-----/, "")
-        .replace(/\s/g, "")
-    )
+    try {
+      if (!pem || typeof pem !== "string") {
+        setLoginClick(false)
+        // throw new Error("Public key PEM is undefined or not a string.")
+      }
+      const binaryDer = str2ab(
+        pem
+          .replace(/-----BEGIN PUBLIC KEY-----/, "")
+          .replace(/-----END PUBLIC KEY-----/, "")
+          .replace(/\s/g, "")
+      )
 
-    return await window.crypto.subtle.importKey(
-      "spki",
-      binaryDer,
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256",
-      },
-      true,
-      ["encrypt"]
-    )
+      return await window.crypto.subtle.importKey(
+        "spki",
+        binaryDer,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256",
+        },
+        true,
+        ["encrypt"]
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const generateTokens = async (args: { id: string; password: string }) => {
@@ -161,15 +166,20 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     const password = args?.password?.trim()
     const response = await LAMP.Credential.publicKey()
     const key = await importPublicKey(response)
-    const encrypted = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      key,
-      new TextEncoder().encode(password)
-    )
+    let base64
+    try {
+      const encrypted = await window.crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        key,
+        new TextEncoder().encode(password)
+      )
+      base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+    } catch (error) {
+      console.error(error)
+    }
 
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
     if (userName && password) {
       try {
         const res = await LAMP.Credential.login(userName, base64)

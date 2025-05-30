@@ -327,8 +327,10 @@ const ActivityAccordion = ({
   }
 
   useEffect(() => {
+    console.log(data)
     const status = initializeStatus()
     if (status) {
+      console.log("ssdff")
       setStatusLoaded(true)
     }
   }, [data])
