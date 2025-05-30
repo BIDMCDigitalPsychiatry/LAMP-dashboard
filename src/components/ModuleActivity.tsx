@@ -48,7 +48,6 @@ const ModuleActivity = ({ ...props }) => {
         const data = JSON.parse(moduleDataFromStore)
         processActivities(data)
         localStorage.removeItem("moduleData")
-        scrollToElement(localStorage.getItem("parentModuleOfActivity"))
         setModuleDataLoadedFromStore(true)
         setLoadingModules(false)
       } else {
@@ -95,11 +94,10 @@ const ModuleActivity = ({ ...props }) => {
     LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
         const moduleStartTime = await getModuleStartTime(y.id)
-        addActivityData(data, 0, moduleStartTime, null)
+        addActivityData(data, 0, moduleStartTime, null, null, false)
       } else {
         localStorage.setItem("activityFromModule", moduleId)
-        localStorage.setItem("parentModuleOfActivity", y.parentModule)
-
+        localStorage.setItem("parentString", y?.parentString)
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -227,10 +225,10 @@ const ModuleActivity = ({ ...props }) => {
     })
   }
 
-  const handleSubModule = async (activity, level) => {
+  const handleSubModule = async (activity, level, fromLocalStore = false) => {
     const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime, activity?.parentModule)
+      addActivityData(data, level, moduleStartTime, activity?.parentModule, activity?.parentString, fromLocalStore)
     })
   }
 
@@ -274,7 +272,11 @@ const ModuleActivity = ({ ...props }) => {
       .forEach(async (sub) => {
         if (sub.spec === "lamp.module") {
           const startTime = new Date(sub.startTime).toString()
-          await handleSubModule({ id: sub.id, startTime: startTime, parentModule: sub.parentModule }, sub.level - 1)
+          await handleSubModule(
+            { id: sub.id, startTime: startTime, parentModule: sub.parentModule },
+            sub.level - 1,
+            true
+          )
         }
         if (sub.subActivities) {
           processSubModules(sub.subActivities)
@@ -282,7 +284,7 @@ const ModuleActivity = ({ ...props }) => {
       })
   }
 
-  const addActivityData = async (data, level, startTime, parent) => {
+  const addActivityData = async (data, level, startTime, parent, parentString, fromLocalStore) => {
     setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
@@ -305,6 +307,8 @@ const ModuleActivity = ({ ...props }) => {
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
         }
+        const parentsString = parentString ? parentString + ">" + data?.id : data?.id
+        fetchedData["parentString"] = parentsString
         fetchedData["parentModule"] = data.id
 
         const eventCreated =
@@ -398,7 +402,13 @@ const ModuleActivity = ({ ...props }) => {
       setParentModuleLevel(level + 1)
       setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
-    scrollToElement(data.id)
+    if (!fromLocalStore) {
+      scrollToElement(parentString ? parentString + ">" + data.id : data.id)
+    } else {
+      if (parentString ? parentString + ">" + data.id : data.id === localStorage.getItem("parentString")) {
+        scrollToElement(localStorage.getItem("parentString"))
+      }
+    }
     setLoadingModules(false)
   }
 

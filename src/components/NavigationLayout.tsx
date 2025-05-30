@@ -529,7 +529,7 @@ export default function NavigationLayout({
                         onClick={() => {
                           localStorage.removeItem("activityFromModule")
                           setTimeout(() => {
-                            const tab = localStorage.getItem("lastActiveTab")
+                            const tab = localStorage.getItem("lastActiveTab").toLowerCase()
                             if (tab === null || typeof tab === "undefined")
                               window.location.href = `/#/participant/${id}/assess `
                             else if (!!tab) window.location.href = `/#/participant/${id}/${tab}`

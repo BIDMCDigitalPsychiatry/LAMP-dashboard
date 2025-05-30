@@ -375,7 +375,7 @@ const ActivityAccordion = ({
                 {activity.subActivities && activity.subActivities.length > 0 && (
                   <Box paddingLeft={5} display="flex" flexDirection="column">
                     <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                      <AccordionSummary id={activity.id}>
+                      <AccordionSummary id={module.id + ">" + activity.id}>
                         <Typography variant="h6">
                           {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
                         </Typography>
@@ -407,7 +407,7 @@ const ActivityAccordion = ({
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
                               <Box paddingLeft={5} display="flex" flexDirection="column">
                                 <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                                  <AccordionSummary id={subActivity.id}>
+                                  <AccordionSummary id={module.id + ">" + activity.id + ">" + subActivity.id}>
                                     <Typography variant="h6">
                                       {subActivity.name}{" "}
                                       {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}

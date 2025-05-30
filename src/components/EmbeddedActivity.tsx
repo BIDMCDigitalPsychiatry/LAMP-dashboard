@@ -376,7 +376,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               if (secondaryActivity.spec === "lamp.module") {
                 const url = `/#/participant/${participant}/module/${responseActivity}?mode=responseActivity`
                 window.open(url, "_blank") // Open in a new tab or window
-                localStorage.setItem("lastActiveTab", tab)
               } else {
                 const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
                 // window.open(url, "_blank") // Open in a new tab or window
