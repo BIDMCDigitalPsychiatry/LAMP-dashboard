@@ -89,6 +89,32 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
+  const MAX_ATTEMPTS = 5
+  const LOCKOUT_DURATION = 60 * 60 * 1000
+  const LOGIN_ATTEMPTS_KEY = "loginAttempts"
+  const LOCKOUT_TIME_KEY = "lockoutTime"
+  const [isLockedOut, setIsLockedOut] = useState(false)
+  useEffect(() => {
+    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    if (lockoutTime) {
+      const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
+      const now = Date.now()
+      if (now < lockoutEnd) {
+        setIsLockedOut(true)
+        const remaining = lockoutEnd - now
+        setTimeout(() => {
+          setIsLockedOut(false)
+          localStorage.removeItem(LOCKOUT_TIME_KEY)
+          localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+        }, remaining)
+      } else {
+        // Lockout expired
+        localStorage.removeItem(LOCKOUT_TIME_KEY)
+        localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const cachedOptions = localStorage.getItem("cachedOptions")
     let options: SuggestedUrlOption[]
@@ -196,6 +222,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
+    if (isLockedOut) {
+      enqueueSnackbar(`${t("Too many login attempts. Please try again later.")}`, {
+        variant: "error",
+      })
+      return
+    }
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+
+    if (attempts >= MAX_ATTEMPTS) {
+      const lockoutUntil = Date.now() + LOCKOUT_DURATION
+      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+      setIsLockedOut(true)
+      enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, { variant: "error" })
+      return
+    }
+    setLoginClick(true)
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
@@ -230,6 +272,27 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+    }).catch((err) => {
+      const currentAttempts = attempts + 1
+      localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
+      if (currentAttempts >= MAX_ATTEMPTS) {
+        const lockoutUntil = Date.now() + LOCKOUT_DURATION
+        localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+        setIsLockedOut(true)
+        enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, {
+          variant: "error",
+        })
+      } else {
+        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+          variant: "error",
+        })
+        if (!srcLocked)
+          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
+            variant: "info",
+          })
+      }
+
+      setLoginClick(false)
     })
 
     if (res.authType === "participant") {
@@ -453,7 +516,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick ? classes.loginDisabled : ""}
+                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick || isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input
