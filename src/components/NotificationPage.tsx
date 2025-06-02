@@ -140,6 +140,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           }
         })
         .catch((e) => {
+          console.log(e)
           setOpenNotFound(true)
           setLoading(false)
         })
@@ -219,17 +220,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       )}
       {!response &&
         !loading &&
-        (activity?.spec === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            onComplete={(data) => {
-              showStreak(participant, activity)
-            }}
-            noBack={false}
-            tab={tab}
-          />
-        ) : activity?.spec === "lamp.module" ? (
+        (activity?.spec === "lamp.group" || activity?.spec === "lamp.module" ? (
           <GroupActivity
             activity={activity}
             participant={participant}

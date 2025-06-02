@@ -6,6 +6,7 @@ export function extractIdsWithHierarchy(data) {
       level: item.level,
       startTime: item.startTime,
       parentModule: item.parentModule,
+      parentString: item.parentString,
     }
     if (item.subActivities && item.subActivities.length > 0) {
       result.subActivities = extractIdsWithHierarchy(item.subActivities)

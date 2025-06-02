@@ -18,6 +18,8 @@ import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
+import ResponsiveDialog from "./ResponsiveDialog"
+import ModuleActivity from "./ModuleActivity"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -78,6 +80,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
+    localStorage.removeItem("lastUrl")
+    localStorage.removeItem("lastActiveTab")
     setCurrentActivity(activity)
     setSaved(true)
     setEmbeddedActivity("")
@@ -110,6 +114,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const handleSubmit = (e) => {
     if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
+      localStorage.setItem("lastUrl", window.location.href)
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
@@ -312,6 +317,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const warningTextSet = new Set(warningTexts)
     return Array.from(warningTextSet)
   }
+  const [open, setOpen] = useState(false)
 
   return (
     <div
@@ -371,6 +377,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           </Button>
         </DialogActions>
       </Dialog>
+      <ResponsiveDialog open={!!open} transient animate fullScreen onClose={() => setOpen(false)}>
+        <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+      </ResponsiveDialog>
       <Dialog
         open={!!showPopup}
         onClose={() => {
@@ -394,12 +403,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               setShowPopUp(false)
               localStorage.setItem("SurveyId", currentActivity?.id)
               if (secondaryActivity.spec === "lamp.module") {
-                const url = `/#/participant/${participant}/module/${responseActivity}?mode=responseActivity`
-                window.open(url, "_blank") // Open in a new tab or window
-                localStorage.setItem("lastActiveTab", tab)
+                setOpen(true)
               } else {
                 const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-                // window.open(url, "_blank") // Open in a new tab or window
                 window.location.href = url
               }
               if (surveyResponse) {

@@ -89,6 +89,32 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
+  const MAX_ATTEMPTS = 5
+  const LOCKOUT_DURATION = 60 * 60 * 1000
+  const LOGIN_ATTEMPTS_KEY = "loginAttempts"
+  const LOCKOUT_TIME_KEY = "lockoutTime"
+  const [isLockedOut, setIsLockedOut] = useState(false)
+  useEffect(() => {
+    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    if (lockoutTime) {
+      const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
+      const now = Date.now()
+      if (now < lockoutEnd) {
+        setIsLockedOut(true)
+        const remaining = lockoutEnd - now
+        setTimeout(() => {
+          setIsLockedOut(false)
+          localStorage.removeItem(LOCKOUT_TIME_KEY)
+          localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+        }, remaining)
+      } else {
+        // Lockout expired
+        localStorage.removeItem(LOCKOUT_TIME_KEY)
+        localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const cachedOptions = localStorage.getItem("cachedOptions")
     let options: SuggestedUrlOption[]
@@ -134,26 +160,31 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return bytes.buffer
   }
   async function importPublicKey(pem) {
-    if (!pem || typeof pem !== "string") {
-      throw new Error("Public key PEM is undefined or not a string.")
-    }
-    const binaryDer = str2ab(
-      pem
-        .replace(/-----BEGIN PUBLIC KEY-----/, "")
-        .replace(/-----END PUBLIC KEY-----/, "")
-        .replace(/\s/g, "")
-    )
+    try {
+      if (!pem || typeof pem !== "string") {
+        setLoginClick(false)
+        // throw new Error("Public key PEM is undefined or not a string.")
+      }
+      const binaryDer = str2ab(
+        pem
+          .replace(/-----BEGIN PUBLIC KEY-----/, "")
+          .replace(/-----END PUBLIC KEY-----/, "")
+          .replace(/\s/g, "")
+      )
 
-    return await window.crypto.subtle.importKey(
-      "spki",
-      binaryDer,
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256",
-      },
-      true,
-      ["encrypt"]
-    )
+      return await window.crypto.subtle.importKey(
+        "spki",
+        binaryDer,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256",
+        },
+        true,
+        ["encrypt"]
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const generateTokens = async (args: { id: string; password: string }) => {
@@ -161,15 +192,20 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     const password = args?.password?.trim()
     const response = await LAMP.Credential.publicKey()
     const key = await importPublicKey(response)
-    const encrypted = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      key,
-      new TextEncoder().encode(password)
-    )
+    let base64
+    try {
+      const encrypted = await window.crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        key,
+        new TextEncoder().encode(password)
+      )
+      base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+    } catch (error) {
+      console.error(error)
+    }
 
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
     if (userName && password) {
       try {
         const res = await LAMP.Credential.login(userName, base64)
@@ -186,6 +222,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
+    if (isLockedOut) {
+      enqueueSnackbar(`${t("Too many login attempts. Please try again later.")}`, {
+        variant: "error",
+      })
+      return
+    }
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+
+    if (attempts >= MAX_ATTEMPTS) {
+      const lockoutUntil = Date.now() + LOCKOUT_DURATION
+      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+      setIsLockedOut(true)
+      enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, { variant: "error" })
+      return
+    }
+    setLoginClick(true)
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
@@ -199,20 +251,34 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
-    console.log(mode)
 
     if (!mode) {
       await LAMP.Auth.set_identity({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
         serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-      }).catch((e) => {
-        enqueueSnackbar(`${t("Invalid id or password.")}`, {
-          variant: "error",
-        })
-        return
+      }).catch((err) => {
+        const currentAttempts = attempts + 1
+        localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
+        if (currentAttempts >= MAX_ATTEMPTS) {
+          const lockoutUntil = Date.now() + LOCKOUT_DURATION
+          localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+          setIsLockedOut(true)
+          enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, {
+            variant: "error",
+          })
+        } else {
+          enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+            variant: "error",
+          })
+          if (!srcLocked)
+            enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
+              variant: "info",
+            })
+        }
+        setLoginClick(false)
       })
-      console.log("sdfs")
+
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
@@ -445,7 +511,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick ? classes.loginDisabled : ""}
+                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick || isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input

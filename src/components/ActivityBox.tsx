@@ -167,7 +167,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [open, setOpen] = useState(false)
-  const moduleDataFromStore = localStorage.getItem("moduleData")
   const [questionCount, setQuestionCount] = React.useState(0)
   const [message, setMessage] = useState("")
   const [moduleData, setModuleData] = useState<any[]>([])
@@ -180,6 +179,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
   const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
   const [pendingSubModules, setPendingSubModules] = useState(null)
+  let moduleDataFromStore = null
+  if (localStorage.getItem("lastActiveTab") === type) {
+    moduleDataFromStore = localStorage.getItem("moduleData")
+  } else {
+    localStorage.removeItem("moduleData")
+  }
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -190,9 +195,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const fromActivityList = true
         const moduleStartTime = await getModuleStartTime(y.id)
         const initializeOpenedModule = isAuto ? true : false
-        addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
+        addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
       } else {
-        localStorage.setItem("parentModuleOfActivity", y.parentModule)
+        localStorage.setItem("parentString", y?.parentString)
+        localStorage.setItem("lastActiveTab", type)
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -213,15 +219,23 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const fromActivityList = true
         const moduleStartTime = await getModuleStartTime(y.id)
         const initializeOpenedModule = isAuto ? true : false
-        await addActivityData(data, 0, moduleStartTime, null, initializeOpenedModule, fromActivityList)
+        await addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
       }
     })
   }
 
-  const handleSubModule = async (activity, level) => {
+  const handleSubModule = async (activity, level, fromLocalStore = false) => {
     const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime, activity?.parentModule, false)
+      addActivityData(
+        data,
+        level,
+        moduleStartTime,
+        activity?.parentModule,
+        activity?.parentString,
+        false,
+        fromLocalStore
+      )
     })
   }
 
@@ -353,8 +367,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       return itm
     })
   }
-
-  const addActivityData = async (data, level, startTime, parent, initializeOpenedModule, fromActivityList = false) => {
+  const addActivityData = async (
+    data,
+    level,
+    startTime,
+    parent,
+    parentString,
+    initializeOpenedModule,
+    fromLocalStore,
+    fromActivityList = false
+  ) => {
     setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
@@ -376,6 +398,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
         }
+        const parentsString = parentString ? parentString + ">" + data?.id : data?.id
+        fetchedData["parentString"] = parentsString
         fetchedData["parentModule"] = data.id
         const eventCreated =
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
@@ -469,7 +493,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     }
     if (!initializeOpenedModule) {
-      scrollToElement(data.id)
+      if (!fromLocalStore) {
+        scrollToElement(parentString ? parentString + ">" + data.id : data.id)
+      } else {
+        if (parentString ? parentString + ">" + data.id : data.id === localStorage.getItem("parentString")) {
+          scrollToElement(localStorage.getItem("parentString"))
+        }
+      }
       setLoadingModules(false)
     }
   }
@@ -522,9 +552,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       .forEach(async (sub) => {
         if (sub.spec === "lamp.module") {
           const startTime = new Date(sub.startTime).toString()
-          await handleSubModule({ id: sub.id, startTime: startTime, parentModule: sub.parentModule }, sub.level - 1)
+          await handleSubModule(
+            { id: sub.id, startTime: startTime, parentModule: sub.parentModule, parentString: sub.parentString },
+            sub.level - 1,
+            true
+          )
         }
-        // If there are nested subActivities, go deeper
         if (sub.subActivities) {
           processSubModules(sub.subActivities)
         }
@@ -574,7 +607,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         processActivities(data)
         setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
         localStorage.removeItem("moduleData")
-        // scrollToElement(localStorage.getItem("parentModuleOfActivity"))
         setModuleDataLoadedFromStore(true)
         setLoadingModules(false)
       }

@@ -112,12 +112,8 @@ export default function GameCreator({
       let enumActivityIds = []
       let enumActivityNames = []
       Service.getAll("activities").then((activities) => {
-        enumActivityIds = (activities || [])
-          .filter((d) => d.study_id == data.studyID && d.spec !== "lamp.group" && d.spec !== "lamp.module")
-          .map((d) => d.id)
-        enumActivityNames = (activities || [])
-          .filter((d) => d.study_id == data.studyID && d.spec !== "lamp.group" && d.spec !== "lamp.module")
-          .map((d) => d.name)
+        enumActivityIds = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.id)
+        enumActivityNames = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.name)
         localStorage.setItem("enumIds", JSON.stringify(enumActivityIds))
         localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
         setSchemaListObj(SchemaList())

@@ -68,7 +68,6 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
       setFilteredActivities(activities)
     }
   }
-
   return (
     <Draggable draggableId={`${index}`} index={index} {...props}>
       {(provided) => (
