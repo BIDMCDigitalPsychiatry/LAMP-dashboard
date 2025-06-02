@@ -222,19 +222,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
-    if (isLockedOut) {
-      enqueueSnackbar(`${t("Too many login attempts. Please try again later.")}`, {
-        variant: "error",
-      })
-      return
-    }
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
-
     if (attempts >= MAX_ATTEMPTS) {
       const lockoutUntil = Date.now() + LOCKOUT_DURATION
       localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
       setIsLockedOut(true)
-      enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, { variant: "error" })
       return
     }
     setLoginClick(true)
@@ -264,9 +256,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           const lockoutUntil = Date.now() + LOCKOUT_DURATION
           localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
           setIsLockedOut(true)
-          enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, {
-            variant: "error",
-          })
         } else {
           enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
             variant: "error",
@@ -429,6 +418,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       }}
                     />
                   </Box>
+                  {isLockedOut && (
+                    <div style={{ marginBottom: "12px" }}>
+                      <span style={{ color: "red", fontSize: "14px" }}>
+                        {t("Too many login attempts. Try again after 1 hour.")}
+                      </span>
+                    </div>
+                  )}
                   <TextField
                     select
                     label={`${t("Select Language")}`}

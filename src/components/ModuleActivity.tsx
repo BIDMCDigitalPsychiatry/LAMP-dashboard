@@ -124,11 +124,11 @@ const ModuleActivity = ({ ...props }) => {
     let checkIsModule = (tag || []).filter((t) => t.moduleId === id)
     let checkNotModule = (tag || []).filter((t) => t.moduleId !== id)
     if (!checkIsModule.length) {
-      checkNotModule.push({ moduleId: id, participants: [participant?.id] })
+      checkNotModule.push({ moduleId: id, participants: participant?.id ?? participant })
     } else {
       checkIsModule.forEach((item) => {
-        if (!item.participants.includes(participant?.id)) {
-          item.participants.push(participant?.id)
+        if (!item.participants.includes(participant?.id ?? participant)) {
+          item.participants.push(participant?.id ?? participant)
         }
       })
     }
@@ -433,7 +433,7 @@ const ModuleActivity = ({ ...props }) => {
         <Grid item xs>
           <ActivityAccordian
             data={moduleData}
-            type={null}
+            type={props.type}
             tag={null}
             handleClickOpen={handleClickOpen}
             handleSubModule={handleSubModule}
@@ -451,7 +451,7 @@ const ModuleActivity = ({ ...props }) => {
             onClose={() => setOpen(false)}
             type={null}
             showStreak={null}
-            participant={participant}
+            participant={participant?.id ?? participant}
           />
           {!!moduleForNotification && (
             <Dialog

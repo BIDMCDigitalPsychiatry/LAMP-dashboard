@@ -25,6 +25,7 @@ import { LinkRenderer } from "./ActivityPopup"
 import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import LAMP from "lamp-core"
 import { getActivityEvents } from "./ActivityBox"
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -115,6 +116,9 @@ const useStyles = makeStyles((theme: Theme) =>
           paddingLeft: 8,
         },
       },
+      "&::before": {
+        display: "none",
+      },
     },
     greentick: {
       "& svg": {
@@ -133,6 +137,18 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    moduleHeader: {
+      position: "fixed",
+      background: "#fff",
+      width: "100%",
+      zIndex: 1,
+      padding: "15px 60px",
+      left: 0,
+      top: 0,
+    },
+    moduleContainer: {
+      paddingTop: "60px !important",
     },
   })
 )
@@ -340,12 +356,18 @@ const ActivityAccordion = ({
       </Backdrop>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
-          <AccordionSummary id={module.id}>
-            <Typography variant="h6">
+          {type != "activity" ? (
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
+              <Typography variant="h6">
+                {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
+              </Typography>
+            </AccordionSummary>
+          ) : (
+            <Typography variant="h6" className={classes.moduleHeader}>
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
             </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
+          )}
+          <AccordionDetails className={type == "activity" && classes.moduleContainer}>
             {statusLoaded && module.id && activityStatus[module.id] === true && (
               <Box className={classes.moduleStart}>
                 Click here to start the module activity

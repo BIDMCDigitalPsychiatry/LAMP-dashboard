@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Typography,
   Icon,
@@ -24,6 +24,8 @@ import gfm from "remark-gfm"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+import NotificationPage from "./NotificationPage"
+import ResponsiveDialog from "./ResponsiveDialog"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -172,6 +174,7 @@ export default function ActivityPopup({
   participant,
   showStreak,
   updateLocalStorage,
+  onClose,
   ...props
 }: {
   activity: any
@@ -181,9 +184,20 @@ export default function ActivityPopup({
   participant: any
   showStreak: Function
   updateLocalStorage: Function
+  onClose?: Function
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [moduleActivity, setModuleActivity] = useState("")
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!!activity) {
+      const activityFromModule = localStorage.getItem("activityFromModule")
+      console.log(activityFromModule, props)
+      setModuleActivity(activityFromModule)
+    }
+  }, [activity])
 
   return (
     <React.Fragment>
@@ -202,7 +216,7 @@ export default function ActivityPopup({
           <IconButton
             aria-label="close"
             className={classes.closeButton}
-            onClick={(evt) => props.onClose(evt, "backdropClick")}
+            onClick={(evt) => onClose(evt, "backdropClick")}
           >
             <Icon>close</Icon>
           </IconButton>
@@ -280,8 +294,16 @@ export default function ActivityPopup({
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
-              href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
-              onClick={() => updateLocalStorage()}
+              href={
+                moduleActivity
+                  ? "javascript:void(0)"
+                  : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
+              }
+              onClick={(evt) => {
+                setOpen(true)
+                updateLocalStorage()
+                onClose(evt, "escapeKeyDown")
+              }}
               underline="none"
               className={classnames(
                 classes.btngreen,
@@ -300,6 +322,14 @@ export default function ActivityPopup({
           </Box>
         </DialogActions>
       </Dialog>
+      <ResponsiveDialog open={!!open} animate fullScreen onClose={() => setOpen(false)}>
+        <NotificationPage
+          participant={participant?.id ?? participant}
+          activityId={activity?.id}
+          mode={"dashboard"}
+          tab={"activity"}
+        />
+      </ResponsiveDialog>
     </React.Fragment>
   )
 }

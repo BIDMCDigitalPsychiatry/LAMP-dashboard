@@ -220,7 +220,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           ;(async () => {
             if (typeof data?.static_data?.is_favorite !== undefined) {
               let tag =
-                [await LAMP.Type.getAttachment(null, "lamp.dashboard.favorite_activities")].map((y: any) =>
+                [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
                   !!y.error ? undefined : y.data
                 )[0] ?? []
               if (!!data?.static_data?.is_favorite) {
@@ -230,7 +230,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
                 tag = (tag || []).filter((t) => t !== data.activity)
               }
-              LAMP.Type.setAttachment(null, "me", "lamp.dashboard.favorite_activities", tag)
+              LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
               delete data.static_data.is_favorite
             }
           })()
@@ -302,11 +302,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      if (currentActivity.spec == "lamp.survey") {
-        return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      } else {
-        return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      }
+      // if (currentActivity.spec == "lamp.survey") {
+      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      // } else {
+      //   return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      // }
     } else {
       return "about:blank"
     }

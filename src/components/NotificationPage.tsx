@@ -24,6 +24,8 @@ import GroupActivity from "./GroupActivity"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
 import VisualPopup from "./VisualPopup"
+import ModuleActivity from "./ModuleActivity"
+import ResponsiveDialog from "./ResponsiveDialog"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -146,6 +148,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         })
     })()
   }, [activityId])
+  const [moduleActivity, setModuleActivity] = useState("")
+  const [open, setOpen] = useState(false)
 
   const returnResult = () => {
     const activityFromModule = localStorage.getItem("activityFromModule")
@@ -154,8 +158,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       const surveyId = localStorage.getItem("SurveyId")
       window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
       localStorage.removeItem("SurveyId")
-    } else if (!!activityFromModule) window.location.href = `/#/participant/${participant}/module/${activityFromModule}`
-    else if (tab === null || typeof tab === "undefined") window.location.href = `/#/participant/${participant}/assess `
+    } else if (!!activityFromModule) {
+      setModuleActivity(activityFromModule)
+      setOpen(true)
+    } else if (tab === null || typeof tab === "undefined")
+      window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) window.location.href = `/#/participant/${participant}/${tab}`
   }
 
@@ -294,6 +301,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
+      <ResponsiveDialog open={!!open} transient animate fullScreen onClose={() => setOpen(false)}>
+        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
+      </ResponsiveDialog>
     </div>
   )
 }

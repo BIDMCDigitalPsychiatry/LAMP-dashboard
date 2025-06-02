@@ -67,7 +67,7 @@ export default function GameCreator({
   const breatheFileLimit = 10
 
   useEffect(() => {
-    setSchemaListObj(SchemaList())
+    updateActivities()
   }, [])
 
   useEffect(() => {
@@ -108,6 +108,13 @@ export default function GameCreator({
   useEffect(() => {
     const studyID = localStorage.getItem("studyId")
     if (studyID != data.studyID) {
+      updateActivities()
+    }
+    validate()
+  }, [data])
+
+  const updateActivities = () => {
+    if (!!data.studyID) {
       localStorage.setItem("studyId", data.studyID)
       let enumActivityIds = []
       let enumActivityNames = []
@@ -118,9 +125,10 @@ export default function GameCreator({
         localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
         setSchemaListObj(SchemaList())
       })
+    } else {
+      setSchemaListObj(SchemaList())
     }
-    validate()
-  }, [data])
+  }
 
   const validateQuestions = (questions) => {
     let status = 0
