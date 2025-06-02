@@ -125,8 +125,8 @@ function AppRouter({ ...props }) {
   let activeTab = (newTab?: string, participantId?: string) => {
     if (window.location.href.indexOf("participant") >= 0) {
       const activityFromModule = localStorage.getItem("activityFromModule")
+      localStorage.removeItem("activityFromModule")
       if (!!activityFromModule) {
-        localStorage.removeItem("activityFromModule")
         window.location.href = `/#/participant/${participantId}/module/${activityFromModule}`
       } else {
         setState((state) => ({

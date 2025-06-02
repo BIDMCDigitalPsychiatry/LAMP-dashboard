@@ -52,7 +52,7 @@ const ModuleActivity = ({ ...props }) => {
         setLoadingModules(false)
       } else {
         if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
-        localStorage.removeItem("activityFromModule")
+        // localStorage.removeItem("activityFromModule")
       }
     }
   }, [moduleId, participant, moduleDataFromStore])
@@ -60,7 +60,7 @@ const ModuleActivity = ({ ...props }) => {
   useEffect(() => {
     const handleTabClose = (event) => {
       localStorage.setItem("ModuleActivityClosed", "true")
-      localStorage.removeItem("activityFromModule")
+      // localStorage.removeItem("activityFromModule")
     }
 
     window.addEventListener("beforeunload", handleTabClose)

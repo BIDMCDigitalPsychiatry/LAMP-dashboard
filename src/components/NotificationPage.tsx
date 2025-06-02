@@ -159,11 +159,16 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
       localStorage.removeItem("SurveyId")
     } else if (!!activityFromModule) {
+      console.log("module", activityFromModule, tab)
+
       setModuleActivity(activityFromModule)
       setOpen(true)
     } else if (tab === null || typeof tab === "undefined")
       window.location.href = `/#/participant/${participant}/assess `
-    else if (!!tab) window.location.href = `/#/participant/${participant}/${tab}`
+    else if (!!tab) {
+      console.log(tab, activityFromModule)
+      window.location.href = `/#/participant/${participant}/${tab}`
+    }
   }
 
   const showStreak = (participant, activity) => {
