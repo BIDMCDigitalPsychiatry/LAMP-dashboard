@@ -257,12 +257,28 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
         serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-      }).catch((e) => {
-        enqueueSnackbar(`${t("Invalid id or password.")}`, {
-          variant: "error",
-        })
-        return
+      }).catch((err) => {
+        const currentAttempts = attempts + 1
+        localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
+        if (currentAttempts >= MAX_ATTEMPTS) {
+          const lockoutUntil = Date.now() + LOCKOUT_DURATION
+          localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+          setIsLockedOut(true)
+          enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, {
+            variant: "error",
+          })
+        } else {
+          enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+            variant: "error",
+          })
+          if (!srcLocked)
+            enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
+              variant: "info",
+            })
+        }
+        setLoginClick(false)
       })
+
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
@@ -272,27 +288,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-    }).catch((err) => {
-      const currentAttempts = attempts + 1
-      localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
-      if (currentAttempts >= MAX_ATTEMPTS) {
-        const lockoutUntil = Date.now() + LOCKOUT_DURATION
-        localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
-        setIsLockedOut(true)
-        enqueueSnackbar(`${t("Too many login attempts. Login is disabled for 1 hour.")}`, {
-          variant: "error",
-        })
-      } else {
-        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
-          variant: "error",
-        })
-        if (!srcLocked)
-          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
-            variant: "info",
-          })
-      }
-
-      setLoginClick(false)
     })
 
     if (res.authType === "participant") {
