@@ -402,12 +402,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onClick={() => {
               setShowPopUp(false)
               localStorage.setItem("SurveyId", currentActivity?.id)
-              if (secondaryActivity.spec === "lamp.module") {
-                setOpen(true)
-              } else {
-                const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
-                window.location.href = url
-              }
+              setOpen(true)
               if (surveyResponse) {
                 handleSaveData(surveyResponse)
               }
