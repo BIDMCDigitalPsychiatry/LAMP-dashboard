@@ -95,7 +95,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       LAMP.Activity.view(responseActivity)
         .then((data: any) => {
           if (!!data) {
-            console.log(data)
             setSecondaryActivity(data)
             setShowPopUp(true)
           }
@@ -123,7 +122,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       let warnings = []
       if (e.data !== null) {
         try {
-          console.log("sdsdf")
           const data = JSON.parse(e.data)
           const isSurvey = currentActivity?.spec === "lamp.survey"
           const branchingSettings = currentActivity?.branchingSettings
