@@ -20,6 +20,7 @@ import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ModuleActivity from "./ModuleActivity"
+import NotificationPage from "./NotificationPage"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -112,6 +113,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [currentActivity])
 
+  useEffect(() => {
+    console.log(surveyResponse)
+  }, [surveyResponse])
+
   const handleSubmit = (e) => {
     if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
       localStorage.setItem("lastUrl", window.location.href)
@@ -131,6 +136,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             const hasActivityId = !!branchingSettings.activityId
             if (meetsScoreThreshold && hasActivityId) {
               setResponseActivity(branchingSettings.activityId)
+              console.log(e)
+              localStorage.setItem("response", JSON.stringify(e.data))
               setSurveyResponse(e)
               skipSaveActivity = true
             }
@@ -162,12 +169,16 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   const handleSaveData = (e) => {
+    console.log(e)
+    // setResponseActivity(null)
+    // setSecondaryActivity(null)
     if (currentActivity !== null && !saved) {
       if (e.data === null) {
         setSaved(true)
         onComplete(null)
         setLoading(false)
       } else if (!saved && currentActivity?.id !== null && currentActivity?.id !== "") {
+        console.log("sdsdf")
         let data = JSON.parse(e.data)
         if (!!data["timestamp"]) {
           setLoading(true)
@@ -180,9 +191,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
             Service.addUserDBRow("activityEvents", data)
           }
+          console.log("sdsdf122")
+
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {
+          console.log("sdsdf865")
+
           setSaved(true)
           onComplete(null)
           setLoading(false)
@@ -297,7 +312,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setLoading(false)
     }
   }
-
   const loadFallBack = async () => {
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
@@ -319,6 +333,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    console.log(open)
+  }, [open])
   return (
     <div
       style={{
@@ -379,17 +396,29 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       </Dialog>
       <ResponsiveDialog
         open={!!open}
-        transient
+        transient={secondaryActivity?.spec === "lamp.module"}
         animate
         fullScreen
         onClose={() => {
           setOpen(false)
-          if (surveyResponse) {
-            handleSaveData(surveyResponse)
+          const response =
+            typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
+          console.log(response)
+          if (response) {
+            handleSaveData({ data: response })
           }
         }}
       >
-        <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+        {secondaryActivity?.spec === "lamp.module" ? (
+          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+        ) : (
+          <NotificationPage
+            participant={participant?.id ?? participant}
+            activityId={responseActivity}
+            mode={"dashboard"}
+            tab={"activity"}
+          />
+        )}
       </ResponsiveDialog>
       <Dialog
         open={!!showPopup}

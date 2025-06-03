@@ -122,53 +122,62 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [staticData, setStaticData] = useState(0)
 
   useEffect(() => {
+    console.log(activityId)
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      LAMP.Activity.view(activityId)
-        .then((data: any) => {
-          if (!!data) {
-            Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
-              setTag(tags[0])
-              const tag = tags[0]
-              data =
-                data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
-              setActivity(data)
+      if (!!activityId) {
+        LAMP.Activity.view(activityId)
+          .then((data: any) => {
+            if (!!data) {
+              Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
+                setTag(tags[0])
+                const tag = tags[0]
+                data =
+                  data.spec === "lamp.survey"
+                    ? spliceActivity({ raw: data, tag })
+                    : spliceCTActivity({ raw: data, tag })
+                setActivity(data)
+                setLoading(false)
+              })
+            } else {
+              setOpenNotFound(true)
               setLoading(false)
-            })
-          } else {
+            }
+          })
+          .catch((e) => {
+            console.log(e)
             setOpenNotFound(true)
             setLoading(false)
-          }
-        })
-        .catch((e) => {
-          console.log(e)
-          setOpenNotFound(true)
-          setLoading(false)
-        })
+          })
+      }
     })()
   }, [activityId])
+
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 
+  useEffect(() => {
+    console.log(open)
+  }, [open])
   const returnResult = () => {
     const activityFromModule = localStorage.getItem("activityFromModule")
+    console.log(tab, activityFromModule)
+
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
       const surveyId = localStorage.getItem("SurveyId")
       window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
       localStorage.removeItem("SurveyId")
-    } else if (!!activityFromModule) {
-      console.log("module", activityFromModule, tab)
-
+    } else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
-    } else if (tab === null || typeof tab === "undefined")
-      window.location.href = `/#/participant/${participant}/assess `
-    else if (!!tab) {
-      console.log(tab, activityFromModule)
-      window.location.href = `/#/participant/${participant}/${tab}`
     }
+    // else if (tab === null || typeof tab === "undefined")
+    //   window.location.href = `/#/participant/${participant}/assess `
+    // else if (!!tab) {
+    //   window.location.href = `/#/participant/${participant}/${tab}`
+    // }
   }
 
   const showStreak = (participant, activity) => {
@@ -306,7 +315,13 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
-      <ResponsiveDialog open={!!open} transient animate fullScreen onClose={() => setOpen(false)}>
+      <ResponsiveDialog
+        open={!!open}
+        transient={activity?.spec === "lamp.module"}
+        animate
+        fullScreen
+        onClose={() => setOpen(false)}
+      >
         <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
       </ResponsiveDialog>
     </div>
