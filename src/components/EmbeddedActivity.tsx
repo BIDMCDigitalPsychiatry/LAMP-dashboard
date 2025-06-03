@@ -95,6 +95,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       LAMP.Activity.view(responseActivity)
         .then((data: any) => {
           if (!!data) {
+            console.log(data)
             setSecondaryActivity(data)
             setShowPopUp(true)
           }
@@ -122,6 +123,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       let warnings = []
       if (e.data !== null) {
         try {
+          console.log("sdsdf")
           const data = JSON.parse(e.data)
           const isSurvey = currentActivity?.spec === "lamp.survey"
           const branchingSettings = currentActivity?.branchingSettings
@@ -377,7 +379,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           </Button>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog open={!!open} transient animate fullScreen onClose={() => setOpen(false)}>
+      <ResponsiveDialog
+        open={!!open}
+        transient
+        animate
+        fullScreen
+        onClose={() => {
+          setOpen(false)
+          if (surveyResponse) {
+            handleSaveData(surveyResponse)
+          }
+        }}
+      >
         <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
       </ResponsiveDialog>
       <Dialog
@@ -403,9 +416,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               setShowPopUp(false)
               localStorage.setItem("SurveyId", currentActivity?.id)
               setOpen(true)
-              if (surveyResponse) {
-                handleSaveData(surveyResponse)
-              }
+              // if (surveyResponse) {
+              //   handleSaveData(surveyResponse)
+              // }
             }}
             color="primary"
             autoFocus
