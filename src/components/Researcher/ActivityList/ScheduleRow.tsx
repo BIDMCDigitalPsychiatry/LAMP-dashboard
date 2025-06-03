@@ -391,6 +391,16 @@ export default function ScheduleRow({
               <Icon>done</Icon>
             </IconButton>
           )}
+          <IconButton
+            onClick={() => {
+              if (validate()) {
+                updateActivitySchedule(data, index, "edit")
+                setEdit(false)
+              }
+            }}
+          >
+            <Icon>notifications</Icon>
+          </IconButton>
           {!isEdit ? (
             <IconButton onClick={() => updateActivitySchedule(null, index, "delete")}>
               <Icon>delete</Icon>
