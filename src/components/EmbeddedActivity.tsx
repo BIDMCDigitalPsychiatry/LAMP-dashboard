@@ -97,6 +97,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         .then((data: any) => {
           if (!!data) {
             setSecondaryActivity(data)
+            localStorage.setItem("secondary_activity", JSON.stringify(data))
             setShowPopUp(true)
           }
         })
@@ -112,10 +113,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
-
-  useEffect(() => {
-    console.log(surveyResponse)
-  }, [surveyResponse])
 
   const handleSubmit = (e) => {
     if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
@@ -136,7 +133,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             const hasActivityId = !!branchingSettings.activityId
             if (meetsScoreThreshold && hasActivityId) {
               setResponseActivity(branchingSettings.activityId)
-              console.log(e)
               localStorage.setItem("response", JSON.stringify(e.data))
               setSurveyResponse(e)
               skipSaveActivity = true
@@ -169,16 +165,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   const handleSaveData = (e) => {
-    console.log(e)
-    // setResponseActivity(null)
-    // setSecondaryActivity(null)
     if (currentActivity !== null && !saved) {
       if (e.data === null) {
         setSaved(true)
         onComplete(null)
         setLoading(false)
       } else if (!saved && currentActivity?.id !== null && currentActivity?.id !== "") {
-        console.log("sdsdf")
         let data = JSON.parse(e.data)
         if (!!data["timestamp"]) {
           setLoading(true)
@@ -191,13 +183,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
             Service.addUserDBRow("activityEvents", data)
           }
-          console.log("sdsdf122")
-
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {
-          console.log("sdsdf865")
-
           setSaved(true)
           onComplete(null)
           setLoading(false)
@@ -256,6 +244,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               })
             })
             .then((x) => {
+              setSecondaryActivity(null)
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
               setSaved(true)
               onComplete(data)
@@ -333,9 +322,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    console.log(open)
-  }, [open])
   return (
     <div
       style={{
@@ -403,7 +389,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           setOpen(false)
           const response =
             typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
-          console.log(response)
           if (response) {
             handleSaveData({ data: response })
           }
@@ -442,10 +427,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onClick={() => {
               setShowPopUp(false)
               localStorage.setItem("SurveyId", currentActivity?.id)
-              setOpen(true)
-              // if (surveyResponse) {
-              //   handleSaveData(surveyResponse)
-              // }
+              if (secondaryActivity.spec === "lamp.module") {
+                setOpen(true)
+              } else {
+                const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
+                window.location.href = url
+              }
             }}
             color="primary"
             autoFocus
@@ -455,6 +442,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           <Button
             onClick={() => {
               setShowPopUp(false)
+              setSecondaryActivity(null)
               setResponseActivity(null)
               if (surveyResponse) {
                 handleSaveData(surveyResponse)
