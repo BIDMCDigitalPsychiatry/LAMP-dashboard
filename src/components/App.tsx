@@ -100,7 +100,7 @@ function AppRouter({ ...props }) {
   localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
 
   useEffect(() => {
-    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
     const hasRoleFlag = localStorage.getItem("isParticipant")
 
     if (userToken && !hasRoleFlag) {
@@ -319,7 +319,7 @@ function AppRouter({ ...props }) {
   }, [state])
 
   const logout = async () => {
-    const token = localStorage.getItem("tokenInfo")
+    const token = sessionStorage.getItem("tokenInfo")
     try {
       await LAMP.Credential.logout(token)
     } catch (err) {
@@ -346,7 +346,7 @@ function AppRouter({ ...props }) {
             device_type: "Dashboard",
             user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
           },
-        } as any).then((res) => localStorage.removeItem("tokenInfo")))
+        } as any).then((res) => sessionStorage.removeItem("tokenInfo")))
     }
 
     await LAMP.Auth.set_identity(identity).catch((e) => {
@@ -377,7 +377,7 @@ function AppRouter({ ...props }) {
           : state?.auth?.serverAddress,
       }))
       localStorage.setItem("verified", JSON.stringify({ value: false }))
-      localStorage.removeItem("tokenInfo")
+      sessionStorage.removeItem("tokenInfo")
       localStorage.removeItem("isParticipant")
       localStorage.removeItem("isLoginPage")
       window.location.href = "/#/"
@@ -1125,20 +1125,20 @@ export default function App({ ...props }) {
     return () => clearInterval(interval)
   }, [confirmSession])
 
-  useEffect(() => {
-    if (confirmSession) {
-      const timeout = setTimeout(() => {
-        setConfirmSession(false)
-        goBackToHome()
-      }, 60 * 1000)
+  // useEffect(() => {
+  //   if (confirmSession) {
+  //     const timeout = setTimeout(() => {
+  //       setConfirmSession(false)
+  //       goBackToHome()
+  //     }, 60 * 1000)
 
-      return () => clearTimeout(timeout)
-    }
-  }, [confirmSession])
+  //     return () => clearTimeout(timeout)
+  //   }
+  // }, [confirmSession])
 
   const goBackToHome = () => {
     setConfirmSession(false)
-    localStorage.removeItem("tokenInfo")
+    sessionStorage.removeItem("tokenInfo")
     localStorage.removeItem("expiry")
     window.location.href = "/#/"
   }

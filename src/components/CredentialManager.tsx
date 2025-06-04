@@ -82,6 +82,13 @@ export function CredentialEditor({
   const [confirmPassword, setConfirmPassword] = useState("")
   const [accepted, setAccepted] = useState(true)
   const [showLink, setShowLink] = useState(false)
+  const [formErrors, setFormErrors] = useState({
+    nameError: "",
+    emailError: "",
+    passwordError: "",
+  })
+  const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))$/
+  const PASSWORD_REGEX = /^(?=.*\d)(?=.*[!@#$%^-_&*?])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -135,6 +142,73 @@ export function CredentialEditor({
       setAccepted(valid)
     })()
   }, [password])
+  // validating email input field
+  const validateEmailField = (value) => {
+    if (EMAIL_REGEX.test(value)) {
+      setFormErrors((prev) => ({
+        ...prev,
+        emailError: "",
+      }))
+    } else {
+      setFormErrors((prev) => ({
+        ...prev,
+        emailError: "Enter a valid Email Address.",
+      }))
+    }
+  }
+  // validating password input field with criteria
+  const validatePasswordField = (value) => {
+    if (PASSWORD_REGEX.test(value)) {
+      setFormErrors((prev) => ({
+        ...prev,
+        passwordError: "",
+      }))
+    } else {
+      setFormErrors((prev) => ({
+        ...prev,
+        passwordError:
+          "Enter a valid Password containing a minimum of 8 characters with at least one uppercase letter, one lowercase letter, one number and one special character.",
+      }))
+    }
+  }
+  // validating name input field
+  const validateNameField = (value) => {
+    if (value.length > 50) {
+      setFormErrors((prev) => ({
+        ...prev,
+        nameError: "Maximum 50 characters allowed.",
+      }))
+    } else {
+      setFormErrors((prev) => ({
+        ...prev,
+        nameError: "",
+      }))
+    }
+  }
+  // show or hide save credentials tick only when all form fields have valid data
+  const showSaveTick = () => {
+    if (mode === "reset-password" && password === confirmPassword) {
+      return false
+    }
+    if (
+      password === confirmPassword &&
+      name?.length > 0 &&
+      role?.length > 0 &&
+      emailAddress?.length > 0 &&
+      password?.length > 0 &&
+      confirmPassword?.length > 0
+    ) {
+      if (
+        formErrors.nameError.length === 0 &&
+        formErrors.emailError.length === 0 &&
+        formErrors.passwordError.length === 0
+      ) {
+        return false
+      }
+    } else {
+      return true
+    }
+  }
 
   return (
     <Grid container justifyContent="center" alignItems="center">
@@ -169,13 +243,17 @@ export function CredentialEditor({
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
+          error={formErrors.nameError.length > 0}
           fullWidth
           label={`${t("Name")}`}
           type="text"
           variant="outlined"
-          // helperText={`${t("Enter the family member or clinician's name here.")}`}
+          helperText={formErrors.nameError}
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            validateNameField(event.target.value)
+            setName(event.target.value)
+          }}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -245,13 +323,17 @@ export function CredentialEditor({
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
+          error={formErrors.emailError.length > 0}
           fullWidth
           label={`${t("Email Address")}`}
           type="email"
           variant="outlined"
-          helperText={`${t("Enter the email address here.")}`}
+          helperText={formErrors.emailError}
           value={emailAddress}
-          onChange={(event) => setEmailAddress(event.target.value)}
+          onChange={(event) => {
+            setEmailAddress(event.target.value)
+            validateEmailField(event.target.value)
+          }}
           style={{ marginBottom: 16 }}
         />
       )}
@@ -262,14 +344,17 @@ export function CredentialEditor({
             label={`${t("Password")}`}
             type="password"
             variant="outlined"
-            error={!accepted ? true : false}
+            error={!accepted || formErrors.passwordError.length > 0 ? true : false}
             helperText={
-              !accepted
-                ? `${t("Password is not complex enough and does not comply with organization password requirement.")}`
-                : `${t("On the right of the box, press the check mark in the circle to save changes.")}`
+              !showSaveTick()
+                ? "On the right of the box, press the check mark in the circle to save changes."
+                : formErrors.passwordError
             }
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              validatePasswordField(event.target.value)
+            }}
             style={{ marginBottom: 16 }}
             InputProps={{
               endAdornment: [
@@ -297,7 +382,7 @@ export function CredentialEditor({
                       <IconButton
                         edge="end"
                         aria-label="submit credential"
-                        disabled={confirmPassword !== password || !accepted}
+                        disabled={showSaveTick()}
                         onClick={() =>
                           onChange({
                             credential,

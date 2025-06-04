@@ -211,7 +211,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
 
   useEffect(() => {
     getAllStudies()
-  }, [researcher, localStorage.getItem("tokenInfo")])
+  }, [researcher, sessionStorage.getItem("tokenInfo")])
 
   useEffect(() => {
     if (!!newStudy) getAllStudies()

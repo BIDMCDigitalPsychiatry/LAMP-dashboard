@@ -28,7 +28,7 @@ export default function SignIn({ onSubmit, ...props }) {
   const [isLoading, setLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const { t } = useTranslation()
-  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)

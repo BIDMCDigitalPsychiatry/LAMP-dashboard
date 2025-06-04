@@ -209,7 +209,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     if (userName && password) {
       try {
         const res = await LAMP.Credential.login(userName, base64)
-        localStorage.setItem(
+        sessionStorage.setItem(
           userTokenKey,
           JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
         )

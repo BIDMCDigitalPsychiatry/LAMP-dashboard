@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
 
 const fetchCoordinators = async (participant) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${participant}/cordinators`, {
       method: "GET",

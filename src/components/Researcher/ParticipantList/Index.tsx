@@ -188,8 +188,8 @@ export default function ParticipantList({
 
   useEffect(() => {
     const userToken: any =
-      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
-        ? JSON.parse(localStorage.getItem("tokenInfo"))
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
         : null
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
@@ -201,7 +201,7 @@ export default function ParticipantList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, localStorage.getItem("tokenInfo")])
+  }, [selected, sessionStorage.getItem("tokenInfo")])
 
   const handleChange = (participant, checked) => {
     if (checked) {

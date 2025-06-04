@@ -54,7 +54,7 @@ export function ajaxRequest(parameters) {
 //jsonata fetch
 export const jsonataFetch = async (query, access_key, secret_key, server) => {
   try {
-    const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+    const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
     let res = await fetch(`https://${server}`, {
       method: "POST",
       headers: {

@@ -208,15 +208,15 @@ export default function Researchers({ history, updateStore, adminType, ...props 
 
   useEffect(() => {
     const userToken: any =
-      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
-        ? JSON.parse(localStorage.getItem("tokenInfo"))
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
         : null
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       refreshResearchers()
     } else {
       window.location.href = "/#/"
     }
-  }, [search, localStorage.getItem("tokenInfo")])
+  }, [search, sessionStorage.getItem("tokenInfo")])
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id

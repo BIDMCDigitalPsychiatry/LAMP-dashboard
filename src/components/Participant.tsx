@@ -228,15 +228,15 @@ export default function Participant({
   }
   useEffect(() => {
     const userToken: any =
-      typeof localStorage.getItem("tokenInfo") !== "undefined" && !!localStorage.getItem("tokenInfo")
-        ? JSON.parse(localStorage.getItem("tokenInfo"))
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
         : null
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       loadData()
     } else {
       window.location.href = "/#/"
     }
-  }, [localStorage.getItem("tokenInfo")])
+  }, [sessionStorage.getItem("tokenInfo")])
 
   useEffect(() => {
     loadData()

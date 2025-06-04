@@ -91,6 +91,8 @@ export default function AddUpdateResearcher({
   const [open, setOpen] = useState(false)
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
   const [rData, setRdara] = useState(researcher)
+  const [nameError, setNameError] = useState("")
+  const [isError, setIsError] = useState(false)
 
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
@@ -134,6 +136,22 @@ export default function AddUpdateResearcher({
         })
     }
   }
+  // validating the input field
+  const validateField = (value) => {
+    if (value.includes("</script>")) {
+      setNameError("</script> tags not allowed in input. Please remove")
+      setIsError(true)
+    } else if (value.includes("<script>")) {
+      setIsError(true)
+      setNameError("<script> tags not allowed in input. Please remove")
+    } else if (value.length > 50) {
+      setIsError(true)
+      setNameError("Maximum 50 characters allowed.")
+    } else {
+      setNameError("")
+      setIsError(false)
+    }
+  }
 
   return (
     <Box display="flex" alignItems="start">
@@ -146,19 +164,30 @@ export default function AddUpdateResearcher({
           <Icon>add</Icon> {`${t("Add")}`}
         </Fab>
       )}
-      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
+      <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false)
+          setIsError(false)
+          setNameError("")
+          setResearcherName("")
+        }}
+        aria-labelledby="form-dialog-title"
+      >
         <DialogContent>
           <TextField
+            error={isError}
             autoFocus
             margin="dense"
             id="name"
             label={`${t("Name")}`}
             fullWidth
-            onChange={(event) => setResearcherName(event.target.value)}
+            onChange={(event) => {
+              setResearcherName(event.target.value)
+              validateField(event.target.value)
+            }}
             value={name}
-            helperText={
-              typeof name == "undefined" || name === null || name.trim() === "" ? `${t("Please enter name.")}` : ""
-            }
+            helperText={nameError}
           />
         </DialogContent>
         <DialogActions>
@@ -174,7 +203,7 @@ export default function AddUpdateResearcher({
           <Button
             onClick={() => addResearcher()}
             color="primary"
-            disabled={typeof name == "undefined" || name === null || name.trim() === "" ? true : false}
+            disabled={typeof name == "undefined" || name === null || name.trim() === "" || isError ? true : false}
           >
             {!!researcher ? `${t("Update")}` : `${t("Add")}`}
           </Button>

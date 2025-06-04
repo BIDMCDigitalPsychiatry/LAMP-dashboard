@@ -125,7 +125,7 @@ export default function QueryBuilder(props) {
   const [tagsLoading, setTagLoadingStatus] = React.useState(false)
   const [tagObject, setTagObject] = React.useState({})
   const [checkedCategories, setCheckedCategories] = React.useState([])
-  const userToken: any = JSON.parse(localStorage.getItem("tokenInfo"))
+  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   //when the list of available tags change,
   //we update a tag variable to display info
   React.useEffect(() => {
