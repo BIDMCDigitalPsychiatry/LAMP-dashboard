@@ -300,9 +300,11 @@ export default function ActivityPopup({
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
-                setOpen(true)
                 updateLocalStorage()
-                onClose(evt, "escapeKeyDown")
+                setTimeout(() => {
+                  setOpen(true)
+                  onClose(evt, "escapeKeyDown")
+                }, 100)
               }}
               underline="none"
               className={classnames(
