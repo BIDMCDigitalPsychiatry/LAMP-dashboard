@@ -322,6 +322,16 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }
 
+  // const loadFallBack = async () => {
+  //   if (!!demoActivities[currentActivity.spec]) {
+  //     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+  //     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+  //     return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+  //   } else {
+  //     return "about:blank"
+  //   }
+  // }
+
   const getUniqueWarningTexts = (warnings: any[]): any[] => {
     const warningTexts = warnings?.map((warning) => warning.warningText)
     const warningTextSet = new Set(warningTexts)

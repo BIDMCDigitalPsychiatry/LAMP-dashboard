@@ -14,6 +14,8 @@ import {
   createStyles,
   DialogProps,
   Link,
+  Fab,
+  Tooltip,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -26,6 +28,7 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -155,6 +158,27 @@ const useStyles = makeStyles((theme: Theme) =>
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    headerTitleIcon: {
+      background: "none",
+      boxShadow: "none",
+      width: 36,
+      height: 36,
+      color: "#666",
+      marginLeft: 8,
+      "& .material-icons": {
+        fontSize: "2rem",
+      },
+      "&:hover": {
+        background: "#fff",
+      },
+      "&.active": {
+        color: "#e3b303",
+      },
+    },
+    dFlex: {
+      display: "Flex",
+      alignItems: "center",
+    },
   })
 )
 
@@ -190,7 +214,7 @@ export default function ActivityPopup({
   const { t } = useTranslation()
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
-
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   useEffect(() => {
     if (!!activity) {
       const activityFromModule = localStorage.getItem("activityFromModule")
@@ -198,6 +222,35 @@ export default function ActivityPopup({
       setModuleActivity(activityFromModule)
     }
   }, [activity])
+
+  useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteIds(tag)
+    })()
+  }, [])
+
+  const handleFavoriteClick = async (activityId) => {
+    try {
+      const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
+      let tag: string[] = !!result.error ? [] : result.data ?? []
+      const isCurrentlyFavorite = tag.includes(activityId)
+      let updatedTag
+      if (isCurrentlyFavorite) {
+        updatedTag = tag.filter((id) => id !== activityId)
+      } else {
+        updatedTag = [...tag, activityId]
+      }
+      console.log("updatedTag", updatedTag)
+      await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
+      setFavoriteIds(updatedTag)
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error)
+    }
+  }
 
   return (
     <React.Fragment>
@@ -251,13 +304,29 @@ export default function ActivityPopup({
             <Typography variant="body2" align="left">
               {`${t(type)}`}
             </Typography>
-            <Typography variant="h2">
+            <Typography variant="h2" className={classes.dFlex}>
               <ReactMarkdown
                 children={t(activity?.name ?? null)}
                 skipHtml={false}
                 remarkPlugins={[gfm, emoji]}
                 components={{ link: LinkRenderer }}
               />
+              {activity?.spec === "lamp.group" && (
+                <Tooltip
+                  title={
+                    favoriteIds.includes(activity.id)
+                      ? "Tap to remove from Favorite Activities"
+                      : "Tap to add to Favorite Activities"
+                  }
+                >
+                  <Fab
+                    className={`${classes.headerTitleIcon} ${favoriteIds.includes(activity.id) ? "active" : ""}`}
+                    onClick={() => handleFavoriteClick(activity.id)}
+                  >
+                    <Icon>star_rounded</Icon>
+                  </Fab>
+                </Tooltip>
+              )}{" "}
             </Typography>
           </div>
         </DialogTitle>

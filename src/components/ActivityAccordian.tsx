@@ -12,6 +12,9 @@ import {
   Button,
   Backdrop,
   CircularProgress,
+  Fab,
+  Tooltip,
+  Icon,
 } from "@material-ui/core"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -113,7 +116,6 @@ const useStyles = makeStyles((theme: Theme) =>
         "& span": {
           fontSize: 18,
           fontWeight: "normal",
-          paddingLeft: 8,
         },
       },
       "&::before": {
@@ -149,6 +151,23 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     moduleContainer: {
       paddingTop: "60px !important",
+    },
+    headerTitleIcon: {
+      background: "none",
+      boxShadow: "none",
+      width: 36,
+      height: 36,
+      color: "#666",
+      marginLeft: 8,
+      "& .material-icons": {
+        fontSize: "2rem",
+      },
+      "&:hover": {
+        background: "#fff",
+      },
+      "&.active": {
+        color: "#e3b303",
+      },
     },
   })
 )
@@ -264,7 +283,10 @@ const ActivityAccordion = ({
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
   const [statusLoaded, setStatusLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
-
+  const [isFavoriteActive, setIsFavoriteActive] = useState(false)
+  const [selectedActivityId, setSelectedActivityId] = useState()
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [expanded, setExpanded] = useState(false)
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
@@ -349,6 +371,33 @@ const ActivityAccordion = ({
     }
   }, [data])
 
+  useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteIds(tag)
+    })()
+  }, [])
+
+  const handleFavoriteClick = async (activityId: string) => {
+    try {
+      const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
+      let tag: string[] = !!result.error ? [] : result.data ?? []
+      const isCurrentlyFavorite = tag.includes(activityId)
+      let updatedTag
+      if (isCurrentlyFavorite) {
+        updatedTag = tag.filter((id) => id !== activityId)
+      } else {
+        updatedTag = [...tag, activityId]
+      }
+      await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
+      setFavoriteIds(updatedTag)
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error)
+    }
+  }
   return (
     <div>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -359,12 +408,46 @@ const ActivityAccordion = ({
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
               <Typography variant="h6">
-                {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
+                {module.name}
+                {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
+                {module.name !== "Other activities" && (
+                  <Tooltip
+                    title={
+                      favoriteIds.includes(module.id)
+                        ? "Tap to remove from Favorite Activities"
+                        : "Tap to add to Favorite Activities"
+                    }
+                  >
+                    <Fab
+                      className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFavoriteClick(module.id)
+                      }}
+                    >
+                      <Icon>star_rounded</Icon>
+                    </Fab>
+                  </Tooltip>
+                )}{" "}
               </Typography>
             </AccordionSummary>
           ) : (
             <Typography variant="h6" className={classes.moduleHeader}>
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
+              <Tooltip
+                title={
+                  favoriteIds.includes(module.id)
+                    ? "Tap to remove from Favorite Activities"
+                    : "Tap to add to Favorite Activities"
+                }
+              >
+                <Fab
+                  className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
+                  onClick={() => handleFavoriteClick(module.id)}
+                >
+                  <Icon>star_rounded</Icon>
+                </Fab>
+              </Tooltip>{" "}
             </Typography>
           )}
           <AccordionDetails className={type == "activity" && classes.moduleContainer}>
