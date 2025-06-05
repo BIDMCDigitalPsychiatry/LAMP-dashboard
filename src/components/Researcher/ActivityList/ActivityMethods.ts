@@ -1217,6 +1217,7 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Text"),
                 minLength: 1,
+                maxLength: 500,
                 default: "",
               },
               required: {
@@ -1228,6 +1229,7 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Description"),
                 default: "",
+                maxLength: 500,
               },
               type: {
                 type: "string",

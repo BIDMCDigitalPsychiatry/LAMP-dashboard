@@ -282,6 +282,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         noBack: noBack,
         is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
       })
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+        is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
+      })
 
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {
