@@ -82,7 +82,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     localStorage.removeItem("lastUrl")
-    localStorage.removeItem("lastActiveTab")
     setCurrentActivity(activity)
     setSaved(true)
     setEmbeddedActivity("")
