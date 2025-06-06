@@ -247,6 +247,7 @@ const ModuleActivity = ({ ...props }) => {
     } finally {
       setTimeout(() => {
         localStorage.removeItem("moduleDataForSurvey")
+        localStorage.removeItem("parentStringForSurvey")
       }, 200)
       const subModules = data
         .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)

@@ -610,6 +610,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         processActivities(data)
         setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
         localStorage.removeItem("moduleData")
+        localStorage.removeItem("parentString")
         setModuleDataLoadedFromStore(true)
         setLoadingModules(false)
       }
