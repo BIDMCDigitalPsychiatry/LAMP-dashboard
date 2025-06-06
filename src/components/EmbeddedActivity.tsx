@@ -404,6 +404,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         fullScreen
         onClose={() => {
           setOpen(false)
+          localStorage.removeItem("activityFromModule")
           const response =
             typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
           if (response) {

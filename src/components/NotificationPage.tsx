@@ -321,7 +321,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         transient={module != "" ? true : false}
         animate
         fullScreen
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false)
+          localStorage.removeItem("activityFromModule")
+        }}
       >
         <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
       </ResponsiveDialog>

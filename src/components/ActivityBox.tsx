@@ -566,6 +566,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [favorites, setFavorites] = useState([])
 
   useEffect(() => {
+    localStorage.removeItem("enabledActivities")
+    localStorage.removeItem("SurveyId")
+    localStorage.removeItem("lastAnsweredIndex")
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
