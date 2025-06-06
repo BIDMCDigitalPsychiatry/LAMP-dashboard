@@ -160,10 +160,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   useEffect(() => {
     console.log(tab)
   }, [tab])
+  const [module, setModule] = useState("")
   const returnResult = () => {
     const activityFromModule = localStorage.getItem("activityFromModule")
     console.log(tab, activityFromModule, mode)
-
+    setModule(activityFromModule)
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
       const surveyId = localStorage.getItem("SurveyId")
@@ -317,7 +318,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       />
       <ResponsiveDialog
         open={!!open}
-        transient={activity?.spec === "lamp.module"}
+        transient={module != "" ? true : false}
         animate
         fullScreen
         onClose={() => setOpen(false)}
