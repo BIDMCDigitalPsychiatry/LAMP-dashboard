@@ -524,30 +524,6 @@ export default function NavigationLayout({
                           : undefined,
                     }}
                   >
-                    {activeTab === "Module Activity" && (
-                      <Fab
-                        onClick={() => {
-                          localStorage.removeItem("activityFromModule")
-                          setTimeout(() => {
-                            const lastUrl = localStorage.getItem("lastUrl")
-                            if (!!lastUrl) {
-                              window.location.href = lastUrl
-                            } else {
-                              const tab = localStorage.getItem("lastActiveTab").toLowerCase()
-                              if (tab === null || typeof tab === "undefined")
-                                window.location.href = `/#/participant/${id}/assess `
-                              else if (!!tab) window.location.href = `/#/participant/${id}/${tab}`
-                            }
-                          }, 100)
-                        }}
-                        color="default"
-                        className={classes.backMain}
-                      >
-                        <IconButton className={classes.backbtn} color="default" aria-label="Menu">
-                          <Icon>arrow_back</Icon>
-                        </IconButton>
-                      </Fab>
-                    )}
                     {typeof activeTab === "string" ? t(activeTab?.charAt(0).toUpperCase() + activeTab?.slice(1)) : ""}
                   </Typography>
                 </Container>

@@ -26,7 +26,6 @@ import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
-import ModuleActivity from "./ModuleActivity"
 import ConfirmModal from "./shared/ConfirmModal"
 
 function ErrorFallback({ error }) {
@@ -124,17 +123,11 @@ function AppRouter({ ...props }) {
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
     if (window.location.href.indexOf("participant") >= 0) {
-      const activityFromModule = localStorage.getItem("activityFromModule")
-      localStorage.removeItem("activityFromModule")
-      if (!!activityFromModule) {
-        window.location.href = `/#/participant/${participantId}/module/${activityFromModule}`
-      } else {
-        setState((state) => ({
-          ...state,
-          activeTab: newTab ?? "assess",
-        }))
-        window.location.href = `/#/participant/${participantId}/${(newTab ?? "assess").toLowerCase()}`
-      }
+      setState((state) => ({
+        ...state,
+        activeTab: newTab ?? "assess",
+      }))
+      window.location.href = `/#/participant/${participantId}/${(newTab ?? "assess").toLowerCase()}`
     }
   }
 
@@ -467,27 +460,6 @@ function AppRouter({ ...props }) {
       })
     }
   }
-
-  useEffect(() => {
-    const key = "ModuleActivityClosed"
-    const sessionKey = "ReloadedThisSession"
-    const interval = 5000
-
-    const checkAndReload = () => {
-      const value = localStorage.getItem(key)
-      const alreadyReloaded = sessionStorage.getItem(sessionKey)
-
-      if (value && !alreadyReloaded) {
-        localStorage.removeItem(key)
-        sessionStorage.setItem(sessionKey, "true")
-        window.location.reload()
-      }
-    }
-
-    const intervalId = setInterval(checkAndReload, interval)
-
-    return () => clearInterval(intervalId)
-  }, [])
 
   return (
     <Switch>
@@ -1000,48 +972,6 @@ function AppRouter({ ...props }) {
                 activityId={props.match.params.activityId}
                 participantId={props.match.params.id}
               />
-            </React.Fragment>
-          )
-        }
-      />
-
-      <Route
-        exact
-        path="/participant/:id/module/:moduleId"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-              <Login
-                setIdentity={async (identity) => !!identity && (await reset(identity))}
-                lastDomain={state.lastDomain}
-                onComplete={() => props.history.replace("/")}
-              />
-            </React.Fragment>
-          ) : !getParticipant(props.match.params.id) ? (
-            <React.Fragment />
-          ) : (
-            <React.Fragment>
-              <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
-              <NavigationLayout
-                authType={state.authType}
-                id={props.match.params.id}
-                title={`User ${getParticipant(props.match.params.id).id}`}
-                name={
-                  getParticipant(props.match.params.id)?.alias ||
-                  getParticipant(props.match.params.id)?.name ||
-                  getParticipant(props.match.params.id)?.id
-                }
-                goBack={props.history.goBack}
-                onLogout={() => logout()}
-                activeTab={"Module Activity"}
-              >
-                <ModuleActivity
-                  type="activity"
-                  moduleId={props.match.params.moduleId}
-                  participant={getParticipant(props.match.params.id)}
-                />
-              </NavigationLayout>
             </React.Fragment>
           )
         }

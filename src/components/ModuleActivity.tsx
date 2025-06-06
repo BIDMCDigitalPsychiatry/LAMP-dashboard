@@ -57,18 +57,6 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleId, participant])
 
   useEffect(() => {
-    const handleTabClose = (event) => {
-      localStorage.setItem("ModuleActivityClosed", "true")
-      // localStorage.removeItem("activityFromModule")
-    }
-
-    window.addEventListener("beforeunload", handleTabClose)
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClose)
-    }
-  }, [])
-
-  useEffect(() => {
     if (!!moduleForNotification && isParentModuleLoaded) {
       setTimeout(() => {
         setShowNotification(true)
