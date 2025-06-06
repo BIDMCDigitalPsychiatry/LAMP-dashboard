@@ -96,7 +96,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         .then((data: any) => {
           if (!!data) {
             setSecondaryActivity(data)
-            localStorage.setItem("secondary_activity", JSON.stringify(data))
             setShowPopUp(true)
           }
         })
