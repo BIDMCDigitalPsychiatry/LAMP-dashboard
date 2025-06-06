@@ -569,6 +569,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
     localStorage.removeItem("SurveyId")
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i)
+      if (key.startsWith("activity-survey-")) {
+        localStorage.removeItem(key)
+      }
+    }
     localStorage.removeItem("lastAnsweredIndex")
     ;(async () => {
       let tag =
