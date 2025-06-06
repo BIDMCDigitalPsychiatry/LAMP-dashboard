@@ -38,7 +38,7 @@ const ModuleActivity = ({ ...props }) => {
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const moduleDataFromStore = localStorage.getItem("moduleData")
+  const moduleDataFromStore = localStorage.getItem("moduleDataForSurvey")
   const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
   const [pendingSubModules, setPendingSubModules] = useState(null)
 
@@ -47,15 +47,14 @@ const ModuleActivity = ({ ...props }) => {
       const data = JSON.parse(moduleDataFromStore)
       if (data && data?.length > 0) {
         processActivities(data)
-        localStorage.removeItem("moduleData")
         setModuleDataLoadedFromStore(true)
         setLoadingModules(false)
       } else {
         if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
-        // localStorage.removeItem("activityFromModule")
+        localStorage.removeItem("activityFromModule")
       }
     }
-  }, [moduleId, participant, moduleDataFromStore])
+  }, [moduleId, participant])
 
   useEffect(() => {
     const handleTabClose = (event) => {
@@ -97,7 +96,7 @@ const ModuleActivity = ({ ...props }) => {
         addActivityData(data, 0, moduleStartTime, null, null, false)
       } else {
         localStorage.setItem("activityFromModule", moduleId)
-        localStorage.setItem("parentString", y?.parentString)
+        localStorage.setItem("parentStringForSurvey", y?.parentString)
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -258,6 +257,9 @@ const ModuleActivity = ({ ...props }) => {
     } catch (err) {
       console.error("Error:", err)
     } finally {
+      setTimeout(() => {
+        localStorage.removeItem("moduleDataForSurvey")
+      }, 200)
       const subModules = data
         .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
         .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
@@ -405,8 +407,8 @@ const ModuleActivity = ({ ...props }) => {
     if (!fromLocalStore) {
       scrollToElement(parentString ? parentString + ">" + data.id : data.id)
     } else {
-      if (parentString ? parentString + ">" + data.id : data.id === localStorage.getItem("parentString")) {
-        scrollToElement(localStorage.getItem("parentString"))
+      if (parentString ? parentString + ">" + data.id : data.id === localStorage.getItem("parentStringForSurvey")) {
+        scrollToElement(localStorage.getItem("parentStringForSurvey"))
       }
     }
     setLoadingModules(false)
@@ -421,7 +423,7 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const updateLocalStorage = () => {
-    localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
+    localStorage.setItem("moduleDataForSurvey", JSON.stringify(extractIdsWithHierarchy(moduleData)))
   }
 
   return (
