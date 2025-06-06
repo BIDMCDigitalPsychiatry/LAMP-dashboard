@@ -543,6 +543,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
         .flat()
       setPendingSubModules(subModules)
+      setLoadingModules(false)
     }
   }
 
@@ -609,17 +610,17 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const data = JSON.parse(moduleDataFromStore)
         processActivities(data)
         setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
+        setLoadingModules(false)
         localStorage.removeItem("moduleData")
         localStorage.removeItem("parentString")
         setModuleDataLoadedFromStore(true)
-        setLoadingModules(false)
       }
     } else if (savedActivities && savedActivities.length === 0) {
       // Handle case when savedActivities is empty
       setShownActivities([])
       setLoadingModules(false)
     }
-  }, [savedActivities, moduleDataFromStore])
+  }, [savedActivities])
 
   const scrollToElement = (id) => {
     const el = document.getElementById(id)
