@@ -656,6 +656,18 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
   }, [favorites])
 
+  useEffect(() => {
+    if (tab === "favorite") {
+      ;(async () => {
+        let tag =
+          [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0] ?? []
+        setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
+      })()
+    }
+  }, [tab])
+
   return (
     <Box>
       <TabContext value={tab}>
@@ -857,6 +869,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         type={type}
         showStreak={showStreak}
         participant={participant}
+        setFavorites={setFavorites}
+        savedActivities={savedActivities}
+        tab={tab}
       />
       {!!moduleForNotification && (
         <Dialog

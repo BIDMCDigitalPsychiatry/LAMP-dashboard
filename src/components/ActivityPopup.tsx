@@ -199,6 +199,9 @@ export default function ActivityPopup({
   showStreak,
   updateLocalStorage,
   onClose,
+  setFavorites,
+  savedActivities,
+  tab,
   ...props
 }: {
   activity: any
@@ -209,6 +212,9 @@ export default function ActivityPopup({
   showStreak: Function
   updateLocalStorage: Function
   onClose?: Function
+  setFavorites?: any
+  savedActivities?: any
+  tab?: any
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -250,6 +256,17 @@ export default function ActivityPopup({
     }
   }
 
+  const handleCloseActivityPopup = (activity) => {
+    if (activity.spec === "lamp.group" && tab === "favorite") {
+      ;(async () => {
+        let tag =
+          [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0] ?? []
+        setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
+      })()
+    }
+  }
   return (
     <React.Fragment>
       <Dialog
@@ -267,7 +284,9 @@ export default function ActivityPopup({
           <IconButton
             aria-label="close"
             className={classes.closeButton}
-            onClick={(evt) => onClose(evt, "backdropClick")}
+            onClick={(evt) => {
+              onClose(evt, "backdropClick"), handleCloseActivityPopup(activity)
+            }}
           >
             <Icon>close</Icon>
           </IconButton>
