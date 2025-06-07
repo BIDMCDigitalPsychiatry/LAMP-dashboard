@@ -1033,6 +1033,10 @@ export default function App({ ...props }) {
   }
 
   useEffect(() => {
+    setConfirmSession(false)
+  }, [location?.pathname])
+
+  useEffect(() => {
     window.addEventListener("mousemove", onMouseMove)
     return () => window.removeEventListener("mousemove", onMouseMove)
   }, [])

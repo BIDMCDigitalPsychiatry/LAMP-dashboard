@@ -218,7 +218,6 @@ export default function ActivityPopup({
   useEffect(() => {
     if (!!activity) {
       const activityFromModule = localStorage.getItem("activityFromModule")
-      console.log(activityFromModule, props)
       setModuleActivity(activityFromModule)
     }
   }, [activity])
@@ -244,7 +243,6 @@ export default function ActivityPopup({
       } else {
         updatedTag = [...tag, activityId]
       }
-      console.log("updatedTag", updatedTag)
       await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
       setFavoriteIds(updatedTag)
     } catch (error) {

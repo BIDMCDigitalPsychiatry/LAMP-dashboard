@@ -280,15 +280,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         noBack: noBack,
         is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
       })
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-        is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
-      })
-
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {
         response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
@@ -311,11 +302,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      if (currentActivity.spec == "lamp.survey") {
-        return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      } else {
-        return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      }
+      // if (currentActivity.spec == "lamp.survey") {
+      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      // } else {
+      //   return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      // }
     } else {
       return "about:blank"
     }

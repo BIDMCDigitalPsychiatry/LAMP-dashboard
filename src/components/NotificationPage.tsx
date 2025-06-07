@@ -122,11 +122,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [staticData, setStaticData] = useState(0)
 
   useEffect(() => {
-    console.log(activityId)
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      if (!!activityId) {
+      if (!!activityId && !!LAMP.Auth) {
         LAMP.Activity.view(activityId)
           .then((data: any) => {
             if (!!data) {
@@ -146,9 +145,12 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             }
           })
           .catch((e) => {
-            console.log(e)
-            setOpenNotFound(true)
-            setLoading(false)
+            if (!LAMP.Auth) {
+              window.location.href = "/#/"
+            } else {
+              setOpenNotFound(true)
+              setLoading(false)
+            }
           })
       }
     })()
@@ -157,13 +159,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    console.log(tab)
-  }, [tab])
   const [module, setModule] = useState("")
   const returnResult = () => {
     const activityFromModule = localStorage.getItem("activityFromModule")
-    console.log(tab, activityFromModule, mode)
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
