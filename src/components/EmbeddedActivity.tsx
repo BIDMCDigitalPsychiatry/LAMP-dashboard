@@ -193,9 +193,13 @@ export default function EmbeddedActivity({
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {
-          setSaved(true)
-          onComplete(null)
-          setLoading(false)
+          ;(async () => {
+            data["activity"] = currentActivity.id
+            await updateFavorite(data)
+            setSaved(true)
+            onComplete(null)
+            setLoading(false)
+          })()
         }
       }
     }
@@ -215,8 +219,23 @@ export default function EmbeddedActivity({
     }
   }, [iFrame])
 
+  const updateFavorite = async (data) => {
+    if (typeof data?.static_data?.is_favorite !== undefined) {
+      let tag = favoriteActivities
+      if (!!data?.static_data?.is_favorite) {
+        if ((tag || []).filter((t) => t == data.activity).length === 0) {
+          tag.push(data.activity)
+        }
+      } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
+        tag = (tag || []).filter((t) => t !== data.activity)
+      }
+      await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
+      delete data.static_data.is_favorite
+    }
+    return data
+  }
+
   useEffect(() => {
-    console.log(data, saved)
     try {
       if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
         if (!!activityTimestamp && (activityTimestamp ?? 0) !== timestamp) {
@@ -228,20 +247,8 @@ export default function EmbeddedActivity({
             activityTimestamp
           )
           ;(async () => {
-            if (typeof data?.static_data?.is_favorite !== undefined) {
-              let tag = favoriteActivities
-              if (!!data?.static_data?.is_favorite) {
-                if ((tag || []).filter((t) => t == data.activity).length === 0) {
-                  tag.push(data.activity)
-                }
-              } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
-                tag = (tag || []).filter((t) => t !== data.activity)
-              }
-              await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
-              delete data.static_data.is_favorite
-            }
-            console.log(data)
-            if (!!data) {
+            const updated = await updateFavorite(data)
+            if (!!updated) {
               LAMP.ActivityEvent.create(participant?.id ?? participant, data)
                 .catch((e) => {
                   enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
@@ -259,9 +266,7 @@ export default function EmbeddedActivity({
                   onComplete(data)
                   setLoading(false)
                 })
-              console.log("ghfhfyt")
             } else {
-              console.log("ghgfgh")
               setCurrentActivity(null)
               setSecondaryActivity(null)
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
@@ -290,14 +295,6 @@ export default function EmbeddedActivity({
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,

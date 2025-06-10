@@ -210,7 +210,7 @@ const renderActivities = (
                   if (activity.spec === "lamp.module" && module.name != "Other activities") {
                     handleSubModule(activity, module.level)
                   } else {
-                    handleClickOpen(activity)
+                    handleClickOpen(activity, "module")
                   }
                 }
               }}
