@@ -47,12 +47,14 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     hide_on_completion: false,
     initialize_opened: false,
   })
+  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
+
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
 
-    if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
+    if (!!favoriteActivities && (groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
@@ -67,13 +69,20 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
         })
       })
     }
-  }, [index])
+  }, [index, favoriteActivities])
 
   useEffect(() => {
     if (groupActivities.length > 0) setIndex(0)
   }, [groupActivities])
 
   useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteActivities(tag)
+    })()
     LAMP.Activity.view(activity.id).then((data) => {
       setIndex(-1)
       if (Array.isArray(data.settings)) {
@@ -121,6 +130,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
             name={currentActivity?.name}
             activity={currentActivity}
             participant={participant}
+            favoriteActivities={favoriteActivities}
             onComplete={(a) => {
               setResponse({})
             }}

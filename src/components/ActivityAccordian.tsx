@@ -58,6 +58,14 @@ const useStyles = makeStyles((theme: Theme) =>
         textAlign: "center !important",
       },
     },
+
+    favstar: {
+      position: "absolute",
+      top: 24,
+      left: 24,
+      zIndex: 1,
+      color: "#f9d801",
+    },
     manage: {
       padding: "10px 0",
       minHeight: 180,
@@ -89,7 +97,7 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 75,
       },
     },
-    thumbMain: { maxWidth: 255 },
+    thumbMain: { maxWidth: 255, position: "relative" },
     fullwidthBtn: { width: "100%" },
     blankMsg: {
       marginBottom: "15px",
@@ -173,7 +181,17 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 //The function to renderActivities in accordian layout
-const renderActivities = (activities, type, tag, handleClickOpen, handleSubModule, classes, module, status) => {
+const renderActivities = (
+  activities,
+  type,
+  tag,
+  favorites,
+  handleClickOpen,
+  handleSubModule,
+  classes,
+  module,
+  status
+) => {
   return (
     <>
       {activities.map((activity) =>
@@ -198,6 +216,9 @@ const renderActivities = (activities, type, tag, handleClickOpen, handleSubModul
               }}
               className={classes.thumbMain}
             >
+              {(favorites || []).filter((f) => f.id == activity.id).length > 0 && (
+                <Icon className={classes.favstar}>star_rounded</Icon>
+              )}
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card
                   className={
@@ -277,6 +298,7 @@ const ActivityAccordion = ({
   moduleForNotification,
   setIsParentModuleLoaded,
   updateModuleStartTime,
+  favorites,
 }) => {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -463,6 +485,7 @@ const ActivityAccordion = ({
                   module.subActivities,
                   type,
                   tag,
+                  favorites,
                   handleClickOpen,
                   handleSubModule,
                   classes,
@@ -500,6 +523,7 @@ const ActivityAccordion = ({
                             activity.subActivities,
                             type,
                             tag,
+                            favorites,
                             handleClickOpen,
                             handleSubModule,
                             classes,
@@ -537,6 +561,7 @@ const ActivityAccordion = ({
                                         subActivity.subActivities,
                                         type,
                                         tag,
+                                        favorites,
                                         handleClickOpen,
                                         handleSubModule,
                                         classes,

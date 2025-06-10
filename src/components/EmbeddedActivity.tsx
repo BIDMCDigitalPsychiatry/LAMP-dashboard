@@ -60,7 +60,16 @@ const demoActivities = {
   "lamp.digit_span": "digitspan",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
+export default function EmbeddedActivity({
+  participant,
+  activity,
+  name,
+  onComplete,
+  noBack,
+  tab,
+  favoriteActivities,
+  ...props
+}) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -207,6 +216,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
+    console.log(data, saved)
     try {
       if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
         if (!!activityTimestamp && (activityTimestamp ?? 0) !== timestamp) {
@@ -217,13 +227,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             currentActivity.id,
             activityTimestamp
           )
-          setCurrentActivity(null)
           ;(async () => {
             if (typeof data?.static_data?.is_favorite !== undefined) {
-              let tag =
-                [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-                  !!y.error ? undefined : y.data
-                )[0] ?? []
+              let tag = favoriteActivities
               if (!!data?.static_data?.is_favorite) {
                 if ((tag || []).filter((t) => t == data.activity).length === 0) {
                   tag.push(data.activity)
@@ -231,23 +237,39 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
                 tag = (tag || []).filter((t) => t !== data.activity)
               }
-              LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
+              await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
               delete data.static_data.is_favorite
             }
-          })()
-          LAMP.ActivityEvent.create(participant?.id ?? participant, data)
-            .catch((e) => {
-              enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
-                variant: "error",
-              })
-            })
-            .then((x) => {
+            console.log(data)
+            if (!!data) {
+              LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+                .catch((e) => {
+                  enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                    variant: "error",
+                  })
+                })
+                .then((x) => {
+                  setCurrentActivity(null)
+                  setSecondaryActivity(null)
+                  localStorage.setItem(
+                    "first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id,
+                    "true"
+                  )
+                  setSaved(true)
+                  onComplete(data)
+                  setLoading(false)
+                })
+              console.log("ghfhfyt")
+            } else {
+              console.log("ghgfgh")
+              setCurrentActivity(null)
               setSecondaryActivity(null)
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
               setSaved(true)
               onComplete(data)
               setLoading(false)
-            })
+            }
+          })()
         } else {
           onComplete(null)
           setLoading(false)
@@ -268,17 +290,21 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      let tag =
-        [await LAMP.Type.getAttachment(null, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0] ?? []
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+      })
       setSettings({
         ...settings,
         activity: currentActivity,
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
-        is_favorite: (tag || []).filter((t) => t == currentActivity.id).length > 0,
+        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (currentActivity.spec == "lamp.survey") {

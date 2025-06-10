@@ -415,6 +415,18 @@ const ModuleActivity = ({ ...props }) => {
     localStorage.setItem("moduleDataForSurvey", JSON.stringify(extractIdsWithHierarchy(moduleData)))
   }
 
+  const [favorites, setFavorites] = useState([])
+
+  useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavorites(moduleData.filter((activity) => tag.includes(activity.id)))
+    })()
+  }, [])
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={loadingModules}>
@@ -426,6 +438,7 @@ const ModuleActivity = ({ ...props }) => {
             data={moduleData}
             type={props.type}
             tag={null}
+            favorites={favorites}
             handleClickOpen={handleClickOpen}
             handleSubModule={handleSubModule}
             participant={participant}

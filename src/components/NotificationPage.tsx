@@ -120,12 +120,23 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [tag, setTag] = useState(null)
   const [visualPopup, setVisualPopup] = useState(null)
   const [staticData, setStaticData] = useState(0)
+  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
+
+  useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteActivities(tag)
+    })()
+  }, [])
 
   useEffect(() => {
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      if (!!activityId && !!LAMP.Auth) {
+      if (!!favoriteActivities && !!activityId && !!LAMP.Auth) {
         LAMP.Activity.view(activityId)
           .then((data: any) => {
             if (!!data) {
@@ -154,7 +165,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           })
       }
     })()
-  }, [activityId])
+  }, [activityId, favoriteActivities])
 
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
@@ -205,7 +216,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       if (
         typeof tag?.visualSettings !== "undefined" &&
         tag?.visualSettings != null &&
-        tag?.visualSettings?.image !== ""
+        tag?.visualSettings?.image !== "" &&
+        !!tag?.visualSettings?.checked
       ) {
         setVisualPopup(tag?.visualSettings)
       } else {
@@ -257,7 +269,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             participant={participant}
             noBack={false}
             tab={tab}
+            favoriteActivities={favoriteActivities}
             onComplete={(data) => {
+              console.log(data)
               setStaticData(data?.static_data ?? {})
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
