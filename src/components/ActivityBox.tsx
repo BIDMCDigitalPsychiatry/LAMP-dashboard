@@ -650,6 +650,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   useEffect(() => {
     if (favorites.length > 0) {
+      if (typeof favorites[0]?.id == "undefined") {
+        setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
+      }
       setTab("favorite")
     } else {
       setTab("all")
@@ -663,6 +666,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
             !!y.error ? undefined : y.data
           )[0] ?? []
+        console.log(savedActivities.filter((activity) => tag.includes(activity.id)))
         setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
       })()
     }
