@@ -457,7 +457,6 @@ const ModuleActivity = ({ ...props }) => {
             type={null}
             showStreak={null}
             participant={participant?.id ?? participant}
-            from="module"
           />
           {!!moduleForNotification && (
             <Dialog

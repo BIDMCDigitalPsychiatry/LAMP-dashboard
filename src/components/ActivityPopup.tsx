@@ -202,7 +202,6 @@ export default function ActivityPopup({
   setFavorites,
   savedActivities,
   tab,
-  from,
   ...props
 }: {
   activity: any
@@ -216,7 +215,6 @@ export default function ActivityPopup({
   setFavorites?: any
   savedActivities?: any
   tab?: any
-  from?: string
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -330,7 +328,7 @@ export default function ActivityPopup({
                 remarkPlugins={[gfm, emoji]}
                 components={{ link: LinkRenderer }}
               />
-              {activity?.spec === "lamp.group" && !!from && (
+              {activity?.spec === "lamp.group" && (
                 <Tooltip
                   title={
                     favoriteIds.includes(activity.id)
