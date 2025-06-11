@@ -99,6 +99,13 @@ function AppRouter({ ...props }) {
   localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
 
   useEffect(() => {
+    try {
+      if (window.self !== window.top) {
+        window.top?.location.replace(window.location.href)
+      }
+    } catch (error) {
+      console.log(error)
+    }
     const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
     const hasRoleFlag = localStorage.getItem("isParticipant")
 
