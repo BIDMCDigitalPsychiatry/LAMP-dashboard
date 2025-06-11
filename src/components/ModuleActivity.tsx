@@ -445,6 +445,7 @@ const ModuleActivity = ({ ...props }) => {
             moduleForNotification={moduleForNotification}
             setIsParentModuleLoaded={setIsParentModuleLoaded}
             updateModuleStartTime={updateModuleStartTime}
+            setFavorites={setFavorites}
           />
           <ActivityPopup
             activity={activity}

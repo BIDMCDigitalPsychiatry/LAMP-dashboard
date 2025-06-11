@@ -682,9 +682,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         )}
         {favorites.length > 0 && (
           <TabPanel value="favorite">
-            {moduleData.length ? (
+            {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
               <ActivityAccordian
-                data={moduleData.concat({
+                data={(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).concat({
                   name: "Other activities",
                   level: 1,
                   subActivities: shownActivities.filter((activity) => favorites.includes(activity)),
@@ -698,6 +698,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 setIsParentModuleLoaded={setIsParentModuleLoaded}
                 updateModuleStartTime={updateModuleStartTime}
                 favorites={favorites}
+                setFavorites={setFavorites}
               />
             ) : (
               <Grid container spacing={2}>
@@ -779,6 +780,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               handleClickOpen={handleClickOpen}
               handleSubModule={handleSubModule}
               participant={participant}
+              setFavorites={setFavorites}
               moduleForNotification={moduleForNotification}
               setIsParentModuleLoaded={setIsParentModuleLoaded}
               updateModuleStartTime={updateModuleStartTime}

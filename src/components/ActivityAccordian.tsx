@@ -299,6 +299,7 @@ const ActivityAccordion = ({
   setIsParentModuleLoaded,
   updateModuleStartTime,
   favorites,
+  setFavorites,
 }) => {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -416,6 +417,7 @@ const ActivityAccordion = ({
       }
       await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
       setFavoriteIds(updatedTag)
+      setFavorites(updatedTag)
     } catch (error) {
       console.error("Failed to toggle favorite:", error)
     }
