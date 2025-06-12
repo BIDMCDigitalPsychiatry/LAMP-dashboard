@@ -96,6 +96,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const [isLockedOut, setIsLockedOut] = useState(false)
   useEffect(() => {
     setConfirmSession(false)
+    localStorage.clear()
     const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
