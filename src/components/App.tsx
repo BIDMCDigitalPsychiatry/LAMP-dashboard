@@ -90,7 +90,7 @@ export const changeCase = (text) => {
   }
   return ""
 }
-function AppRouter({ ...props }) {
+function AppRouter({ setConfirmSession, ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
@@ -482,6 +482,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (
@@ -510,6 +511,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : state.authType === "participant" ? (
@@ -542,6 +544,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (
@@ -569,6 +572,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -604,6 +608,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -640,6 +645,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -675,6 +681,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -712,6 +719,7 @@ function AppRouter({ ...props }) {
                   lastDomain={state.lastDomain}
                   onComplete={() => props.history.replace("/")}
                   setAuthenticated={setAuthenticated}
+                  setConfirmSession={setConfirmSession}
                 />
               </React.Fragment>
             ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -755,6 +763,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -804,6 +813,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -868,6 +878,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/data_portal")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
@@ -919,6 +930,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -967,6 +979,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -996,6 +1009,7 @@ function AppRouter({ ...props }) {
                 lastDomain={state.lastDomain}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
               />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
@@ -1159,7 +1173,7 @@ export default function App({ ...props }) {
               onClose={() => setConfirmSession(false)}
             />
             <HashRouter>
-              <AppRouter {...props} />
+              <AppRouter {...props} setConfirmSession={setConfirmSession} />
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>

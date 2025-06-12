@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
+export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
@@ -95,6 +95,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const LOCKOUT_TIME_KEY = "lockoutTime"
   const [isLockedOut, setIsLockedOut] = useState(false)
   useEffect(() => {
+    setConfirmSession(false)
     const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
