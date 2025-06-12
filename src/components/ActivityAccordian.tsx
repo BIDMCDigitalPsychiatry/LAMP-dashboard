@@ -429,8 +429,7 @@ const ActivityAccordion = ({
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
               <Typography variant="h6">
-                {module.name}
-                {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
+                {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
                 {module.name !== "Other activities" && (
                   <Tooltip
                     title={
