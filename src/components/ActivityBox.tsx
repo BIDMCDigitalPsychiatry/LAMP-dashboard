@@ -326,6 +326,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
     }
+    console.log(activityEventCreated)
     return activityEventCreated
   }
 
@@ -430,7 +431,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         arr.push(null)
       }
     }
+    console.log(arr)
     const filteredArr = arr.filter((item) => item != null)
+    console.log()
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
@@ -500,8 +503,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           scrollToElement(localStorage.getItem("parentString"))
         }
       }
-      setLoadingModules(false)
     }
+    setLoadingModules(false)
   }
 
   useEffect(() => {
@@ -666,7 +669,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
             !!y.error ? undefined : y.data
           )[0] ?? []
-        console.log(savedActivities.filter((activity) => tag.includes(activity.id)))
         setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
       })()
     }

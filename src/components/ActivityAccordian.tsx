@@ -306,10 +306,7 @@ const ActivityAccordion = ({
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
   const [statusLoaded, setStatusLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [isFavoriteActive, setIsFavoriteActive] = useState(false)
-  const [selectedActivityId, setSelectedActivityId] = useState()
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  const [expanded, setExpanded] = useState(false)
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
