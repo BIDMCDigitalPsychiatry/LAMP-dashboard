@@ -635,7 +635,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     const el = document.getElementById(id)
     setTimeout(() => {
       if (el) {
-        el.style.scrollMarginTop = "80px"
+        el.style.scrollMarginTop = "100px"
         el.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       }
     }, 1000)
