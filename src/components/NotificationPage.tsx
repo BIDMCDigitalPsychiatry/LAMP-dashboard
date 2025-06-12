@@ -111,7 +111,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [openComplete, setOpenComplete] = React.useState(false)
-  const [streak, setStreak] = useState(1)
+  const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
@@ -190,6 +190,17 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     }
   }
 
+  useEffect(() => {
+    if (streak > 0) {
+      setOpenComplete(true)
+      setTimeout(() => {
+        setOpenComplete(false)
+        returnResult()
+        setLoading(false)
+      }, 5000)
+    }
+  }, [streak])
+
   const showStreak = (participant, activity) => {
     setLoading(true)
     setVisualPopup(null)
@@ -197,12 +208,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
       getEvents(participant, activity.id).then((streak) => {
         setStreak(streak)
-        setOpenComplete(true)
-        setTimeout(() => {
-          setOpenComplete(false)
-          returnResult()
-          setLoading(false)
-        }, 5000)
       })
     } else {
       returnResult()
