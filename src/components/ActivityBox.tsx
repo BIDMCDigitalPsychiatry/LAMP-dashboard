@@ -681,7 +681,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <TabList onChange={(e, val) => setTab(val)}>
               <Tab label="Favorites" value="favorite" />
-              {/* <Tab label="Modules" value="module" />  */}
+              <Tab label="Modules" value="modules" />
               <Tab label="All" value="all" />
             </TabList>
           </Box>
@@ -777,6 +777,21 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
           </TabPanel>
         )}
+        <TabPanel value="modules">
+          <ActivityAccordian
+            data={moduleData}
+            type={type}
+            tag={tag}
+            handleClickOpen={handleClickOpen}
+            handleSubModule={handleSubModule}
+            participant={participant}
+            setFavorites={setFavorites}
+            moduleForNotification={moduleForNotification}
+            setIsParentModuleLoaded={setIsParentModuleLoaded}
+            updateModuleStartTime={updateModuleStartTime}
+            favorites={favorites}
+          />
+        </TabPanel>
         <TabPanel value="all">
           {moduleData.length ? (
             <ActivityAccordian
