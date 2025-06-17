@@ -34,7 +34,7 @@ export default function Credentials({ participant, ...props }) {
         <Icon>vpn_key</Icon>
       </Fab>
       <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
-        <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
+        <CredentialManager fromParticipant={true} style={{ margin: 16 }} id={openPasswordReset} />
       </ResponsiveDialog>
     </Box>
   )
