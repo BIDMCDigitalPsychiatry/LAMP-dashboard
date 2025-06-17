@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Credentials({ user, ...props }) {
+export default function Credentials({ user, fromParticipant, ...props }) {
   const classes = useStyles()
   const [openPasswordReset, setOpenPasswordReset] = useState(null)
   const { t } = useTranslation()
@@ -33,8 +33,17 @@ export default function Credentials({ user, ...props }) {
       <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => setOpenPasswordReset(user.id)}>
         <Icon>vpn_key</Icon>
       </Fab>
-      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
-        <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
+      <ResponsiveDialog open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
+        {!fromParticipant ? (
+          <CredentialManager
+            fromParticipant={fromParticipant}
+            style={{ margin: 16 }}
+            id={openPasswordReset}
+            userType={"researcher"}
+          />
+        ) : (
+          <CredentialManager fromParticipant={fromParticipant} style={{ margin: 16 }} id={openPasswordReset} />
+        )}
       </ResponsiveDialog>
     </Box>
   )

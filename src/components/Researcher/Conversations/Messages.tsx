@@ -4,24 +4,21 @@ import {
   Typography,
   makeStyles,
   Box,
-  Grid,
   IconButton,
   Container,
   AppBar,
   Toolbar,
   Icon,
-  Link,
   Divider,
   useTheme,
   useMediaQuery,
   TextareaAutosize,
 } from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
-import useInterval from "./useInterval"
+import ResponsiveDialog from "../../ResponsiveDialog"
+import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import ConfirmationDialog from "./ConfirmationDialog"
-import { Alert } from "@mui/material"
+
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -134,21 +131,6 @@ const useStyles = makeStyles((theme) => ({
   composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
-const fetchCoordinators = async (participant) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
-  let result = await (
-    await fetch(`${baseUrl}/${participant}/cordinators`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
-      },
-    })
-  ).json()
-  return result
-}
-
 export default function Messages({
   refresh,
   participant,
@@ -156,6 +138,7 @@ export default function Messages({
   privateOnly,
   expandHeight,
   msgOpen,
+  setDialogOpen,
   ...props
 }: {
   privateOnly?: boolean
@@ -165,23 +148,19 @@ export default function Messages({
   refresh?: boolean
   style?: any
   msgOpen?: boolean
+  setDialogOpen?: Function
 }) {
   const classes = useStyles()
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(true) // msgOpen ?? false)
   const [conversations, setConversations] = useState({})
-  const [sender, setSender] = useState(null)
+  // const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [confirmationDialog, setConfirmationDialog] = useState(!!participantOnly)
-  const [coordinators, setCoordinators] = useState([])
-  const [selectedCoordinator, setSelectedCoordinator] = useState()
-  const { t } = useTranslation()
 
+  const { t } = useTranslation()
   useEffect(() => {
-    fetchCoordinators(participant).then((coordinators) => {
-      setCoordinators(coordinators.cordinators)
-    })
+    refreshMessages()
   }, [])
 
   useInterval(
@@ -256,12 +235,12 @@ export default function Messages({
     setConversations({ ...(conversations || {}), [participant]: all })
   }
 
-  const messageSection = () => {
+  const messageSection = (type: number) => {
     return (
       <Box>
         {getMessages()
           // .filter(
-          //   // (x) => (x.from = "") //&&  x.from === sender - to be replaced with different senders
+          //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
           // )
           .map((x) => (
             <Box
@@ -294,11 +273,6 @@ export default function Messages({
           ))}
 
         <Divider />
-        {(coordinators || []).length == 0 && (
-          <Box>
-            <Alert severity="warning">{`${t("No Coach or Support staff are available for messaging.")}`}</Alert>
-          </Box>
-        )}
         <Box my={2} display="flex" className={classes.composeMsg}>
           <Box width="100%" className={classes.composeTextarea}>
             <TextareaAutosize
@@ -327,18 +301,6 @@ export default function Messages({
     )
   }
 
-  const confirmAction = (status: string) => {
-    if (status == "No") {
-      history.back()
-    }
-    setConfirmationDialog(false)
-  }
-
-  const openMessage = (coordinator) => {
-    setSelectedCoordinator(coordinator)
-    setOpen(true)
-  }
-
   return (
     <Box>
       <Container className={classes.containerWidth}>
@@ -348,7 +310,7 @@ export default function Messages({
           fullScreen
           open={open}
           onClose={() => {
-            // setDialogOpen(false)
+            setDialogOpen(false)
             setOpen(false)
           }}
         >
@@ -356,9 +318,8 @@ export default function Messages({
             <Toolbar className={classes.toolbardashboard}>
               <IconButton
                 onClick={() => {
-                  // setDialogOpen(false)
+                  setDialogOpen(false)
                   setOpen(false)
-                  window.history.back()
                 }}
                 color="default"
                 aria-label="Menu"
@@ -374,18 +335,18 @@ export default function Messages({
                 {`${t("Conversations")}`}
               </Typography>
               {/* <Typography
-                  variant="h5"
-                  style={{
-                    marginLeft: supportsSidebar ? 0 : undefined,
-                  }}
-                >
-                  {sender}
-                </Typography> */}
+                variant="h5"
+                style={{
+                  marginLeft: supportsSidebar ? 0 : undefined,
+                }}
+              >
+                {sender}
+              </Typography> */}
             </Toolbar>
           </AppBar>
           <Container className={classes.containerWidth}>
             <Box px={2} style={{ marginTop: "20px" }}>
-              {messageSection()}
+              {messageSection(0)}
             </Box>
           </Container>
         </ResponsiveDialog>

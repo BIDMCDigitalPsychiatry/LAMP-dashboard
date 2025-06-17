@@ -24,11 +24,13 @@ import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
 import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
+import { ReactComponent as Conversation } from "../../icons/Conversation.svg"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
+import Conversations from "./Conversations/Index"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,8 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "inline-block",
       textAlign: "center",
       color: "rgba(0, 0, 0, 0.4)",
-      paddingTop: 40,
-      paddingBottom: 30,
+      paddingTop: 24,
+      paddingBottom: 24,
       [theme.breakpoints.down("sm")]: {
         paddingTop: 16,
         paddingBottom: 9,
@@ -58,6 +60,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     menuIcon: {
       minWidth: "auto",
+      width: 30,
+      height: 30,
+      justifyContent: "center",
       [theme.breakpoints.down("xs")]: {
         top: 5,
         position: "relative",
@@ -119,6 +124,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         borderBottom: "#7599FF solid 5px",
         borderRight: "#7599FF solid 5px",
+        borderLeft: "#7599FF solid 5px",
       },
     },
     btnCursor: {
@@ -185,6 +191,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const classes = useStyles()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState(null)
 
   useInterval(
     () => {
@@ -196,6 +203,16 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   )
 
   useEffect(() => {
+    if (LAMP.Auth._auth.id != "admin") {
+      LAMP.Type.getAttachment(researcherId, "lamp.dashboard.credential_roles").then((data: any) => {
+        if (data?.error || !data?.data || !LAMP?.Auth?._auth?.id) {
+          setRole(null)
+        } else {
+          const userRole = data.data[LAMP.Auth._auth.id]?.role
+          setRole(userRole ?? null)
+        }
+      })
+    }
     LAMP.Researcher.view(researcherId).then(setResearcher)
   }, [])
 
@@ -353,6 +370,20 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
+                {role == "message_coordinator" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={tab === "conversations"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/conversations`)}
+                    disableGutters
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Conversation />
+                    </ListItemIcon>
+                    <ListItemText primary={`${t("Conversations")}`} />
+                  </ListItem>
+                )}
               </List>
             </Drawer>
             {tab === "users" && (
@@ -418,6 +449,21 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   name: researcher.name,
                 }}
                 data={LAMP.Auth}
+              />
+            )}
+            {tab === "conversations" && (
+              <Conversations
+                title={null}
+                onParticipantSelect={onParticipantSelect}
+                researcherId={researcherId}
+                studies={studies}
+                notificationColumn={notificationColumn}
+                selectedStudies={selectedStudies}
+                setSelectedStudies={setSelectedStudies}
+                getAllStudies={getAllStudies}
+                mode={mode}
+                setOrder={() => setOrder(!order)}
+                order={order}
               />
             )}
           </ResponsivePaper>

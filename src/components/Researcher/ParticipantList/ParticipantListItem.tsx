@@ -145,7 +145,7 @@ export default function ParticipantListItem({
         <Box>
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
-            <Credentials user={participant} />
+            <Credentials user={participant} fromParticipant={true} />
             <Link
               href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`}
               underline="none"
