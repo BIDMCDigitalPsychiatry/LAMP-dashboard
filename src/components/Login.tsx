@@ -127,7 +127,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         { label: "mindlamp-qa.dmh.lacounty.gov" },
       ]
     } else {
-      options = JSON.parse(cachedOptions).filter((o) => typeof o?.label !== "undefined")
+      options = (JSON.parse(cachedOptions) || []).filter((o) => typeof o?.label !== "undefined")
     }
     setOptions(options)
     let query = window.location.hash.split("?")
