@@ -186,21 +186,13 @@ export default function Conversations({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      if ((selected || []).length > 0) {
-        searchParticipants()
-      } else {
-        setParticipants([])
-        setLoading(false)
-      }
+    if ((selected || []).length > 0) {
+      searchParticipants()
     } else {
-      window.location.href = "/#/"
+      setParticipants([])
+      setLoading(false)
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected])
 
   const handleChange = (participant, checked) => {
     if (checked) {
