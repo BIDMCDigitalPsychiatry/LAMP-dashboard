@@ -170,6 +170,15 @@ export default function ParticipantListItem({
   const updateAnalytics = async () => {
     setSensorData(null)
     setDialogOpen(true)
+    sensorDataUpdate()
+  }
+
+  useEffect(() => {
+    sensorDataUpdate()
+  }, [dialogOpen])
+
+  const sensorDataUpdate = async () => {
+    setMsgCount(0)
     await sensorEventUpdate("conversations", researcherId, null)
     let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
     data = (data || []).filter((d) => d.data.page === "conversations")
