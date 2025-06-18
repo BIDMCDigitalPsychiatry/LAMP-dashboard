@@ -429,6 +429,15 @@ const ActivityAccordion = ({
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
               <Typography variant="h6">
+                <Box
+                  className={classes.mainIcons}
+                  style={{
+                    margin: "auto",
+                    background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                      ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                      : `url(${InfoIcon}) center center/contain no-repeat`,
+                  }}
+                ></Box>
                 {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
                 {module.name !== "Other activities" && (
                   <Tooltip
@@ -448,11 +457,20 @@ const ActivityAccordion = ({
                       <Icon>star_rounded</Icon>
                     </Fab>
                   </Tooltip>
-                )}{" "}
+                )}
               </Typography>
             </AccordionSummary>
           ) : (
             <Typography variant="h6" className={classes.moduleHeader}>
+              <Box
+                className={classes.mainIcons}
+                style={{
+                  margin: "auto",
+                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                    ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                    : `url(${InfoIcon}) center center/contain no-repeat`,
+                }}
+              ></Box>
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
               <Tooltip
                 title={

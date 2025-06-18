@@ -326,7 +326,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
     }
-    console.log(activityEventCreated)
     return activityEventCreated
   }
 
@@ -431,9 +430,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         arr.push(null)
       }
     }
-    console.log(arr)
     const filteredArr = arr.filter((item) => item != null)
-    console.log()
+
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
@@ -682,7 +680,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             <TabList onChange={(e, val) => setTab(val)}>
               <Tab label="Favorites" value="favorite" />
               <Tab label="Modules" value="modules" />
-              <Tab label="All" value="all" />
+              <Tab label="Other Activities" value="other" />
             </TabList>
           </Box>
         )}
@@ -778,24 +776,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           </TabPanel>
         )}
         <TabPanel value="modules">
-          <ActivityAccordian
-            data={moduleData}
-            type={type}
-            tag={tag}
-            handleClickOpen={handleClickOpen}
-            handleSubModule={handleSubModule}
-            participant={participant}
-            setFavorites={setFavorites}
-            moduleForNotification={moduleForNotification}
-            setIsParentModuleLoaded={setIsParentModuleLoaded}
-            updateModuleStartTime={updateModuleStartTime}
-            favorites={favorites}
-          />
-        </TabPanel>
-        <TabPanel value="all">
-          {moduleData.length ? (
+          {(moduleData || []).length > 0 ? (
             <ActivityAccordian
-              data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
+              data={moduleData.concat({
+                name: "Other activities",
+                level: 1,
+                subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
+              })}
               type={type}
               tag={tag}
               handleClickOpen={handleClickOpen}
@@ -809,8 +796,79 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             />
           ) : (
             <Grid container spacing={2}>
-              {savedActivities.length
-                ? savedActivities.map((activity) => (
+              {savedActivities.filter((activity) => activity.spec == "lamp.module").length
+                ? savedActivities
+                    .filter((activity) => activity.spec == "lamp.module")
+                    .map((activity) => (
+                      <Grid
+                        item
+                        xs={6}
+                        sm={4}
+                        md={3}
+                        lg={3}
+                        onClick={() => {
+                          handleClickOpen(activity)
+                        }}
+                        className={classes.thumbMain}
+                      >
+                        {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                          <Icon className={classes.favstar}>star_rounded</Icon>
+                        )}
+
+                        <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                          <Card
+                            className={
+                              classes.manage +
+                              " " +
+                              (type === "Manage"
+                                ? classes.manageH
+                                : type === "Assess"
+                                ? classes.assessH
+                                : type === "Learn"
+                                ? classes.learnH
+                                : classes.preventH)
+                            }
+                          >
+                            <Box mt={2} mb={1}>
+                              <Box
+                                className={classes.mainIcons}
+                                style={{
+                                  margin: "auto",
+                                  background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                    ? `url(${
+                                        tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                      }) center center/contain no-repeat`
+                                    : `url(${InfoIcon}) center center/contain no-repeat`,
+                                }}
+                              ></Box>
+                            </Box>
+                            <Typography className={classes.cardlabel}>
+                              <ReactMarkdown
+                                children={t(activity.name)}
+                                skipHtml={false}
+                                remarkPlugins={[gfm, emoji]}
+                                components={{ link: LinkRenderer }}
+                              />
+                            </Typography>
+                          </Card>
+                        </ButtonBase>
+                      </Grid>
+                    ))
+                : type !== "Portal" && (
+                    <Box display="flex" className={classes.blankMsg} ml={1}>
+                      <Icon>info</Icon>
+                      <p>{`${t(message)}`}</p>
+                    </Box>
+                  )}
+            </Grid>
+          )}
+        </TabPanel>
+        <TabPanel value="other">
+          <Grid container spacing={2}>
+            {savedActivities.filter((activity) => activity.spec != "lamp.module").length
+              ? savedActivities
+                  .filter((activity) => activity.spec != "lamp.module")
+                  .map((activity) => (
                     <Grid
                       item
                       xs={6}
@@ -871,30 +929,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                       </ButtonBase>
                     </Grid>
                   ))
-                : type !== "Portal" && (
-                    <Box display="flex" className={classes.blankMsg} ml={1}>
-                      <Icon>info</Icon>
-                      <p>{`${t(message)}`}</p>
-                    </Box>
-                  )}
-            </Grid>
-          )}
+              : type !== "Portal" && (
+                  <Box display="flex" className={classes.blankMsg} ml={1}>
+                    <Icon>info</Icon>
+                    <p>{`${t(message)}`}</p>
+                  </Box>
+                )}
+          </Grid>
         </TabPanel>
-        {/* <TabPanel value="module">
-          {moduleData.length ? (
-            <ActivityAccordian
-              data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
-              type={type}
-              tag={tag}
-              handleClickOpen={handleClickOpen}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              moduleForNotification={moduleForNotification}
-              setIsParentModuleLoaded={setIsParentModuleLoaded}
-              updateModuleStartTime={updateModuleStartTime}
-            />
-          ) : <Box></Box>} 
-        </TabPanel>*/}
       </TabContext>
       {loadingModules && (
         <Backdrop className={classes.backdrop} open={loadingModules}>
