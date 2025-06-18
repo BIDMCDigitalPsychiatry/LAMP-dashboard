@@ -133,6 +133,7 @@ export default function ParticipantListItem({
       ;(async () => {
         let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
         data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+        console.log(data)
         setSensorData(!!data ? data[0] : [])
       })()
     }
@@ -162,6 +163,10 @@ export default function ParticipantListItem({
 
   const getMessageCount = () => {
     let x = (conversations || {})[participant.id || ""] || []
+    console.log(
+      x,
+      x.filter((a) => a.from === "participant" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
+    )
     return !Array.isArray(x)
       ? 0
       : x.filter((a) => a.from === "participant" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
@@ -170,6 +175,15 @@ export default function ParticipantListItem({
   const updateAnalytics = async () => {
     setSensorData(null)
     setDialogOpen(true)
+    sensorDataUpdate()
+  }
+
+  useEffect(() => {
+    sensorDataUpdate()
+  }, [dialogOpen])
+
+  const sensorDataUpdate = async () => {
+    setMsgCount(0)
     await sensorEventUpdate("conversations", researcherId, null)
     let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
     data = (data || []).filter((d) => d.data.page === "conversations")
