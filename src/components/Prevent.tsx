@@ -20,7 +20,7 @@ import {
 } from "@material-ui/core"
 import { Stack } from "@mui/material"
 import { Service } from "./DBService/DBService"
-import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
+import { KeyboardDatePicker } from "@material-ui/pickers"
 
 import LAMP, {
   Participant as ParticipantObj,

@@ -151,9 +151,8 @@ export default function Messages({
   setDialogOpen?: Function
 }) {
   const classes = useStyles()
-  const [open, setOpen] = useState(true) // msgOpen ?? false)
+  const [open, setOpen] = useState(true)
   const [conversations, setConversations] = useState({})
-  // const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
@@ -238,39 +237,35 @@ export default function Messages({
   const messageSection = (type: number) => {
     return (
       <Box>
-        {getMessages()
-          // .filter(
-          //   (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
-          // )
-          .map((x) => (
-            <Box
-              className={classes.innerMessage}
-              style={{
-                background:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "#F6F6F6"
-                    : "#5784EE",
-                marginLeft:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? ""
-                    : "10%",
-                marginRight:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "10%"
-                    : "",
-                borderRadius:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "0px 20px 20px 20px"
-                    : "20px 0px 20px 20px",
-                color:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "rgba(0, 0, 0, 0.75)"
-                    : "white",
-              }}
-            >
-              <Typography>{x.text}</Typography>
-            </Box>
-          ))}
+        {getMessages().map((x) => (
+          <Box
+            className={classes.innerMessage}
+            style={{
+              background:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "#F6F6F6"
+                  : "#5784EE",
+              marginLeft:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? ""
+                  : "10%",
+              marginRight:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "10%"
+                  : "",
+              borderRadius:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "0px 20px 20px 20px"
+                  : "20px 0px 20px 20px",
+              color:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "rgba(0, 0, 0, 0.75)"
+                  : "white",
+            }}
+          >
+            <Typography>{x.text}</Typography>
+          </Box>
+        ))}
 
         <Divider />
         <Box my={2} display="flex" className={classes.composeMsg}>
@@ -334,14 +329,6 @@ export default function Messages({
               >
                 {`${t("Conversations")}`}
               </Typography>
-              {/* <Typography
-                variant="h5"
-                style={{
-                  marginLeft: supportsSidebar ? 0 : undefined,
-                }}
-              >
-                {sender}
-              </Typography> */}
             </Toolbar>
           </AppBar>
           <Container className={classes.containerWidth}>

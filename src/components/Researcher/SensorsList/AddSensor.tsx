@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { Box, Fab, Icon, makeStyles, createStyles } from "@material-ui/core"
-import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import SensorDialog from "./SensorDialog"
@@ -53,7 +52,6 @@ export default function AddSensor({
   const classes = useStyles()
   const { t } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
-
   const [allSensors, setAllSensors] = useState<Array<Object>>([])
 
   useEffect(() => {

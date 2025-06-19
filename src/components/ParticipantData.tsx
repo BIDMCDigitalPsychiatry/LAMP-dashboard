@@ -10,10 +10,8 @@ import LAMP, {
 import ActivityCard from "./ActivityCard"
 import MultipleSelect from "./MultipleSelect"
 import Sparkline from "./Sparkline"
-// import MultiPieChart from "./MultiPieChart"
 import { useTranslation } from "react-i18next"
 import { strategies } from "./PreventSelectedActivities"
-// TODO: all SensorEvents?
 
 function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")

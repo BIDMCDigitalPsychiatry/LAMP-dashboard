@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Box, Collapse, Paper, Typography, Card, CardActions, IconButton, Icon, makeStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import classnames from "classnames" // FIXME
+import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({

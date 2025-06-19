@@ -1,58 +1,25 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
-  IconButton,
   Button,
   TextField,
-  Popover,
   MenuItem,
-  Tooltip,
-  Grid,
-  Fab,
   Typography,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
   InputBase,
   DialogProps,
   Backdrop,
   CircularProgress,
   makeStyles,
-  Theme,
   createStyles,
   withStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-
-import QRCode from "qrcode.react"
 // Local Imports
-import LAMP, { Study } from "lamp-core"
-
-import SnackMessage from "../../SnackMessage"
-
+import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
-
-import Header from "./Header"
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
-const CssTextField = withStyles({
-  root: {
-    "label + &": {},
-  },
-  input: {
-    fontSize: 16,
-    fontFamily: "Inter",
-    fontWeight: "bold",
-    color: "rgba(0, 0, 0, 0.75)",
-  },
-})(InputBase)
 
 const useStyles = makeStyles((theme) =>
   createStyles({

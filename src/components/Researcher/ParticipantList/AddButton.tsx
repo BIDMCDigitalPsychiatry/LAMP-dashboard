@@ -1,21 +1,5 @@
-import React, { useState, useEffect } from "react"
-import {
-  Box,
-  MenuItem,
-  AppBar,
-  Toolbar,
-  Icon,
-  IconButton,
-  Divider,
-  Grid,
-  Fab,
-  Typography,
-  Popover,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
-import LAMP from "lamp-core"
+import React, { useState } from "react"
+import { Box, MenuItem, Icon, Fab, Typography, Popover, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import AddUser from "./AddUser"
 import StudyCreator from "./StudyCreator"

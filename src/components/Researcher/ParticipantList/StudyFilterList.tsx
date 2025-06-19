@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Chip, Fab, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 // Local Imports
-import LAMP, { StudyService } from "lamp-core"
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
@@ -76,8 +75,6 @@ export default function StudyFilterList({
   const [studiesCount, setStudiesCount] = useState(null)
   const [studs, setStuds] = useState(studies)
   const [allStudies, setAllStudies] = useState([])
-  const [selectAll, setSelectAll] = useState(false)
-  const [deSelectAll, setDeselectAll] = useState(false)
 
   useEffect(() => {
     refreshStudies()
@@ -175,8 +172,6 @@ export default function StudyFilterList({
                       selectAllStudy = false
                       deselectAllStudy = false
                     }
-                    setSelectAll(selectAllStudy)
-                    setDeselectAll(deselectAllStudy)
                     localStorage.setItem("studies_" + researcherId, JSON.stringify(allStudiesArray))
                     localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(flagData))
                     setSelectedStudies(allStudiesArray)
@@ -196,12 +191,7 @@ export default function StudyFilterList({
                   localStorage.setItem("studies_" + researcherId, JSON.stringify(x))
                   setSelectedStudies(x)
                   let flagData = 0 // 0 = "", 1 = "Select All", 2 = "Deselect All"
-                  if (allStudies.length !== x.length) {
-                    setDeselectAll(false)
-                    setSelectAll(false)
-                  } else {
-                    setSelectAll(true)
-                    setDeselectAll(false)
+                  if (allStudies.length == x.length) {
                     flagData = 1
                   }
                   localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(flagData))

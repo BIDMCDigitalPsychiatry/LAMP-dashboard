@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react"
 import {
   Box,
-  Popover,
-  Fab,
   Typography,
-  Icon,
-  MenuItem,
   makeStyles,
   Theme,
   createStyles,
@@ -17,7 +13,6 @@ import {
   Button,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
 import SearchBox from "../../SearchBox"
 import Switch, { SwitchProps } from "@mui/material/Switch"
 import { styled } from "@mui/material/styles"
@@ -78,11 +73,6 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    // toggleSwitch: {
-    //   "& .MuiSwitch-track": {
-    //     backgroundColor: "#7599FF !important",
-    //   },
-    // },
   })
 )
 

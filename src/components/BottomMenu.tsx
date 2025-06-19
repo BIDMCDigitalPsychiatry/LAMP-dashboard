@@ -8,13 +8,11 @@ import {
   BottomNavigationAction,
   IconButton,
   Typography,
-  ClickAwayListener,
   makeStyles,
   Theme,
   createStyles,
   withStyles,
   Tooltip,
-  Popper,
 } from "@material-ui/core"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
@@ -23,7 +21,6 @@ import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
-import Participant from "./Participant"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

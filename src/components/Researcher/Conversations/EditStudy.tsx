@@ -26,14 +26,12 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function EditStudy({ study, upatedDataStudy, allStudies, researcherId, ...props }) {
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [editStudy, setEditStudy] = useState(false)
   const [editStudyName, setEditStudyName] = useState("")
   const [aliasStudyName, setAliasStudyName] = useState("")
   const [studyArray, setStudyNameArray] = useState([])
-  const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
 
   const updateStudyName = (data) => {
     setEditStudy(false)
@@ -45,7 +43,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, research
   }
 
   const callbackModal = () => {
-    setOpenDialogManageStudies(false)
+    // setOpenDialogManageStudies(false)
   }
 
   const editStudyField = (selectedRows, event) => {

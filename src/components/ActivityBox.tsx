@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useEffect, useRef, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
+import LAMP from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -24,7 +24,6 @@ import {
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
 import { extractIdsWithHierarchy } from "./helper"
-import { tags_object } from "./data_portal/DataPortalShared"
 import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 
 const useStyles = makeStyles((theme: Theme) =>
