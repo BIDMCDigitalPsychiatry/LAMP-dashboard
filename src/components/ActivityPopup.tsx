@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Typography,
   Icon,
@@ -14,6 +14,8 @@ import {
   createStyles,
   DialogProps,
   Link,
+  Fab,
+  Tooltip,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -24,6 +26,9 @@ import gfm from "remark-gfm"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+import NotificationPage from "./NotificationPage"
+import ResponsiveDialog from "./ResponsiveDialog"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -153,6 +158,27 @@ const useStyles = makeStyles((theme: Theme) =>
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    headerTitleIcon: {
+      background: "none",
+      boxShadow: "none",
+      width: 36,
+      height: 36,
+      color: "#666",
+      marginLeft: 8,
+      "& .material-icons": {
+        fontSize: "2rem",
+      },
+      "&:hover": {
+        background: "#fff",
+      },
+      "&.active": {
+        color: "#e3b303",
+      },
+    },
+    dFlex: {
+      display: "Flex",
+      alignItems: "center",
+    },
   })
 )
 
@@ -171,6 +197,11 @@ export default function ActivityPopup({
   type,
   participant,
   showStreak,
+  updateLocalStorage,
+  onClose,
+  setFavorites,
+  savedActivities,
+  tab,
   ...props
 }: {
   activity: any
@@ -179,10 +210,63 @@ export default function ActivityPopup({
   type: string
   participant: any
   showStreak: Function
+  updateLocalStorage: Function
+  onClose?: Function
+  setFavorites?: any
+  savedActivities?: any
+  tab?: any
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [moduleActivity, setModuleActivity] = useState("")
+  const [open, setOpen] = useState(false)
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  useEffect(() => {
+    if (!!activity) {
+      const activityFromModule = localStorage.getItem("activityFromModule")
+      setModuleActivity(activityFromModule)
+    }
+  }, [activity])
 
+  useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteIds(tag)
+    })()
+  }, [])
+
+  const handleFavoriteClick = async (activityId) => {
+    try {
+      const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
+      let tag: string[] = !!result.error ? [] : result.data ?? []
+      const isCurrentlyFavorite = tag.includes(activityId)
+      let updatedTag
+      if (isCurrentlyFavorite) {
+        updatedTag = tag.filter((id) => id !== activityId)
+      } else {
+        updatedTag = [...tag, activityId]
+      }
+      await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
+      setFavoriteIds(updatedTag)
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error)
+    }
+  }
+
+  const handleCloseActivityPopup = (activity) => {
+    if (activity.spec === "lamp.group" && tab === "favorite") {
+      ;(async () => {
+        let tag =
+          [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0] ?? []
+        setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
+      })()
+    }
+  }
   return (
     <React.Fragment>
       <Dialog
@@ -200,7 +284,9 @@ export default function ActivityPopup({
           <IconButton
             aria-label="close"
             className={classes.closeButton}
-            onClick={(evt) => props.onClose(evt, "backdropClick")}
+            onClick={(evt) => {
+              onClose(evt, "backdropClick"), handleCloseActivityPopup(activity)
+            }}
           >
             <Icon>close</Icon>
           </IconButton>
@@ -221,8 +307,8 @@ export default function ActivityPopup({
               className={classes.topicon}
               style={{
                 margin: "auto",
-                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                  ? `url(${tag.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
+                background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                  ? `url(${tag?.filter((x) => x.id === activity?.id)[0]?.photo}) center center/contain no-repeat`
                   : activity?.spec === "lamp.breathe"
                   ? `url(${BreatheIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.journal"
@@ -235,13 +321,29 @@ export default function ActivityPopup({
             <Typography variant="body2" align="left">
               {`${t(type)}`}
             </Typography>
-            <Typography variant="h2">
+            <Typography variant="h2" className={classes.dFlex}>
               <ReactMarkdown
                 children={t(activity?.name ?? null)}
                 skipHtml={false}
                 remarkPlugins={[gfm, emoji]}
                 components={{ link: LinkRenderer }}
               />
+              {activity?.spec === "lamp.group" && (
+                <Tooltip
+                  title={
+                    favoriteIds.includes(activity.id)
+                      ? "Tap to remove from Favorite Activities"
+                      : "Tap to add to Favorite Activities"
+                  }
+                >
+                  <Fab
+                    className={`${classes.headerTitleIcon} ${favoriteIds.includes(activity.id) ? "active" : ""}`}
+                    onClick={() => handleFavoriteClick(activity.id)}
+                  >
+                    <Icon>star_rounded</Icon>
+                  </Fab>
+                </Tooltip>
+              )}{" "}
             </Typography>
           </div>
         </DialogTitle>
@@ -266,7 +368,7 @@ export default function ActivityPopup({
             <ReactMarkdown
               children={
                 activity?.spec !== "lamp.dbt_diary_card"
-                  ? t(tag.filter((x) => x.id === activity?.id)[0]?.description ?? null)
+                  ? t(tag?.filter((x) => x.id === activity?.id)[0]?.description ?? null)
                   : `${t("Daily log of events and related feelings. Track target behaviors and use of skills.")}`
               }
               skipHtml={false}
@@ -278,7 +380,18 @@ export default function ActivityPopup({
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
-              href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
+              href={
+                moduleActivity
+                  ? "javascript:void(0)"
+                  : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
+              }
+              onClick={(evt) => {
+                updateLocalStorage()
+                setTimeout(() => {
+                  setOpen(true)
+                  onClose(evt, "escapeKeyDown")
+                }, 100)
+              }}
               underline="none"
               className={classnames(
                 classes.btngreen,
@@ -297,6 +410,14 @@ export default function ActivityPopup({
           </Box>
         </DialogActions>
       </Dialog>
+      <ResponsiveDialog open={!!open} animate fullScreen onClose={() => setOpen(false)}>
+        <NotificationPage
+          participant={participant?.id ?? participant}
+          activityId={activity?.id}
+          mode={"dashboard"}
+          tab={"activity"}
+        />
+      </ResponsiveDialog>
     </React.Fragment>
   )
 }

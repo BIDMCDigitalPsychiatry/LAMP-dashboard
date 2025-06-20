@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -65,8 +65,15 @@ export default function DeleteActivity({
         } else {
           tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
         }
+        if (activity.spec === "lamp.module" || activity.spec === "lamp.group") {
+          let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0]
+          let hidden = (tag || []).filter((t) => t.moduleId !== activity.id)
+          await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
+        }
         console.dir("deleted tag " + JSON.stringify(tag))
-        let raw = await LAMP.Activity.delete(activity.id)
+        await LAMP.Activity.delete(activity.id)
         Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
       }
       Service.delete("activities", activityIds)

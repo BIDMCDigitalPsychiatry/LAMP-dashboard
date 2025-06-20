@@ -7,6 +7,7 @@ import { Service } from "../../DBService/DBService"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -92,13 +93,21 @@ export default function SensorsList({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchFilterSensors()
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      if ((selected || []).length > 0) {
+        searchFilterSensors()
+      } else {
+        setSensors([])
+        setLoading(false)
+      }
     } else {
-      setSensors([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
-  }, [selected])
+  }, [selected, sessionStorage.getItem("tokenInfo")])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {

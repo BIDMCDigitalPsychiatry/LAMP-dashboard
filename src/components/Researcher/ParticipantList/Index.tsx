@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
@@ -18,6 +18,7 @@ import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -186,13 +187,21 @@ export default function ParticipantList({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchParticipants()
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      if ((selected || []).length > 0) {
+        searchParticipants()
+      } else {
+        setParticipants([])
+        setLoading(false)
+      }
     } else {
-      setParticipants([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
-  }, [selected])
+  }, [selected, sessionStorage.getItem("tokenInfo")])
 
   const handleChange = (participant, checked) => {
     if (checked) {

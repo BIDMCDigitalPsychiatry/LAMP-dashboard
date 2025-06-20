@@ -11,7 +11,6 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 // Local Imports
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
@@ -182,9 +181,8 @@ export default function Participant({
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const [hiddenEvents, setHiddenEvents] = React.useState([])
-  const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const [visualPopup, setVisualPopup] = useState(null)
@@ -201,27 +199,48 @@ export default function Participant({
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
-  useEffect(() => {
+  const loadData = () => {
     setLoading(true)
-    LAMP.Activity.allByParticipant(participant.id, null, !(LAMP.Auth._auth.serverAddress === "demo.lamp.digital")).then(
-      (activities) => {
-        setActivities(activities)
+    LAMP.Activity.allByParticipant(participant.id, null, false).then((activities) => {
+      ;(async () => {
+        let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        const hiddenActivities = (tag || []).flatMap((module) => module.activities)
+        const updatedActivities = (activities || []).filter((activity) => !hiddenActivities.includes(activity.id))
+        setActivities(updatedActivities)
         props.activeTab(tab, participant.id)
-        let language = !!localStorage.getItem("LAMP_user_" + participant.id)
-          ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-          : getSelectedLanguage()
-          ? getSelectedLanguage()
-          : "en-US"
-        i18n.changeLanguage(language)
-        //  getShowWelcome(participant).then(setOpen)
-      }
-    )
+      })()
+
+      let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+        ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+        : getSelectedLanguage()
+        ? getSelectedLanguage()
+        : "en-US"
+      i18n.changeLanguage(language)
+      //  getShowWelcome(participant).then(setOpen)
+    })
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
+  }
+  useEffect(() => {
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      loadData()
+    } else {
+      window.location.href = "/#/"
+    }
+  }, [sessionStorage.getItem("tokenInfo")])
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   useEffect(() => {
-    setLoading(true)
+    props.activeTab(tab, participant.id)
     if (activities !== null) {
       Service.getAllTags("activitytags").then((result) => {
         if ((result || []).length == 0) {
@@ -239,6 +258,7 @@ export default function Participant({
                 streak: img?.streak ?? null,
                 questions: img?.questions ?? null,
                 visualSettings: img?.visualSettings ?? null,
+                branchingSettings: img?.branchingSettings ?? null,
               })
               if (count === activities.length - 1) {
                 Service.addUserData("activitytags", data, true).then(() => {
@@ -305,7 +325,7 @@ export default function Participant({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={activities == null || loading}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       {activities !== null && !loading && (
@@ -346,7 +366,6 @@ export default function Participant({
                 showStreak={showVisualPopup}
                 activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
-                  setSurveyName(activity.name)
                   setVisibleActivities([
                     {
                       ...activity,
@@ -363,7 +382,6 @@ export default function Participant({
                   ])
                 }}
                 onCopyAction={(activity, data) => {
-                  setSurveyName(activity.name)
                   setVisibleActivities([
                     {
                       ...activity,

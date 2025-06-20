@@ -2,7 +2,6 @@
 import React from "react"
 import { Typography, Grid, Card, Box, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { Participant as ParticipantObj } from "lamp-core"
-import { useTranslation } from "react-i18next"
 import { Vega } from "react-vega"
 
 const useStyles = makeStyles((theme: Theme) =>

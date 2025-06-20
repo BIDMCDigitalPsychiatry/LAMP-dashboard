@@ -3,7 +3,85 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
+function getContingencySettings() {
+  const enumIds = localStorage.getItem("enumIds")
+  const enumNames = localStorage.getItem("enumNames")
 
+  if (!enumIds || JSON.parse(enumIds).length === 0) return {}
+
+  return {
+    contigencySettings: {
+      type: "object",
+      title: "Contigency Settings",
+      required: ["enable_contigency"],
+      properties: {
+        enable_contigency: {
+          type: "boolean",
+          title: "Enable Contigency",
+          default: false,
+        },
+      },
+      dependencies: {
+        enable_contigency: {
+          oneOf: [
+            {
+              properties: {
+                enable_contigency: { const: true },
+                contigency_type: {
+                  type: "string",
+                  enum: ["activity", "question"],
+                  enumNames: [i18n.t("Activity"), i18n.t("Question")],
+                  default: "activity",
+                },
+              },
+              required: ["contigency_type"],
+            },
+            {
+              properties: {
+                enable_contigency: { const: false },
+              },
+            },
+          ],
+        },
+        contigency_type: {
+          allOf: [
+            {
+              if: {
+                properties: { contigency_type: { const: "activity" } },
+              },
+              then: {
+                properties: {
+                  activity: {
+                    type: "string",
+                    title: "Select an activity",
+                    enum: enumIds ? JSON.parse(enumIds) : [],
+                    enumNames: enumNames ? JSON.parse(enumNames) : [],
+                  },
+                },
+                required: ["activity"],
+              },
+            },
+            {
+              if: {
+                properties: { contigency_type: { const: "question" } },
+              },
+              then: {
+                properties: {
+                  question_index: {
+                    type: "number",
+                    title: "Question number",
+                    minimum: 1,
+                  },
+                },
+                required: ["question_index"],
+              },
+            },
+          ],
+        },
+      },
+    },
+  }
+}
 export const SchemaList = () => {
   return {
     "lamp.spin_wheel": {
@@ -926,7 +1004,6 @@ export const SchemaList = () => {
           },
           items: {
             required: ["text", "type"],
-
             type: "object",
             dependencies: {
               type: {
@@ -934,38 +1011,148 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "boolean", "short", "likert", "matrix"],
+                        enum: ["text", "short", "matrix"],
                       },
                     },
                   },
                   {
+                    type: "object",
                     properties: {
                       type: {
-                        enum: ["list", "multiselect"],
+                        // type: "string",
+                        enum: ["likert", "boolean", "list", "multiselect"],
+                        // default: "list"
                       },
-                      options: {
-                        type: "array",
-                        title: i18n.t("Response Options"),
-                        minItems: 1,
-                        items: {
-                          type: "object",
+                    },
+                    required: ["type", "options"],
+                    allOf: [
+                      // Likert type
+                      {
+                        if: {
+                          properties: { type: { const: "likert" } },
+                        },
+                        then: {
+                          required: ["options"],
+
                           properties: {
-                            value: {
-                              title: i18n.t("Option Text"),
-                              type: "string",
-                              minLength: 1,
-                              default: "",
-                            },
-                            description: {
-                              title: i18n.t("Option Description"),
-                              type: "string",
-                              default: "",
+                            options: {
+                              type: "array",
+                              title: i18n.t("Response Options"),
+                              minItems: 4,
+                              maxItems: 4,
+                              default: [
+                                { value: "3", description: "Nearly All the Time", contigencySettings: {} },
+                                { value: "2", description: "More than Half the Time", contigencySettings: {} },
+                                { value: "1", description: "Several Times", contigencySettings: {} },
+                                { value: "0", description: "Not at all", contigencySettings: {} },
+                              ],
+                              items: {
+                                type: "object",
+                                properties: {
+                                  value: {
+                                    title: "Value",
+                                    readOnly: true,
+                                    type: "string",
+                                    enum: ["3", "2", "1", "0"],
+                                    enumNames: [
+                                      i18n.t("Nearly All the Time"),
+                                      i18n.t("More than Half the Time"),
+                                      i18n.t("Several Times"),
+                                      i18n.t("Not at all"),
+                                    ],
+                                  },
+                                  description: {
+                                    readOnly: true,
+                                    title: i18n.t("Option Description"),
+                                    type: "string",
+                                  },
+                                  ...getContingencySettings(),
+                                },
+                                required: ["value"],
+                              },
                             },
                           },
                         },
                       },
-                    },
-                    required: ["options"],
+
+                      // Boolean type
+                      {
+                        if: {
+                          properties: { type: { const: "boolean" } },
+                        },
+                        then: {
+                          properties: {
+                            options: {
+                              type: "array",
+                              title: i18n.t("Response Options"),
+                              minItems: 2,
+                              maxItems: 2,
+                              default: [
+                                { value: "Yes", description: "Yes", contigencySettings: {} },
+                                { value: "No", description: "No", contigencySettings: {} },
+                              ],
+                              items: {
+                                type: "object",
+                                properties: {
+                                  value: {
+                                    readOnly: true,
+                                    title: i18n.t("Option Text"),
+                                    type: "string",
+                                    enum: ["Yes", "No"],
+                                    enumNames: [i18n.t("Yes"), i18n.t("No")],
+                                  },
+                                  description: {
+                                    readOnly: true,
+                                    title: i18n.t("Option Description"),
+                                    type: "string",
+                                  },
+                                  ...getContingencySettings(),
+                                },
+                                required: ["value", "description"],
+                              },
+                            },
+                          },
+                          required: ["options"],
+                        },
+                      },
+                      {
+                        if: {
+                          properties: {
+                            type: {
+                              enum: ["list", "multiselect"],
+                            },
+                          },
+                        },
+                        then: {
+                          properties: {
+                            options: {
+                              type: "array",
+                              title: i18n.t("Response Options"),
+                              minItems: 1,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  value: {
+                                    title: i18n.t("Option Text"),
+                                    type: "string",
+                                    minLength: 1,
+                                    default: "",
+                                  },
+                                  description: {
+                                    title: i18n.t("Option Description"),
+                                    type: "string",
+                                    default: "",
+                                  },
+                                  ...getContingencySettings(),
+                                },
+                                required: ["value"],
+                              },
+                            },
+                          },
+                          required: ["options"],
+                        },
+                      },
+                    ],
                   },
                   {
                     properties: {
@@ -1014,6 +1201,7 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
+                            ...getContingencySettings(),
                           },
                         },
                       },
@@ -1029,6 +1217,7 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Text"),
                 minLength: 1,
+                maxLength: 500,
                 default: "",
               },
               required: {
@@ -1040,6 +1229,7 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Description"),
                 default: "",
+                maxLength: 500,
               },
               type: {
                 type: "string",
@@ -1511,6 +1701,7 @@ export function spliceActivity({ raw, tag }) {
     photo: tag?.photo,
     streak: tag?.streak,
     visualSettings: tag?.visualSettings,
+    branchingSettings: tag?.branchingSettings,
     showFeed: tag?.showFeed,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
@@ -1526,9 +1717,11 @@ export function spliceActivity({ raw, tag }) {
               : question.type !== "matrix" && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
-                  description: tag?.questions?.[idx]?.options?.[idx2],
+                  description: tag?.questions?.[idx]?.options?.[idx2]?.description,
+                  contigencySettings: tag?.questions?.[idx]?.options?.[idx2]?.contigencySettings,
                 }))
               : question.options,
+
           warnings: question.warnings,
         })),
   }
@@ -1577,15 +1770,18 @@ export function unspliceActivity(x) {
       photo: x.photo,
       streak: x.streak,
       showFeed: x.showFeed,
+      branchingSettings: x.branchingSettings,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        options:
-          y?.options === null
-            ? null
-            : y?.type !== "matrix" && y?.type !== "time"
-            ? y?.options?.map((z) => z?.description ?? "")
-            : null,
+        options: Array.isArray(y?.options)
+          ? y.options.map((z) => ({
+              description: z?.description ?? "",
+              contigencySettings: ["slider", "list", "multiselect", "rating", "boolean", "likert"].includes(y?.type)
+                ? z?.contigencySettings ?? {}
+                : undefined,
+            }))
+          : [],
       })),
     },
   }

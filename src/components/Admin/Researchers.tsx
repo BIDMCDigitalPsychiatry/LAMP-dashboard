@@ -1,11 +1,9 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Backdrop, CircularProgress, DialogContent, Grid, Icon } from "@material-ui/core"
-import { useSnackbar } from "notistack"
+import { Box, Grid, Icon } from "@material-ui/core"
 import LAMP from "lamp-core"
-import { CredentialManager } from "../CredentialManager"
 import { useTranslation } from "react-i18next"
-import { MuiThemeProvider, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import Pagination from "../PaginatedElement"
 import ResearcherRow from "./ResearcherRow"
@@ -175,7 +173,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Researchers({ history, updateStore, adminType, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
-  const [page, setPage] = useState(0)
   const [rowCount, setRowCount] = useState(40)
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
@@ -183,7 +180,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
@@ -193,22 +190,29 @@ export default function Researchers({ history, updateStore, adminType, ...props 
 
   const refreshResearchers = () => {
     setPaginatedResearchers([])
-    setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
-      if (search.trim().length > 0) {
+      if (search?.trim()?.length > 0) {
         data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
         setResearchers(data)
       } else {
         setResearchers(data)
       }
-      setPaginatedResearchers(data.slice(0, rowCount))
+      setPaginatedResearchers(data?.slice(0, rowCount))
     })
   }
 
   useEffect(() => {
-    refreshResearchers()
-  }, [search])
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      refreshResearchers()
+    } else {
+      window.location.href = "/#/"
+    }
+  }, [search, sessionStorage.getItem("tokenInfo")])
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id
@@ -221,9 +225,8 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   }, [])
 
   const handleChangePage = (page: number, rowCount: number) => {
-    setPage(page)
     setRowCount(rowCount)
-    setPaginatedResearchers(researchers.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedResearchers(researchers?.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -236,9 +239,9 @@ export default function Researchers({ history, updateStore, adminType, ...props 
       />
       <Box className={classes.tableContainer} mt={4}>
         <Grid container spacing={3}>
-          {researchers.length > 0 ? (
+          {researchers?.length > 0 ? (
             <Grid container spacing={3}>
-              {(paginatedResearchers ?? []).map((item, index) => (
+              {(paginatedResearchers ?? [])?.map((item, index) => (
                 <Grid item lg={6} xs={12} key={item.id}>
                   <ResearcherRow
                     researcher={item}

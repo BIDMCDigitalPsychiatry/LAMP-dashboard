@@ -23,7 +23,7 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
-import { duplicate } from "vega-lite"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,7 +67,7 @@ export default function GameCreator({
   const breatheFileLimit = 10
 
   useEffect(() => {
-    setSchemaListObj(SchemaList())
+    updateActivities()
   }, [])
 
   useEffect(() => {
@@ -98,6 +98,7 @@ export default function GameCreator({
     photo: details?.photo ?? null,
     streak: details?.streak ?? null,
     visualSettings: details?.visualSettings ?? null,
+    branchingSettings: details?.branchingSettings ?? null,
     showFeed: details?.showFeed ?? null,
     settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
@@ -105,8 +106,29 @@ export default function GameCreator({
   })
 
   useEffect(() => {
+    const studyID = localStorage.getItem("studyId")
+    if (studyID != data.studyID) {
+      updateActivities()
+    }
     validate()
   }, [data])
+
+  const updateActivities = () => {
+    if (!!data.studyID) {
+      localStorage.setItem("studyId", data.studyID)
+      let enumActivityIds = []
+      let enumActivityNames = []
+      Service.getAll("activities").then((activities) => {
+        enumActivityIds = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.id)
+        enumActivityNames = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.name)
+        localStorage.setItem("enumIds", JSON.stringify(enumActivityIds))
+        localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
+        setSchemaListObj(SchemaList())
+      })
+    } else {
+      setSchemaListObj(SchemaList())
+    }
+  }
 
   const validateQuestions = (questions) => {
     let status = 0
@@ -139,7 +161,28 @@ export default function GameCreator({
             : optionsArray.push(0)
         })
       }
-
+      ;(questions || []).map((x, idx) => {
+        ;(questions[idx].options || []).map((i) => {
+          if (!!value?.id && !!i?.contigencySettings?.activity && i?.contigencySettings?.activity === value?.id) {
+            optionsArray.push(1)
+            enqueueSnackbar(
+              `${t("The selected activity in the contingency settings must differ from the activity being edited.")}`,
+              {
+                variant: "error",
+              }
+            )
+          }
+          if (
+            !!i?.contigencySettings?.question_index &&
+            i?.contigencySettings?.question_index > (questions || []).length + 1
+          ) {
+            optionsArray.push(1)
+            enqueueSnackbar(`${t("The specified question number does not exist.")}`, {
+              variant: "error",
+            })
+          }
+        })
+      })
       if (optionsArray.filter((val) => val !== 0).length > 0) {
         status = 1
         return false
@@ -464,6 +507,7 @@ export default function GameCreator({
       photo: details.photo,
       streak: details.streak,
       visualSettings: details?.visualSettings,
+      branchingSettings: details?.branchingSettings,
       showFeed: details.showFeed,
       studyID: details.studyId,
       category: data?.category ?? [],
@@ -495,7 +539,9 @@ export default function GameCreator({
             x.type === "list" ||
             x.type === "multiselect" ||
             x.type === "slider" ||
-            x.type === "rating"
+            x.type === "rating" ||
+            x.type === "boolean" ||
+            x.type === "likert"
           ) &&
           typeof x.options !== "undefined"
         ) {

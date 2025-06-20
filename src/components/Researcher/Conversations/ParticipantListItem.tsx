@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Fab, Icon, Typography, Box, makeStyles, Theme, createStyles, Grid, Badge, Dialog } from "@material-ui/core"
+import { Fab, Icon, Typography, Box, makeStyles, Theme, createStyles, Badge } from "@material-ui/core"
 // Local Imports
 import { sensorEventUpdate } from "../../BottomMenu"
-
 import { Service } from "../../DBService/DBService"
-import MessageDialog from "../ParticipantList/Profile/MessageDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "../../useInterval"
@@ -219,13 +217,6 @@ export default function ParticipantListItem({
           </Box>
         )}
       </Box>
-      {/* <Dialog
-        classes={{ paper: classes.popWidth }}
-        onClose={() => setDialogOpen(false)}
-        aria-labelledby="simple-dialog-title"
-        open={dialogOpen}
-      >
-        <div className={classes.padding20}> */}
       {!!enabled && !!dialogOpen && (
         <Messages
           setDialogOpen={setDialogOpen}
@@ -235,8 +226,6 @@ export default function ParticipantListItem({
           participantOnly={false}
         />
       )}
-      {/* </div>
-      </Dialog> */}
     </>
   )
 }

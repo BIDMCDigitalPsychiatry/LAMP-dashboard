@@ -11,7 +11,6 @@ import {
   Grid,
   Container,
   Typography,
-  Popover,
   Select,
   makeStyles,
   Theme,
@@ -28,7 +27,6 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useDropzone } from "react-dropzone"
-import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { saveSurveyActivity, saveCTestActivity, addActivity } from "../ActivityList/ActivityMethods"
 import Pagination from "../../PaginatedElement"
@@ -78,7 +76,6 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       marginRight: 15,
       color: "#7599FF",
-      // "&:hover": { background: "#f4f4f4" },
     },
     tableContainer: {
       "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
@@ -214,7 +211,6 @@ export default function ImportActivity({ ...props }) {
   const [paginatedImported, setPaginatedImported] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
-  const [duplicateExists, setDuplicateExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const inputRef = React.useRef(null)
   const [studies, setStudies] = useState(null)
@@ -342,27 +338,14 @@ export default function ImportActivity({ ...props }) {
     history.back()
   }
 
-  const checkDuplicateActivity = (obj, activitiesList, selectedStudyId) => {
-    setDuplicateExists(false)
-    const objArray = obj
-    objArray.map((eachData) => {
-      const nameExists = (activities || []).some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
-      if (nameExists) {
-        setDuplicateExists(true)
-      }
-    })
-  }
-
   const checkDuplicateUpdateActivity = (obj, activitiesList, selectedStudyId) => {
     const objArray = obj
     objArray.map((eachData, i) => {
       let activityStudyCount = activitiesList.reduce(function (n, eachActivity) {
-        //return n + (eachActivity.name === eachData.name && eachActivity.study_id === selectedStudyId)
         return n + (eachActivity.study_id === selectedStudyId)
       }, 0)
       const nameExists = activitiesList.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
       if (nameExists) {
-        //setDuplicateExists(true)
         if (activityStudyCount > 0) {
           objArray[i].name = eachData.name + "-duplicate-" + parseInt(activityStudyCount + 1)
         } else {
@@ -382,7 +365,6 @@ export default function ImportActivity({ ...props }) {
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       ) {
-        checkDuplicateActivity(obj, activities, inputRef.current.className)
         setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
       } else {
@@ -451,14 +433,7 @@ export default function ImportActivity({ ...props }) {
         ) : (
           ""
         )}
-        <Box
-          {...getRootProps()}
-          py={3}
-          //bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-          //color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
-          className={classes.dragDrop}
-          onClick={() => inputRef.current?.click()}
-        >
+        <Box {...getRootProps()} py={3} className={classes.dragDrop} onClick={() => inputRef.current?.click()}>
           <input
             {...getInputProps()}
             className={selectedStudy}

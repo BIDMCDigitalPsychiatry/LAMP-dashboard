@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const availableActivitySpecs = [
   "lamp.group",
+  "lamp.module",
   "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
@@ -65,6 +66,7 @@ export const availableActivitySpecs = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -84,6 +86,7 @@ export const games = [
   "lamp.voice_survey",
   "lamp.fragmented_letters",
   "lamp.digit_span",
+  "lamp.memory_game",
 ]
 export default function ActivityList({
   researcherId,
@@ -128,13 +131,21 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    if ((selected || []).length > 0) {
-      searchActivities()
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      if ((selected || []).length > 0) {
+        searchActivities()
+      } else {
+        setActivities([])
+        setLoading(false)
+      }
     } else {
-      setActivities([])
-      setLoading(false)
+      window.location.href = "/#/"
     }
-  }, [selected])
+  }, [selected, sessionStorage.getItem("tokenInfo")])
 
   const handleChange = (activity, checked) => {
     if (checked) {

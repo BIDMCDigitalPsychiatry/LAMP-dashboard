@@ -5,8 +5,6 @@ import locale_lang from "../../locale_map.json"
 import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
-// import { useWorker } from "@koale/useworker"
-import { Service } from "../DBService/DBService"
 
 export default function Researcher({ researcher, onParticipantSelect, mode, tab, ...props }) {
   const { t, i18n } = useTranslation()

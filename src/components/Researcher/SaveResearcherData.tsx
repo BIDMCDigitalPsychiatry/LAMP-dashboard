@@ -11,12 +11,13 @@ interface StudyObject {
 }
 export const fetchResult = async (authString, id, type, modal) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Basic " + authString,
+        Authorization: "Bearer " + userToken.accessToken,
       },
     })
   ).json()
@@ -25,12 +26,13 @@ export const fetchResult = async (authString, id, type, modal) => {
 
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Basic " + authString,
+        Authorization: "Bearer " + userToken.accessToken,
       },
       body: JSON.stringify(bodyData),
     })
@@ -43,15 +45,16 @@ const saveStudiesAndParticipants = (result, studies, researcherId) => {
   let activities = []
   let sensors = []
   let studiesList = []
-  result.studies.map((study) => {
-    participants = participants.concat(study.participants)
-    activities = activities.concat(study.activities)
-    sensors = sensors.concat(study.sensors)
-  })
-  studies.map((study) => {
-    studiesList = studiesList.concat(study.name)
-  })
-
+  if (Array.isArray(result.studies)) {
+    result.studies.map((study) => {
+      participants = participants.concat(study.participants)
+      activities = activities.concat(study.activities)
+      sensors = sensors.concat(study.sensors)
+    })
+    studies.map((study) => {
+      studiesList = studiesList.concat(study.name)
+    })
+  }
   let studiesSelected =
     localStorage.getItem("studies_" + researcherId) !== null
       ? JSON.parse(localStorage.getItem("studies_" + researcherId))
@@ -128,7 +131,7 @@ export const saveDataToCache = (authString, id) => {
       }
     })
     saveStudiesAndParticipants(data, studies, id)
-    studies.map((study) => {
+    studies?.map((study) => {
       fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
         saveSettings(sensors, "accelerometer")
         saveSettings(sensors, "analytics")

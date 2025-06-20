@@ -33,7 +33,6 @@ import {
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import LAMP from "lamp-core"
-import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
@@ -87,6 +86,12 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
+    },
+    backMain: {
+      width: 40,
+      height: 40,
+      marginTop: -8,
+      background: "#fff",
     },
     thumbContainer: {
       maxWidth: 1055,

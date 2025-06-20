@@ -6,6 +6,7 @@ import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
 import { Service } from "../../DBService/DBService"
 import useInterval from "../../useInterval"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -90,8 +91,16 @@ export default function StudiesList({
   }, [allStudies])
 
   useEffect(() => {
-    searchFilterStudies()
-  }, [search])
+    const userToken: any =
+      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
+        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
+        : null
+    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      searchFilterStudies()
+    } else {
+      window.location.href = "/#/"
+    }
+  }, [search, sessionStorage.getItem("tokenInfo")])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)

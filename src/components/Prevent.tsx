@@ -20,7 +20,7 @@ import {
 } from "@material-ui/core"
 import { Stack } from "@mui/material"
 import { Service } from "./DBService/DBService"
-import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
+import { KeyboardDatePicker } from "@material-ui/pickers"
 
 import LAMP, {
   Participant as ParticipantObj,
@@ -197,7 +197,7 @@ async function getActivityEvents(
       ...x,
       activity: _activities.find((y) => x.activity === y.id),
     }))
-    .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
+    .filter((x) => (!!x.activity ? !_hidden?.includes(`${x.timestamp}/${x.activity.id}`) : true))
     .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
     .map((x) => ({
       ...x,
@@ -408,7 +408,10 @@ export default function Prevent({
         setActivityCounts(activityEventCount)
         activities = activities.filter(
           (activity) =>
-            activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
+            activityEventCount[activity.name] > 0 &&
+            activity.spec !== "lamp.group" &&
+            activity.spec !== "lamp.tips" &&
+            activity.spec !== "lamp.module"
         )
         setActivities(activities)
         setSelectedActivities(activities.map((activity) => activity.name))

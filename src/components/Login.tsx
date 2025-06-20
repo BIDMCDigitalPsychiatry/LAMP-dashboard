@@ -30,6 +30,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+
 type SuggestedUrlOption = {
   label: string
 }
@@ -60,13 +61,7 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: {
-      color: "#6083E7",
-      fontWeight: "bold",
-      cursor: "pointer",
-      marginRight: "20px",
-      "&:hover": { textDecoration: "underline" },
-    },
+    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
     loginDisabled: {
@@ -75,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
+export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
@@ -87,12 +82,44 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
+  const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
+  const MAX_ATTEMPTS = 5
+  const LOCKOUT_DURATION = 60 * 60 * 1000
+  const LOGIN_ATTEMPTS_KEY = "loginAttempts"
+  const LOCKOUT_TIME_KEY = "lockoutTime"
+  const [isLockedOut, setIsLockedOut] = useState(false)
+  useEffect(() => {
+    setConfirmSession(false)
+    const cached = localStorage.getItem("cachedOptions")
+    localStorage.clear()
+    localStorage.setItem("cachedOptions", cached)
+    sessionStorage.clear()
+    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    if (lockoutTime) {
+      const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
+      const now = Date.now()
+      if (now < lockoutEnd) {
+        setIsLockedOut(true)
+        const remaining = lockoutEnd - now
+        setTimeout(() => {
+          setIsLockedOut(false)
+          localStorage.removeItem(LOCKOUT_TIME_KEY)
+          localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+        }, remaining)
+      } else {
+        // Lockout expired
+        localStorage.removeItem(LOCKOUT_TIME_KEY)
+        localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const cachedOptions = localStorage.getItem("cachedOptions")
     let options: SuggestedUrlOption[]
@@ -130,8 +157,84 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  let handleLogin = (event: any, mode?: string): void => {
+  function str2ab(base64) {
+    const binary = atob(base64)
+    const len = binary.length
+    const bytes = new Uint8Array(len)
+    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
+    return bytes.buffer
+  }
+  async function importPublicKey(pem) {
+    try {
+      if (!pem || typeof pem !== "string") {
+        setLoginClick(false)
+        // throw new Error("Public key PEM is undefined or not a string.")
+      }
+      const binaryDer = str2ab(
+        pem
+          .replace(/-----BEGIN PUBLIC KEY-----/, "")
+          .replace(/-----END PUBLIC KEY-----/, "")
+          .replace(/\s/g, "")
+      )
+
+      return await window.crypto.subtle.importKey(
+        "spki",
+        binaryDer,
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-256",
+        },
+        true,
+        ["encrypt"]
+      )
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const generateTokens = async (args: { id: string; password: string }) => {
+    const userName = args?.id?.trim()
+    const password = args?.password?.trim()
+    const response = await LAMP.Credential.publicKey()
+    const key = await importPublicKey(response)
+    let base64
+    try {
+      const encrypted = await window.crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        key,
+        new TextEncoder().encode(password)
+      )
+      base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+    } catch (error) {
+      console.error(error)
+    }
+
+    if (userName && password) {
+      try {
+        const res = await LAMP.Credential.login(userName, base64)
+        sessionStorage.setItem(
+          userTokenKey,
+          JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+        )
+        props?.setAuthenticated(true)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+    if (attempts >= MAX_ATTEMPTS) {
+      const lockoutUntil = Date.now() + LOCKOUT_DURATION
+      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+      setIsLockedOut(true)
+      return
+    }
+    setLoginClick(true)
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
@@ -145,65 +248,93 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
-    setIdentity({
+
+    if (!mode) {
+      await LAMP.Auth.set_identity({
+        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+        password: !!mode ? "demo" : state.password,
+        serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+      }).catch((err) => {
+        const currentAttempts = attempts + 1
+        localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
+        if (currentAttempts >= MAX_ATTEMPTS) {
+          const lockoutUntil = Date.now() + LOCKOUT_DURATION
+          localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
+          setIsLockedOut(true)
+        } else {
+          enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+            variant: "error",
+          })
+          if (!srcLocked)
+            enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
+              variant: "info",
+            })
+        }
+        setLoginClick(false)
+      })
+
+      await generateTokens({
+        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+        password: !!mode ? "demo" : state.password,
+      })
+    }
+    const res = await setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
-      .then((res) => {
-        if (res.authType === "participant") {
-          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
-          LAMP.SensorEvent.create(res.identity.id, {
-            timestamp: Date.now(),
-            sensor: "lamp.analytics",
-            data: {
-              type: "login",
-              device_type: "Dashboard",
-              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-            },
-          } as any).then((res) => console.dir(res))
-          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
-        }
-        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
-          let studiesSelected =
-            localStorage.getItem("studies_" + res.identity.id) !== null
-              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
-              : []
-          if (studiesSelected.length === 0) {
-            let studiesList = [res.identity.name]
-            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
-            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
-          }
-        }
-        process.env.REACT_APP_LATEST_LAMP === "true"
-          ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
-          : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
-        localStorage.setItem(
-          "LAMP_user_" + res.identity.id,
-          JSON.stringify({
-            language: selectedLanguage,
-          })
-        )
-        ;(async () => {
-          await Service.deleteDB()
-          if (mode != "selfHelp") {
-            await Service.deleteUserDB()
-          }
-        })()
-        setLoginClick(false)
-        onComplete()
-      })
-      .catch((err) => {
-        // console.warn("error with auth request", err)
-        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
-          variant: "error",
-        })
-        if (!srcLocked)
-          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-        setLoginClick(false)
-      })
-  }
 
+    if (res.authType === "participant") {
+      await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
+      await LAMP.SensorEvent.create(res.identity.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "login",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
+      await LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
+    }
+    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+      let studiesSelected =
+        localStorage.getItem("studies_" + res.identity.id) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+          : []
+      if (studiesSelected.length === 0) {
+        let studiesList = [res.identity.name]
+        localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+        localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+      }
+    }
+    process.env.REACT_APP_LATEST_LAMP === "true"
+      ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
+      : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
+    localStorage.setItem(
+      "LAMP_user_" + res?.identity?.id,
+      JSON.stringify({
+        language: selectedLanguage,
+      })
+    )
+    ;(async () => {
+      await Service.deleteDB()
+      await Service.deleteUserDB()
+    })()
+    if (!srcLocked)
+      enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
+    setLoginClick(false)
+    onComplete()
+    // .catch((err) => {
+    //   // console.warn("error with auth request", err)
+    //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+    //     variant: "error",
+    //   })
+    //   if (!srcLocked)
+    //     enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
+    //   setLoginClick(false)
+    // })
+  }
   const handleSubmit = () => {
     LAMP.initializeDemoDB(self_help_db)
     localStorage.setItem("demo_mode", "self_help")
@@ -239,6 +370,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               }}
             >
               <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://community.lamp.digital", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -283,6 +423,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       }}
                     />
                   </Box>
+                  {isLockedOut && (
+                    <div style={{ marginBottom: "12px" }}>
+                      <span style={{ color: "red", fontSize: "14px" }}>
+                        {t("Too many login attempts. Try again after 1 hour.")}
+                      </span>
+                    </div>
+                  )}
                   <TextField
                     select
                     label={`${t("Select Language")}`}
@@ -365,7 +512,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick ? classes.loginDisabled : ""}
+                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick || isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input
@@ -394,9 +542,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         localStorage.setItem("demo_mode", "try_it")
                         setTryitMenu(event.currentTarget)
                       }}
+                      // setTryitMenu(event.currentTarget)}
                     >
                       {`${t("Try it")}`}
                     </Link>
+                    <br />
                     <Link
                       underline="none"
                       className={classes.linkBlue}
@@ -406,8 +556,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     >
                       {`${t("Self Help")}`}
                     </Link>
-                    {/* <br />
-                  <Link
+                    {/* <Link
                     underline="none"
                     className={classes.linkBlue}
                     onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}

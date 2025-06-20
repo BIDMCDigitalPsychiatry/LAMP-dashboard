@@ -1,6 +1,6 @@
 // Core Imports
-import React, { useState, useCallback, useEffect } from "react"
-import { useMediaQuery, useTheme } from "@material-ui/core"
+import React, { useState, useCallback } from "react"
+import { useMediaQuery } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { Handler } from "vega-tooltip"
 

@@ -1,7 +1,6 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { Box, Typography, Grid, Checkbox, makeStyles, createStyles } from "@material-ui/core"
-import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"
 import { useTranslation } from "react-i18next"
@@ -48,16 +47,34 @@ export default function ActivityRow({
   const { t } = useTranslation()
 
   const types = {
-    "lamp.survey": `${t("Survey")}`,
-    "lamp.group": `${t("Group")}`,
-    "lamp.tips": `${t("Tips")}`,
     "lamp.journal": `${t("Journal")}`,
+    "lamp.scratch_image": `${t("Scratch card")}`,
     "lamp.breathe": `${t("Breathe")}`,
+    "lamp.tips": `${t("Tip")}`,
     "lamp.dbt_diary_card": `${t("DBT Diary Card")}`,
-    "lamp.scratch_image": `${t("Scratch image")}`,
+    "lamp.cats_and_dogs": `${t("Cats and Dogs")}`,
+    "lamp.jewels_a": `${t("Jewels A")}`,
+    "lamp.jewels_b": `${t("Jewels B")}`,
+    "lamp.spatial_span": `${t("Spatial Span")}`,
+    "lamp.pop_the_bubbles": `${t("Pop the bubbles")}`,
+    "lamp.balloon_risk": `${t("Balloon Risk")}`,
+    "lamp.recording": `${t("Voice Recording")}`,
+    "lamp.survey": `${t("Survey Instrument")}`,
+    "lamp.group": `${t("Activity Group")}`,
+    "lamp.module": `${t("Activity Module")}`,
     "lamp.memory_game": `${t("Memory Game")}`,
     "lamp.goals": `${t("Goals")}`,
     "lamp.medications": `${t("Medications")}`,
+    "lamp.spin_wheel": `${t("Spin The Wheel")}`,
+    "lamp.maze_game": `${t("Maze Game")}`,
+    "lamp.emotion_recognition": `${t("Emotion Recognition")}`,
+    "lamp.symbol_digit_substitution": `${t("Symbol-digit Substitution")}`,
+    "lamp.dcog": `${t("D-Cog")}`,
+    "lamp.funny_memory": `${t("Funny Memory Game")}`,
+    "lamp.trails_b": `${t("Trails B")}`,
+    "lamp.voice_survey": `${t("Speech Recording")}`,
+    "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
+    "lamp.digit_span": `${t("Digit Span")}`,
   }
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

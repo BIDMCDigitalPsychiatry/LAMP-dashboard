@@ -20,6 +20,15 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
   },
+  activityLevel: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.2)",
+    borderRadius: "15px 0 0 0",
+    padding: "4px 7px",
+    color: "#000",
+  },
 }))
 
 export default function GroupActivity({ participant, activity, noBack, tab, ...props }) {
@@ -31,12 +40,21 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   const { t } = useTranslation()
   const [index, setIndex] = useState(-1)
   const [data, setResponse] = useState(null)
+  const [groupActivitySettings, setGroupActivitySettings] = useState({
+    track_progress: false,
+    sequential_ordering: false,
+    hide_sub_activities: false,
+    hide_on_completion: false,
+    initialize_opened: false,
+  })
+  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
 
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
-    if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
+
+    if (!!favoriteActivities && (groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
@@ -51,16 +69,29 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
         })
       })
     }
-  }, [index])
+  }, [index, favoriteActivities])
 
   useEffect(() => {
     if (groupActivities.length > 0) setIndex(0)
   }, [groupActivities])
 
   useEffect(() => {
+    ;(async () => {
+      let tag =
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0] ?? []
+      setFavoriteActivities(tag)
+    })()
     LAMP.Activity.view(activity.id).then((data) => {
       setIndex(-1)
-      setGroupActivities(data.settings)
+      if (Array.isArray(data.settings)) {
+        setGroupActivities(data.settings)
+      } else {
+        setGroupActivities(data.settings?.activities)
+        let { activities, ...settings } = data.settings
+        setGroupActivitySettings(settings)
+      }
     })
   }, [])
 
@@ -90,10 +121,16 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     <div style={{ height: "100%" }}>
       {!!currentActivity && (
         <Box>
+          {groupActivitySettings && !!groupActivitySettings?.track_progress && (
+            <Box className={classes.activityLevel}>
+              Activity {index + 1} of {groupActivities.length}
+            </Box>
+          )}
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
             participant={participant}
+            favoriteActivities={favoriteActivities}
             onComplete={(a) => {
               setResponse({})
             }}

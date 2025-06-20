@@ -10,12 +10,17 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
+import ResponsiveDialog from "./ResponsiveDialog"
+import ModuleActivity from "./ModuleActivity"
+import NotificationPage from "./NotificationPage"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -55,7 +60,16 @@ const demoActivities = {
   "lamp.digit_span": "digitspan",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
+export default function EmbeddedActivity({
+  participant,
+  activity,
+  name,
+  onComplete,
+  noBack,
+  tab,
+  favoriteActivities,
+  ...props
+}) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -69,9 +83,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [timestamp, setTimestamp] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [warningsDialogState, setWarningsDialogState] = useState(null)
+  const [responseActivity, setResponseActivity] = useState(null)
+  const [showPopup, setShowPopUp] = useState(false)
+  const [secondaryActivity, setSecondaryActivity] = useState(null)
+  const [surveyResponse, setSurveyResponse] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
+    localStorage.removeItem("lastUrl")
     setCurrentActivity(activity)
     setSaved(true)
     setEmbeddedActivity("")
@@ -81,6 +100,21 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [activity])
 
   useEffect(() => {
+    if (!!responseActivity) {
+      LAMP.Activity.view(responseActivity)
+        .then((data: any) => {
+          if (!!data) {
+            setSecondaryActivity(data)
+            setShowPopUp(true)
+          }
+        })
+        .catch((e) => {
+          console.log("url cannot be opened")
+        })
+    }
+  }, [responseActivity])
+
+  useEffect(() => {
     if (currentActivity !== null && !!currentActivity?.spec) {
       setLoading(true)
       activateEmbeddedActivity(currentActivity)
@@ -88,31 +122,52 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [currentActivity])
 
   const handleSubmit = (e) => {
-    localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
-    let warnings = []
-    if (e.data !== null) {
-      try {
-        const data = JSON.parse(e.data)
-        currentActivity.settings.map((setting, index) => {
-          if (!!setting.warnings && !!data["temporal_slices"][index]) {
-            setting.warnings.map((warning) => {
-              if (warning.answer === data["temporal_slices"][index].value) {
-                warnings.push(warning)
-              }
-            })
-          }
-        })
-      } catch {}
-    }
-
-    if (warnings.length > 0) {
-      setWarningsDialogState({
-        warnings,
-        activitySubmitEvent: e,
-      })
+    if (currentActivity?.spec === "lamp.survey" && e?.data && e?.data?.type === "OPEN_ACTIVITY") {
+      localStorage.setItem("lastUrl", window.location.href)
+      setResponseActivity(e?.data?.activityId)
     } else {
-      setWarningsDialogState(null)
-      handleSaveData(e)
+      let skipSaveActivity = false
+      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      let warnings = []
+      if (e.data !== null) {
+        try {
+          const data = JSON.parse(e.data)
+          const isSurvey = currentActivity?.spec === "lamp.survey"
+          const branchingSettings = currentActivity?.branchingSettings
+          const totalScore = data?.static_data?.totalScore
+          if (isSurvey && branchingSettings) {
+            const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
+            const hasActivityId = !!branchingSettings.activityId
+            if (meetsScoreThreshold && hasActivityId) {
+              setResponseActivity(branchingSettings.activityId)
+              localStorage.setItem("response", JSON.stringify(e.data))
+              setSurveyResponse(e)
+              skipSaveActivity = true
+            }
+          }
+          currentActivity.settings.map((setting, index) => {
+            if (!!setting.warnings && !!data["temporal_slices"][index]) {
+              setting.warnings.map((warning) => {
+                if (warning.answer === data["temporal_slices"][index].value) {
+                  warnings.push(warning)
+                }
+              })
+            }
+          })
+        } catch {}
+      }
+
+      if (warnings.length > 0) {
+        setWarningsDialogState({
+          warnings,
+          activitySubmitEvent: e,
+        })
+      } else {
+        setWarningsDialogState(null)
+        if (!skipSaveActivity) {
+          handleSaveData(e)
+        }
+      }
     }
   }
 
@@ -138,9 +193,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           setEmbeddedActivity(undefined)
           setSettings(null)
         } else {
-          setSaved(true)
-          onComplete(null)
-          setLoading(false)
+          ;(async () => {
+            data["activity"] = currentActivity.id
+            await updateFavorite(data)
+            setSaved(true)
+            onComplete(null)
+            setLoading(false)
+          })()
         }
       }
     }
@@ -160,6 +219,22 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [iFrame])
 
+  const updateFavorite = async (data) => {
+    if (typeof data?.static_data?.is_favorite !== undefined) {
+      let tag = favoriteActivities
+      if (!!data?.static_data?.is_favorite) {
+        if ((tag || []).filter((t) => t == data.activity).length === 0) {
+          tag.push(data.activity)
+        }
+      } else if ((tag || []).filter((t) => t == data.activity).length > 0) {
+        tag = (tag || []).filter((t) => t !== data.activity)
+      }
+      await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
+      delete data.static_data.is_favorite
+    }
+    return data
+  }
+
   useEffect(() => {
     try {
       if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
@@ -171,19 +246,35 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             currentActivity.id,
             activityTimestamp
           )
-          setCurrentActivity(null)
-          LAMP.ActivityEvent.create(participant?.id ?? participant, data)
-            .catch((e) => {
-              enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
-                variant: "error",
-              })
-            })
-            .then((x) => {
+          ;(async () => {
+            const updated = await updateFavorite(data)
+            if (!!updated) {
+              LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+                .catch((e) => {
+                  enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                    variant: "error",
+                  })
+                })
+                .then((x) => {
+                  setCurrentActivity(null)
+                  setSecondaryActivity(null)
+                  localStorage.setItem(
+                    "first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id,
+                    "true"
+                  )
+                  setSaved(true)
+                  onComplete(data)
+                  setLoading(false)
+                })
+            } else {
+              setCurrentActivity(null)
+              setSecondaryActivity(null)
               localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
               setSaved(true)
               onComplete(data)
               setLoading(false)
-            })
+            }
+          })()
         } else {
           onComplete(null)
           setLoading(false)
@@ -210,6 +301,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
+        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
@@ -227,7 +319,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setLoading(false)
     }
   }
-
   const loadFallBack = async () => {
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
@@ -243,9 +334,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const warningTextSet = new Set(warningTexts)
     return Array.from(warningTextSet)
   }
+  const [open, setOpen] = useState(false)
 
   return (
-    <div style={{ display: "flex", width: "100%", height: "100vh", flexDirection: "column", overflow: "hidden" }}>
+    <div
+      style={{
+        display: "flex",
+        width: "100%",
+        height: "100vh",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       {embeddedActivity !== "" && (
         <iframe
           ref={(e) => {
@@ -291,6 +391,81 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }}
           >
             {t("Ok")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <ResponsiveDialog
+        open={!!open}
+        transient={secondaryActivity?.spec === "lamp.module"}
+        animate
+        fullScreen
+        onClose={() => {
+          setOpen(false)
+          localStorage.removeItem("activityFromModule")
+          const response =
+            typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
+          if (response) {
+            handleSaveData({ data: response })
+          }
+        }}
+      >
+        {secondaryActivity?.spec === "lamp.module" ? (
+          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+        ) : (
+          <NotificationPage
+            participant={participant?.id ?? participant}
+            activityId={responseActivity}
+            mode={"dashboard"}
+            tab={"activity"}
+          />
+        )}
+      </ResponsiveDialog>
+      <Dialog
+        open={!!showPopup}
+        onClose={() => {
+          setShowPopUp(false)
+          setResponseActivity(null)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{`${t("Activity")}`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`${t(
+              "There is an activity based on your response. Would you like to proceed to it or go back to the survey?"
+            )}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+              localStorage.setItem("SurveyId", currentActivity?.id)
+              if (secondaryActivity.spec === "lamp.module") {
+                setOpen(true)
+              } else {
+                const url = `/#/participant/${participant}/activity/${responseActivity}?mode=responseActivity`
+                window.location.href = url
+              }
+            }}
+            color="primary"
+            autoFocus
+          >
+            {`${t("Proceed")}`}
+          </Button>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+              setSecondaryActivity(null)
+              setResponseActivity(null)
+              if (surveyResponse) {
+                handleSaveData(surveyResponse)
+              }
+            }}
+            color="secondary"
+          >
+            {`${t("Go Back")}`}
           </Button>
         </DialogActions>
       </Dialog>
