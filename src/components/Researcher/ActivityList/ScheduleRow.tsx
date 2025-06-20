@@ -165,15 +165,7 @@ const localeMap = {
   "zh-HK": zhHKLocale,
 }
 import DateFnsUtils from "@date-io/date-fns"
-// import RemindBefore from "./ReminderSettings/RemindBefore"
-// import Repeat from "./ReminderSettings/Repeat"
-// import ReminderSettings from "./ReminderSettings"
 
-class LocalizedUtils extends DateFnsUtils {
-  getWeekdays() {
-    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-  }
-}
 export default function ScheduleRow({
   scheduleRow,
   index,

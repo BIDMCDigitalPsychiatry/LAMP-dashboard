@@ -439,7 +439,6 @@ export default function Tips({
           }
         : {
             id: value?.id || category ? category : undefined,
-            //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,

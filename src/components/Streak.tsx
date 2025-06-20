@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import {
   Dialog,
   DialogProps,
@@ -6,7 +6,6 @@ import {
   DialogTitle,
   Icon,
   IconButton,
-  Slide,
   useTheme,
   useMediaQuery,
   makeStyles,

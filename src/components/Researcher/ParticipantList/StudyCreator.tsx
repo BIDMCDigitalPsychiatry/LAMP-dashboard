@@ -6,7 +6,6 @@ import {
   IconButton,
   Button,
   TextField,
-  MenuItem,
   Typography,
   Dialog,
   DialogTitle,
@@ -66,7 +65,7 @@ export default function StudyCreator({
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
   const [duplicateCnt, setCount] = useState(0)
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
   const validate = () => {

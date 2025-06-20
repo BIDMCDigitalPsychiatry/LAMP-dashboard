@@ -1,28 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react"
-import {
-  TextField,
-  makeStyles,
-  createStyles,
-  Theme,
-  Switch,
-  FormControlLabel,
-  Grid,
-  Divider,
-  Typography,
-  ButtonBase,
-  Icon,
-  Tooltip,
-  Box,
-  MenuItem,
-} from "@material-ui/core"
-import { useSnackbar } from "notistack"
-import Jewels from "../../../icons/VisualPopup/Jewels.svg"
-import Maze from "../../../icons/VisualPopup/Maze.svg"
-import SpatialSpan from "../../../icons/VisualPopup/SpatialSpan.svg"
-import SpinWheel from "../../../icons/VisualPopup/SpinWheel.svg"
-import Symbol_Digit from "../../../icons/VisualPopup/Symbol_Digit.svg"
+import React, { useState, useEffect } from "react"
+import { TextField, makeStyles, createStyles, Theme, Grid, Divider, Typography, MenuItem } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { useDropzone } from "react-dropzone"
 import { Service } from "../../DBService/DBService"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

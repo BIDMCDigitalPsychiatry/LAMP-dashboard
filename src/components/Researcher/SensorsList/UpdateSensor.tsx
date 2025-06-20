@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useSnackbar } from "notistack"
-import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
 import { Service } from "../../DBService/DBService"

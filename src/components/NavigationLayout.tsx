@@ -33,7 +33,6 @@ import {
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import LAMP from "lamp-core"
-import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { Box, Typography, Grid, makeStyles, createStyles } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import AddSensor from "../../SensorsList/AddSensor"
 import { Service } from "../../../DBService/DBService"

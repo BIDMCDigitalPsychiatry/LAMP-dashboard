@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react"
-import { Box, Icon, Fab, makeStyles, Theme, createStyles, FormControlLabel, Checkbox } from "@material-ui/core"
+import React, { useState } from "react"
+import { Icon, Fab, makeStyles, Theme, createStyles, FormControlLabel, Checkbox } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../../ConfirmationDialog"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

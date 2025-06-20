@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import SearchBox from "../SearchBox"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function Header({ researchers, searchData, refreshResearchers, adminType, ...props }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <Box display="flex" alignItems="center" className={classes.header}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Box, makeStyles } from "@material-ui/core"
 import Autosuggest from "react-autosuggest"
 import i18n from "./../../i18n"

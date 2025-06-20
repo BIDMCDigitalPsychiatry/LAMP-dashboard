@@ -1,6 +1,6 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
-import { Box, Typography, Icon, IconButton, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
+import React from "react"
+import { Box, Typography, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import UpdateSensor from "../../SensorsList/UpdateSensor"
 const useStyles = makeStyles((theme) =>

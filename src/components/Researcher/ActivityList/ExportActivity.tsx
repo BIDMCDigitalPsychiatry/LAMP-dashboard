@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
+import React from "react"
+import { Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -22,9 +22,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff" },
       "& span.MuiIcon-root": { fontSize: 20, marginRight: 3 },
-      [theme.breakpoints.up("md")]: {
-        //position: "absolute",
-      },
     },
   })
 )

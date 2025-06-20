@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Tooltip,
@@ -395,20 +395,6 @@ export default function GroupCreator({
                 labelPlacement="end"
               />
             )}
-            {/* {type !== "lamp.group" && (
-              <FormControlLabel
-                value="hide_on_completion"
-                control={
-                  <Switch
-                    color="primary"
-                    checked={data.settings?.hide_on_completion}
-                    onChange={(evt) => setHideOnCompletion(evt.target.checked)}
-                  />
-                }
-                label="Hide on Completion"
-                labelPlacement="end"
-              />
-            )} */}
             <FormControlLabel
               value="hide_sub_activities"
               control={

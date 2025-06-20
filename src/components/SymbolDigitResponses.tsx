@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { makeStyles, Theme, createStyles, TableCell, Table, TableRow, TableHead, TableBody } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import Pagination from "./PaginatedElement"

@@ -11,7 +11,6 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 // Local Imports
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
@@ -27,7 +26,6 @@ import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import locale_lang from "../locale_map.json"
 import VisualPopup from "./VisualPopup"
-import BranchingSettings from "./Researcher/ActivityList/BranchingSettings"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -183,7 +181,6 @@ export default function Participant({
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const [hiddenEvents, setHiddenEvents] = React.useState([])
-  const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
   const [loading, setLoading] = useState(true)
   const [openComplete, setOpenComplete] = React.useState(false)
@@ -369,7 +366,6 @@ export default function Participant({
                 showStreak={showVisualPopup}
                 activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
-                  setSurveyName(activity.name)
                   setVisibleActivities([
                     {
                       ...activity,
@@ -386,7 +382,6 @@ export default function Participant({
                   ])
                 }}
                 onCopyAction={(activity, data) => {
-                  setSurveyName(activity.name)
                   setVisibleActivities([
                     {
                       ...activity,

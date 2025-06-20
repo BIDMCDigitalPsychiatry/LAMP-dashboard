@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react"
 import { Typography, makeStyles, Box, Grid, Container, useMediaQuery, useTheme, Icon } from "@material-ui/core"
 import WeekView from "./WeekView"
-import LAMP from "lamp-core"
 import { DatePicker } from "@material-ui/pickers"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
