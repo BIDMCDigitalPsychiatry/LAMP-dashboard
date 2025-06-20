@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useEffect, useRef, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
-import LAMP from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -24,6 +24,7 @@ import {
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
 import { extractIdsWithHierarchy } from "./helper"
+import { tags_object } from "./data_portal/DataPortalShared"
 import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -119,6 +120,19 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    tabPanelMain: {
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
+    tabHeader: {
+      "& button": {
+        fontSize: 15,
+        fontWeight: 600,
+        [theme.breakpoints.down("xs")]: {
+          fontSize: 14,
+        },
+      },
     },
   })
 )
@@ -676,7 +690,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       <TabContext value={tab}>
         {favorites.length > 0 && (
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={(e, val) => setTab(val)}>
+            <TabList onChange={(e, val) => setTab(val)} centered className={classes.tabHeader}>
               <Tab label="Favorites" value="favorite" />
               <Tab label="Modules" value="modules" />
               <Tab label="Other Activities" value="other" />
@@ -684,7 +698,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           </Box>
         )}
         {favorites.length > 0 && (
-          <TabPanel value="favorite">
+          <TabPanel value="favorite" className={classes.tabPanelMain}>
             {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
               <ActivityAccordian
                 data={(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).concat({
@@ -774,7 +788,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
           </TabPanel>
         )}
-        <TabPanel value="modules">
+        <TabPanel value="modules" className={classes.tabPanelMain}>
           {(moduleData || []).length > 0 ? (
             <ActivityAccordian
               data={moduleData.concat({
@@ -862,7 +876,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             </Grid>
           )}
         </TabPanel>
-        <TabPanel value="other">
+        <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
             {savedActivities.filter((activity) => activity.spec != "lamp.module").length
               ? savedActivities

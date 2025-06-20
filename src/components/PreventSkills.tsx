@@ -23,8 +23,6 @@ import {
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { getDates, getDateVal } from "./PreventDBT"
-import { getDateString } from "./PreventDBT"
-import { SettingsApplicationsRounded } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
