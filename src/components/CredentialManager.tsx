@@ -338,7 +338,7 @@ export function CredentialEditor({
         />
       )}
       {["create-new", "reset-password", "update-profile"].includes(mode) && (
-        <Box>
+        <Box width={1}>
           <TextField
             fullWidth
             label={`${t("Password")}`}
@@ -645,7 +645,7 @@ export const CredentialManager: React.FunctionComponent<{
   }
 
   return (
-    <Box {...props}>
+    <Box {...props} style={{ margin: 24 }}>
       <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
