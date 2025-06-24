@@ -13,6 +13,7 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
 import ActivityAccordian from "./ActivityAccordian"
+import VideoMeeting from "../icons/Video.svg"
 import {
   Backdrop,
   Button,
@@ -778,6 +779,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                   ? `url(${JournalIcon}) center center/contain no-repeat`
                                   : activity.spec === "lamp.scratch_image"
                                   ? `url(${ScratchCard}) center center/contain no-repeat`
+                                  : activity?.spec === "lamp.zoom_meeting"
+                                  ? `url(${VideoMeeting}) center center/contain no-repeat`
                                   : `url(${InfoIcon}) center center/contain no-repeat`,
                               }}
                             ></Box>
@@ -942,6 +945,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                 ? `url(${JournalIcon}) center center/contain no-repeat`
                                 : activity.spec === "lamp.scratch_image"
                                 ? `url(${ScratchCard}) center center/contain no-repeat`
+                                : activity?.spec === "lamp.zoom_meeting"
+                                ? `url(${VideoMeeting}) center center/contain no-repeat`
                                 : `url(${InfoIcon}) center center/contain no-repeat`,
                             }}
                           ></Box>

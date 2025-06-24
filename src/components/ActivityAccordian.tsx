@@ -28,6 +28,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import LAMP from "lamp-core"
 import { getActivityEvents } from "./ActivityBox"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
+import VideoMeeting from "../icons/Video.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -359,6 +360,8 @@ const renderActivities = (
                           ? `url(${JournalIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.scratch_image"
                           ? `url(${ScratchCard}) center center/contain no-repeat`
+                          : activity?.spec === "lamp.zoom_meeting"
+                          ? `url(${VideoMeeting}) center center/contain no-repeat`
                           : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
                     ></Box>

@@ -25,6 +25,7 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
+import VideoMeeting from "../icons/Video.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -269,22 +270,14 @@ export default function ActivityPopup({
   }
 
   const openMeetingLink = (meetingActivity) => {
-    console.log("meeting", meetingActivity)
-    return meetingActivity?.settings?.zoom_link
-    // const now = new Date().getTime();
-
-    // // Attempt to open in app
-    // const win = window.open(meetingActivity?.zoom_link, "_self");
-
-    // // Fallback to browser after timeout if app not opened
-    // setTimeout(() => {
-    //   const elapsed = new Date().getTime() - now;
-
-    //   // If still here after ~1500ms, assume app didn't open
-    //   if (elapsed < 2000) {
-    //     window.open(meetingActivity?.zoom_link, "_blank");
-    //   }
-    // }, 1500);
+    const now = new Date().getTime()
+    const win = window.open(meetingActivity?.settings?.zoom_link, "_self")
+    setTimeout(() => {
+      const elapsed = new Date().getTime() - now
+      if (elapsed < 2000) {
+        window.open(meetingActivity?.settings?.zoom_link, "_blank")
+      }
+    }, 1500)
   }
 
   return (
@@ -335,6 +328,8 @@ export default function ActivityPopup({
                   ? `url(${JournalIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.scratch_image"
                   ? `url(${ScratchCard}) center center/contain no-repeat`
+                  : activity?.spec === "lamp.zoom_meeting"
+                  ? `url(${VideoMeeting}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>
@@ -401,18 +396,20 @@ export default function ActivityPopup({
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               href={
-                moduleActivity
+                moduleActivity || activity?.spec === "lamp.zoom_meeting"
                   ? "javascript:void(0)"
-                  : activity?.spec === "lamp.zoom_meeting"
-                  ? openMeetingLink(activity)
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
-                updateLocalStorage()
-                setTimeout(() => {
-                  setOpen(true)
-                  onClose(evt, "escapeKeyDown")
-                }, 100)
+                if (activity?.spec == "lamp.zoom_meeting") {
+                  openMeetingLink(activity)
+                } else {
+                  updateLocalStorage()
+                  setTimeout(() => {
+                    setOpen(true)
+                    onClose(evt, "escapeKeyDown")
+                  }, 100)
+                }
               }}
               underline="none"
               className={classnames(
