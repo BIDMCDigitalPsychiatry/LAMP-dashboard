@@ -3,12 +3,6 @@ import { Avatar, Menu, Tooltip, ButtonBase } from "@material-ui/core"
 import clsx from "clsx"
 import { Box, makeStyles, createStyles } from "@material-ui/core"
 
-/*const createTestAccount = (id) => ({
-  id,
-  name: `${id}`,
-  image: "/images/test.jpg",
-})*/
-
 export const useMenu = (): any => {
   const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null })
   const handleOpen = React.useCallback((id, event) => setAnchor({ id, anchorEl: event.currentTarget }), [setAnchor])

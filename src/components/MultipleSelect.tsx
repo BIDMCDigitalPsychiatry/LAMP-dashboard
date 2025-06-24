@@ -1,7 +1,6 @@
 import React, { useEffect } from "react"
 import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { id } from "vega"
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

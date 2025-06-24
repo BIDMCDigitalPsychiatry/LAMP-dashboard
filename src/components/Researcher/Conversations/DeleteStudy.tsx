@@ -44,7 +44,6 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
-  const [loading, setLoading] = useState(true)
   const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
   const [studyIdDelete, setStudyIdForDelete] = useState("")
 

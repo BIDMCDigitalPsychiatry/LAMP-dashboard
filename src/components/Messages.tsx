@@ -4,13 +4,11 @@ import {
   Typography,
   makeStyles,
   Box,
-  Grid,
   IconButton,
   Container,
   AppBar,
   Toolbar,
   Icon,
-  Link,
   Divider,
   useTheme,
   useMediaQuery,
@@ -20,7 +18,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import ConfirmationDialog from "./ConfirmationDialog"
 import { Alert } from "@mui/material"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
@@ -169,13 +166,10 @@ export default function Messages({
   const classes = useStyles()
   const [open, setOpen] = useState(true)
   const [conversations, setConversations] = useState({})
-  const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [confirmationDialog, setConfirmationDialog] = useState(!!participantOnly)
   const [coordinators, setCoordinators] = useState([])
-  const [selectedCoordinator, setSelectedCoordinator] = useState()
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -325,18 +319,6 @@ export default function Messages({
         </Box>
       </Box>
     )
-  }
-
-  const confirmAction = (status: string) => {
-    if (status == "No") {
-      history.back()
-    }
-    setConfirmationDialog(false)
-  }
-
-  const openMessage = (coordinator) => {
-    setSelectedCoordinator(coordinator)
-    setOpen(true)
   }
 
   return (

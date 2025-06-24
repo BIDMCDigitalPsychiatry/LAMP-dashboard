@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import {
   Box,
   Typography,
@@ -12,8 +12,6 @@ import {
 } from "@material-ui/core"
 import ScheduleActivity from "./ScheduleActivity"
 import UpdateActivity from "./UpdateActivity"
-import { updateSchedule } from "./ActivityMethods"
-import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation, useParams } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
+import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { CssBaseline, Button, ThemeProvider, colors } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -950,6 +950,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => logout()}
                 activeTab={state.activeTab}
+                // participant={getParticipant(props.match.params.id)}
               >
                 <Participant
                   participant={getParticipant(props.match.params.id)}

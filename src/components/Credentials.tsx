@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, MenuItem, Fab, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Fab, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { CredentialManager } from "./CredentialManager"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { useTranslation } from "react-i18next"

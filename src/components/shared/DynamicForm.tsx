@@ -7,8 +7,6 @@ import {
   DescriptionFieldProps,
   ArrayFieldTemplateProps,
   RegistryWidgetsType,
-  RegistryFieldsType,
-  optionId,
 } from "@rjsf/utils"
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"

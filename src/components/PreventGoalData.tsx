@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { Typography, makeStyles, Box, Divider, Container, Link, Badge, Icon } from "@material-ui/core"
+import { Typography, makeStyles, Box, Container } from "@material-ui/core"
 import { Service } from "./DBService/DBService"
 import { DatePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"

@@ -1,7 +1,6 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { Box, Typography, Grid, Checkbox, makeStyles, createStyles } from "@material-ui/core"
-import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"
 import { useTranslation } from "react-i18next"

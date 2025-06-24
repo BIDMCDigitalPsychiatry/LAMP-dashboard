@@ -22,18 +22,19 @@ const useStyles = makeStyles((theme: Theme) =>
 
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    pr100: {
+      paddingRight: 100,
+    },
   })
 )
 
 export default function EditStudy({ study, upatedDataStudy, allStudies, researcherId, ...props }) {
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [editStudy, setEditStudy] = useState(false)
   const [editStudyName, setEditStudyName] = useState("")
   const [aliasStudyName, setAliasStudyName] = useState("")
   const [studyArray, setStudyNameArray] = useState([])
-  const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
 
   const updateStudyName = (data) => {
     setEditStudy(false)
@@ -45,7 +46,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, research
   }
 
   const callbackModal = () => {
-    setOpenDialogManageStudies(false)
+    // setOpenDialogManageStudies(false)
   }
 
   const editStudyField = (selectedRows, event) => {
@@ -55,7 +56,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, research
 
   return (
     <Box display="flex" alignItems="center">
-      <Box flexGrow={1} pl={1}>
+      <Box flexGrow={1} pl={1} className={classes.pr100}>
         {editStudy && study.id == editStudyName ? (
           <Box flexGrow={1} className={classes.studyName}>
             <EditStudyField

@@ -12,7 +12,6 @@ import {
   TextField,
   Button,
 } from "@material-ui/core"
-import SearchBox from "../SearchBox"
 import LAMP, { Researcher } from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"

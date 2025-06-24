@@ -19,7 +19,6 @@ import {
   DialogContent,
   Button,
   Icon,
-  MuiThemeProvider,
   createTheme,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
@@ -32,12 +31,6 @@ import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
 import { getDate } from "./Researcher/ActivityList/ScheduleRow"
 import { Service } from "./DBService/DBService"
-
-class LocalizedUtils extends DateFnsUtils {
-  getWeekdays() {
-    return ["S", "M", "T", "W", "T", "F", "S"]
-  }
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

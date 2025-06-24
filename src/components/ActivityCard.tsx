@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@material-ui/core"
 // Local Imports
 import Sparkline from "./Sparkline"

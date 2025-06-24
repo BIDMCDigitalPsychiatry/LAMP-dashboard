@@ -13,7 +13,7 @@ import {
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
-import PercentageSettings from "./PercentageSettings"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     btnWhite: {
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function ScheduleActivity({ activity, activities, setActivities, ...props }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [showScheduler, setShowScheduler] = useState(false)
   return (
     <span>

@@ -71,7 +71,7 @@ export default function PatientStudyCreator({
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
   const [duplicateCnt, setDuplicateCnt] = useState(0)
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
   const [duplicateStudyName, setDuplicateStudyName] = useState<any>("")
   const [createPatient, setCreatePatient] = useState(false)

@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Header({ searchData, ...props }: { searchData: Function }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     searchData(search)
