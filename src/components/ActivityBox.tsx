@@ -825,70 +825,70 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             />
           ) : (
             <Grid container spacing={2}>
-              {savedActivities.filter((activity) => activity.spec == "lamp.module").length
-                ? savedActivities
-                    .filter((activity) => activity.spec == "lamp.module")
-                    .map((activity) => (
-                      <Grid
-                        item
-                        xs={6}
-                        sm={4}
-                        md={3}
-                        lg={3}
-                        onClick={() => {
-                          handleClickOpen(activity)
-                        }}
-                        className={classes.thumbMain}
-                      >
-                        {favorites.filter((f) => f.id == activity.id).length > 0 && (
-                          <Icon className={classes.favstar}>star_rounded</Icon>
-                        )}
+              {savedActivities.filter((activity) => activity.spec == "lamp.module").length ? (
+                savedActivities
+                  .filter((activity) => activity.spec == "lamp.module")
+                  .map((activity) => (
+                    <Grid
+                      item
+                      xs={6}
+                      sm={4}
+                      md={3}
+                      lg={3}
+                      onClick={() => {
+                        handleClickOpen(activity)
+                      }}
+                      className={classes.thumbMain}
+                    >
+                      {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                        <Icon className={classes.favstar}>star_rounded</Icon>
+                      )}
 
-                        <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                          <Card
-                            className={
-                              classes.manage +
-                              " " +
-                              (type === "Manage"
-                                ? classes.manageH
-                                : type === "Assess"
-                                ? classes.assessH
-                                : type === "Learn"
-                                ? classes.learnH
-                                : classes.preventH)
-                            }
-                          >
-                            <Box mt={2} mb={1}>
-                              <Box
-                                className={classes.mainIcons}
-                                style={{
-                                  margin: "auto",
-                                  background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                    ? `url(${
-                                        tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                      }) center center/contain no-repeat`
-                                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                                }}
-                              ></Box>
-                            </Box>
-                            <Typography className={classes.cardlabel}>
-                              <ReactMarkdown
-                                children={t(activity.name)}
-                                skipHtml={false}
-                                remarkPlugins={[gfm, emoji]}
-                                components={{ link: LinkRenderer }}
-                              />
-                            </Typography>
-                          </Card>
-                        </ButtonBase>
-                      </Grid>
-                    ))
-                : type !== "Portal" && (
-                    <Box display="flex" className={classes.blankMsg} ml={1}>
-                      <Icon>info</Icon>
-                      <p>{`${t(message)}`}</p>
-                    </Box>
-                  )}
+                      <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                        <Card
+                          className={
+                            classes.manage +
+                            " " +
+                            (type === "Manage"
+                              ? classes.manageH
+                              : type === "Assess"
+                              ? classes.assessH
+                              : type === "Learn"
+                              ? classes.learnH
+                              : classes.preventH)
+                          }
+                        >
+                          <Box mt={2} mb={1}>
+                            <Box
+                              className={classes.mainIcons}
+                              style={{
+                                margin: "auto",
+                                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                  ? `url(${
+                                      tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                    }) center center/contain no-repeat`
+                                  : `url(${InfoIcon}) center center/contain no-repeat`,
+                              }}
+                            ></Box>
+                          </Box>
+                          <Typography className={classes.cardlabel}>
+                            <ReactMarkdown
+                              children={t(activity.name)}
+                              skipHtml={false}
+                              remarkPlugins={[gfm, emoji]}
+                              components={{ link: LinkRenderer }}
+                            />
+                          </Typography>
+                        </Card>
+                      </ButtonBase>
+                    </Grid>
+                  ))
+              ) : (
+                <Box display="flex" className={classes.blankMsg} ml={1}>
+                  <Icon>info</Icon>
+                  <p>{`${t("No modules available")}`}</p>
+                </Box>
+              )}
             </Grid>
           )}
         </TabPanel>
