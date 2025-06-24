@@ -299,9 +299,14 @@ const renderActivities = (
                 if (status === true) {
                   return
                 } else {
-                  if (activity.spec === "lamp.module" && module.name != "Other activities") {
+                  if (
+                    activity.spec === "lamp.module" &&
+                    module.name != "Other activities" &&
+                    module.name != "Unstarted Modules"
+                  ) {
                     handleSubModule(activity, module.level)
                   } else {
+                    console.log("in else")
                     handleClickOpen(activity)
                   }
                 }
