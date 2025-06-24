@@ -244,6 +244,22 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "16px !important",
         height: "16px !important",
       },
+      "&::after": {
+        content: "''",
+        position: "absolute",
+        width: 18,
+        height: 18,
+        left: 0,
+        top: 0,
+        zIndex: -1,
+        borderRadius: "50%",
+        border: "4px solid #ccc",
+        [theme.breakpoints.down("xs")]: {
+          width: 16,
+          height: 16,
+          border: "3px solid #ccc",
+        },
+      },
     },
     progressDetails: {
       "& p": {
@@ -544,17 +560,19 @@ const ActivityAccordion = ({
                           </Tooltip>
                         )}
                       </Box>
-                      <Grid display="flex" alignItems="center" className={classes.progressDetails}>
-                        <CircularProgress
-                          variant="determinate"
-                          thickness={8}
-                          className={classes.progressCircle}
-                          value={70}
-                        />
-                        <Typography variant="body1">
-                          {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>} Sections Complete
-                        </Typography>
-                      </Grid>
+                      {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
+                        <Grid display="flex" alignItems="center" className={classes.progressDetails}>
+                          <CircularProgress
+                            variant="determinate"
+                            thickness={8}
+                            className={classes.progressCircle}
+                            value={70}
+                          />
+                          <Typography variant="body1">
+                            {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>} Sections Complete
+                          </Typography>
+                        </Grid>
+                      )}
                     </Box>
                   </Grid>
                 </Grid>

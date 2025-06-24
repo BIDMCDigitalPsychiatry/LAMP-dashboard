@@ -129,9 +129,22 @@ const useStyles = makeStyles((theme: Theme) =>
       "& button": {
         fontSize: 15,
         fontWeight: 600,
+        minWidth: "auto",
+        padding: 0,
+        margin: "0 30px",
+        "&:first-child": {
+          marginLeft: 0,
+        },
+        "&.Mui-selected": {
+          color: "#7599FF",
+        },
         [theme.breakpoints.down("xs")]: {
           fontSize: 14,
+          margin: "0 12px",
         },
+      },
+      "& .MuiTabs-indicator": {
+        backgroundColor: "#7599FF",
       },
     },
   })
@@ -467,6 +480,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return itm
       })
     }
+    console.log(updateSubActivities, moduleData)
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
@@ -490,6 +504,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return item
       })
       const sortedData = sortModulesByCompletion(updatedData)
+      console.log(sortedData)
       setModuleData(sortedData)
     } else {
       moduleActivityData.subActivities = filteredArr
@@ -535,6 +550,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   useEffect(() => {
+    console.log(moduleData, pendingSubModules)
     if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
       processSubModules(pendingSubModules)
       setPendingSubModules(null) // Clear it after processing
@@ -690,7 +706,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       <TabContext value={tab}>
         {favorites.length > 0 && (
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={(e, val) => setTab(val)} centered className={classes.tabHeader}>
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
               <Tab label="Favorites" value="favorite" />
               <Tab label="Modules" value="modules" />
               <Tab label="Other Activities" value="other" />
@@ -792,7 +808,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           {(moduleData || []).length > 0 ? (
             <ActivityAccordian
               data={moduleData.concat({
-                name: "Other activities",
+                name: "Unstarted Modules",
                 level: 1,
                 subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
               })}
