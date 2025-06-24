@@ -306,7 +306,6 @@ const renderActivities = (
                   ) {
                     handleSubModule(activity, module.level)
                   } else {
-                    console.log("in else")
                     handleClickOpen(activity)
                   }
                 }
