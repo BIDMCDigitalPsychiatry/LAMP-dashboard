@@ -76,6 +76,7 @@ export default function ActivityRow({
     "lamp.voice_survey": `${t("Speech Recording")}`,
     "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
     "lamp.digit_span": `${t("Digit Span")}`,
+    "lamp.zoom_meeting": `${t("Virtual Meeting")}`,
   }
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

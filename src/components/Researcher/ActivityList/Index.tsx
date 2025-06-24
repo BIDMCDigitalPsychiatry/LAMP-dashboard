@@ -67,6 +67,7 @@ export const availableActivitySpecs = [
   "lamp.fragmented_letters",
   "lamp.digit_span",
   "lamp.memory_game",
+  "lamp.zoom_meeting",
 ]
 export const games = [
   "lamp.jewels_a",

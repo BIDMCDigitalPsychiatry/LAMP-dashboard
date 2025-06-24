@@ -267,6 +267,26 @@ export default function ActivityPopup({
       })()
     }
   }
+
+  const openMeetingLink = (meetingActivity) => {
+    console.log("meeting", meetingActivity)
+    return meetingActivity?.settings?.zoom_link
+    // const now = new Date().getTime();
+
+    // // Attempt to open in app
+    // const win = window.open(meetingActivity?.zoom_link, "_self");
+
+    // // Fallback to browser after timeout if app not opened
+    // setTimeout(() => {
+    //   const elapsed = new Date().getTime() - now;
+
+    //   // If still here after ~1500ms, assume app didn't open
+    //   if (elapsed < 2000) {
+    //     window.open(meetingActivity?.zoom_link, "_blank");
+    //   }
+    // }, 1500);
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -383,6 +403,8 @@ export default function ActivityPopup({
               href={
                 moduleActivity
                   ? "javascript:void(0)"
+                  : activity?.spec === "lamp.zoom_meeting"
+                  ? openMeetingLink(activity)
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
@@ -405,7 +427,11 @@ export default function ActivityPopup({
                   : classes.btnPrevent
               )}
             >
-              {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
+              {activity?.spec === "lamp.survey"
+                ? `${t("Start survey")}`
+                : activity?.spec === "lamp.zoom_meeting"
+                ? `${t("Launch meeting")}`
+                : `${t("Begin")}`}
             </Link>
           </Box>
         </DialogActions>
