@@ -322,10 +322,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     const token = sessionStorage.getItem("tokenInfo")
     try {
       await LAMP.Credential.logout(token)
-      const cached = localStorage.getItem("cachedOptions")
-      localStorage.clear()
-      localStorage.setItem("cachedOptions", cached)
-      sessionStorage.clear()
     } catch (err) {
       console.error("Logout failed:", err)
     } finally {
@@ -380,10 +376,6 @@ function AppRouter({ setConfirmSession, ...props }) {
           ? undefined
           : state?.auth?.serverAddress,
       }))
-      const cached = localStorage.getItem("cachedOptions")
-      localStorage.clear()
-      localStorage.setItem("cachedOptions", cached)
-      sessionStorage.clear()
       localStorage.setItem("verified", JSON.stringify({ value: false }))
       sessionStorage.removeItem("tokenInfo")
       localStorage.removeItem("isParticipant")
@@ -958,6 +950,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => logout()}
                 activeTab={state.activeTab}
+                // participant={getParticipant(props.match.params.id)}
               >
                 <Participant
                   participant={getParticipant(props.match.params.id)}

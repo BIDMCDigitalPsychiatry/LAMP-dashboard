@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react"
-import { Box, Icon, Grid, makeStyles, Theme, createStyles, Backdrop, CircularProgress } from "@material-ui/core"
+import {
+  Box,
+  Icon,
+  Grid,
+  makeStyles,
+  Theme,
+  createStyles,
+  Backdrop,
+  CircularProgress,
+  Fab,
+  FormControlLabel,
+  Checkbox,
+} from "@material-ui/core"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
@@ -7,6 +19,7 @@ import EditStudy from "./EditStudy"
 import { Service } from "../../DBService/DBService"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,9 +44,35 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
-    studyMain: { background: "#F8F8F8", borderRadius: 4 },
+    studyMain: { background: "#F8F8F8", borderRadius: 4, position: "relative" },
     norecords: {
       "& span": { marginRight: 5 },
+    },
+    checkMsgContainer: {
+      position: "absolute",
+      right: 104,
+      top: 0,
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      "& label": {
+        marginRight: 8,
+      },
+    },
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    disabledButton: {
+      color: "#4C66D6 !important",
+      opacity: 0.5,
     },
   })
 )
@@ -55,6 +94,8 @@ export default function StudiesList({
   const [allStudies, setAllStudies] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [enabledMessagingStudyIds, setEnabledMessagingStudyIds] = useState([])
+  const { enqueueSnackbar } = useSnackbar()
 
   useInterval(
     () => {
@@ -71,10 +112,15 @@ export default function StudiesList({
   }, [newStudy])
 
   useEffect(() => {
-    if ((studies || []).length > 0) setAllStudies(studies)
-    else setAllStudies([])
+    if ((studies || []).length > 0) {
+      setAllStudies(studies)
+      const enabledIds = studies.filter((study) => study.isMessagingEnabled).map((study) => study.id)
+      setEnabledMessagingStudyIds(enabledIds)
+    } else {
+      setAllStudies([])
+      setEnabledMessagingStudyIds([]) // Reset if studies is empty
+    }
   }, [studies])
-
   const searchFilterStudies = async () => {
     if (!!search && search !== "") {
       let studiesList: any = await Service.getAll("studies")
@@ -114,7 +160,47 @@ export default function StudiesList({
   const handleSearchData = (val) => {
     setSearch(val)
   }
+  const handleMessageIconClick = () => {
+    //ASK Saritha Chechi what is its logic
+  }
 
+  // const handleEnableMessaging = (studyId, event) => {
+  //   const isChecked = event.target.checked
+  //   setEnabledMessagingStudyIds((prevIds) =>
+  //     isChecked ? [...prevIds, studyId] : prevIds.filter((id) => id !== studyId)
+  //   )
+  // }
+  const handleEnableMessaging = async (studyId, event) => {
+    const isChecked = event.target.checked
+    // Update local state if needed
+    setEnabledMessagingStudyIds((prevIds) =>
+      isChecked ? [...prevIds, studyId] : prevIds.filter((id) => id !== studyId)
+    )
+
+    // Prepare update payload
+    const studyUpdate = {
+      id: studyId,
+      isMessageEnabled: isChecked,
+    }
+
+    try {
+      // Call your API or service
+      await Service.updateValue("studies", { studies: [studyUpdate] }, "isMessageEnabled", "id")
+
+      enqueueSnackbar(`${t("Messaging setting updated")}`, {
+        variant: "success",
+      })
+    } catch (err) {
+      enqueueSnackbar(
+        `${t("Failed to update messaging setting: errorMessage", {
+          errorMessage: err.message,
+        })}`,
+        { variant: "error" }
+      )
+    }
+  }
+
+  console.log("allStudies", allStudies)
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading || allStudies === null}>
@@ -142,6 +228,29 @@ export default function StudiesList({
                         researcherId={researcherId}
                       />
                     </Box>
+                    {/* <Box className={classes.checkMsgContainer}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={enabledMessagingStudyIds?.includes(study.id)}
+                            onChange={(e) => handleEnableMessaging(study.id, e)}
+                          />
+                        }
+                        label=""
+                      />
+                      <Fab
+                        size="small"
+                        color="primary"
+                        disabled={study.id > 1 ? true : false}
+                        classes={{ root: classes.btnWhite, disabled: classes.disabledButton }}
+                        onClick={() => {
+                          handleMessageIconClick()
+                        }}
+                      >
+                        <Icon>chat_bubble_outline</Icon>
+                      </Fab>
+                    </Box> */}
+
                     <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
                   </Box>
                 </Grid>

@@ -15,6 +15,8 @@ import {
   Backdrop,
   CircularProgress,
   makeStyles,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -49,6 +51,12 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
+  enableMessaging: {
+    paddingLeft: 18,
+    "& span": {
+      fontSize: 14,
+    },
+  },
 }))
 export default function StudyCreator({
   studies,
@@ -68,6 +76,7 @@ export default function StudyCreator({
   const { t } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(false)
+  const [isMessagingEnabled, setIsMessagingEnabled] = useState(false)
   const validate = () => {
     return !(
       duplicateCnt > 0 ||
@@ -85,14 +94,22 @@ export default function StudyCreator({
     setCount(duplicateCount)
   }, [studyName])
 
-  const createStudy = async (studyName: string) => {
+  const createStudy = async (studyName: string, isMessagingEnabled: boolean) => {
     setLoading(true)
     let study = new Study()
     study.name = studyName
+    study.isMessagingEnabled = isMessagingEnabled
     LAMP.Study.create(researcherId, study)
       .then(async (res) => {
         let result = JSON.parse(JSON.stringify(res))
-        let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
+        let studiesData = {
+          id: result.data,
+          name: studyName,
+          participant_count: 1,
+          activity_count: 0,
+          sensor_count: 0,
+          isMessagingEnabled: isMessagingEnabled,
+        }
         Service.addData("studies", [studiesData])
         enqueueSnackbar(`${t("Successfully created new group - studyName.", { studyName: studyName })}`, {
           variant: "success",
@@ -102,6 +119,7 @@ export default function StudyCreator({
         closePopUp(2)
         setStudyName("")
         setLoading(false)
+        setIsMessagingEnabled(false)
       })
       .catch((e) => {
         enqueueSnackbar(`${t("An error occured while creating new group - studyName.", { studyName: studyName })}`, {
@@ -111,19 +129,19 @@ export default function StudyCreator({
       })
   }
 
-  const createNewStudy = (studyName) => {
+  const createNewStudy = (studyName, isMessagingEnabled) => {
     let lampAuthId = LAMP.Auth._auth.id
     if (
       LAMP.Auth._type === "researcher" &&
       (lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")
     ) {
-      createDemoStudy(studyName)
+      createDemoStudy(studyName, isMessagingEnabled)
     } else {
-      createStudy(studyName)
+      createStudy(studyName, isMessagingEnabled)
     }
   }
 
-  const createDemoStudy = async (studyName: string) => {
+  const createDemoStudy = async (studyName: string, isMessagingEnabled: boolean) => {
     setLoading(true)
     Service.getAll("studies").then((allStudies: any) => {
       let studiesCount = allStudies.length
@@ -135,11 +153,17 @@ export default function StudyCreator({
         participant_count: 0,
         sensor_count: 0,
         activity_count: 0,
+        isMessagingEnabled: isMessagingEnabled,
       }
       Service.addData("studies", [newStudyObj])
-      enqueueSnackbar(`${t("Successfully created new group - studyName.", { studyName: studyName })}`, {
-        variant: "success",
-      })
+      enqueueSnackbar(
+        `${t("Successfully created new group - studyName.", {
+          studyName: studyName,
+        })}`,
+        {
+          variant: "success",
+        }
+      )
       handleNewStudy(newStudyObj)
       closePopUp(2)
       setStudyName("")
@@ -149,6 +173,10 @@ export default function StudyCreator({
 
   const handleEnter = () => {
     setStudyName("")
+  }
+  const handleEnableMessaging = (event) => {
+    const isChecked = event.target.checked
+    setIsMessagingEnabled(isChecked)
   }
 
   return (
@@ -171,6 +199,7 @@ export default function StudyCreator({
           onClick={() => {
             setStudyName("")
             closePopUp(2)
+            setIsMessagingEnabled(false)
           }}
         >
           <Icon>close</Icon>
@@ -198,18 +227,25 @@ export default function StudyCreator({
         />
       </DialogContent>
       <DialogActions>
+        {/* <Box className={classes.enableMessaging}>
+          <FormControlLabel
+            control={<Checkbox checked={isMessagingEnabled} onChange={handleEnableMessaging} />}
+            label="Enable Messaging"
+          />
+        </Box> */}
         <Box textAlign="right" width={1} mt={3} mb={3} mx={3}>
           <Button
             color="primary"
             onClick={() => {
               closePopUp(2)
+              setIsMessagingEnabled(false)
             }}
           >
             {`${t("Cancel")}`}
           </Button>
           <Button
             onClick={() => {
-              createNewStudy(studyName)
+              createNewStudy(studyName, isMessagingEnabled)
             }}
             color="primary"
             autoFocus
