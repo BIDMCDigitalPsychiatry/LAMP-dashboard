@@ -312,7 +312,7 @@ const renderActivities = (
               }}
               className={classes.thumbMain}
             >
-              {(favorites || []).filter((f) => f.id == activity.id).length > 0 && (
+              {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                 <Icon className={classes.favstar}>star_rounded</Icon>
               )}
               <ButtonBase focusRipple className={classes.fullwidthBtn}>

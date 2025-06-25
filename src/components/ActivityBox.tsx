@@ -717,7 +717,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </Box>
         {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
+            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav.id === activity.id)) || [])
+              .length ? (
               <ActivityAccordian
                 data={(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).concat({
                   name: "Other activities",
@@ -737,8 +738,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               />
             ) : (
               <Grid container spacing={2}>
-                {favorites.length ? (
-                  favorites.map((activity) => (
+                {(favorites || []).length ? (
+                  (favorites || []).map((activity) => (
                     <Grid
                       item
                       xs={6}
@@ -809,7 +810,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         <TabPanel value="modules" className={classes.tabPanelMain}>
           {(moduleData || []).length > 0 ? (
             <ActivityAccordian
-              data={moduleData.concat({
+              data={(moduleData || []).concat({
                 name: "Unstarted Modules",
                 level: 1,
                 subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
@@ -896,8 +897,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </TabPanel>
         <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
-            {savedActivities.filter((activity) => activity.spec != "lamp.module").length ? (
-              savedActivities
+            {(savedActivities || []).filter((activity) => activity.spec != "lamp.module").length ? (
+              (savedActivities || [])
                 .filter((activity) => activity.spec != "lamp.module")
                 .map((activity) => (
                   <Grid
@@ -911,7 +912,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     }}
                     className={classes.thumbMain}
                   >
-                    {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                    {(favorites || []).filter((f) => f.id == activity.id).length > 0 && (
                       <Icon className={classes.favstar}>star_rounded</Icon>
                     )}
 
