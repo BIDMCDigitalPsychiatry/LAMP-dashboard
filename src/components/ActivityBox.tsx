@@ -548,7 +548,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   useEffect(() => {
-    console.log(moduleData, pendingSubModules)
     if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
       processSubModules(pendingSubModules)
       setPendingSubModules(null) // Clear it after processing
@@ -681,16 +680,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       if (typeof favorites[0]?.id == "undefined") {
         setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
       }
-      console.log("dasd")
       setTab("favorite")
     } else {
       setTab("other")
     }
-    console.log(favorites, "asdad")
   }, [favorites])
 
   useEffect(() => {
-    console.log(tab)
     if (tab === "favorite") {
       ;(async () => {
         let tag =
@@ -702,21 +698,24 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
   }, [tab])
 
-  useEffect(() => {
-    console.log("asd", tab)
-  }, [])
-
   return (
     <Box>
       <TabContext value={tab}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-            {favorites.length > 0 && <Tab label="Favorites" value="favorite" />}
-            <Tab label="Modules" value="modules" />
-            <Tab label="Other Activities" value="other" />
-          </TabList>
+          {(favorites || []).length > 0 ? (
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+              <Tab label="Favorites" value="favorite" />
+              <Tab label="Modules" value="modules" />
+              <Tab label="Other Activities" value="other" />
+            </TabList>
+          ) : (
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+              <Tab label="Modules" value="modules" />
+              <Tab label="Other Activities" value="other" />
+            </TabList>
+          )}
         </Box>
-        {favorites.length > 0 && (
+        {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
             {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
               <ActivityAccordian
