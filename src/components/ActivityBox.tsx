@@ -698,7 +698,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       })()
     }
   }, [tab])
-
   return (
     <Box>
       <TabContext value={tab}>
@@ -718,9 +717,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </Box>
         {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
+            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
+              .length ? (
               <ActivityAccordian
-                data={(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).concat({
+                data={(
+                  moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []
+                ).concat({
                   name: "Other activities",
                   level: 1,
                   subActivities: shownActivities.filter((activity) => favorites.includes(activity)),
@@ -738,8 +740,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               />
             ) : (
               <Grid container spacing={2}>
-                {favorites.length ? (
-                  favorites.map((activity) => (
+                {(favorites || []).length ? (
+                  (favorites || []).map((activity) => (
                     <Grid
                       item
                       xs={6}
@@ -775,11 +777,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                   ? `url(${
                                       tag.filter((x) => x.id === activity?.id)[0]?.photo
                                     }) center center/contain no-repeat`
-                                  : activity.spec === "lamp.breathe"
+                                  : activity?.spec === "lamp.breathe"
                                   ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                  : activity.spec === "lamp.journal"
+                                  : activity?.spec === "lamp.journal"
                                   ? `url(${JournalIcon}) center center/contain no-repeat`
-                                  : activity.spec === "lamp.scratch_image"
+                                  : activity?.spec === "lamp.scratch_image"
                                   ? `url(${ScratchCard}) center center/contain no-repeat`
                                   : activity?.spec === "lamp.zoom_meeting"
                                   ? `url(${VideoMeeting}) center center/contain no-repeat`
@@ -789,7 +791,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                           </Box>
                           <Typography className={classes.cardlabel}>
                             <ReactMarkdown
-                              children={t(activity.name)}
+                              children={t(activity?.name)}
                               skipHtml={false}
                               remarkPlugins={[gfm, emoji]}
                               components={{ link: LinkRenderer }}
@@ -812,7 +814,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         <TabPanel value="modules" className={classes.tabPanelMain}>
           {(moduleData || []).length > 0 ? (
             <ActivityAccordian
-              data={moduleData.concat({
+              data={(moduleData || []).concat({
                 name: "Unstarted Modules",
                 level: 1,
                 subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
@@ -845,7 +847,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                       }}
                       className={classes.thumbMain}
                     >
-                      {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                      {favorites?.filter((f) => f?.id == activity?.id)?.length > 0 && (
                         <Icon className={classes.favstar}>star_rounded</Icon>
                       )}
 
@@ -899,8 +901,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </TabPanel>
         <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
-            {savedActivities.filter((activity) => activity.spec != "lamp.module").length ? (
-              savedActivities
+            {(savedActivities || []).filter((activity) => activity.spec != "lamp.module").length ? (
+              (savedActivities || [])
                 .filter((activity) => activity.spec != "lamp.module")
                 .map((activity) => (
                   <Grid
@@ -914,7 +916,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     }}
                     className={classes.thumbMain}
                   >
-                    {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                    {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                       <Icon className={classes.favstar}>star_rounded</Icon>
                     )}
 
