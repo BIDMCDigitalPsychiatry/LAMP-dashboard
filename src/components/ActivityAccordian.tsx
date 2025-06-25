@@ -514,6 +514,7 @@ const ActivityAccordion = ({
       await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
       setFavoriteIds(updatedTag)
       setFavorites(updatedTag)
+      debugger
     } catch (error) {
       console.error("Failed to toggle favorite:", error)
     }
