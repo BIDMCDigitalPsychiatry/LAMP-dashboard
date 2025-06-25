@@ -199,7 +199,9 @@ export default function ActivityHeader({
           label={`${t("Show activity in the participant feed?")}`}
         />
       </Grid>
-      <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
+      {!["lamp.zoom_meeting"].includes(activitySpecId) && (
+        <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
+      )}
       <Divider />
       {[
         "lamp.jewels_a",

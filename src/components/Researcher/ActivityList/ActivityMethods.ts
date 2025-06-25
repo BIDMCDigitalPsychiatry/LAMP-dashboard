@@ -1637,6 +1637,23 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.zoom_meeting": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Details"),
+          type: "object",
+          required: ["zoom_link"],
+          properties: {
+            zoom_link: {
+              title: i18n.t("Zoom Link"),
+              type: "string",
+              format: "url",
+            },
+          },
+        },
+      },
+    },
     "lamp.breathe": {
       type: "object",
       properties: {
@@ -1882,7 +1899,8 @@ export async function getDefaultTab(spec) {
       spec === "lamp.group" ||
       spec === "lamp.dbt_diary_card" ||
       spec === "lamp.recording" ||
-      spec === "lamp.survey"
+      spec === "lamp.survey" ||
+      spec === "lamp.zoom_meeting"
     ) {
       return "assess"
     }
