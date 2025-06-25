@@ -514,7 +514,6 @@ const ActivityAccordion = ({
       await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
       setFavoriteIds(updatedTag)
       setFavorites(updatedTag)
-      debugger
     } catch (error) {
       console.error("Failed to toggle favorite:", error)
     }
@@ -546,7 +545,7 @@ const ActivityAccordion = ({
                     <Box>
                       <Box display="flex" alignItems="center">
                         <Typography variant="h6">{module.name}</Typography>
-                        {module.name !== "Other activities" && (
+                        {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
                           <Tooltip
                             title={
                               favoriteIds.includes(module.id)
@@ -611,7 +610,7 @@ const ActivityAccordion = ({
                 >
                   <Icon>star_rounded</Icon>
                 </Fab>
-              </Tooltip>{" "}
+              </Tooltip>
             </Typography>
           )}
           <AccordionDetails className={type == "activity" && classes.moduleContainer}>
@@ -665,7 +664,7 @@ const ActivityAccordion = ({
                               <Box display="flex" alignItems="center">
                                 <Box>
                                   {activity.name}
-                                  {activity.name !== "Other activities" && (
+                                  {activity.name !== "Other activities" && activity.name !== "Unstarted Modules" && (
                                     <Tooltip
                                       title={
                                         favoriteIds.includes(activity.id)
@@ -758,27 +757,28 @@ const ActivityAccordion = ({
                                           <Box display="flex" alignItems="center">
                                             <Box>
                                               <Typography variant="h6">{subActivity.name}</Typography>
-                                              {subActivity.name !== "Other activities" && (
-                                                <Tooltip
-                                                  title={
-                                                    favoriteIds.includes(subActivity.id)
-                                                      ? "Tap to remove from Favorite Activities"
-                                                      : "Tap to add to Favorite Activities"
-                                                  }
-                                                >
-                                                  <Fab
-                                                    className={`${classes.headerTitleIcon} ${
-                                                      favoriteIds.includes(subActivity.id) ? "active" : ""
-                                                    }`}
-                                                    onClick={(e) => {
-                                                      e.stopPropagation()
-                                                      handleFavoriteClick(subActivity.id)
-                                                    }}
+                                              {subActivity.name !== "Other activities" &&
+                                                subActivity.name !== "Unstarted Modules" && (
+                                                  <Tooltip
+                                                    title={
+                                                      favoriteIds.includes(subActivity.id)
+                                                        ? "Tap to remove from Favorite Activities"
+                                                        : "Tap to add to Favorite Activities"
+                                                    }
                                                   >
-                                                    <Icon>star_rounded</Icon>
-                                                  </Fab>
-                                                </Tooltip>
-                                              )}
+                                                    <Fab
+                                                      className={`${classes.headerTitleIcon} ${
+                                                        favoriteIds.includes(subActivity.id) ? "active" : ""
+                                                      }`}
+                                                      onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleFavoriteClick(subActivity.id)
+                                                      }}
+                                                    >
+                                                      <Icon>star_rounded</Icon>
+                                                    </Fab>
+                                                  </Tooltip>
+                                                )}
                                             </Box>
                                             {subActivity.name !== "Other activities" &&
                                               subActivity.name !== "Unstarted Modules" && (

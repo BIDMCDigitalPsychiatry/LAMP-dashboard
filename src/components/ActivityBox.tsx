@@ -717,7 +717,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </Box>
         {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav.id === activity.id)) || [])
+            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
               .length ? (
               <ActivityAccordian
                 data={(
@@ -916,7 +916,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     }}
                     className={classes.thumbMain}
                   >
-                    {(favorites || []).filter((f) => f.id == activity.id).length > 0 && (
+                    {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                       <Icon className={classes.favstar}>star_rounded</Icon>
                     )}
 
