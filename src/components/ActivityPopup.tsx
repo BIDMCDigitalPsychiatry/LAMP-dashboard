@@ -222,12 +222,19 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
   useEffect(() => {
     if (!!activity) {
       const activityFromModule = localStorage.getItem("activityFromModule")
       setModuleActivity(activityFromModule)
     }
   }, [activity])
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera
+    setIsMobile(/android|iphone|ipad|ipod|windows phone/i.test(userAgent.toLowerCase()))
+  }, [])
 
   useEffect(() => {
     ;(async () => {
@@ -271,7 +278,14 @@ export default function ActivityPopup({
 
   const openMeetingLink = (meetingActivity) => {
     const now = new Date().getTime()
-    const win = window.open(meetingActivity?.settings?.zoom_link, "_self")
+    LAMP.ActivityEvent.create(participant.id ?? participant, {
+      timestamp: new Date().getTime(),
+      activity: meetingActivity.id,
+      static_data: {},
+    })
+    const win = isMobile
+      ? window.open(meetingActivity?.settings?.zoom_link, "_self")
+      : window.open(meetingActivity?.settings?.zoom_link, "_blank")
     setTimeout(() => {
       const elapsed = new Date().getTime() - now
       if (elapsed < 2000) {
