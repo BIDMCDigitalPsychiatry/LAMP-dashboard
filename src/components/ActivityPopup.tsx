@@ -25,6 +25,7 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
+import VideoMeeting from "../icons/Video.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -221,12 +222,19 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
   useEffect(() => {
     if (!!activity) {
       const activityFromModule = localStorage.getItem("activityFromModule")
       setModuleActivity(activityFromModule)
     }
   }, [activity])
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent
+    setIsMobile(/android|iphone|ipad|ipod|windows phone/i.test(userAgent.toLowerCase()))
+  }, [])
 
   useEffect(() => {
     ;(async () => {
@@ -267,6 +275,25 @@ export default function ActivityPopup({
       })()
     }
   }
+
+  const openMeetingLink = (meetingActivity) => {
+    const now = new Date().getTime()
+    LAMP.ActivityEvent.create(participant.id ?? participant, {
+      timestamp: new Date().getTime(),
+      activity: meetingActivity.id,
+      static_data: {},
+    })
+    const win = isMobile
+      ? window.open(meetingActivity?.settings?.zoom_link, "_self")
+      : window.open(meetingActivity?.settings?.zoom_link, "_blank")
+    setTimeout(() => {
+      const elapsed = new Date().getTime() - now
+      if (elapsed < 2000) {
+        window.open(meetingActivity?.settings?.zoom_link, "_blank")
+      }
+    }, 1500)
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -315,6 +342,8 @@ export default function ActivityPopup({
                   ? `url(${JournalIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.scratch_image"
                   ? `url(${ScratchCard}) center center/contain no-repeat`
+                  : activity?.spec === "lamp.zoom_meeting"
+                  ? `url(${VideoMeeting}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>
@@ -381,16 +410,20 @@ export default function ActivityPopup({
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               href={
-                moduleActivity
+                moduleActivity || activity?.spec === "lamp.zoom_meeting"
                   ? "javascript:void(0)"
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
-                updateLocalStorage()
-                setTimeout(() => {
-                  setOpen(true)
-                  onClose(evt, "escapeKeyDown")
-                }, 100)
+                if (activity?.spec == "lamp.zoom_meeting") {
+                  openMeetingLink(activity)
+                } else {
+                  updateLocalStorage()
+                  setTimeout(() => {
+                    setOpen(true)
+                    onClose(evt, "escapeKeyDown")
+                  }, 100)
+                }
               }}
               underline="none"
               className={classnames(
@@ -405,7 +438,11 @@ export default function ActivityPopup({
                   : classes.btnPrevent
               )}
             >
-              {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
+              {activity?.spec === "lamp.survey"
+                ? `${t("Start survey")}`
+                : activity?.spec === "lamp.zoom_meeting"
+                ? `${t("Launch meeting")}`
+                : `${t("Begin")}`}
             </Link>
           </Box>
         </DialogActions>

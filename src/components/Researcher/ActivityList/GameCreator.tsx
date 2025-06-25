@@ -279,6 +279,8 @@ export default function GameCreator({
       return validateDBT(duplicates)
     } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       return validateBreathe(duplicates)
+    } else if ((value?.spec && ["lamp.zoom_meeting"].includes(value.spec)) || activitySpecId === "lamp.zoom_meeting") {
+      return validateZoomMeeting(duplicates)
     } else if (
       (value?.spec && ["lamp.symbol_digit_substitution"].includes(value.spec)) ||
       activitySpecId === "lamp.symbol_digit_substitution"
@@ -320,6 +322,20 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
+  }
+
+  const validateZoomMeeting = (duplicates) => {
+    console.log("duplicates", data.settings)
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      typeof data.settings?.zoom_link === "undefined" ||
+      data.settings?.zoom_link === "" ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
   }
 
   const validateRecording = (duplicates) => {
