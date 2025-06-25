@@ -1646,7 +1646,7 @@ export const SchemaList = () => {
           required: ["zoom_link"],
           properties: {
             zoom_link: {
-              title: i18n.t("Zoom Link"),
+              title: i18n.t("Meeting Link"),
               type: "string",
               format: "url",
             },
