@@ -98,7 +98,7 @@ export default function StudyCreator({
     setLoading(true)
     let study = new Study()
     study.name = studyName
-    study.isMessagingEnabled = isMessagingEnabled
+    // study.isMessagingEnabled = isMessagingEnabled
     LAMP.Study.create(researcherId, study)
       .then(async (res) => {
         let result = JSON.parse(JSON.stringify(res))
