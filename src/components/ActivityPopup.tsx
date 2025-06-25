@@ -232,7 +232,7 @@ export default function ActivityPopup({
   }, [activity])
 
   useEffect(() => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera
+    const userAgent = window.navigator.userAgent
     setIsMobile(/android|iphone|ipad|ipod|windows phone/i.test(userAgent.toLowerCase()))
   }, [])
 
