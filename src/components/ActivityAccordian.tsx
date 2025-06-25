@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
+import { Accordion, AccordionSummary, AccordionDetails, Grid } from "@mui/material"
 import {
   Typography,
-  Grid,
   Card,
   Box,
   ButtonBase,
@@ -85,6 +84,20 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
+    accordionHeadIcons: {
+      [theme.breakpoints.up("lg")]: {
+        width: 80,
+        height: 80,
+      },
+      [theme.breakpoints.down("sm")]: {
+        width: 75,
+        height: 75,
+      },
+      [theme.breakpoints.down("xs")]: {
+        width: 65,
+        height: 65,
+      },
+    },
     mainIcons: {
       width: 80,
       height: 80,
@@ -95,6 +108,10 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         width: 75,
         height: 75,
+      },
+      [theme.breakpoints.down("xs")]: {
+        width: 65,
+        height: 65,
       },
     },
     thumbMain: { maxWidth: 255, position: "relative" },
@@ -117,17 +134,51 @@ const useStyles = makeStyles((theme: Theme) =>
     preventH: {
       background: "#ECF4FF !important",
     },
-    boxShadowNone: {
+    accordionMain: {
       boxShadow: "none !important",
+      background: "#f8f8f8 !important",
+      borderRadius: "18px !important",
+      marginBottom: 16,
+      [theme.breakpoints.down("xs")]: {
+        borderRadius: "12px !important",
+        marginBottom: 8,
+      },
       "& h6": {
-        fontSize: 22,
-        "& span": {
-          fontSize: 18,
-          fontWeight: "normal",
+        fontSize: 17,
+        [theme.breakpoints.down("xs")]: {
+          fontSize: 15,
+          fontWeight: 500,
         },
+        // "& span": {
+        //   fontSize: 18,
+        //   fontWeight: "normal",
+        // },
       },
       "&::before": {
         display: "none",
+      },
+      "& .MuiAccordionSummary-root": {
+        padding: "0 8px",
+        "& .MuiAccordionSummary-expandIconWrapper": {
+          "& svg": {
+            fontSize: "2rem",
+            [theme.breakpoints.down("xs")]: {
+              fontSize: "1.5rem",
+            },
+          },
+        },
+      },
+      "& .MuiAccordionSummary-content": {
+        display: "block",
+        margin: "8px 0",
+        [theme.breakpoints.down("xs")]: {
+          paddingLeft: 0,
+        },
+      },
+      "&.Mui-expanded": {
+        background: "#fff !important",
+        boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.20) !important",
+        marginTop: "0 !important",
       },
     },
     greentick: {
@@ -163,18 +214,59 @@ const useStyles = makeStyles((theme: Theme) =>
     headerTitleIcon: {
       background: "none",
       boxShadow: "none",
-      width: 36,
-      height: 36,
+      width: 34,
+      height: 34,
       color: "#666",
       marginLeft: 8,
+      [theme.breakpoints.down("xs")]: {
+        width: 22,
+        height: 22,
+        minHeight: 22,
+      },
       "& .material-icons": {
-        fontSize: "2rem",
+        fontSize: "1.7rem",
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "1.3rem",
+        },
       },
       "&:hover": {
         background: "#fff",
       },
       "&.active": {
         color: "#e3b303",
+      },
+    },
+    progressCircle: {
+      width: "18px !important",
+      height: "18px !important",
+      marginRight: "8px",
+      [theme.breakpoints.down("xs")]: {
+        width: "16px !important",
+        height: "16px !important",
+      },
+      "&::after": {
+        content: "''",
+        position: "absolute",
+        width: 18,
+        height: 18,
+        left: 0,
+        top: 0,
+        zIndex: -1,
+        borderRadius: "50%",
+        border: "4px solid #ccc",
+        [theme.breakpoints.down("xs")]: {
+          width: 16,
+          height: 16,
+          border: "3px solid #ccc",
+        },
+      },
+    },
+    progressDetails: {
+      "& p": {
+        fontSize: 15,
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "14px",
+        },
       },
     },
   })
@@ -207,7 +299,11 @@ const renderActivities = (
                 if (status === true) {
                   return
                 } else {
-                  if (activity.spec === "lamp.module" && module.name != "Other activities") {
+                  if (
+                    activity.spec === "lamp.module" &&
+                    module.name != "Other activities" &&
+                    module.name != "Unstarted Modules"
+                  ) {
                     handleSubModule(activity, module.level)
                   } else {
                     handleClickOpen(activity)
@@ -425,34 +521,78 @@ const ActivityAccordion = ({
         <CircularProgress color="inherit" />
       </Backdrop>
       {data.map((module, index) => (
-        <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
+        <Accordion key={index} defaultExpanded className={classes.accordionMain}>
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
               <Typography variant="h6">
-                {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
-                {module.name !== "Other activities" && (
-                  <Tooltip
-                    title={
-                      favoriteIds.includes(module.id)
-                        ? "Tap to remove from Favorite Activities"
-                        : "Tap to add to Favorite Activities"
-                    }
-                  >
-                    <Fab
-                      className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFavoriteClick(module.id)
+                <Grid container spacing={1}>
+                  <Grid lg="auto" item>
+                    <Box
+                      className={classes.accordionHeadIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                          ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
-                    >
-                      <Icon>star_rounded</Icon>
-                    </Fab>
-                  </Tooltip>
-                )}{" "}
+                    ></Box>
+                  </Grid>
+
+                  <Grid item xs display="flex" alignItems="center" spacing={0}>
+                    <Box>
+                      <Box display="flex" alignItems="center">
+                        <Typography variant="h6">{module.name}</Typography>
+                        {module.name !== "Other activities" && (
+                          <Tooltip
+                            title={
+                              favoriteIds.includes(module.id)
+                                ? "Tap to remove from Favorite Activities"
+                                : "Tap to add to Favorite Activities"
+                            }
+                          >
+                            <Fab
+                              className={`${classes.headerTitleIcon} ${
+                                favoriteIds.includes(module.id) ? "active" : ""
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleFavoriteClick(module.id)
+                              }}
+                            >
+                              <Icon>star_rounded</Icon>
+                            </Fab>
+                          </Tooltip>
+                        )}
+                      </Box>
+                      {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
+                        <Grid display="flex" alignItems="center" className={classes.progressDetails}>
+                          <CircularProgress
+                            variant="determinate"
+                            thickness={8}
+                            className={classes.progressCircle}
+                            value={70}
+                          />
+                          <Typography variant="body1">
+                            {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>} Sections Complete
+                          </Typography>
+                        </Grid>
+                      )}
+                    </Box>
+                  </Grid>
+                </Grid>
               </Typography>
             </AccordionSummary>
           ) : (
             <Typography variant="h6" className={classes.moduleHeader}>
+              <Box
+                className={classes.mainIcons}
+                style={{
+                  margin: "auto",
+                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                    ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                    : `url(${InfoIcon}) center center/contain no-repeat`,
+                }}
+              ></Box>
               {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
               <Tooltip
                 title={
@@ -500,7 +640,7 @@ const ActivityAccordion = ({
               <>
                 {activity.subActivities && activity.subActivities.length > 0 && (
                   <Box paddingLeft={5} display="flex" flexDirection="column">
-                    <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                    <Accordion defaultExpanded={true} className={classes.accordionMain}>
                       <AccordionSummary id={module.id + ">" + activity.id}>
                         <Typography variant="h6">
                           {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
@@ -533,7 +673,7 @@ const ActivityAccordion = ({
                           <>
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
                               <Box paddingLeft={5} display="flex" flexDirection="column">
-                                <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
+                                <Accordion defaultExpanded={true} className={classes.accordionMain}>
                                   <AccordionSummary id={module.id + ">" + activity.id + ">" + subActivity.id}>
                                     <Typography variant="h6">
                                       {subActivity.name}{" "}

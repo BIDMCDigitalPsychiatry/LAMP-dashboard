@@ -5,6 +5,7 @@ import LAMP from "lamp-core"
 interface StudyObject {
   id: string
   name: string
+  isMessagingEnabled: boolean
   participants: Array<any>
   activities: Array<any>
   sensors: Array<any>
@@ -111,7 +112,7 @@ export const saveDataToCache = (authString, id) => {
       " $list :={'unity_settings': $LAMP.Tag.get('" +
       id +
       "','to.unityhealth.psychiatry.enabled')," +
-      "'studies':[$map($studyList,function($study){{'name': $study.name,'id':$study.id," +
+      "'studies':[$map($studyList,function($study){{'name': $study.name,'id':$study.id,'isMessagingEnabled':$study.isMessagingEnabled," +
       "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
       "$LAMP.Tag.get($id,'lamp.name'), 'is_deleted': $LAMP.Tag.get($id,'lamp.is_deleted'), 'unity_settings' : $unitySettings ? " +
       "$LAMP.Tag.get($id,'to.unityhealth.psychiatry.settings') : null,'id':$id, 'study_id' : $study.id, 'study_name': $study.name }})]," +
@@ -125,6 +126,7 @@ export const saveDataToCache = (authString, id) => {
       return {
         id: study?.id || "",
         name: study?.name || "",
+        isMessagingEnabled: study?.isMessagingEnabled,
         participant_count: (study?.participants || []).length,
         activity_count: (study?.activities || []).length,
         sensor_count: (study?.sensors || []).length,
