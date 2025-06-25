@@ -481,7 +481,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return itm
       })
     }
-    console.log(updateSubActivities, moduleData)
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
       const updatedData = moduleData.map((item) => {
@@ -505,7 +504,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         return item
       })
       const sortedData = sortModulesByCompletion(updatedData)
-      console.log(sortedData)
       setModuleData(sortedData)
     } else {
       moduleActivityData.subActivities = filteredArr
@@ -551,7 +549,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   useEffect(() => {
-    console.log(moduleData, pendingSubModules)
     if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
       processSubModules(pendingSubModules)
       setPendingSubModules(null) // Clear it after processing
@@ -612,7 +609,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
           !!y.error ? undefined : y.data
         )[0] ?? []
-      setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
+      setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
     })()
 
     const runAsync = async () => {
@@ -677,7 +674,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
   }
 
-  const [tab, setTab] = useState("all")
+  const [tab, setTab] = useState("other")
 
   useEffect(() => {
     if (favorites.length > 0) {
@@ -686,7 +683,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("all")
+      setTab("other")
     }
   }, [favorites])
 
@@ -705,16 +702,21 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   return (
     <Box>
       <TabContext value={tab}>
-        {favorites.length > 0 && (
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          {(favorites || []).length > 0 ? (
             <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
               <Tab label="Favorites" value="favorite" />
               <Tab label="Modules" value="modules" />
               <Tab label="Other Activities" value="other" />
             </TabList>
-          </Box>
-        )}
-        {favorites.length > 0 && (
+          ) : (
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+              <Tab label="Modules" value="modules" />
+              <Tab label="Other Activities" value="other" />
+            </TabList>
+          )}
+        </Box>
+        {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
             {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
               <ActivityAccordian
@@ -828,8 +830,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             />
           ) : (
             <Grid container spacing={2}>
-              {savedActivities.filter((activity) => activity.spec == "lamp.module").length ? (
-                savedActivities
+              {(savedActivities || []).filter((activity) => activity.spec == "lamp.module").length ? (
+                (savedActivities || [])
                   .filter((activity) => activity.spec == "lamp.module")
                   .map((activity) => (
                     <Grid

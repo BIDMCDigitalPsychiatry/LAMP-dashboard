@@ -200,7 +200,6 @@ export default function StudiesList({
     }
   }
 
-  console.log("allStudies", allStudies)
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading || allStudies === null}>
