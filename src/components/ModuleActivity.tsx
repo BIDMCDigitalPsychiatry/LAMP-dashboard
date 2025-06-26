@@ -427,6 +427,26 @@ const ModuleActivity = ({ ...props }) => {
     })()
   }, [])
 
+  const updateIsCompleted = (subActivityId, parentString) => {
+    const updateRecursive = (activities) => {
+      return activities.map((activity) => {
+        if (activity.id === subActivityId && activity.parentString === parentString) {
+          return { ...activity, isCompleted: true }
+        }
+
+        if (activity.subActivities && activity.subActivities.length > 0) {
+          const updatedSubActivities = updateRecursive(activity.subActivities)
+          return { ...activity, subActivities: updatedSubActivities }
+        }
+
+        return activity
+      })
+    }
+
+    const updatedData = updateRecursive(moduleData)
+    setModuleData(updatedData)
+  }
+
   return (
     <>
       <Backdrop className={classes.backdrop} open={loadingModules}>
@@ -457,6 +477,7 @@ const ModuleActivity = ({ ...props }) => {
             type={null}
             showStreak={null}
             participant={participant?.id ?? participant}
+            updateIsCompleted={updateIsCompleted}
           />
           {!!moduleForNotification && (
             <Dialog

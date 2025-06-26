@@ -237,6 +237,28 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
+  const updateIsCompleted = (subActivityId, parentString) => {
+    const updateRecursive = (activities) => {
+      return activities.map((activity) => {
+        if (activity.id === subActivityId && activity.parentString === parentString) {
+          return { ...activity, isCompleted: true }
+        }
+
+        if (activity.subActivities && activity.subActivities.length > 0) {
+          const updatedSubActivities = updateRecursive(activity.subActivities)
+          return { ...activity, subActivities: updatedSubActivities }
+        }
+
+        return activity
+      })
+    }
+
+    const updatedData = updateRecursive(moduleData)
+    setModuleData(updatedData)
+  }
+
+  console.log("moduleData", JSON.stringify(moduleData))
+
   const handleInitializeOpenedModules = (y: any, isAuto = false) => {
     return LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
@@ -995,6 +1017,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         setFavorites={setFavorites}
         savedActivities={savedActivities}
         tab={tab}
+        updateIsCompleted={updateIsCompleted}
       />
       {!!moduleForNotification && (
         <Dialog
