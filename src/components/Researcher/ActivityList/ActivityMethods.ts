@@ -1648,7 +1648,10 @@ export const SchemaList = () => {
             zoom_link: {
               title: i18n.t("Meeting Link"),
               type: "string",
-              format: "url",
+              "ui:widget": "textarea",
+              "ui:options": {
+                rows: 5,
+              },
             },
           },
         },
