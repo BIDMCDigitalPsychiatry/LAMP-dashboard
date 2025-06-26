@@ -202,6 +202,7 @@ export default function ActivityPopup({
   onClose,
   setFavorites,
   savedActivities,
+  updateIsCompleted,
   tab,
   ...props
 }: {
@@ -215,6 +216,7 @@ export default function ActivityPopup({
   onClose?: Function
   setFavorites?: any
   savedActivities?: any
+  updateIsCompleted: Function
   tab?: any
 } & DialogProps) {
   const classes = useStyles()
@@ -276,13 +278,15 @@ export default function ActivityPopup({
     }
   }
 
-  const openMeetingLink = (meetingActivity) => {
+  const openMeetingLink = (meetingActivity, evt) => {
     const now = new Date().getTime()
     LAMP.ActivityEvent.create(participant.id ?? participant, {
       timestamp: new Date().getTime(),
       activity: meetingActivity.id,
       static_data: {},
     })
+    updateIsCompleted(meetingActivity?.id, localStorage.getItem("parentString"))
+    onClose(evt, "backdropClick")
     const win = isMobile
       ? window.open(meetingActivity?.settings?.zoom_link, "_self")
       : window.open(meetingActivity?.settings?.zoom_link, "_blank")
@@ -416,7 +420,7 @@ export default function ActivityPopup({
               }
               onClick={(evt) => {
                 if (activity?.spec == "lamp.zoom_meeting") {
-                  openMeetingLink(activity)
+                  openMeetingLink(activity, evt)
                 } else {
                   updateLocalStorage()
                   setTimeout(() => {
