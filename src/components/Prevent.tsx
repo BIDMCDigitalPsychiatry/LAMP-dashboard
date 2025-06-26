@@ -411,7 +411,8 @@ export default function Prevent({
             activityEventCount[activity.name] > 0 &&
             activity.spec !== "lamp.group" &&
             activity.spec !== "lamp.tips" &&
-            activity.spec !== "lamp.module"
+            activity.spec !== "lamp.module" &&
+            activity.spec !== "lamp.zoom_meeting"
         )
         setActivities(activities)
         setSelectedActivities(activities.map((activity) => activity.name))
