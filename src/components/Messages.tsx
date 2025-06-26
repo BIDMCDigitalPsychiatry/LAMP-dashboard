@@ -141,6 +141,7 @@ const fetchCoordinators = async (participant) => {
         "Content-Type": "application/json",
         Authorization: "Bearer " + userToken.accessToken,
       },
+      credentials: "include",
     })
   ).json()
   return result
