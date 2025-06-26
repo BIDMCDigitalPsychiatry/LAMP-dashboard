@@ -20,6 +20,7 @@ export const fetchResult = async (authString, id, type, modal) => {
         "Content-Type": "application/json",
         Authorization: "Bearer " + userToken.accessToken,
       },
+      credentials: "include",
     })
   ).json()
   return result
@@ -35,6 +36,7 @@ export const fetchPostData = async (authString, id, type, modal, methodType, bod
         "Content-Type": "application/json",
         Authorization: "Bearer " + userToken.accessToken,
       },
+      credentials: "include",
       body: JSON.stringify(bodyData),
     })
   ).json()

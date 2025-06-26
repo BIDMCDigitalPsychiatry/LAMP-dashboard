@@ -32,6 +32,7 @@ export function ajaxRequest(parameters) {
       : parameters.data
     : ""
   let xmlhttp = new XMLHttpRequest()
+  xmlhttp.withCredentials = true
   xmlhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       if (parameters.callback) parameters.callback(this.responseText)
@@ -60,6 +61,7 @@ export const jsonataFetch = async (query, access_key, secret_key, server) => {
       headers: {
         Authorization: `Bearer ${userToken.accessToken}`,
       },
+      credentials: "include",
       body: query,
     })
     let text = await res.text()

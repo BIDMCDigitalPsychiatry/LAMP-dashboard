@@ -442,8 +442,9 @@ export default function ScheduleRow({
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <strong style={{ fontSize: 12 }}>{t("Notification Text")}</strong>
               <textarea
-                rows={2}
+                rows={4}
                 value={data?.notificationMessage}
+                maxLength={250}
                 onChange={(e) =>
                   setData({
                     ...data,
@@ -463,6 +464,9 @@ export default function ScheduleRow({
                   resize: "none",
                 }}
               />
+              <div style={{ textAlign: "right", fontSize: 12, color: "#666", marginTop: 4 }}>
+                {data?.notificationMessage?.length || 0}/250
+              </div>
             </div>
           </TableCell>
           <TableCell>
