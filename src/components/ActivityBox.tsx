@@ -674,7 +674,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
   }
 
-  const [tab, setTab] = useState("other")
+  const [tab, setTab] = useState("modules")
 
   useEffect(() => {
     if (favorites.length > 0) {
@@ -683,7 +683,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("other")
+      setTab("modules")
     }
   }, [favorites])
 
