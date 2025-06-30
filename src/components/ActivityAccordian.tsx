@@ -414,6 +414,13 @@ const ActivityAccordion = ({
           module.subActivities.length
   }
 
+  const getPercentage = (module) => {
+    return (
+      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
+      100
+    )
+  }
+
   const checkIsBegin = async (module) => {
     const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
     return activityEvents.length === 0
@@ -573,7 +580,7 @@ const ActivityAccordion = ({
                             variant="determinate"
                             thickness={8}
                             className={classes.progressCircle}
-                            value={70}
+                            value={getPercentage(module)}
                           />
                           <Typography variant="body1">
                             {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>} Sections Complete
@@ -691,7 +698,7 @@ const ActivityAccordion = ({
                                         variant="determinate"
                                         thickness={8}
                                         className={classes.progressCircle}
-                                        value={70}
+                                        value={getPercentage(activity)}
                                       />
                                       <Typography variant="body1">
                                         {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>} Sections
@@ -791,14 +798,14 @@ const ActivityAccordion = ({
                                                     variant="determinate"
                                                     thickness={8}
                                                     className={classes.progressCircle}
-                                                    value={70}
+                                                    value={getPercentage(subActivity)}
                                                   />
                                                   <Typography variant="body1">
                                                     {subActivity?.trackProgress ? (
                                                       <span>{getStatus(subActivity)}</span>
                                                     ) : (
                                                       <></>
-                                                    )}{" "}
+                                                    )}
                                                     Sections Complete
                                                   </Typography>
                                                 </Grid>

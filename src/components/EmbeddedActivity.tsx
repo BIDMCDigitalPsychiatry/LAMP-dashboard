@@ -173,6 +173,7 @@ export default function EmbeddedActivity({
 
   const handleSaveData = (e) => {
     if (currentActivity !== null && !saved) {
+      console.log(e.data)
       if (e.data === null) {
         setSaved(true)
         onComplete(null)
@@ -197,7 +198,7 @@ export default function EmbeddedActivity({
             data["activity"] = currentActivity.id
             await updateFavorite(data)
             setSaved(true)
-            onComplete(null)
+            onComplete({ forward: data.forward })
             setLoading(false)
           })()
         }
@@ -246,6 +247,8 @@ export default function EmbeddedActivity({
             currentActivity.id,
             activityTimestamp
           )
+          const forward = data?.forward
+          delete data.forward
           ;(async () => {
             const updated = await updateFavorite(data)
             if (!!updated) {
@@ -263,7 +266,7 @@ export default function EmbeddedActivity({
                     "true"
                   )
                   setSaved(true)
-                  onComplete(data)
+                  onComplete(typeof forward != "undefined" ? { ...data, forward: forward } : data)
                   setLoading(false)
                 })
             } else {
@@ -301,6 +304,16 @@ export default function EmbeddedActivity({
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
+        forward: currentActivity.spec == "lamp.group",
+        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+      })
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+        forward: currentActivity.spec == "lamp.group",
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
