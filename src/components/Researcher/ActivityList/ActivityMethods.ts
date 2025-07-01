@@ -1220,6 +1220,18 @@ export const SchemaList = () => {
                 maxLength: 500,
                 default: "",
               },
+              image: {
+                title: i18n.t("Tips Image"),
+                description: i18n.t(
+                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
+                ),
+                type: "string",
+                format: "data-url",
+                "ui:widget": "file",
+                "ui:options": {
+                  accept: ".gif,.jpg,.png,.svg",
+                },
+              },
               required: {
                 title: i18n.t("Required"),
                 type: "boolean",
@@ -1731,6 +1743,7 @@ export function spliceActivity({ raw, tag }) {
           type: question.type,
           required: question.required ?? false,
           description: tag?.questions?.[idx]?.description,
+          image: tag?.questions?.[idx]?.image,
           options:
             question.options === null
               ? null
@@ -1794,6 +1807,7 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
+        image: y?.image,
         options: Array.isArray(y?.options)
           ? y.options.map((z) => ({
               description: z?.description ?? "",
