@@ -173,7 +173,6 @@ export default function EmbeddedActivity({
 
   const handleSaveData = (e) => {
     if (currentActivity !== null && !saved) {
-      console.log(e.data)
       if (e.data === null) {
         setSaved(true)
         onComplete(null)
@@ -248,7 +247,9 @@ export default function EmbeddedActivity({
             activityTimestamp
           )
           const forward = data?.forward
-          delete data.forward
+          if (data?.forward) {
+            delete data?.forward
+          }
           ;(async () => {
             const updated = await updateFavorite(data)
             if (!!updated) {
@@ -304,19 +305,13 @@ export default function EmbeddedActivity({
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
-        forward: currentActivity.spec == "lamp.group",
-        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
-      })
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-        forward: currentActivity.spec == "lamp.group",
+        forward: props?.forward ?? false,
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
+      if (currentActivity.spec == "lamp.survey") {
+        response = await loadFallBack()
+      }
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
@@ -336,6 +331,9 @@ export default function EmbeddedActivity({
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+
+      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+
       return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"

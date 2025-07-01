@@ -103,7 +103,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [data])
 
   const iterateActivity = (forward?: boolean | undefined) => {
-    console.log(forward)
     let val = typeof forward == "undefined" || !!forward ? index + 1 : index - 1
     setCurrentActivity(null)
     if (val >= 0) setIndex(val)

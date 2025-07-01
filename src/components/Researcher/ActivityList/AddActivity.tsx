@@ -198,6 +198,7 @@ export default function AddActivity({
           }
         })
       } else {
+        setActivitySpecs(availableSpecs)
         setLoading(false)
       }
     })()
