@@ -257,8 +257,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     setModuleData(updatedData)
   }
 
-  console.log("moduleData", JSON.stringify(moduleData))
-
   const handleInitializeOpenedModules = (y: any, isAuto = false) => {
     return LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
@@ -705,7 +703,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("modules")
+      setTab(savedActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other")
     }
   }, [favorites])
 
