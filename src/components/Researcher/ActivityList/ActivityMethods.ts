@@ -3,6 +3,17 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
+
+function geFeedBackSettings() {
+  return {
+    feedback_text: {
+      type: "string",
+      title: i18n.t("Feedback Text"),
+      default: "",
+      description: i18n.t("This text will be shown to the participant after the input."),
+    },
+  }
+}
 function getContingencySettings() {
   const enumIds = localStorage.getItem("enumIds")
   const enumNames = localStorage.getItem("enumNames")
@@ -1013,6 +1024,7 @@ export const SchemaList = () => {
                       type: {
                         enum: ["text", "short", "matrix"],
                       },
+                      ...geFeedBackSettings(),
                     },
                   },
                   {
@@ -1066,6 +1078,8 @@ export const SchemaList = () => {
                                     title: i18n.t("Option Description"),
                                     type: "string",
                                   },
+                                  ...geFeedBackSettings(),
+
                                   ...getContingencySettings(),
                                 },
                                 required: ["value"],
@@ -1106,6 +1120,7 @@ export const SchemaList = () => {
                                     title: i18n.t("Option Description"),
                                     type: "string",
                                   },
+                                  ...geFeedBackSettings(),
                                   ...getContingencySettings(),
                                 },
                                 required: ["value", "description"],
@@ -1143,6 +1158,7 @@ export const SchemaList = () => {
                                     type: "string",
                                     default: "",
                                   },
+                                  ...geFeedBackSettings(),
                                   ...getContingencySettings(),
                                 },
                                 required: ["value"],
@@ -1174,6 +1190,7 @@ export const SchemaList = () => {
                               enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
                               default: "standard",
                             },
+                            ...geFeedBackSettings(),
                           },
                         },
                       },
@@ -1201,6 +1218,7 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
+                            ...geFeedBackSettings(),
                             ...getContingencySettings(),
                           },
                         },
@@ -1731,12 +1749,14 @@ export function spliceActivity({ raw, tag }) {
           type: question.type,
           required: question.required ?? false,
           description: tag?.questions?.[idx]?.description,
+          feedback_text: tag?.questions?.[idx]?.feedback_text ?? "",
           options:
             question.options === null
               ? null
               : question.type !== "matrix" && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
+                  feedback_text: tag?.questions?.[idx]?.options?.[idx2]?.feedback_text ?? "",
                   description: tag?.questions?.[idx]?.options?.[idx2]?.description,
                   contigencySettings: tag?.questions?.[idx]?.options?.[idx2]?.contigencySettings,
                 }))
@@ -1794,9 +1814,11 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
+        feedback_text: y?.feedback_text ?? "",
         options: Array.isArray(y?.options)
           ? y.options.map((z) => ({
               description: z?.description ?? "",
+              feedback_text: z?.feedback_text ?? "",
               contigencySettings: ["slider", "list", "multiselect", "rating", "boolean", "likert"].includes(y?.type)
                 ? z?.contigencySettings ?? {}
                 : undefined,
