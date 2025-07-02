@@ -267,7 +267,7 @@ export default function ActivityPopup({
   }
 
   const handleCloseActivityPopup = (activity) => {
-    if (activity.spec === "lamp.group" && tab === "favorite") {
+    if (activity?.spec === "lamp.group" && tab === "favorite") {
       ;(async () => {
         let tag =
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>

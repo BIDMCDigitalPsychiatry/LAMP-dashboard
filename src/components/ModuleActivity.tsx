@@ -462,9 +462,6 @@ const ModuleActivity = ({ ...props }) => {
             handleClickOpen={handleClickOpen}
             handleSubModule={handleSubModule}
             participant={participant}
-            moduleForNotification={moduleForNotification}
-            setIsParentModuleLoaded={setIsParentModuleLoaded}
-            updateModuleStartTime={updateModuleStartTime}
             setFavorites={setFavorites}
           />
           <ActivityPopup

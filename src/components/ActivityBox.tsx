@@ -204,13 +204,25 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
-  const [pendingSubModules, setPendingSubModules] = useState(null)
-  let moduleDataFromStore = null
-  if (localStorage.getItem("lastActiveTab") === type) {
-    moduleDataFromStore = localStorage.getItem("moduleData")
-  } else {
-    localStorage.removeItem("moduleData")
+  const [pendingSubModules, setPendingSubModules] = useState([])
+  const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
+
+  const checkIsBegin = async (module) => {
+    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
+    return activityEvents.length === 0
+  }
+
+  const addActivityEventForModule = async (module) => {
+    if ((await checkIsBegin(module)) === true) {
+      LAMP.ActivityEvent.create(participant.id ?? participant, {
+        timestamp: new Date().getTime(),
+        duration: 0,
+        activity: module.id,
+        static_data: {},
+      }).then((a) => {
+        return new Date()
+      })
+    }
   }
 
   const handleClickOpen = (y: any, isAuto = false) => {
@@ -220,7 +232,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        const moduleStartTime = await getModuleStartTime(y.id)
+        let moduleStartTime = await getModuleStartTime(y.id)
+        if (!moduleStartTime) {
+          moduleStartTime = await addActivityEventForModule(y)
+        }
         const initializeOpenedModule = isAuto ? true : false
         addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
       } else {
@@ -272,18 +287,22 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level, fromLocalStore = false) => {
-    const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
-    LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(
-        data,
-        level,
-        moduleStartTime,
-        activity?.parentModule,
-        activity?.parentString,
-        false,
-        fromLocalStore
-      )
-    })
+    let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
+    if (!moduleStartTime) {
+      moduleStartTime = await addActivityEventForModule(activity)
+    }
+
+    const data = await LAMP.Activity.view(activity.id)
+
+    await addActivityData(
+      data,
+      level,
+      moduleStartTime,
+      activity?.parentModule,
+      activity?.parentString,
+      false,
+      fromLocalStore
+    )
   }
 
   const checkIsModuleCompleted = async (id) => {
@@ -376,44 +395,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     return activityEventCreated
   }
 
-  const updateModuleStartTime = (module, startTime) => {
-    setLoadingModules(true)
-    const updatedData = moduleData.map((item) => {
-      if (item.id === module.id && item.parentModule == module.parentModule) {
-        return {
-          ...item,
-          subActivities: updateTime(module, item.subActivities, startTime),
-        }
-      }
-      if (item.subActivities?.length > 0) {
-        return {
-          ...item,
-          subActivities: updateTime(module, item.subActivities, startTime),
-        }
-      }
-      return item
-    })
-    setModuleData(updatedData)
-    setLoadingModules(false)
-  }
-
-  const updateTime = (module, subActivities, startTime) => {
-    return subActivities.map((itm) => {
-      if (itm.parentModule === module.id && itm.spec === "lamp.module") {
-        return {
-          ...itm,
-          startTime: startTime,
-        }
-      }
-      if (itm.subActivities?.length > 0) {
-        return {
-          ...itm,
-          subActivities: updateTime(module, itm.subActivities, startTime),
-        }
-      }
-      return itm
-    })
-  }
   const addActivityData = async (
     data,
     level,
@@ -451,7 +432,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const eventCreated =
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
-
         if (
           (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
@@ -469,6 +449,19 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           } else if (sequential && sequentialActivityAdded) {
             fetchedData["isHidden"] = true
           }
+        }
+        if (
+          fetchedData.spec === "lamp.module" &&
+          activityEvents.filter((event) => event.activity === fetchedData.id)?.length > 0 &&
+          (initializeOpenedModule || fromLocalStore) &&
+          !fetchedData["isCompleted"]
+        ) {
+          const updatedModuleData = {
+            ...fetchedData,
+            level: level + 1,
+          }
+
+          setPendingSubModules((prevModules) => [...prevModules, updatedModuleData])
         }
 
         arr.push(fetchedData)
@@ -503,28 +496,30 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
-      const updatedData = moduleData.map((item) => {
-        if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
-          setParentModuleLevel(level + 1)
-          return {
-            ...item,
-            isHidden: true,
-            level: level + 1,
-            subActivities: filteredArr,
-            sequentialOrdering: sequential,
-            trackProgress: trackProgress,
+      setModuleData((prev) => {
+        const updatedData = prev.map((item) => {
+          if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
+            setParentModuleLevel(level + 1)
+            return {
+              ...item,
+              isHidden: true,
+              level: level + 1,
+              subActivities: filteredArr,
+              sequentialOrdering: sequential,
+              trackProgress: trackProgress,
+            }
           }
-        }
-        if (item.subActivities?.length > 0) {
-          return {
-            ...item,
-            subActivities: updateSubActivities(item.subActivities, item.level),
+          if (item.subActivities?.length > 0) {
+            return {
+              ...item,
+              subActivities: updateSubActivities(item.subActivities, item.level),
+            }
           }
-        }
-        return item
+          return item
+        })
+        const sortedData = sortModulesByCompletion(updatedData)
+        return sortModulesByCompletion(sortedData)
       })
-      const sortedData = sortModulesByCompletion(updatedData)
-      setModuleData(sortedData)
     } else {
       moduleActivityData.subActivities = filteredArr
       moduleActivityData.level = level + 1
@@ -549,68 +544,46 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
     }
-    setLoadingModules(false)
+    if (!(fromLocalStore || initializeOpenedModule)) {
+      setLoadingModules(false)
+    }
   }
 
   useEffect(() => {
-    if (!!moduleForNotification && isParentModuleLoaded) {
+    if (!!moduleForNotification) {
       setTimeout(() => {
         setShowNotification(true)
       }, 300)
     }
   }, [moduleForNotification, isParentModuleLoaded])
 
-  function moduleDataIsReady() {
-    if (moduleData?.length > 0) {
-      return true
-    } else {
-      return false
-    }
-  }
-
   useEffect(() => {
-    if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
-      processSubModules(pendingSubModules)
-      setPendingSubModules(null) // Clear it after processing
+    if (pendingSubModulesReady && pendingSubModules?.length == 0) setLoadingModules(false) // Reset loader
+    if (pendingSubModules?.length > 0 && pendingSubModulesReady) {
+      ;(async () => {
+        await processSubModules(pendingSubModules)
+      })()
     }
-  }, [moduleData, pendingSubModules])
+  }, [pendingSubModules, pendingSubModulesReady])
 
-  async function processActivities(data) {
-    setLoadingModules(true)
-    const tasks = []
-    for (const activity of data) {
-      tasks.push(handleInitializeOpenedModules({ spec: "lamp.module", id: activity.id }, true))
+  async function processSubModules(subActivities) {
+    // Process each submodule one by one sequentially
+    for (const subModule of subActivities) {
+      if (subModule.spec === "lamp.module") {
+        const startTime = new Date(subModule.startTime).toString()
+        await handleSubModule(
+          {
+            id: subModule.id,
+            startTime: startTime,
+            parentModule: subModule.parentModule,
+            parentString: subModule.parentString,
+          },
+          subModule.level,
+          true
+        )
+      }
     }
-    try {
-      await Promise.all(tasks)
-    } catch (err) {
-      console.error("Error:", err)
-    } finally {
-      const subModules = data
-        .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
-        .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
-        .flat()
-      setPendingSubModules(subModules)
-      setLoadingModules(false)
-    }
-  }
-
-  function processSubModules(subActivities) {
-    subActivities
-      .filter((item) => item.spec === "lamp.module")
-      .forEach(async (sub) => {
-        if (sub.spec === "lamp.module") {
-          const startTime = new Date(sub.startTime).toString()
-          await handleSubModule(
-            { id: sub.id, startTime: startTime, parentModule: sub.parentModule, parentString: sub.parentString },
-            sub.level - 1,
-            true
-          )
-        }
-        if (sub.subActivities) {
-          processSubModules(sub.subActivities)
-        }
-      })
+    setPendingSubModules([])
   }
   const [favorites, setFavorites] = useState([])
 
@@ -631,17 +604,29 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         )[0] ?? []
       setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
     })()
+    setShownActivities(savedActivities)
 
     const runAsync = async () => {
       const activitiesList = savedActivities
-      const initializeOpenedModules = activitiesList.filter(
-        (activity) => activity.spec === "lamp.module" && activity?.settings?.initialize_opened
+      const moduleActivities = activitiesList.filter((activity) => activity.spec === "lamp.module")
+
+      const initializeOpenedModules = await Promise.all(
+        moduleActivities.map(async (module) => {
+          const moduleStartTime = await getModuleStartTime(module.id)
+          if (!!moduleStartTime) {
+            return module
+          }
+          return null // or undefined
+        })
       )
 
-      if (initializeOpenedModules.length > 0) {
+      // Filter out null or undefined values
+      const filteredModules = initializeOpenedModules.filter(Boolean)
+
+      if (filteredModules.length > 0) {
         setLoadingModules(true)
         const tasks = []
-        for (const activity of initializeOpenedModules) {
+        for (const activity of filteredModules) {
           tasks.push(handleInitializeOpenedModules(activity, true))
         }
         try {
@@ -649,31 +634,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         } catch (err) {
           console.error("Error:", err)
         } finally {
-          setLoadingModules(false) // Reset loader
+          setPendingSubModulesReady(true)
         }
-        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b.id === a.id)))
+        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b?.id === a?.id)))
       } else {
         setShownActivities(savedActivities)
         setLoadingModules(false)
       }
     }
 
-    if (!moduleDataLoadedFromStore && savedActivities && savedActivities.length > 0) {
-      if (!moduleDataFromStore) runAsync()
-      else {
-        const data = JSON.parse(moduleDataFromStore)
-        processActivities(data)
-        setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
-        setLoadingModules(false)
-        localStorage.removeItem("moduleData")
-        localStorage.removeItem("parentString")
-        setModuleDataLoadedFromStore(true)
-      }
-    } else if (savedActivities && savedActivities.length === 0) {
-      // Handle case when savedActivities is empty
-      setShownActivities([])
-      setLoadingModules(false)
-    }
+    runAsync()
   }, [savedActivities])
 
   const scrollToElement = (id) => {
@@ -703,7 +673,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab(savedActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other")
+      setTab("modules")
     }
   }, [favorites])
 
@@ -752,9 +722,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleClickOpen={handleClickOpen}
                 handleSubModule={handleSubModule}
                 participant={participant}
-                moduleForNotification={moduleForNotification}
-                setIsParentModuleLoaded={setIsParentModuleLoaded}
-                updateModuleStartTime={updateModuleStartTime}
                 favorites={favorites}
                 setFavorites={setFavorites}
               />
@@ -845,9 +812,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               handleSubModule={handleSubModule}
               participant={participant}
               setFavorites={setFavorites}
-              moduleForNotification={moduleForNotification}
-              setIsParentModuleLoaded={setIsParentModuleLoaded}
-              updateModuleStartTime={updateModuleStartTime}
               favorites={favorites}
             />
           ) : (

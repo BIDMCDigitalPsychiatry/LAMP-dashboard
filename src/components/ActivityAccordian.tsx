@@ -394,17 +394,13 @@ const ActivityAccordion = ({
   handleClickOpen,
   handleSubModule,
   participant,
-  moduleForNotification,
-  setIsParentModuleLoaded,
-  updateModuleStartTime,
+
   favorites,
   setFavorites,
 }) => {
   const classes = useStyles()
   const { t } = useTranslation()
   const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-  const [statusLoaded, setStatusLoaded] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -413,82 +409,6 @@ const ActivityAccordion = ({
           "/" +
           module.subActivities.length
   }
-
-  const checkIsBegin = async (module) => {
-    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
-    return activityEvents.length === 0
-  }
-
-  const addActivityEventForModule = async (module, parentIds = []) => {
-    const compositeKey = getCompositeKey(module, parentIds)
-    if ((await checkIsBegin(module)) === true) {
-      setLoading(true)
-      LAMP.ActivityEvent.create(participant.id ?? participant, {
-        timestamp: new Date().getTime(),
-        duration: 0,
-        activity: module.id,
-        static_data: {},
-      }).then((a) => {
-        setActivityStatus((prevState) => ({
-          ...prevState,
-          [compositeKey]: true,
-        }))
-        updateModuleStartTime(module, new Date())
-        setLoading(false)
-      })
-    } else {
-      const hasBegun = true
-      setActivityStatus((prevState) => ({
-        ...prevState,
-        [compositeKey]: hasBegun,
-      }))
-    }
-  }
-
-  const getCompositeKey = (module, parentIds = []) => {
-    return [...parentIds, module.id].join(">")
-  }
-
-  const initializeStatus = async () => {
-    setStatusLoaded(false)
-    const statuses = {}
-    const checkAndNotify = async (module, parentIds = []) => {
-      const status = await checkIsBegin(module)
-      const compositeKey = getCompositeKey(module, parentIds)
-      statuses[compositeKey] = status
-      if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
-        setIsParentModuleLoaded(true)
-      }
-    }
-    const tasks = []
-    for (const module of data?.filter((m) => m.name !== "Other activities")) {
-      tasks.push(checkAndNotify(module))
-      if (module?.subActivities) {
-        for (const activity of module.subActivities) {
-          if (activity.spec === "lamp.module") {
-            tasks.push(checkAndNotify(activity, [module.id]))
-          }
-          if (activity?.subActivities) {
-            for (const subActivity of activity.subActivities) {
-              if (subActivity.spec === "lamp.module") {
-                tasks.push(checkAndNotify(subActivity, [module.id, activity.id]))
-              }
-            }
-          }
-        }
-      }
-    }
-    await Promise.all(tasks)
-    setActivityStatus(statuses)
-    return true
-  }
-
-  useEffect(() => {
-    const status = initializeStatus()
-    if (status) {
-      setStatusLoaded(true)
-    }
-  }, [data])
 
   useEffect(() => {
     ;(async () => {
@@ -520,9 +440,6 @@ const ActivityAccordion = ({
   }
   return (
     <div>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.accordionMain}>
           {type != "activity" ? (
@@ -614,12 +531,6 @@ const ActivityAccordion = ({
             </Typography>
           )}
           <AccordionDetails className={type == "activity" && classes.moduleContainer}>
-            {statusLoaded && module.id && activityStatus[module.id] === true && (
-              <Box className={classes.moduleStart}>
-                Click here to start the module activity
-                <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
-              </Box>
-            )}
             <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
@@ -706,15 +617,6 @@ const ActivityAccordion = ({
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {statusLoaded && activity.id && activityStatus[module.id + ">" + activity.id] && (
-                          <Box className={classes.moduleStart}>
-                            Click here to start the module activity
-                            <Button
-                              variant="contained"
-                              onClick={() => addActivityEventForModule(activity, [module.id])}
-                            >{`${t("Start")}`}</Button>
-                          </Box>
-                        )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
                             activity.subActivities,
@@ -809,19 +711,6 @@ const ActivityAccordion = ({
                                     </Typography>
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {statusLoaded &&
-                                      subActivity.id &&
-                                      activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
-                                        <Box className={classes.moduleStart}>
-                                          Click here to start the module activity
-                                          <Button
-                                            variant="contained"
-                                            onClick={() =>
-                                              addActivityEventForModule(subActivity, [module.id, activity.id])
-                                            }
-                                          >{`${t("Start")}`}</Button>
-                                        </Box>
-                                      )}
                                     <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
                                         subActivity.subActivities,
