@@ -190,6 +190,24 @@ export const sortModulesByCompletion = (modules) => {
     .sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0))
 }
 
+const checkIsBegin = async (module, participant) => {
+  const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
+  return activityEvents.length === 0
+}
+
+export const addActivityEventForModule = async (module, participant) => {
+  if ((await checkIsBegin(module, participant)) === true) {
+    LAMP.ActivityEvent.create(participant.id ?? participant, {
+      timestamp: new Date().getTime(),
+      duration: 0,
+      activity: module.id,
+      static_data: {},
+    }).then((a) => {
+      return new Date()
+    })
+  }
+}
+
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -206,24 +224,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
   const [pendingSubModules, setPendingSubModules] = useState([])
   const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
-
-  const checkIsBegin = async (module) => {
-    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
-    return activityEvents.length === 0
-  }
-
-  const addActivityEventForModule = async (module) => {
-    if ((await checkIsBegin(module)) === true) {
-      LAMP.ActivityEvent.create(participant.id ?? participant, {
-        timestamp: new Date().getTime(),
-        duration: 0,
-        activity: module.id,
-        static_data: {},
-      }).then((a) => {
-        return new Date()
-      })
-    }
-  }
+  const [subModuleProcessCount, setSubModuleProcessCount] = useState(0)
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -234,7 +235,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const fromActivityList = true
         let moduleStartTime = await getModuleStartTime(y.id)
         if (!moduleStartTime) {
-          moduleStartTime = await addActivityEventForModule(y)
+          moduleStartTime = await addActivityEventForModule(y, participant)
         }
         const initializeOpenedModule = isAuto ? true : false
         addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
@@ -289,7 +290,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const handleSubModule = async (activity, level, fromLocalStore = false) => {
     let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     if (!moduleStartTime) {
-      moduleStartTime = await addActivityEventForModule(activity)
+      moduleStartTime = await addActivityEventForModule(activity, participant)
     }
 
     const data = await LAMP.Activity.view(activity.id)
@@ -558,19 +559,26 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }, [moduleForNotification, isParentModuleLoaded])
 
   useEffect(() => {
-    if (pendingSubModulesReady && pendingSubModules?.length == 0) setLoadingModules(false) // Reset loader
-    if (pendingSubModules?.length > 0 && pendingSubModulesReady) {
+    if (pendingSubModulesReady && pendingSubModules?.length > 0) {
       ;(async () => {
         await processSubModules(pendingSubModules)
       })()
     }
   }, [pendingSubModules, pendingSubModulesReady])
 
+  useEffect(() => {
+    if (pendingSubModulesReady && subModuleProcessCount === 0) {
+      setLoadingModules(false)
+    }
+  }, [subModuleProcessCount, pendingSubModulesReady])
+
   async function processSubModules(subActivities) {
     // Process each submodule one by one sequentially
     for (const subModule of subActivities) {
       if (subModule.spec === "lamp.module") {
         const startTime = new Date(subModule.startTime).toString()
+        setSubModuleProcessCount((count) => count + 1)
+
         await handleSubModule(
           {
             id: subModule.id,
@@ -581,6 +589,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           subModule.level,
           true
         )
+        setSubModuleProcessCount((count) => count - 1)
       }
     }
     setPendingSubModules([])

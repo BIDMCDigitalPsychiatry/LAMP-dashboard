@@ -274,17 +274,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 //The function to renderActivities in accordian layout
-const renderActivities = (
-  activities,
-  type,
-  tag,
-  favorites,
-  handleClickOpen,
-  handleSubModule,
-  classes,
-  module,
-  status
-) => {
+const renderActivities = (activities, type, tag, favorites, handleClickOpen, handleSubModule, classes, module) => {
   return (
     <>
       {activities.map((activity) =>
@@ -297,18 +287,14 @@ const renderActivities = (
               md={3}
               lg={3}
               onClick={() => {
-                if (status === true) {
-                  return
+                if (
+                  activity.spec === "lamp.module" &&
+                  module.name != "Other activities" &&
+                  module.name != "Unstarted Modules"
+                ) {
+                  handleSubModule(activity, module.level)
                 } else {
-                  if (
-                    activity.spec === "lamp.module" &&
-                    module.name != "Other activities" &&
-                    module.name != "Unstarted Modules"
-                  ) {
-                    handleSubModule(activity, module.level)
-                  } else {
-                    handleClickOpen(activity)
-                  }
+                  handleClickOpen(activity)
                 }
               }}
               className={classes.thumbMain}
@@ -541,8 +527,7 @@ const ActivityAccordion = ({
                   handleClickOpen,
                   handleSubModule,
                   classes,
-                  module,
-                  activityStatus[module.id]
+                  module
                 )
               ) : (
                 <Box display="flex" className={classes.blankMsg} ml={1}>
@@ -626,14 +611,13 @@ const ActivityAccordion = ({
                             handleClickOpen,
                             handleSubModule,
                             classes,
-                            activity,
-                            activityStatus[activity.id]
+                            activity
                           )}
                         </Grid>
                         {activity.subActivities.map((subActivity) => (
                           <>
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
-                              <Box paddingLeft={5} display="flex" flexDirection="column">
+                              <Box marginTop={4} display="flex" flexDirection="column">
                                 <Accordion defaultExpanded={true} className={classes.accordionMain}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
@@ -656,8 +640,8 @@ const ActivityAccordion = ({
                                         </Grid>
 
                                         <Grid item xs display="flex" alignItems="center" spacing={0}>
-                                          <Box display="flex" alignItems="center">
-                                            <Box>
+                                          <Box>
+                                            <Box display="flex" alignItems="center">
                                               <Typography variant="h6">{subActivity.name}</Typography>
                                               {subActivity.name !== "Other activities" &&
                                                 subActivity.name !== "Unstarted Modules" && (
@@ -720,8 +704,7 @@ const ActivityAccordion = ({
                                         handleClickOpen,
                                         handleSubModule,
                                         classes,
-                                        subActivity,
-                                        activityStatus[subActivity.id]
+                                        subActivity
                                       )}
                                     </Grid>
                                   </AccordionDetails>

@@ -30,6 +30,7 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LAMP from "lamp-core"
+import { isMobile } from "react-device-detect"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -224,7 +225,6 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     if (!!activity) {
@@ -232,11 +232,6 @@ export default function ActivityPopup({
       setModuleActivity(activityFromModule)
     }
   }, [activity])
-
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent
-    setIsMobile(/android|iphone|ipad|ipod|windows phone/i.test(userAgent.toLowerCase()))
-  }, [])
 
   useEffect(() => {
     ;(async () => {
