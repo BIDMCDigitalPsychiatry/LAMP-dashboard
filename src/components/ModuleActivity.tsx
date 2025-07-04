@@ -38,9 +38,9 @@ const ModuleActivity = ({ ...props }) => {
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const [pendingSubModules, setPendingSubModules] = useState(null)
-  const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
+  const [pendingSubModules, setPendingSubModules] = useState([])
   const [subModuleProcessCount, setSubModuleProcessCount] = useState(0)
+  const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
 
   useEffect(() => {
     if (participant != null) handleClickOpen({ spec: "lamp.module", id: moduleId })
@@ -75,7 +75,8 @@ const ModuleActivity = ({ ...props }) => {
         if (!moduleStartTime) {
           moduleStartTime = await addActivityEventForModule(y, participant)
         }
-        addActivityData(data, 0, moduleStartTime, null, null, false)
+        await addActivityData(data, 0, moduleStartTime, null, null, false)
+        setPendingSubModulesReady(true)
       } else {
         localStorage.setItem("activityFromModule", moduleId)
         localStorage.setItem("parentStringForSurvey", y?.parentString)
@@ -172,17 +173,9 @@ const ModuleActivity = ({ ...props }) => {
     if (!moduleStartTime) {
       moduleStartTime = await addActivityEventForModule(activity, participant)
     }
-    LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(data, level, moduleStartTime, activity?.parentModule, activity?.parentString, fromLocalStore)
-    })
-  }
+    const data = await LAMP.Activity.view(activity.id)
 
-  function moduleDataIsReady() {
-    if (moduleData?.length > 0) {
-      return true
-    } else {
-      return false
-    }
+    await addActivityData(data, level, moduleStartTime, activity?.parentModule, activity?.parentString, fromLocalStore)
   }
 
   useEffect(() => {
@@ -196,6 +189,7 @@ const ModuleActivity = ({ ...props }) => {
   useEffect(() => {
     if (pendingSubModulesReady && subModuleProcessCount === 0) {
       setLoadingModules(false)
+      scrollToElement(localStorage.getItem("parentStringForSurvey"))
     }
   }, [subModuleProcessCount, pendingSubModulesReady])
 
@@ -271,7 +265,7 @@ const ModuleActivity = ({ ...props }) => {
         if (
           fetchedData.spec === "lamp.module" &&
           activityEvents.filter((event) => event.activity === fetchedData.id)?.length > 0 &&
-          fromLocalStore &&
+          level <= 1 &&
           !fetchedData["isCompleted"]
         ) {
           const updatedModuleData = {
@@ -373,10 +367,6 @@ const ModuleActivity = ({ ...props }) => {
     }, 1000)
   }
 
-  const updateLocalStorage = () => {
-    localStorage.setItem("moduleDataForSurvey", JSON.stringify(extractIdsWithHierarchy(moduleData)))
-  }
-
   const [favorites, setFavorites] = useState([])
 
   useEffect(() => {
@@ -414,7 +404,7 @@ const ModuleActivity = ({ ...props }) => {
       <Backdrop className={classes.backdrop} open={loadingModules}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid container className={classes.thumbContainer}>
+      <Grid marginTop={5} container className={classes.thumbContainer}>
         <Grid item xs>
           <ActivityAccordian
             data={moduleData}
@@ -431,7 +421,6 @@ const ModuleActivity = ({ ...props }) => {
             tag={null}
             questionCount={questionCount}
             open={open}
-            updateLocalStorage={updateLocalStorage}
             onClose={() => setOpen(false)}
             type={null}
             showStreak={null}

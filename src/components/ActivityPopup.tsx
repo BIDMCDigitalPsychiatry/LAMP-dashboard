@@ -199,7 +199,6 @@ export default function ActivityPopup({
   type,
   participant,
   showStreak,
-  updateLocalStorage,
   onClose,
   setFavorites,
   savedActivities,
@@ -213,7 +212,6 @@ export default function ActivityPopup({
   type: string
   participant: any
   showStreak: Function
-  updateLocalStorage: Function
   onClose?: Function
   setFavorites?: any
   savedActivities?: any
@@ -280,8 +278,9 @@ export default function ActivityPopup({
       activity: meetingActivity.id,
       static_data: {},
     })
-    updateIsCompleted(meetingActivity?.id, localStorage.getItem("parentString"))
-    onClose(evt, "backdropClick")
+    // updateIsCompleted(meetingActivity?.id, localStorage.getItem("parentString"))
+    // onClose(evt, "backdropClick")
+
     const win = isMobile
       ? window.open(meetingActivity?.settings?.zoom_link, "_self")
       : window.open(meetingActivity?.settings?.zoom_link, "_blank")
@@ -291,6 +290,8 @@ export default function ActivityPopup({
         window.open(meetingActivity?.settings?.zoom_link, "_blank")
       }
     }, 1500)
+
+    window.location.reload()
   }
 
   return (
@@ -417,7 +418,6 @@ export default function ActivityPopup({
                 if (activity?.spec == "lamp.zoom_meeting") {
                   openMeetingLink(activity, evt)
                 } else {
-                  updateLocalStorage()
                   setTimeout(() => {
                     setOpen(true)
                     onClose(evt, "escapeKeyDown")

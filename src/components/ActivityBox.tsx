@@ -455,7 +455,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           fetchedData.spec === "lamp.module" &&
           activityEvents.filter((event) => event.activity === fetchedData.id)?.length > 0 &&
           (initializeOpenedModule || fromLocalStore) &&
-          !fetchedData["isCompleted"]
+          !fetchedData["isCompleted"] &&
+          level <= 1
         ) {
           const updatedModuleData = {
             ...fetchedData,
@@ -569,6 +570,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     if (pendingSubModulesReady && subModuleProcessCount === 0) {
       setLoadingModules(false)
+      scrollToElement(localStorage.getItem("parentString"))
     }
   }, [subModuleProcessCount, pendingSubModulesReady])
 
@@ -668,10 +670,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
-
-  const updateLocalStorage = () => {
-    localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
-  }
 
   const [tab, setTab] = useState("modules")
 
@@ -979,7 +977,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         activity={activity}
         tag={tag}
         questionCount={questionCount}
-        updateLocalStorage={updateLocalStorage}
         open={open}
         onClose={() => setOpen(false)}
         type={type}
