@@ -50,6 +50,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         headers: {
           Authorization: `Bearer ${userToken.accessToken}`,
         },
+        credentials: "include",
         body: query,
       })
       let text = await res.text()

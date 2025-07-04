@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useEffect, useRef, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
-import LAMP from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -13,6 +13,7 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
 import ActivityAccordian from "./ActivityAccordian"
+import VideoMeeting from "../icons/Video.svg"
 import {
   Backdrop,
   Button,
@@ -24,6 +25,7 @@ import {
 } from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
 import { extractIdsWithHierarchy } from "./helper"
+import { tags_object } from "./data_portal/DataPortalShared"
 import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -120,6 +122,32 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    tabPanelMain: {
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
+    tabHeader: {
+      "& button": {
+        fontSize: 15,
+        fontWeight: 600,
+        minWidth: "auto",
+        padding: 0,
+        margin: "0 30px",
+        "&:first-child": {
+          marginLeft: 0,
+        },
+        "&.Mui-selected": {
+          color: "#7599FF",
+        },
+        [theme.breakpoints.down("xs")]: {
+          fontSize: 14,
+          margin: "0 12px",
+        },
+      },
+      "& .MuiTabs-indicator": {
+        backgroundColor: "#7599FF",
+      },
+    },
   })
 )
 
@@ -162,6 +190,24 @@ export const sortModulesByCompletion = (modules) => {
     .sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0))
 }
 
+const checkIsBegin = async (module, participant) => {
+  const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
+  return activityEvents.length === 0
+}
+
+export const addActivityEventForModule = async (module, participant) => {
+  if ((await checkIsBegin(module, participant)) === true) {
+    LAMP.ActivityEvent.create(participant.id ?? participant, {
+      timestamp: new Date().getTime(),
+      duration: 0,
+      activity: module.id,
+      static_data: {},
+    }).then((a) => {
+      return new Date()
+    })
+  }
+}
+
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -176,14 +222,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const [moduleDataLoadedFromStore, setModuleDataLoadedFromStore] = useState(false)
-  const [pendingSubModules, setPendingSubModules] = useState(null)
-  let moduleDataFromStore = null
-  if (localStorage.getItem("lastActiveTab") === type) {
-    moduleDataFromStore = localStorage.getItem("moduleData")
-  } else {
-    localStorage.removeItem("moduleData")
-  }
+  const [pendingSubModules, setPendingSubModules] = useState([])
+  const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
+  const [subModuleProcessCount, setSubModuleProcessCount] = useState(0)
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -192,7 +233,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
         }
         const fromActivityList = true
-        const moduleStartTime = await getModuleStartTime(y.id)
+        let moduleStartTime = await getModuleStartTime(y.id)
+        if (!moduleStartTime) {
+          moduleStartTime = await addActivityEventForModule(y, participant)
+        }
         const initializeOpenedModule = isAuto ? true : false
         addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
       } else {
@@ -207,6 +251,26 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           : setQuestionCount(0)
       }
     })
+  }
+
+  const updateIsCompleted = (subActivityId, parentString) => {
+    const updateRecursive = (activities) => {
+      return activities.map((activity) => {
+        if (activity.id === subActivityId && activity.parentString === parentString) {
+          return { ...activity, isCompleted: true }
+        }
+
+        if (activity.subActivities && activity.subActivities.length > 0) {
+          const updatedSubActivities = updateRecursive(activity.subActivities)
+          return { ...activity, subActivities: updatedSubActivities }
+        }
+
+        return activity
+      })
+    }
+
+    const updatedData = updateRecursive(moduleData)
+    setModuleData(updatedData)
   }
 
   const handleInitializeOpenedModules = (y: any, isAuto = false) => {
@@ -224,18 +288,22 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity, level, fromLocalStore = false) => {
-    const moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
-    LAMP.Activity.view(activity.id).then((data) => {
-      addActivityData(
-        data,
-        level,
-        moduleStartTime,
-        activity?.parentModule,
-        activity?.parentString,
-        false,
-        fromLocalStore
-      )
-    })
+    let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
+    if (!moduleStartTime) {
+      moduleStartTime = await addActivityEventForModule(activity, participant)
+    }
+
+    const data = await LAMP.Activity.view(activity.id)
+
+    await addActivityData(
+      data,
+      level,
+      moduleStartTime,
+      activity?.parentModule,
+      activity?.parentString,
+      false,
+      fromLocalStore
+    )
   }
 
   const checkIsModuleCompleted = async (id) => {
@@ -325,48 +393,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
     }
-    console.log(activityEventCreated)
     return activityEventCreated
   }
 
-  const updateModuleStartTime = (module, startTime) => {
-    setLoadingModules(true)
-    const updatedData = moduleData.map((item) => {
-      if (item.id === module.id && item.parentModule == module.parentModule) {
-        return {
-          ...item,
-          subActivities: updateTime(module, item.subActivities, startTime),
-        }
-      }
-      if (item.subActivities?.length > 0) {
-        return {
-          ...item,
-          subActivities: updateTime(module, item.subActivities, startTime),
-        }
-      }
-      return item
-    })
-    setModuleData(updatedData)
-    setLoadingModules(false)
-  }
-
-  const updateTime = (module, subActivities, startTime) => {
-    return subActivities.map((itm) => {
-      if (itm.parentModule === module.id && itm.spec === "lamp.module") {
-        return {
-          ...itm,
-          startTime: startTime,
-        }
-      }
-      if (itm.subActivities?.length > 0) {
-        return {
-          ...itm,
-          subActivities: updateTime(module, itm.subActivities, startTime),
-        }
-      }
-      return itm
-    })
-  }
   const addActivityData = async (
     data,
     level,
@@ -404,7 +433,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         const eventCreated =
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
-
         if (
           (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
@@ -423,6 +451,20 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             fetchedData["isHidden"] = true
           }
         }
+        if (
+          fetchedData.spec === "lamp.module" &&
+          activityEvents.filter((event) => event.activity === fetchedData.id)?.length > 0 &&
+          (initializeOpenedModule || fromLocalStore) &&
+          !fetchedData["isCompleted"] &&
+          level <= 1
+        ) {
+          const updatedModuleData = {
+            ...fetchedData,
+            level: level + 1,
+          }
+
+          setPendingSubModules((prevModules) => [...prevModules, updatedModuleData])
+        }
 
         arr.push(fetchedData)
       } catch (error) {
@@ -430,9 +472,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         arr.push(null)
       }
     }
-    console.log(arr)
     const filteredArr = arr.filter((item) => item != null)
-    console.log()
+
     const updateSubActivities = (subActivities, itemLevel) => {
       return subActivities.map((itm) => {
         if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
@@ -457,28 +498,30 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
     delete moduleActivityData.settings
     if (moduleData.length > 0 && !fromActivityList) {
-      const updatedData = moduleData.map((item) => {
-        if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
-          setParentModuleLevel(level + 1)
-          return {
-            ...item,
-            isHidden: true,
-            level: level + 1,
-            subActivities: filteredArr,
-            sequentialOrdering: sequential,
-            trackProgress: trackProgress,
+      setModuleData((prev) => {
+        const updatedData = prev.map((item) => {
+          if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
+            setParentModuleLevel(level + 1)
+            return {
+              ...item,
+              isHidden: true,
+              level: level + 1,
+              subActivities: filteredArr,
+              sequentialOrdering: sequential,
+              trackProgress: trackProgress,
+            }
           }
-        }
-        if (item.subActivities?.length > 0) {
-          return {
-            ...item,
-            subActivities: updateSubActivities(item.subActivities, item.level),
+          if (item.subActivities?.length > 0) {
+            return {
+              ...item,
+              subActivities: updateSubActivities(item.subActivities, item.level),
+            }
           }
-        }
-        return item
+          return item
+        })
+        const sortedData = sortModulesByCompletion(updatedData)
+        return sortModulesByCompletion(sortedData)
       })
-      const sortedData = sortModulesByCompletion(updatedData)
-      setModuleData(sortedData)
     } else {
       moduleActivityData.subActivities = filteredArr
       moduleActivityData.level = level + 1
@@ -503,68 +546,55 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         }
       }
     }
-    setLoadingModules(false)
+    if (!(fromLocalStore || initializeOpenedModule)) {
+      setLoadingModules(false)
+    }
   }
 
   useEffect(() => {
-    if (!!moduleForNotification && isParentModuleLoaded) {
+    if (!!moduleForNotification) {
       setTimeout(() => {
         setShowNotification(true)
       }, 300)
     }
   }, [moduleForNotification, isParentModuleLoaded])
 
-  function moduleDataIsReady() {
-    if (moduleData?.length > 0) {
-      return true
-    } else {
-      return false
+  useEffect(() => {
+    if (pendingSubModulesReady && pendingSubModules?.length > 0) {
+      ;(async () => {
+        await processSubModules(pendingSubModules)
+      })()
     }
-  }
+  }, [pendingSubModules, pendingSubModulesReady])
 
   useEffect(() => {
-    if (pendingSubModules?.length > 0 && moduleDataIsReady()) {
-      processSubModules(pendingSubModules)
-      setPendingSubModules(null) // Clear it after processing
-    }
-  }, [moduleData, pendingSubModules])
-
-  async function processActivities(data) {
-    setLoadingModules(true)
-    const tasks = []
-    for (const activity of data) {
-      tasks.push(handleInitializeOpenedModules({ spec: "lamp.module", id: activity.id }, true))
-    }
-    try {
-      await Promise.all(tasks)
-    } catch (err) {
-      console.error("Error:", err)
-    } finally {
-      const subModules = data
-        .filter((activity) => activity.spec === "lamp.module" && activity?.subActivities?.length > 0)
-        .map((activity) => activity.subActivities.filter((item) => item.spec === "lamp.module"))
-        .flat()
-      setPendingSubModules(subModules)
+    if (pendingSubModulesReady && subModuleProcessCount === 0) {
       setLoadingModules(false)
+      scrollToElement(localStorage.getItem("parentString"))
     }
-  }
+  }, [subModuleProcessCount, pendingSubModulesReady])
 
-  function processSubModules(subActivities) {
-    subActivities
-      .filter((item) => item.spec === "lamp.module")
-      .forEach(async (sub) => {
-        if (sub.spec === "lamp.module") {
-          const startTime = new Date(sub.startTime).toString()
-          await handleSubModule(
-            { id: sub.id, startTime: startTime, parentModule: sub.parentModule, parentString: sub.parentString },
-            sub.level - 1,
-            true
-          )
-        }
-        if (sub.subActivities) {
-          processSubModules(sub.subActivities)
-        }
-      })
+  async function processSubModules(subActivities) {
+    // Process each submodule one by one sequentially
+    for (const subModule of subActivities) {
+      if (subModule.spec === "lamp.module") {
+        const startTime = new Date(subModule.startTime).toString()
+        setSubModuleProcessCount((count) => count + 1)
+
+        await handleSubModule(
+          {
+            id: subModule.id,
+            startTime: startTime,
+            parentModule: subModule.parentModule,
+            parentString: subModule.parentString,
+          },
+          subModule.level,
+          true
+        )
+        setSubModuleProcessCount((count) => count - 1)
+      }
+    }
+    setPendingSubModules([])
   }
   const [favorites, setFavorites] = useState([])
 
@@ -583,19 +613,31 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
           !!y.error ? undefined : y.data
         )[0] ?? []
-      setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
+      setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
     })()
+    setShownActivities(savedActivities)
 
     const runAsync = async () => {
       const activitiesList = savedActivities
-      const initializeOpenedModules = activitiesList.filter(
-        (activity) => activity.spec === "lamp.module" && activity?.settings?.initialize_opened
+      const moduleActivities = activitiesList.filter((activity) => activity.spec === "lamp.module")
+
+      const initializeOpenedModules = await Promise.all(
+        moduleActivities.map(async (module) => {
+          const moduleStartTime = await getModuleStartTime(module.id)
+          if (!!moduleStartTime) {
+            return module
+          }
+          return null // or undefined
+        })
       )
 
-      if (initializeOpenedModules.length > 0) {
+      // Filter out null or undefined values
+      const filteredModules = initializeOpenedModules.filter(Boolean)
+
+      if (filteredModules.length > 0) {
         setLoadingModules(true)
         const tasks = []
-        for (const activity of initializeOpenedModules) {
+        for (const activity of filteredModules) {
           tasks.push(handleInitializeOpenedModules(activity, true))
         }
         try {
@@ -603,31 +645,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         } catch (err) {
           console.error("Error:", err)
         } finally {
-          setLoadingModules(false) // Reset loader
+          setPendingSubModulesReady(true)
         }
-        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b.id === a.id)))
+        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b?.id === a?.id)))
       } else {
         setShownActivities(savedActivities)
         setLoadingModules(false)
       }
     }
 
-    if (!moduleDataLoadedFromStore && savedActivities && savedActivities.length > 0) {
-      if (!moduleDataFromStore) runAsync()
-      else {
-        const data = JSON.parse(moduleDataFromStore)
-        processActivities(data)
-        setShownActivities(savedActivities.filter((a) => !data.some((b) => b.id === a.id)))
-        setLoadingModules(false)
-        localStorage.removeItem("moduleData")
-        localStorage.removeItem("parentString")
-        setModuleDataLoadedFromStore(true)
-      }
-    } else if (savedActivities && savedActivities.length === 0) {
-      // Handle case when savedActivities is empty
-      setShownActivities([])
-      setLoadingModules(false)
-    }
+    runAsync()
   }, [savedActivities])
 
   const scrollToElement = (id) => {
@@ -644,11 +671,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     setMessage("There are no " + type + " activities available.")
   }, [type])
 
-  const updateLocalStorage = () => {
-    localStorage.setItem("moduleData", JSON.stringify(extractIdsWithHierarchy(moduleData)))
-  }
-
-  const [tab, setTab] = useState("all")
+  const [tab, setTab] = useState("modules")
 
   useEffect(() => {
     if (favorites.length > 0) {
@@ -657,7 +680,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("all")
+      setTab("modules")
     }
   }, [favorites])
 
@@ -672,24 +695,31 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       })()
     }
   }, [tab])
-
   return (
     <Box>
       <TabContext value={tab}>
-        {favorites.length > 0 && (
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <TabList onChange={(e, val) => setTab(val)}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          {(favorites || []).length > 0 ? (
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
               <Tab label="Favorites" value="favorite" />
-              {/* <Tab label="Modules" value="module" />  */}
-              <Tab label="All" value="all" />
+              <Tab label="Modules" value="modules" />
+              <Tab label="Other Activities" value="other" />
             </TabList>
-          </Box>
-        )}
-        {favorites.length > 0 && (
-          <TabPanel value="favorite">
-            {(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).length ? (
+          ) : (
+            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+              <Tab label="Modules" value="modules" />
+              <Tab label="Other Activities" value="other" />
+            </TabList>
+          )}
+        </Box>
+        {(favorites || []).length > 0 && (
+          <TabPanel value="favorite" className={classes.tabPanelMain}>
+            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
+              .length ? (
               <ActivityAccordian
-                data={(moduleData.filter((activity) => favorites.some((fav) => fav.id === activity.id)) || []).concat({
+                data={(
+                  moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []
+                ).concat({
                   name: "Other activities",
                   level: 1,
                   subActivities: shownActivities.filter((activity) => favorites.includes(activity)),
@@ -699,102 +729,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleClickOpen={handleClickOpen}
                 handleSubModule={handleSubModule}
                 participant={participant}
-                moduleForNotification={moduleForNotification}
-                setIsParentModuleLoaded={setIsParentModuleLoaded}
-                updateModuleStartTime={updateModuleStartTime}
                 favorites={favorites}
                 setFavorites={setFavorites}
               />
             ) : (
               <Grid container spacing={2}>
-                {favorites.length
-                  ? favorites.map((activity) => (
-                      <Grid
-                        item
-                        xs={6}
-                        sm={4}
-                        md={3}
-                        lg={3}
-                        onClick={() => {
-                          handleClickOpen(activity)
-                        }}
-                        className={classes.thumbMain}
-                      >
-                        <Icon className={classes.favstar}>star_rounded</Icon>
-                        <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                          <Card
-                            className={
-                              classes.manage +
-                              " " +
-                              (type === "Manage"
-                                ? classes.manageH
-                                : type === "Assess"
-                                ? classes.assessH
-                                : type === "Learn"
-                                ? classes.learnH
-                                : classes.preventH)
-                            }
-                          >
-                            <Box mt={2} mb={1}>
-                              <Box
-                                className={classes.mainIcons}
-                                style={{
-                                  margin: "auto",
-                                  background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                    ? `url(${
-                                        tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                      }) center center/contain no-repeat`
-                                    : activity.spec === "lamp.breathe"
-                                    ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                    : activity.spec === "lamp.journal"
-                                    ? `url(${JournalIcon}) center center/contain no-repeat`
-                                    : activity.spec === "lamp.scratch_image"
-                                    ? `url(${ScratchCard}) center center/contain no-repeat`
-                                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                                }}
-                              ></Box>
-                            </Box>
-                            <Typography className={classes.cardlabel}>
-                              <ReactMarkdown
-                                children={t(activity.name)}
-                                skipHtml={false}
-                                remarkPlugins={[gfm, emoji]}
-                                components={{ link: LinkRenderer }}
-                              />
-                            </Typography>
-                          </Card>
-                        </ButtonBase>
-                      </Grid>
-                    ))
-                  : type !== "Portal" && (
-                      <Box display="flex" className={classes.blankMsg} ml={1}>
-                        <Icon>info</Icon>
-                        <p>{`${t(message)}`}</p>
-                      </Box>
-                    )}
-              </Grid>
-            )}
-          </TabPanel>
-        )}
-        <TabPanel value="all">
-          {moduleData.length ? (
-            <ActivityAccordian
-              data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
-              type={type}
-              tag={tag}
-              handleClickOpen={handleClickOpen}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              setFavorites={setFavorites}
-              moduleForNotification={moduleForNotification}
-              setIsParentModuleLoaded={setIsParentModuleLoaded}
-              updateModuleStartTime={updateModuleStartTime}
-              favorites={favorites}
-            />
-          ) : (
-            <Grid container spacing={2}>
-              {savedActivities.length
-                ? savedActivities.map((activity) => (
+                {(favorites || []).length ? (
+                  (favorites || []).map((activity) => (
                     <Grid
                       item
                       xs={6}
@@ -806,7 +747,98 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                       }}
                       className={classes.thumbMain}
                     >
-                      {favorites.filter((f) => f.id == activity.id).length > 0 && (
+                      <Icon className={classes.favstar}>star_rounded</Icon>
+                      <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                        <Card
+                          className={
+                            classes.manage +
+                            " " +
+                            (type === "Manage"
+                              ? classes.manageH
+                              : type === "Assess"
+                              ? classes.assessH
+                              : type === "Learn"
+                              ? classes.learnH
+                              : classes.preventH)
+                          }
+                        >
+                          <Box mt={2} mb={1}>
+                            <Box
+                              className={classes.mainIcons}
+                              style={{
+                                margin: "auto",
+                                background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                  ? `url(${
+                                      tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                    }) center center/contain no-repeat`
+                                  : activity?.spec === "lamp.breathe"
+                                  ? `url(${BreatheIcon}) center center/contain no-repeat`
+                                  : activity?.spec === "lamp.journal"
+                                  ? `url(${JournalIcon}) center center/contain no-repeat`
+                                  : activity?.spec === "lamp.scratch_image"
+                                  ? `url(${ScratchCard}) center center/contain no-repeat`
+                                  : activity?.spec === "lamp.zoom_meeting"
+                                  ? `url(${VideoMeeting}) center center/contain no-repeat`
+                                  : `url(${InfoIcon}) center center/contain no-repeat`,
+                              }}
+                            ></Box>
+                          </Box>
+                          <Typography className={classes.cardlabel}>
+                            <ReactMarkdown
+                              children={t(activity?.name)}
+                              skipHtml={false}
+                              remarkPlugins={[gfm, emoji]}
+                              components={{ link: LinkRenderer }}
+                            />
+                          </Typography>
+                        </Card>
+                      </ButtonBase>
+                    </Grid>
+                  ))
+                ) : (
+                  <Box display="flex" className={classes.blankMsg} ml={1}>
+                    <Icon>info</Icon>
+                    <p>{`${t(message)}`}</p>
+                  </Box>
+                )}
+              </Grid>
+            )}
+          </TabPanel>
+        )}
+        <TabPanel value="modules" className={classes.tabPanelMain}>
+          {(moduleData || []).length > 0 ? (
+            <ActivityAccordian
+              data={(moduleData || []).concat({
+                name: "Unstarted Modules",
+                level: 1,
+                subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
+              })}
+              type={type}
+              tag={tag}
+              handleClickOpen={handleClickOpen}
+              handleSubModule={handleSubModule}
+              participant={participant}
+              setFavorites={setFavorites}
+              favorites={favorites}
+            />
+          ) : (
+            <Grid container spacing={2}>
+              {(savedActivities || []).filter((activity) => activity.spec == "lamp.module").length ? (
+                (savedActivities || [])
+                  .filter((activity) => activity.spec == "lamp.module")
+                  .map((activity) => (
+                    <Grid
+                      item
+                      xs={6}
+                      sm={4}
+                      md={3}
+                      lg={3}
+                      onClick={() => {
+                        handleClickOpen(activity)
+                      }}
+                      className={classes.thumbMain}
+                    >
+                      {favorites?.filter((f) => f?.id == activity?.id)?.length > 0 && (
                         <Icon className={classes.favstar}>star_rounded</Icon>
                       )}
 
@@ -833,12 +865,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                   ? `url(${
                                       tag.filter((x) => x.id === activity?.id)[0]?.photo
                                     }) center center/contain no-repeat`
-                                  : activity.spec === "lamp.breathe"
-                                  ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                  : activity.spec === "lamp.journal"
-                                  ? `url(${JournalIcon}) center center/contain no-repeat`
-                                  : activity.spec === "lamp.scratch_image"
-                                  ? `url(${ScratchCard}) center center/contain no-repeat`
                                   : `url(${InfoIcon}) center center/contain no-repeat`,
                               }}
                             ></Box>
@@ -855,30 +881,91 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                       </ButtonBase>
                     </Grid>
                   ))
-                : type !== "Portal" && (
-                    <Box display="flex" className={classes.blankMsg} ml={1}>
-                      <Icon>info</Icon>
-                      <p>{`${t(message)}`}</p>
-                    </Box>
-                  )}
+              ) : (
+                <Box display="flex" className={classes.blankMsg} ml={1}>
+                  <Icon>info</Icon>
+                  <p>{`${t("No modules available")}`}</p>
+                </Box>
+              )}
             </Grid>
           )}
         </TabPanel>
-        {/* <TabPanel value="module">
-          {moduleData.length ? (
-            <ActivityAccordian
-              data={moduleData.concat({ name: "Other activities", level: 1, subActivities: shownActivities })}
-              type={type}
-              tag={tag}
-              handleClickOpen={handleClickOpen}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              moduleForNotification={moduleForNotification}
-              setIsParentModuleLoaded={setIsParentModuleLoaded}
-              updateModuleStartTime={updateModuleStartTime}
-            />
-          ) : <Box></Box>} 
-        </TabPanel>*/}
+        <TabPanel value="other" className={classes.tabPanelMain}>
+          <Grid container spacing={2}>
+            {(savedActivities || []).filter((activity) => activity.spec != "lamp.module").length ? (
+              (savedActivities || [])
+                .filter((activity) => activity.spec != "lamp.module")
+                .map((activity) => (
+                  <Grid
+                    item
+                    xs={6}
+                    sm={4}
+                    md={3}
+                    lg={3}
+                    onClick={() => {
+                      handleClickOpen(activity)
+                    }}
+                    className={classes.thumbMain}
+                  >
+                    {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
+                      <Icon className={classes.favstar}>star_rounded</Icon>
+                    )}
+
+                    <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                      <Card
+                        className={
+                          classes.manage +
+                          " " +
+                          (type === "Manage"
+                            ? classes.manageH
+                            : type === "Assess"
+                            ? classes.assessH
+                            : type === "Learn"
+                            ? classes.learnH
+                            : classes.preventH)
+                        }
+                      >
+                        <Box mt={2} mb={1}>
+                          <Box
+                            className={classes.mainIcons}
+                            style={{
+                              margin: "auto",
+                              background: tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                ? `url(${
+                                    tag.filter((x) => x.id === activity?.id)[0]?.photo
+                                  }) center center/contain no-repeat`
+                                : activity.spec === "lamp.breathe"
+                                ? `url(${BreatheIcon}) center center/contain no-repeat`
+                                : activity.spec === "lamp.journal"
+                                ? `url(${JournalIcon}) center center/contain no-repeat`
+                                : activity.spec === "lamp.scratch_image"
+                                ? `url(${ScratchCard}) center center/contain no-repeat`
+                                : activity?.spec === "lamp.zoom_meeting"
+                                ? `url(${VideoMeeting}) center center/contain no-repeat`
+                                : `url(${InfoIcon}) center center/contain no-repeat`,
+                            }}
+                          ></Box>
+                        </Box>
+                        <Typography className={classes.cardlabel}>
+                          <ReactMarkdown
+                            children={t(activity.name)}
+                            skipHtml={false}
+                            remarkPlugins={[gfm, emoji]}
+                            components={{ link: LinkRenderer }}
+                          />
+                        </Typography>
+                      </Card>
+                    </ButtonBase>
+                  </Grid>
+                ))
+            ) : (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <Icon>info</Icon>
+                <p>{`${t(message)}`}</p>
+              </Box>
+            )}
+          </Grid>
+        </TabPanel>
       </TabContext>
       {loadingModules && (
         <Backdrop className={classes.backdrop} open={loadingModules}>
@@ -890,7 +977,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         activity={activity}
         tag={tag}
         questionCount={questionCount}
-        updateLocalStorage={updateLocalStorage}
         open={open}
         onClose={() => setOpen(false)}
         type={type}
@@ -899,6 +985,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         setFavorites={setFavorites}
         savedActivities={savedActivities}
         tab={tab}
+        updateIsCompleted={updateIsCompleted}
       />
       {!!moduleForNotification && (
         <Dialog

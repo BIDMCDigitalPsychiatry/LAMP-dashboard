@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material"
+import { Accordion, AccordionSummary, AccordionDetails, Grid } from "@mui/material"
 import {
   Typography,
-  Grid,
   Card,
   Box,
   ButtonBase,
@@ -29,6 +28,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import LAMP from "lamp-core"
 import { getActivityEvents } from "./ActivityBox"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
+import VideoMeeting from "../icons/Video.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -85,6 +85,20 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
+    accordionHeadIcons: {
+      [theme.breakpoints.up("lg")]: {
+        width: 80,
+        height: 80,
+      },
+      [theme.breakpoints.down("sm")]: {
+        width: 75,
+        height: 75,
+      },
+      [theme.breakpoints.down("xs")]: {
+        width: 65,
+        height: 65,
+      },
+    },
     mainIcons: {
       width: 80,
       height: 80,
@@ -95,6 +109,10 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         width: 75,
         height: 75,
+      },
+      [theme.breakpoints.down("xs")]: {
+        width: 65,
+        height: 65,
       },
     },
     thumbMain: { maxWidth: 255, position: "relative" },
@@ -117,17 +135,51 @@ const useStyles = makeStyles((theme: Theme) =>
     preventH: {
       background: "#ECF4FF !important",
     },
-    boxShadowNone: {
+    accordionMain: {
       boxShadow: "none !important",
+      background: "#f8f8f8 !important",
+      borderRadius: "18px !important",
+      marginBottom: 16,
+      [theme.breakpoints.down("xs")]: {
+        borderRadius: "12px !important",
+        marginBottom: 8,
+      },
       "& h6": {
-        fontSize: 22,
-        "& span": {
-          fontSize: 18,
-          fontWeight: "normal",
+        fontSize: 17,
+        [theme.breakpoints.down("xs")]: {
+          fontSize: 15,
+          fontWeight: 500,
         },
+        // "& span": {
+        //   fontSize: 18,
+        //   fontWeight: "normal",
+        // },
       },
       "&::before": {
         display: "none",
+      },
+      "& .MuiAccordionSummary-root": {
+        padding: "0 8px",
+        "& .MuiAccordionSummary-expandIconWrapper": {
+          "& svg": {
+            fontSize: "2rem",
+            [theme.breakpoints.down("xs")]: {
+              fontSize: "1.5rem",
+            },
+          },
+        },
+      },
+      "& .MuiAccordionSummary-content": {
+        display: "block",
+        margin: "8px 0",
+        [theme.breakpoints.down("xs")]: {
+          paddingLeft: 0,
+        },
+      },
+      "&.Mui-expanded": {
+        background: "#fff !important",
+        boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.20) !important",
+        marginTop: "0 !important",
       },
     },
     greentick: {
@@ -158,17 +210,25 @@ const useStyles = makeStyles((theme: Theme) =>
       top: 0,
     },
     moduleContainer: {
-      paddingTop: "60px !important",
+      paddingTop: "30px !important",
     },
     headerTitleIcon: {
       background: "none",
       boxShadow: "none",
-      width: 36,
-      height: 36,
+      width: 34,
+      height: 34,
       color: "#666",
       marginLeft: 8,
+      [theme.breakpoints.down("xs")]: {
+        width: 22,
+        height: 22,
+        minHeight: 22,
+      },
       "& .material-icons": {
-        fontSize: "2rem",
+        fontSize: "1.7rem",
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "1.3rem",
+        },
       },
       "&:hover": {
         background: "#fff",
@@ -177,21 +237,124 @@ const useStyles = makeStyles((theme: Theme) =>
         color: "#e3b303",
       },
     },
+    progressCircle: {
+      width: "18px !important",
+      height: "18px !important",
+      marginRight: "8px",
+      [theme.breakpoints.down("xs")]: {
+        width: "16px !important",
+        height: "16px !important",
+      },
+      "&::after": {
+        content: "''",
+        position: "absolute",
+        width: 18,
+        height: 18,
+        left: 0,
+        top: 0,
+        zIndex: -1,
+        borderRadius: "50%",
+        border: "4px solid #ccc",
+        [theme.breakpoints.down("xs")]: {
+          width: 16,
+          height: 16,
+          border: "3px solid #ccc",
+        },
+      },
+    },
+    progressDetails: {
+      "& p": {
+        fontSize: 15,
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "14px",
+        },
+      },
+    },
   })
 )
 
+const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick) => {
+  // Function to get the status of the module
+  const getStatus = (module) => {
+    return module.name === "Other activities"
+      ? ""
+      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
+          "/" +
+          module.subActivities.length
+  }
+  // Function to calculate the percentage of completed sub-activities
+  const getPercentage = (module) => {
+    return (
+      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
+      100
+    )
+  }
+
+  return (
+    <Typography variant="h6">
+      <Grid container spacing={1}>
+        <Grid lg="auto" item>
+          <Box
+            className={classes.accordionHeadIcons}
+            style={{
+              margin: "auto",
+              background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                : `url(${InfoIcon}) center center/contain no-repeat`,
+            }}
+          ></Box>
+        </Grid>
+
+        <Grid item xs display="flex" alignItems="center" spacing={0}>
+          <Box>
+            <Box display="flex" alignItems="center">
+              <Typography variant="h6">{module.name}</Typography>
+              {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
+                <Tooltip
+                  title={
+                    favoriteIds.includes(module.id)
+                      ? "Tap to remove from Favorite Activities"
+                      : "Tap to add to Favorite Activities"
+                  }
+                >
+                  <Fab
+                    className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFavoriteClick(module.id)
+                    }}
+                  >
+                    <Icon>star_rounded</Icon>
+                  </Fab>
+                </Tooltip>
+              )}
+            </Box>
+            {module.name !== "Other activities" && module.name !== "Unstarted Modules" && module?.trackProgress && (
+              <Grid display="flex" alignItems="center" className={classes.progressDetails}>
+                <CircularProgress
+                  variant="determinate"
+                  thickness={8}
+                  className={classes.progressCircle}
+                  value={getPercentage(module)}
+                />
+                <Typography variant="body1">
+                  {
+                    <span>
+                      <span>{getStatus(module)}</span> Sections Complete
+                    </span>
+                  }
+                </Typography>
+              </Grid>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
+    </Typography>
+  )
+}
+
 //The function to renderActivities in accordian layout
-const renderActivities = (
-  activities,
-  type,
-  tag,
-  favorites,
-  handleClickOpen,
-  handleSubModule,
-  classes,
-  module,
-  status
-) => {
+const renderActivities = (activities, type, tag, favorites, handleClickOpen, handleSubModule, classes, module) => {
   return (
     <>
       {activities.map((activity) =>
@@ -204,19 +367,19 @@ const renderActivities = (
               md={3}
               lg={3}
               onClick={() => {
-                if (status === true) {
-                  return
+                if (
+                  activity.spec === "lamp.module" &&
+                  module.name != "Other activities" &&
+                  module.name != "Unstarted Modules"
+                ) {
+                  handleSubModule(activity, module.level)
                 } else {
-                  if (activity.spec === "lamp.module" && module.name != "Other activities") {
-                    handleSubModule(activity, module.level)
-                  } else {
-                    handleClickOpen(activity)
-                  }
+                  handleClickOpen(activity)
                 }
               }}
               className={classes.thumbMain}
             >
-              {(favorites || []).filter((f) => f.id == activity.id).length > 0 && (
+              {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                 <Icon className={classes.favstar}>star_rounded</Icon>
               )}
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -263,6 +426,8 @@ const renderActivities = (
                           ? `url(${JournalIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.scratch_image"
                           ? `url(${ScratchCard}) center center/contain no-repeat`
+                          : activity?.spec === "lamp.zoom_meeting"
+                          ? `url(${VideoMeeting}) center center/contain no-repeat`
                           : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
                     ></Box>
@@ -295,101 +460,11 @@ const ActivityAccordion = ({
   handleClickOpen,
   handleSubModule,
   participant,
-  moduleForNotification,
-  setIsParentModuleLoaded,
-  updateModuleStartTime,
   favorites,
   setFavorites,
 }) => {
   const classes = useStyles()
-  const { t } = useTranslation()
-  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-  const [statusLoaded, setStatusLoaded] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  const getStatus = (module) => {
-    return module.name === "Other activities"
-      ? ""
-      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
-          "/" +
-          module.subActivities.length
-  }
-
-  const checkIsBegin = async (module) => {
-    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
-    return activityEvents.length === 0
-  }
-
-  const addActivityEventForModule = async (module, parentIds = []) => {
-    const compositeKey = getCompositeKey(module, parentIds)
-    if ((await checkIsBegin(module)) === true) {
-      setLoading(true)
-      LAMP.ActivityEvent.create(participant.id ?? participant, {
-        timestamp: new Date().getTime(),
-        duration: 0,
-        activity: module.id,
-        static_data: {},
-      }).then((a) => {
-        setActivityStatus((prevState) => ({
-          ...prevState,
-          [compositeKey]: true,
-        }))
-        updateModuleStartTime(module, new Date())
-        setLoading(false)
-      })
-    } else {
-      const hasBegun = true
-      setActivityStatus((prevState) => ({
-        ...prevState,
-        [compositeKey]: hasBegun,
-      }))
-    }
-  }
-
-  const getCompositeKey = (module, parentIds = []) => {
-    return [...parentIds, module.id].join(">")
-  }
-
-  const initializeStatus = async () => {
-    setStatusLoaded(false)
-    const statuses = {}
-    const checkAndNotify = async (module, parentIds = []) => {
-      const status = await checkIsBegin(module)
-      const compositeKey = getCompositeKey(module, parentIds)
-      statuses[compositeKey] = status
-      if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
-        setIsParentModuleLoaded(true)
-      }
-    }
-    const tasks = []
-    for (const module of data?.filter((m) => m.name !== "Other activities")) {
-      tasks.push(checkAndNotify(module))
-      if (module?.subActivities) {
-        for (const activity of module.subActivities) {
-          if (activity.spec === "lamp.module") {
-            tasks.push(checkAndNotify(activity, [module.id]))
-          }
-          if (activity?.subActivities) {
-            for (const subActivity of activity.subActivities) {
-              if (subActivity.spec === "lamp.module") {
-                tasks.push(checkAndNotify(subActivity, [module.id, activity.id]))
-              }
-            }
-          }
-        }
-      }
-    }
-    await Promise.all(tasks)
-    setActivityStatus(statuses)
-    return true
-  }
-
-  useEffect(() => {
-    const status = initializeStatus()
-    if (status) {
-      setStatusLoaded(true)
-    }
-  }, [data])
 
   useEffect(() => {
     ;(async () => {
@@ -421,62 +496,16 @@ const ActivityAccordion = ({
   }
   return (
     <div>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       {data.map((module, index) => (
-        <Accordion key={index} defaultExpanded className={classes.boxShadowNone}>
+        <Accordion key={index} defaultExpanded className={classes.accordionMain}>
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
-              <Typography variant="h6">
-                {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
-                {module.name !== "Other activities" && (
-                  <Tooltip
-                    title={
-                      favoriteIds.includes(module.id)
-                        ? "Tap to remove from Favorite Activities"
-                        : "Tap to add to Favorite Activities"
-                    }
-                  >
-                    <Fab
-                      className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFavoriteClick(module.id)
-                      }}
-                    >
-                      <Icon>star_rounded</Icon>
-                    </Fab>
-                  </Tooltip>
-                )}{" "}
-              </Typography>
+              {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)}
             </AccordionSummary>
           ) : (
-            <Typography variant="h6" className={classes.moduleHeader}>
-              {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
-              <Tooltip
-                title={
-                  favoriteIds.includes(module.id)
-                    ? "Tap to remove from Favorite Activities"
-                    : "Tap to add to Favorite Activities"
-                }
-              >
-                <Fab
-                  className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
-                  onClick={() => handleFavoriteClick(module.id)}
-                >
-                  <Icon>star_rounded</Icon>
-                </Fab>
-              </Tooltip>{" "}
-            </Typography>
+            moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)
           )}
           <AccordionDetails className={type == "activity" && classes.moduleContainer}>
-            {statusLoaded && module.id && activityStatus[module.id] === true && (
-              <Box className={classes.moduleStart}>
-                Click here to start the module activity
-                <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
-              </Box>
-            )}
             <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
@@ -487,8 +516,7 @@ const ActivityAccordion = ({
                   handleClickOpen,
                   handleSubModule,
                   classes,
-                  module,
-                  activityStatus[module.id]
+                  module
                 )
               ) : (
                 <Box display="flex" className={classes.blankMsg} ml={1}>
@@ -499,23 +527,12 @@ const ActivityAccordion = ({
             {module.subActivities.map((activity) => (
               <>
                 {activity.subActivities && activity.subActivities.length > 0 && (
-                  <Box paddingLeft={5} display="flex" flexDirection="column">
-                    <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                      <AccordionSummary id={module.id + ">" + activity.id}>
-                        <Typography variant="h6">
-                          {activity.name} {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>}
-                        </Typography>
+                  <Box marginTop={3} display="flex" flexDirection="column">
+                    <Accordion defaultExpanded className={classes.accordionMain}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id + ">" + activity.id}>
+                        {moduleAccordianContent(activity, classes, tag, favoriteIds, handleFavoriteClick)}
                       </AccordionSummary>
                       <AccordionDetails>
-                        {statusLoaded && activity.id && activityStatus[module.id + ">" + activity.id] && (
-                          <Box className={classes.moduleStart}>
-                            Click here to start the module activity
-                            <Button
-                              variant="contained"
-                              onClick={() => addActivityEventForModule(activity, [module.id])}
-                            >{`${t("Start")}`}</Button>
-                          </Box>
-                        )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
                             activity.subActivities,
@@ -525,35 +542,27 @@ const ActivityAccordion = ({
                             handleClickOpen,
                             handleSubModule,
                             classes,
-                            activity,
-                            activityStatus[activity.id]
+                            activity
                           )}
                         </Grid>
                         {activity.subActivities.map((subActivity) => (
                           <>
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
-                              <Box paddingLeft={5} display="flex" flexDirection="column">
-                                <Accordion defaultExpanded={true} className={classes.boxShadowNone}>
-                                  <AccordionSummary id={module.id + ">" + activity.id + ">" + subActivity.id}>
-                                    <Typography variant="h6">
-                                      {subActivity.name}{" "}
-                                      {subActivity?.trackProgress ? <span>{getStatus(subActivity)}</span> : <></>}
-                                    </Typography>
+                              <Box marginTop={4} display="flex" flexDirection="column">
+                                <Accordion defaultExpanded={true} className={classes.accordionMain}>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    id={module.id + ">" + activity.id + ">" + subActivity.id}
+                                  >
+                                    {moduleAccordianContent(
+                                      subActivity,
+                                      classes,
+                                      tag,
+                                      favoriteIds,
+                                      handleFavoriteClick
+                                    )}
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {statusLoaded &&
-                                      subActivity.id &&
-                                      activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
-                                        <Box className={classes.moduleStart}>
-                                          Click here to start the module activity
-                                          <Button
-                                            variant="contained"
-                                            onClick={() =>
-                                              addActivityEventForModule(subActivity, [module.id, activity.id])
-                                            }
-                                          >{`${t("Start")}`}</Button>
-                                        </Box>
-                                      )}
                                     <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
                                         subActivity.subActivities,
@@ -563,8 +572,7 @@ const ActivityAccordion = ({
                                         handleClickOpen,
                                         handleSubModule,
                                         classes,
-                                        subActivity,
-                                        activityStatus[subActivity.id]
+                                        subActivity
                                       )}
                                     </Grid>
                                   </AccordionDetails>

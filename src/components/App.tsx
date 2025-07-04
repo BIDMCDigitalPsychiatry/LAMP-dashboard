@@ -950,6 +950,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => logout()}
                 activeTab={state.activeTab}
+                // participant={getParticipant(props.match.params.id)}
               >
                 <Participant
                   participant={getParticipant(props.match.params.id)}
