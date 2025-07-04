@@ -680,7 +680,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("modules")
+      setTab(
+        (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other"
+      )
     }
   }, [favorites])
 
