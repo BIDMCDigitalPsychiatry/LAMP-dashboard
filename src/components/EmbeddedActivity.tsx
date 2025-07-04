@@ -58,6 +58,7 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
+  "lamp.zoom_meeting": "Virtual Meeting",
 }
 
 export default function EmbeddedActivity({
@@ -309,9 +310,6 @@ export default function EmbeddedActivity({
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      if (currentActivity.spec == "lamp.survey") {
-        response = await loadFallBack()
-      }
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
@@ -331,9 +329,6 @@ export default function EmbeddedActivity({
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-
-      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-
       return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"

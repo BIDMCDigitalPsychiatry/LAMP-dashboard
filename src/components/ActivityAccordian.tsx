@@ -210,7 +210,7 @@ const useStyles = makeStyles((theme: Theme) =>
       top: 0,
     },
     moduleContainer: {
-      paddingTop: "60px !important",
+      paddingTop: "30px !important",
     },
     headerTitleIcon: {
       background: "none",
@@ -273,18 +273,88 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick) => {
+  // Function to get the status of the module
+  const getStatus = (module) => {
+    return module.name === "Other activities"
+      ? ""
+      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
+          "/" +
+          module.subActivities.length
+  }
+  // Function to calculate the percentage of completed sub-activities
+  const getPercentage = (module) => {
+    return (
+      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
+      100
+    )
+  }
+
+  return (
+    <Typography variant="h6">
+      <Grid container spacing={1}>
+        <Grid lg="auto" item>
+          <Box
+            className={classes.accordionHeadIcons}
+            style={{
+              margin: "auto",
+              background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                : `url(${InfoIcon}) center center/contain no-repeat`,
+            }}
+          ></Box>
+        </Grid>
+
+        <Grid item xs display="flex" alignItems="center" spacing={0}>
+          <Box>
+            <Box display="flex" alignItems="center">
+              <Typography variant="h6">{module.name}</Typography>
+              {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
+                <Tooltip
+                  title={
+                    favoriteIds.includes(module.id)
+                      ? "Tap to remove from Favorite Activities"
+                      : "Tap to add to Favorite Activities"
+                  }
+                >
+                  <Fab
+                    className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFavoriteClick(module.id)
+                    }}
+                  >
+                    <Icon>star_rounded</Icon>
+                  </Fab>
+                </Tooltip>
+              )}
+            </Box>
+            {module.name !== "Other activities" && module.name !== "Unstarted Modules" && module?.trackProgress && (
+              <Grid display="flex" alignItems="center" className={classes.progressDetails}>
+                <CircularProgress
+                  variant="determinate"
+                  thickness={8}
+                  className={classes.progressCircle}
+                  value={getPercentage(module)}
+                />
+                <Typography variant="body1">
+                  {
+                    <span>
+                      <span>{getStatus(module)}</span> Sections Complete
+                    </span>
+                  }
+                </Typography>
+              </Grid>
+            )}
+          </Box>
+        </Grid>
+      </Grid>
+    </Typography>
+  )
+}
+
 //The function to renderActivities in accordian layout
-const renderActivities = (
-  activities,
-  type,
-  tag,
-  favorites,
-  handleClickOpen,
-  handleSubModule,
-  classes,
-  module,
-  status
-) => {
+const renderActivities = (activities, type, tag, favorites, handleClickOpen, handleSubModule, classes, module) => {
   return (
     <>
       {activities.map((activity) =>
@@ -297,18 +367,14 @@ const renderActivities = (
               md={3}
               lg={3}
               onClick={() => {
-                if (status === true) {
-                  return
+                if (
+                  activity.spec === "lamp.module" &&
+                  module.name != "Other activities" &&
+                  module.name != "Unstarted Modules"
+                ) {
+                  handleSubModule(activity, module.level)
                 } else {
-                  if (
-                    activity.spec === "lamp.module" &&
-                    module.name != "Other activities" &&
-                    module.name != "Unstarted Modules"
-                  ) {
-                    handleSubModule(activity, module.level)
-                  } else {
-                    handleClickOpen(activity)
-                  }
+                  handleClickOpen(activity)
                 }
               }}
               className={classes.thumbMain}
@@ -394,108 +460,11 @@ const ActivityAccordion = ({
   handleClickOpen,
   handleSubModule,
   participant,
-  moduleForNotification,
-  setIsParentModuleLoaded,
-  updateModuleStartTime,
   favorites,
   setFavorites,
 }) => {
   const classes = useStyles()
-  const { t } = useTranslation()
-  const [activityStatus, setActivityStatus] = useState({}) // Store start status for each activity
-  const [statusLoaded, setStatusLoaded] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  const getStatus = (module) => {
-    return module.name === "Other activities"
-      ? ""
-      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
-          "/" +
-          module.subActivities.length
-  }
-
-  const getPercentage = (module) => {
-    return (
-      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
-      100
-    )
-  }
-
-  const checkIsBegin = async (module) => {
-    const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
-    return activityEvents.length === 0
-  }
-
-  const addActivityEventForModule = async (module, parentIds = []) => {
-    const compositeKey = getCompositeKey(module, parentIds)
-    if ((await checkIsBegin(module)) === true) {
-      setLoading(true)
-      LAMP.ActivityEvent.create(participant.id ?? participant, {
-        timestamp: new Date().getTime(),
-        duration: 0,
-        activity: module.id,
-        static_data: {},
-      }).then((a) => {
-        setActivityStatus((prevState) => ({
-          ...prevState,
-          [compositeKey]: true,
-        }))
-        updateModuleStartTime(module, new Date())
-        setLoading(false)
-      })
-    } else {
-      const hasBegun = true
-      setActivityStatus((prevState) => ({
-        ...prevState,
-        [compositeKey]: hasBegun,
-      }))
-    }
-  }
-
-  const getCompositeKey = (module, parentIds = []) => {
-    return [...parentIds, module.id].join(">")
-  }
-
-  const initializeStatus = async () => {
-    setStatusLoaded(false)
-    const statuses = {}
-    const checkAndNotify = async (module, parentIds = []) => {
-      const status = await checkIsBegin(module)
-      const compositeKey = getCompositeKey(module, parentIds)
-      statuses[compositeKey] = status
-      if (moduleForNotification?.id != null && module.id === moduleForNotification?.id) {
-        setIsParentModuleLoaded(true)
-      }
-    }
-    const tasks = []
-    for (const module of data?.filter((m) => m.name !== "Other activities")) {
-      tasks.push(checkAndNotify(module))
-      if (module?.subActivities) {
-        for (const activity of module.subActivities) {
-          if (activity.spec === "lamp.module") {
-            tasks.push(checkAndNotify(activity, [module.id]))
-          }
-          if (activity?.subActivities) {
-            for (const subActivity of activity.subActivities) {
-              if (subActivity.spec === "lamp.module") {
-                tasks.push(checkAndNotify(subActivity, [module.id, activity.id]))
-              }
-            }
-          }
-        }
-      }
-    }
-    await Promise.all(tasks)
-    setActivityStatus(statuses)
-    return true
-  }
-
-  useEffect(() => {
-    const status = initializeStatus()
-    if (status) {
-      setStatusLoaded(true)
-    }
-  }, [data])
 
   useEffect(() => {
     ;(async () => {
@@ -527,106 +496,16 @@ const ActivityAccordion = ({
   }
   return (
     <div>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       {data.map((module, index) => (
         <Accordion key={index} defaultExpanded className={classes.accordionMain}>
           {type != "activity" ? (
             <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
-              <Typography variant="h6">
-                <Grid container spacing={1}>
-                  <Grid lg="auto" item>
-                    <Box
-                      className={classes.accordionHeadIcons}
-                      style={{
-                        margin: "auto",
-                        background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                          ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Grid>
-
-                  <Grid item xs display="flex" alignItems="center" spacing={0}>
-                    <Box>
-                      <Box display="flex" alignItems="center">
-                        <Typography variant="h6">{module.name}</Typography>
-                        {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
-                          <Tooltip
-                            title={
-                              favoriteIds.includes(module.id)
-                                ? "Tap to remove from Favorite Activities"
-                                : "Tap to add to Favorite Activities"
-                            }
-                          >
-                            <Fab
-                              className={`${classes.headerTitleIcon} ${
-                                favoriteIds.includes(module.id) ? "active" : ""
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleFavoriteClick(module.id)
-                              }}
-                            >
-                              <Icon>star_rounded</Icon>
-                            </Fab>
-                          </Tooltip>
-                        )}
-                      </Box>
-                      {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
-                        <Grid display="flex" alignItems="center" className={classes.progressDetails}>
-                          <CircularProgress
-                            variant="determinate"
-                            thickness={8}
-                            className={classes.progressCircle}
-                            value={getPercentage(module)}
-                          />
-                          <Typography variant="body1">
-                            {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>} Sections Complete
-                          </Typography>
-                        </Grid>
-                      )}
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Typography>
+              {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)}
             </AccordionSummary>
           ) : (
-            <Typography variant="h6" className={classes.moduleHeader}>
-              <Box
-                className={classes.mainIcons}
-                style={{
-                  margin: "auto",
-                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                    ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
-                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                }}
-              ></Box>
-              {module.name} {module?.trackProgress ? <span>{getStatus(module)}</span> : <></>}
-              <Tooltip
-                title={
-                  favoriteIds.includes(module.id)
-                    ? "Tap to remove from Favorite Activities"
-                    : "Tap to add to Favorite Activities"
-                }
-              >
-                <Fab
-                  className={`${classes.headerTitleIcon} ${favoriteIds.includes(module.id) ? "active" : ""}`}
-                  onClick={() => handleFavoriteClick(module.id)}
-                >
-                  <Icon>star_rounded</Icon>
-                </Fab>
-              </Tooltip>
-            </Typography>
+            moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)
           )}
           <AccordionDetails className={type == "activity" && classes.moduleContainer}>
-            {statusLoaded && module.id && activityStatus[module.id] === true && (
-              <Box className={classes.moduleStart}>
-                Click here to start the module activity
-                <Button variant="contained" onClick={() => addActivityEventForModule(module)}>{`${t("Start")}`}</Button>
-              </Box>
-            )}
             <Grid container spacing={2}>
               {module.subActivities.length ? (
                 renderActivities(
@@ -637,8 +516,7 @@ const ActivityAccordion = ({
                   handleClickOpen,
                   handleSubModule,
                   classes,
-                  module,
-                  activityStatus[module.id]
+                  module
                 )
               ) : (
                 <Box display="flex" className={classes.blankMsg} ml={1}>
@@ -652,76 +530,9 @@ const ActivityAccordion = ({
                   <Box marginTop={3} display="flex" flexDirection="column">
                     <Accordion defaultExpanded className={classes.accordionMain}>
                       <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id + ">" + activity.id}>
-                        <Typography variant="h6">
-                          <Grid container spacing={1}>
-                            <Grid lg="auto" item>
-                              <Box
-                                className={classes.accordionHeadIcons}
-                                style={{
-                                  margin: "auto",
-                                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                                    ? `url(${
-                                        tag.filter((x) => x.id === module?.id)[0]?.photo
-                                      }) center center/contain no-repeat`
-                                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                                }}
-                              ></Box>
-                            </Grid>
-                            <Grid item xs display="flex" alignItems="center" spacing={0}>
-                              <Box display="flex" alignItems="center">
-                                <Box>
-                                  {activity.name}
-                                  {activity.name !== "Other activities" && activity.name !== "Unstarted Modules" && (
-                                    <Tooltip
-                                      title={
-                                        favoriteIds.includes(activity.id)
-                                          ? "Tap to remove from Favorite Activities"
-                                          : "Tap to add to Favorite Activities"
-                                      }
-                                    >
-                                      <Fab
-                                        className={`${classes.headerTitleIcon} ${
-                                          favoriteIds.includes(activity.id) ? "active" : ""
-                                        }`}
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          handleFavoriteClick(activity.id)
-                                        }}
-                                      >
-                                        <Icon>star_rounded</Icon>
-                                      </Fab>
-                                    </Tooltip>
-                                  )}
-                                  {activity.name !== "Other activities" && activity.name !== "Unstarted Modules" && (
-                                    <Grid display="flex" alignItems="center" className={classes.progressDetails}>
-                                      <CircularProgress
-                                        variant="determinate"
-                                        thickness={8}
-                                        className={classes.progressCircle}
-                                        value={getPercentage(activity)}
-                                      />
-                                      <Typography variant="body1">
-                                        {activity?.trackProgress ? <span>{getStatus(activity)}</span> : <></>} Sections
-                                        Complete
-                                      </Typography>
-                                    </Grid>
-                                  )}
-                                </Box>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Typography>
+                        {moduleAccordianContent(activity, classes, tag, favoriteIds, handleFavoriteClick)}
                       </AccordionSummary>
                       <AccordionDetails>
-                        {statusLoaded && activity.id && activityStatus[module.id + ">" + activity.id] && (
-                          <Box className={classes.moduleStart}>
-                            Click here to start the module activity
-                            <Button
-                              variant="contained"
-                              onClick={() => addActivityEventForModule(activity, [module.id])}
-                            >{`${t("Start")}`}</Button>
-                          </Box>
-                        )}
                         <Grid container spacing={2} direction="row" wrap="wrap">
                           {renderActivities(
                             activity.subActivities,
@@ -731,104 +542,27 @@ const ActivityAccordion = ({
                             handleClickOpen,
                             handleSubModule,
                             classes,
-                            activity,
-                            activityStatus[activity.id]
+                            activity
                           )}
                         </Grid>
                         {activity.subActivities.map((subActivity) => (
                           <>
                             {subActivity.subActivities && subActivity.subActivities.length > 0 && (
-                              <Box paddingLeft={5} display="flex" flexDirection="column">
+                              <Box marginTop={4} display="flex" flexDirection="column">
                                 <Accordion defaultExpanded={true} className={classes.accordionMain}>
                                   <AccordionSummary
                                     expandIcon={<ExpandMoreIcon />}
                                     id={module.id + ">" + activity.id + ">" + subActivity.id}
                                   >
-                                    <Typography variant="h6">
-                                      <Grid container spacing={1}>
-                                        <Grid lg="auto" item>
-                                          <Box
-                                            className={classes.accordionHeadIcons}
-                                            style={{
-                                              margin: "auto",
-                                              background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                                                ? `url(${
-                                                    tag.filter((x) => x.id === module?.id)[0]?.photo
-                                                  }) center center/contain no-repeat`
-                                                : `url(${InfoIcon}) center center/contain no-repeat`,
-                                            }}
-                                          ></Box>
-                                        </Grid>
-
-                                        <Grid item xs display="flex" alignItems="center" spacing={0}>
-                                          <Box display="flex" alignItems="center">
-                                            <Box>
-                                              <Typography variant="h6">{subActivity.name}</Typography>
-                                              {subActivity.name !== "Other activities" &&
-                                                subActivity.name !== "Unstarted Modules" && (
-                                                  <Tooltip
-                                                    title={
-                                                      favoriteIds.includes(subActivity.id)
-                                                        ? "Tap to remove from Favorite Activities"
-                                                        : "Tap to add to Favorite Activities"
-                                                    }
-                                                  >
-                                                    <Fab
-                                                      className={`${classes.headerTitleIcon} ${
-                                                        favoriteIds.includes(subActivity.id) ? "active" : ""
-                                                      }`}
-                                                      onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleFavoriteClick(subActivity.id)
-                                                      }}
-                                                    >
-                                                      <Icon>star_rounded</Icon>
-                                                    </Fab>
-                                                  </Tooltip>
-                                                )}
-                                            </Box>
-                                            {subActivity.name !== "Other activities" &&
-                                              subActivity.name !== "Unstarted Modules" && (
-                                                <Grid
-                                                  display="flex"
-                                                  alignItems="center"
-                                                  className={classes.progressDetails}
-                                                >
-                                                  <CircularProgress
-                                                    variant="determinate"
-                                                    thickness={8}
-                                                    className={classes.progressCircle}
-                                                    value={getPercentage(subActivity)}
-                                                  />
-                                                  <Typography variant="body1">
-                                                    {subActivity?.trackProgress ? (
-                                                      <span>{getStatus(subActivity)}</span>
-                                                    ) : (
-                                                      <></>
-                                                    )}
-                                                    Sections Complete
-                                                  </Typography>
-                                                </Grid>
-                                              )}
-                                          </Box>
-                                        </Grid>
-                                      </Grid>
-                                    </Typography>
+                                    {moduleAccordianContent(
+                                      subActivity,
+                                      classes,
+                                      tag,
+                                      favoriteIds,
+                                      handleFavoriteClick
+                                    )}
                                   </AccordionSummary>
                                   <AccordionDetails>
-                                    {statusLoaded &&
-                                      subActivity.id &&
-                                      activityStatus[module.id + ">" + activity.id + ">" + subActivity.id] && (
-                                        <Box className={classes.moduleStart}>
-                                          Click here to start the module activity
-                                          <Button
-                                            variant="contained"
-                                            onClick={() =>
-                                              addActivityEventForModule(subActivity, [module.id, activity.id])
-                                            }
-                                          >{`${t("Start")}`}</Button>
-                                        </Box>
-                                      )}
                                     <Grid container spacing={2} direction="row" wrap="wrap">
                                       {renderActivities(
                                         subActivity.subActivities,
@@ -838,8 +572,7 @@ const ActivityAccordion = ({
                                         handleClickOpen,
                                         handleSubModule,
                                         classes,
-                                        subActivity,
-                                        activityStatus[subActivity.id]
+                                        subActivity
                                       )}
                                     </Grid>
                                   </AccordionDetails>
