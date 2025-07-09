@@ -366,7 +366,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               dense
               onClick={() => {
                 setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital", "_blank")
+                window.open("https://docs.lamp.digital/troubleshooting", "_blank")
               }}
             >
               <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
