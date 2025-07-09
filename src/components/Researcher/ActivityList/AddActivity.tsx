@@ -164,6 +164,7 @@ export default function AddActivity({
     "lamp.voice_survey": `${t("Speech Recording")}`,
     "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
     "lamp.digit_span": `${t("Digit Span")}`,
+    "lamp.zoom_meeting": `${t("Virtual Meeting")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -197,6 +198,7 @@ export default function AddActivity({
           }
         })
       } else {
+        setActivitySpecs(availableSpecs)
         setLoading(false)
       }
     })()

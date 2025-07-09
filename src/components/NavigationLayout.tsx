@@ -204,6 +204,7 @@ export default function NavigationLayout({
   activeTab,
   sameLineTitle,
   changeResearcherType,
+  // participant,
   ...props
 }: {
   title?: string
@@ -216,6 +217,7 @@ export default function NavigationLayout({
   activeTab?: string
   sameLineTitle?: boolean
   changeResearcherType?: Function
+  // participant?: Participant
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -529,6 +531,7 @@ export default function NavigationLayout({
               )}
               <Box flexGrow={1} />
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
+                // participant?.isMessagingEnabled && (
                 // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
                 <Box className={classes.headerRight}>
                   {hideNotifications.indexOf(activeTab) < 0 ? (

@@ -99,7 +99,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     const cached = localStorage.getItem("cachedOptions")
     localStorage.clear()
     localStorage.setItem("cachedOptions", cached)
-    sessionStorage.clear()
+    // sessionStorage.clear()
     const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION

@@ -58,6 +58,7 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
+  "lamp.zoom_meeting": "Virtual Meeting",
 }
 
 export default function EmbeddedActivity({

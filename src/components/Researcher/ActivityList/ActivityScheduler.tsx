@@ -44,6 +44,7 @@ export default function ActivityScheduler({ activity, activities, setActivities,
   const [activityData, setActivityData] = useState(activity ?? null)
   const [schedule, setSchedule] = useState(activity?.schedule ?? [])
   const [newRow, setNewRow] = useState(null)
+  const [showNotificationInputs, setShowNotificationInputs] = useState<{ [key: number]: boolean }>({})
   const { t } = useTranslation()
   const classes = useStyles()
 
@@ -76,6 +77,9 @@ export default function ActivityScheduler({ activity, activities, setActivities,
       setNewRow(x)
     }
   }
+  const toggleNotificationInput = (index: number, value: boolean) => {
+    setShowNotificationInputs((prev) => ({ ...prev, [index]: value }))
+  }
 
   return (
     <TableContainer component={Paper} elevation={0}>
@@ -96,7 +100,13 @@ export default function ActivityScheduler({ activity, activities, setActivities,
         </TableHead>
         <TableBody>
           {(schedule || []).map((row, index) => (
-            <ScheduleRow scheduleRow={row} index={index} updateActivitySchedule={updateActivitySchedule} />
+            <ScheduleRow
+              scheduleRow={row}
+              index={index}
+              updateActivitySchedule={updateActivitySchedule}
+              showNotificationInput={showNotificationInputs[index] || false}
+              setShowNotificationInput={(value: boolean) => toggleNotificationInput(index, value)}
+            />
           ))}
         </TableBody>
       </Table>

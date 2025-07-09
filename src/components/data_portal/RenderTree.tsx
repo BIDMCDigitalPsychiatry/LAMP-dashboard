@@ -163,6 +163,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         headers: {
           Authorization: `Bearer ${userToken.accessToken}`,
         },
+        credentials: "include",
         body: query,
       })
       return JSON.parse(await res.text())

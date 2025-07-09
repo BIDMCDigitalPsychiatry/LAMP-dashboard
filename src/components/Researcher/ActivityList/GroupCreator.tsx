@@ -206,7 +206,7 @@ export default function GroupCreator({
           sequential_ordering: false,
           hide_sub_activities: false,
           hide_on_completion: false,
-          initialize_opened: false,
+          // initialize_opened: false,
         },
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
@@ -281,7 +281,7 @@ export default function GroupCreator({
 
   const [sequentialOrdering, setSequentialOrdering] = useState(data.settings?.sequential_ordering ?? false)
   const [hideOnCompletion, setHideOnCompletion] = useState(data.settings?.hide_on_completion ?? false)
-  const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
+  // const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
   const [hideSubActivities, setHideSubActivities] = useState(data.settings?.hide_sub_activities ?? false)
   const [trackProgress, setTrackProgress] = useState(data.settings?.track_progress ?? false)
 
@@ -305,10 +305,10 @@ export default function GroupCreator({
     setData({ ...data, settings: data.settings })
   }, [hideOnCompletion])
 
-  useEffect(() => {
-    data.settings.initialize_opened = initializeOpened
-    setData({ ...data, settings: data.settings })
-  }, [initializeOpened])
+  // useEffect(() => {
+  //   data.settings.initialize_opened = initializeOpened
+  //   setData({ ...data, settings: data.settings })
+  // }, [initializeOpened])
 
   const handleTabChange = (tab) => {
     setData({ ...data, category: tab })
@@ -381,7 +381,7 @@ export default function GroupCreator({
                 labelPlacement="end"
               />
             )}
-            {type !== "lamp.group" && (
+            {/* {type !== "lamp.group" && (
               <FormControlLabel
                 value="initialize_opened"
                 control={
@@ -394,7 +394,7 @@ export default function GroupCreator({
                 label="Initialize Opened"
                 labelPlacement="end"
               />
-            )}
+            )} */}
             <FormControlLabel
               value="hide_sub_activities"
               control={

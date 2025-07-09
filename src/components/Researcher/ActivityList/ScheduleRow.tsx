@@ -14,6 +14,7 @@ import {
   createStyles,
   createTheme,
   MuiThemeProvider,
+  Box,
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
@@ -77,6 +78,9 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 13,
       lineHeight: "14px",
       padding: 12,
+    },
+    btnIcon: {
+      padding: 10,
     },
   })
 ) //MuiTypography-root MuiPickersCalendarHeader-dayLabel MuiTypography-caption
@@ -170,11 +174,15 @@ export default function ScheduleRow({
   scheduleRow,
   index,
   updateActivitySchedule,
+  setShowNotificationInput,
+  showNotificationInput,
   ...props
 }: {
   scheduleRow: any
   index: number
   updateActivitySchedule: Function
+  setShowNotificationInput: any
+  showNotificationInput: boolean
 }) {
   const classes = useStyles()
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
@@ -217,6 +225,9 @@ export default function ScheduleRow({
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
+  }
+  const handleNotificationChange = () => {
+    setShowNotificationInput(true)
   }
 
   return (
@@ -362,42 +373,130 @@ export default function ScheduleRow({
           )}
         </TableCell>
         <TableCell>
-          {!isEdit ? (
-            <IconButton
-              onClick={() => {
-                setEdit(true)
-                setShowReminderSettings(true)
-              }}
-            >
-              <Icon>edit</Icon>
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={() => {
-                if (validate()) {
-                  updateActivitySchedule(data, index, "edit")
-                  setEdit(false)
-                }
-              }}
-            >
-              <Icon>done</Icon>
-            </IconButton>
-          )}
-          {!isEdit ? (
-            <IconButton onClick={() => updateActivitySchedule(null, index, "delete")}>
-              <Icon>delete</Icon>
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={() =>
-                !!scheduleRow.start_date ? setEdit(false) : updateActivitySchedule(null, index, "delete")
-              }
-            >
-              <Icon>close</Icon>
-            </IconButton>
+          {!showNotificationInput && (
+            <>
+              <IconButton className={classes.btnIcon} onClick={() => handleNotificationChange()}>
+                <Icon>notifications</Icon>
+              </IconButton>
+
+              {/* Action Icons */}
+
+              {!isEdit ? (
+                <>
+                  <IconButton
+                    className={classes.btnIcon}
+                    onClick={() => {
+                      setEdit(true)
+                      setShowReminderSettings(true)
+                    }}
+                  >
+                    <Icon>edit</Icon>
+                  </IconButton>
+                  <IconButton className={classes.btnIcon} onClick={() => updateActivitySchedule(null, index, "delete")}>
+                    <Icon>delete</Icon>
+                  </IconButton>
+                </>
+              ) : (
+                <>
+                  <IconButton
+                    className={classes.btnIcon}
+                    onClick={() => {
+                      if (validate()) {
+                        updateActivitySchedule(data, index, "edit")
+                        setEdit(false)
+                        setShowNotificationInput(false)
+                      }
+                    }}
+                  >
+                    <Icon>done</Icon>
+                  </IconButton>
+                  <IconButton
+                    className={classes.btnIcon}
+                    onClick={() => {
+                      if (!!scheduleRow.start_date) {
+                        setEdit(false)
+                        setShowNotificationInput(false)
+                        setData(scheduleRow)
+                      } else {
+                        updateActivitySchedule(null, index, "delete")
+                      }
+                      setShowNotificationInput(false)
+                    }}
+                    // onClick={() => {
+                    //   setEdit(false)
+                    //   setShowNotificationInput(false)
+                    //   setData(scheduleRow) //To make the state value to its initial value other wise updated state value is showing
+                    // }}
+                  >
+                    <Icon>close</Icon>
+                  </IconButton>
+                </>
+              )}
+            </>
           )}
         </TableCell>
       </TableRow>
+      {showNotificationInput && (
+        <TableRow>
+          <TableCell colSpan={4}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <strong style={{ fontSize: 12 }}>{t("Notification Text")}</strong>
+              <textarea
+                rows={4}
+                value={data?.notificationMessage}
+                maxLength={250}
+                onChange={(e) =>
+                  setData({
+                    ...data,
+                    notificationMessage: e.target.value,
+                  })
+                }
+                placeholder={t("Enter custom message")}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  backgroundColor: "#f5f5f5",
+                  border: "none",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontFamily: "inherit",
+                  outline: "none",
+                  resize: "none",
+                }}
+              />
+              <div style={{ textAlign: "right", fontSize: 12, color: "#666", marginTop: 4 }}>
+                {data?.notificationMessage?.length || 0}/250
+              </div>
+            </div>
+          </TableCell>
+          <TableCell>
+            <Box pt={3}>
+              <IconButton
+                className={classes.btnIcon}
+                onClick={() => {
+                  if (validate()) {
+                    updateActivitySchedule(data, index, "edit")
+                    setEdit(false)
+                    setShowNotificationInput(false)
+                  }
+                }}
+              >
+                <Icon>done</Icon>
+              </IconButton>
+              <IconButton
+                className={classes.btnIcon}
+                onClick={() => {
+                  setEdit(false)
+                  setShowNotificationInput(false)
+                  setData(scheduleRow) //To make the state value to its initial value other wise updated state value is showing
+                }}
+              >
+                <Icon>close</Icon>
+              </IconButton>
+            </Box>
+          </TableCell>
+        </TableRow>
+      )}
       {/* <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
         <ReminderSettings
           isEdit={isEdit}
