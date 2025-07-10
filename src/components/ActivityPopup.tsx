@@ -279,7 +279,7 @@ export default function ActivityPopup({
       if (win) {
         win.focus()
       } else {
-        window.location.href = teamsLink
+        window.location.href = webUrl
       }
     }, 1500)
   }
