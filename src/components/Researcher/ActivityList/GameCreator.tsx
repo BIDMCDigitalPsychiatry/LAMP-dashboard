@@ -325,7 +325,6 @@ export default function GameCreator({
   }
 
   const validateZoomMeeting = (duplicates) => {
-    console.log("duplicates", data.settings)
     return !(
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
