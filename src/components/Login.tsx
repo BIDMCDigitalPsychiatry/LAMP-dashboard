@@ -56,7 +56,8 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { width: "100%", height: 41, marginBottom: 10 },
     },
     textfieldStyle: {
-      "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
+      backgroundColor: "#f5f5f5", 
+      borderRadius: 10,
       "& fieldset": { border: 0 },
       "& .MuiInputBase-inputAdornedEnd": { paddingRight: 48 },
     },
