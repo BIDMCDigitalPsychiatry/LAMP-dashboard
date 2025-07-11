@@ -150,10 +150,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const [isLockedOut, setIsLockedOut] = useState(false)
 
   useEffect(() => {
+    console.log("Login page", LAMP.Auth._auth.id)
+    if (!LAMP.Auth._auth.id) {
+    }
     setConfirmSession(false)
-    const cached = localStorage.getItem("cachedOptions")
-    localStorage.clear()
-    localStorage.setItem("cachedOptions", cached)
+    // const cached = localStorage.getItem("cachedOptions")
+    // localStorage.clear()
+    // localStorage.setItem("cachedOptions", cached)
     // sessionStorage.clear()
     const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     if (lockoutTime) {
