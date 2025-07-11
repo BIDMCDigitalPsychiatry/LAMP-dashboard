@@ -163,7 +163,7 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (localStorage.getItem("demo_mode") === "try_it") {
