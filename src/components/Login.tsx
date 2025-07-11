@@ -9,6 +9,7 @@ import {
   MenuItem,
   Icon,
   IconButton,
+  InputAdornment,
   colors,
   Grid,
   makeStyles,
@@ -73,6 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
+  const [showPassword, setShowPassword] = useState(false)
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
@@ -492,7 +494,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                   <TextField
                     required
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     margin="normal"
                     variant="outlined"
                     style={{ width: "100%", height: 50, marginBottom: 40 }}
@@ -503,6 +505,18 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                       classes: {
                         root: classes.textfieldStyle,
                       },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            onMouseDown={(event) => event.preventDefault()}
+                            edge="end"
+                          >
+                            <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
 
