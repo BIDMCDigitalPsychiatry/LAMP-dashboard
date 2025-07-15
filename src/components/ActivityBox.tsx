@@ -470,6 +470,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       } catch (error) {
         console.error("Error fetching data for id:", id, error)
         arr.push(null)
+        setLoadingModules(false)
       }
     }
     const filteredArr = arr.filter((item) => item != null)
