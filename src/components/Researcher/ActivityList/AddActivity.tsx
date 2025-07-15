@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  MenuItem,
-  Icon,
-  Grid,
-  Fab,
-  Backdrop,
-  CircularProgress,
-  Popover,
-  makeStyles,
-  Theme,
-  createStyles,
-  Link,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import MenuItem from "@material-ui/core/MenuItem"
+import Icon from "@material-ui/core/Icon"
+import Grid from "@material-ui/core/Grid"
+import Fab from "@material-ui/core/Fab"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Popover from "@material-ui/core/Popover"
+import Link from "@material-ui/core/Link"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"

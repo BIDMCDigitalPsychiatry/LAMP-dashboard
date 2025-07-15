@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Grid, Tooltip, Icon, Fab, makeStyles, Theme, createStyles, ThemeProvider } from "@material-ui/core"
+import Grid from "@material-ui/core/Grid"
+import Tooltip from "@material-ui/core/Tooltip"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme, ThemeProvider } from "@material-ui/core/styles"
 import { createTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import red from "@material-ui/core/colors/red"

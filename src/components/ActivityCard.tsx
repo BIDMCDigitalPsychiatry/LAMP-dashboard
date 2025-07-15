@@ -1,7 +1,13 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@material-ui/core"
-// Local Imports
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import Tooltip from "@material-ui/core/Tooltip"
+import Typography from "@material-ui/core/Typography"
+import Divider from "@material-ui/core/Divider"
+// For colors, import directly
+import blue from "@material-ui/core/colors/blue"
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 import { useTranslation } from "react-i18next"
@@ -181,7 +187,7 @@ export default function ActivityCard({
             <Sparkline
               minWidth={48}
               minHeight={48}
-              color={colors.blue[500]}
+              color={blue[500]}
               data={eachData[idx]}
               onClick={(datum) => {
                 setVisibleSlice(datum)
@@ -227,7 +233,7 @@ export default function ActivityCard({
           minHeight={350}
           XAxisLabel={`${t("Time")}`}
           YAxisLabel={`${t("Score")}`}
-          color={colors.blue[500]}
+          color={blue[500]}
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),

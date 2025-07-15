@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles, NativeSelect } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+import NativeSelect from "@material-ui/core/NativeSelect"
 import { useTranslation } from "react-i18next"
 import { getDateString } from "./PreventDBT"
 

@@ -1,6 +1,10 @@
 // Core Imports
 import React from "react"
-import { Typography, Grid, Card, Box, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+import Card from "@material-ui/core/Card"
+import Box from "@material-ui/core/Box"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { Participant as ParticipantObj } from "lamp-core"
 import { Vega } from "react-vega"
 

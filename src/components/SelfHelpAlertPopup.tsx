@@ -1,17 +1,15 @@
 // Core Imports
 import React from "react"
-import {
-  Typography,
-  Box,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  makeStyles,
-  Theme,
-  createStyles,
-  DialogProps,
-  Link,
-} from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Box from "@material-ui/core/Box"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogActions from "@material-ui/core/DialogActions"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript
+import { DialogProps } from "@material-ui/core/Dialog" // TypeScript
+import Link from "@material-ui/core/Link"
 import { useTranslation } from "react-i18next"
 import ReactMarkdown from "react-markdown"
 

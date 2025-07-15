@@ -1,19 +1,18 @@
 import React from "react"
-import {
-  Dialog,
-  DialogProps,
-  DialogContent,
-  DialogTitle,
-  Icon,
-  IconButton,
-  useTheme,
-  useMediaQuery,
-  makeStyles,
-  Theme,
-  createStyles,
-  Box,
-  Typography,
-} from "@material-ui/core"
+import Dialog from "@material-ui/core/Dialog"
+import { DialogProps } from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import useTheme from "@material-ui/core/styles/useTheme"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import ReactMarkdown from "react-markdown"

@@ -1,16 +1,16 @@
 import React, { useState } from "react"
-import {
-  Box,
-  IconButton,
-  Icon,
-  Fab,
-  Dialog,
-  DialogContent,
-  makeStyles,
-  Theme,
-  createStyles,
-  Tooltip,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import IconButton from "@material-ui/core/IconButton"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import Tooltip from "@material-ui/core/Tooltip"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
 

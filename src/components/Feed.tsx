@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import {
-  Card,
-  Step,
-  Stepper,
-  StepLabel,
-  Typography,
-  Box,
-  Grid,
-  StepContent,
-  useMediaQuery,
-  useTheme,
-  StepConnector,
-  Backdrop,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Button,
-  Icon,
-  createTheme,
-} from "@material-ui/core/"
+import { makeStyles, Theme, createStyles, createTheme } from "@material-ui/core/styles"
+import { useMediaQuery, useTheme } from "@material-ui/core"
+// Components
+import Card from "@material-ui/core/Card"
+import Step from "@material-ui/core/Step"
+import Stepper from "@material-ui/core/Stepper"
+import StepLabel from "@material-ui/core/StepLabel"
+import Typography from "@material-ui/core/Typography"
+import Box from "@material-ui/core/Box"
+import Grid from "@material-ui/core/Grid"
+import StepContent from "@material-ui/core/StepContent"
+import StepConnector from "@material-ui/core/StepConnector"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Dialog from "@material-ui/core/Dialog"
+import DialogActions from "@material-ui/core/DialogActions"
+import DialogContent from "@material-ui/core/DialogContent"
+import Button from "@material-ui/core/Button"
+import Icon from "@material-ui/core/Icon"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"

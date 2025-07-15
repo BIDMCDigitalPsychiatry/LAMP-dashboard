@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Chip from "@material-ui/core/Chip"
+import Tooltip from "@material-ui/core/Tooltip"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 // Local Imports
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"

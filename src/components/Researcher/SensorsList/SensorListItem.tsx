@@ -1,15 +1,11 @@
 import React from "react"
-import {
-  Box,
-  Typography,
-  Card,
-  CardHeader,
-  CardActions,
-  makeStyles,
-  Theme,
-  createStyles,
-  Checkbox,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import CardHeader from "@material-ui/core/CardHeader"
+import CardActions from "@material-ui/core/CardActions"
+import Checkbox from "@material-ui/core/Checkbox"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import UpdateSensor from "./UpdateSensor"
 import { useTranslation } from "react-i18next"
 

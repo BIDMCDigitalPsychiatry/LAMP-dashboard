@@ -1,20 +1,19 @@
 import React from "react"
-import {
-  Box,
-  Typography,
-  Card,
-  CardHeader,
-  CardActions,
-  Icon,
-  IconButton,
-  FormControlLabel,
-  makeStyles,
-  TextField,
-  ClickAwayListener,
-  Tooltip,
-  CardContent,
-  Checkbox,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import CardHeader from "@material-ui/core/CardHeader"
+import CardActions from "@material-ui/core/CardActions"
+import CardContent from "@material-ui/core/CardContent"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import TextField from "@material-ui/core/TextField"
+import ClickAwayListener from "@material-ui/core/ClickAwayListener"
+import Tooltip from "@material-ui/core/Tooltip"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+
 import {
   tags_object,
   queryables_array,

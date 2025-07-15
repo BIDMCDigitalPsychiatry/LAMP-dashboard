@@ -1,25 +1,22 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Fab,
-  Box,
-  TextField,
-  Slide,
-  Menu,
-  MenuItem,
-  Icon,
-  IconButton,
-  colors,
-  Grid,
-  makeStyles,
-  createStyles,
-  Link,
-  Theme,
-} from "@material-ui/core"
+// Components
+import Fab from "@material-ui/core/Fab"
+import Box from "@material-ui/core/Box"
+import TextField from "@material-ui/core/TextField"
+import Slide from "@material-ui/core/Slide"
+import Menu from "@material-ui/core/Menu"
+import MenuItem from "@material-ui/core/MenuItem"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import Grid from "@material-ui/core/Grid"
+import Link from "@material-ui/core/Link"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import grey from "@material-ui/core/colors/grey" // example
 
 // Local Imports
 import { ResponsiveMargin } from "./Utils"
@@ -369,7 +366,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                 window.open("https://docs.lamp.digital", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+              <b style={{ color: grey["600"] }}>{`${t("Help & Support")}`}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -378,7 +375,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                 window.open("https://community.lamp.digital", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
+              <b style={{ color: grey["600"] }}>LAMP {`${t("Community")}`}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -387,7 +384,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                 window.open("mailto:team@digitalpsych.org", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
+              <b style={{ color: grey["600"] }}>{`${t("Contact Us")}`}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -396,7 +393,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                 window.open("https://docs.lamp.digital/privacy/", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+              <b style={{ color: grey["600"] }}>{`${t("Privacy Policy")}`}</b>
             </MenuItem>
           </Menu>
           <Grid

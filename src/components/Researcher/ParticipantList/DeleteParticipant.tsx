@@ -1,5 +1,7 @@
 import React, { useState } from "react"
-import { Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"

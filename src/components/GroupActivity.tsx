@@ -1,6 +1,9 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { makeStyles, Box, Backdrop, CircularProgress } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import { makeStyles } from "@material-ui/core/styles"
 import LAMP from "lamp-core"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"

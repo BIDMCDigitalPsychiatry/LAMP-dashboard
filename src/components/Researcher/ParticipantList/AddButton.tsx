@@ -1,5 +1,14 @@
 import React, { useState } from "react"
-import { Box, MenuItem, Icon, Fab, Typography, Popover, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import MenuItem from "@material-ui/core/MenuItem"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+import Typography from "@material-ui/core/Typography"
+import Popover from "@material-ui/core/Popover"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import { useTranslation } from "react-i18next"
 import AddUser from "./AddUser"
 import StudyCreator from "./StudyCreator"

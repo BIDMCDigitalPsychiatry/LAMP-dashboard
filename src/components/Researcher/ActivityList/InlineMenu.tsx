@@ -1,17 +1,16 @@
 // Core Imports
 import React, { useState } from "react"
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Divider,
-  ListItemSecondaryAction,
-  InputAdornment,
-  Tooltip,
-  IconButton,
-  Icon,
-  Typography,
-} from "@material-ui/core"
+import Button from "@material-ui/core/Button"
+import Menu from "@material-ui/core/Menu"
+import MenuItem from "@material-ui/core/MenuItem"
+import Divider from "@material-ui/core/Divider"
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction"
+import InputAdornment from "@material-ui/core/InputAdornment"
+import Tooltip from "@material-ui/core/Tooltip"
+import IconButton from "@material-ui/core/IconButton"
+import Icon from "@material-ui/core/Icon"
+import Typography from "@material-ui/core/Typography"
+
 import { KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import { getDate, dateInUTCformat, manyDates } from "./ScheduleRow"

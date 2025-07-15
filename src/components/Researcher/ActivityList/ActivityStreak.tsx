@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react"
-import {
-  TextField,
-  makeStyles,
-  createStyles,
-  Theme,
-  Switch,
-  FormControlLabel,
-  Grid,
-  Divider,
-  Typography,
-} from "@material-ui/core"
+import TextField from "@material-ui/core/TextField"
+import Switch from "@material-ui/core/Switch"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Grid from "@material-ui/core/Grid"
+import Divider from "@material-ui/core/Divider"
+import Typography from "@material-ui/core/Typography"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
 import { useTranslation } from "react-i18next"
 import { removeExtraSpace } from "./ActivityHeader"
 

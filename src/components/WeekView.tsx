@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Paper, Grid, Box, useMediaQuery, useTheme, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Paper from "@material-ui/core/Paper"
+import Grid from "@material-ui/core/Grid"
+import Box from "@material-ui/core/Box"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import useTheme from "@material-ui/core/styles/useTheme"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // For TypeScript
 import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -50,7 +57,7 @@ function getDates() {
   let years = []
   let first
   let curr = new Date()
-  if(curr.getDay() === 0) curr.setDate(curr.getDate() - 6)
+  if (curr.getDay() === 0) curr.setDate(curr.getDate() - 6)
   for (let i = 1; i < 8; i++) {
     first = curr.getDate() - curr.getDay() + i
     let day = new Date(curr.setDate(first))

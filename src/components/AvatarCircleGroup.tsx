@@ -1,7 +1,11 @@
 import * as React from "react"
-import { Avatar, Menu, Tooltip, ButtonBase } from "@material-ui/core"
+import Avatar from "@material-ui/core/Avatar"
+import Menu from "@material-ui/core/Menu"
+import Tooltip from "@material-ui/core/Tooltip"
+import ButtonBase from "@material-ui/core/ButtonBase"
 import clsx from "clsx"
-import { Box, makeStyles, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
 
 export const useMenu = (): any => {
   const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null })

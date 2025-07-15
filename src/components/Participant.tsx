@@ -1,16 +1,14 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  useTheme,
-  useMediaQuery,
-  Slide,
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import useTheme from "@material-ui/core/styles/useTheme"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import Slide from "@material-ui/core/Slide"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // For TypeScript Theme type
 // Local Imports
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"

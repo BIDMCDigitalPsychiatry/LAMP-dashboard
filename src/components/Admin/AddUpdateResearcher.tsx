@@ -1,17 +1,17 @@
 import React, { useState } from "react"
-import {
-  Box,
-  DialogContent,
-  makeStyles,
-  Theme,
-  createStyles,
-  Fab,
-  Icon,
-  Dialog,
-  DialogActions,
-  TextField,
-  Button,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import DialogContent from "@material-ui/core/DialogContent"
+import Dialog from "@material-ui/core/Dialog"
+import DialogActions from "@material-ui/core/DialogActions"
+import Fab from "@material-ui/core/Fab"
+import Icon from "@material-ui/core/Icon"
+import TextField from "@material-ui/core/TextField"
+import Button from "@material-ui/core/Button"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 import LAMP, { Researcher } from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"

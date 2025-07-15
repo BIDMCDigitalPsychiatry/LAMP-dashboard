@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Typography, Fab, Box, Slide, Container, Icon, Card, Grid } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Fab from "@material-ui/core/Fab"
+import Box from "@material-ui/core/Box"
+import Slide from "@material-ui/core/Slide"
+import Container from "@material-ui/core/Container"
+import Icon from "@material-ui/core/Icon"
+import Card from "@material-ui/core/Card"
+import Grid from "@material-ui/core/Grid"
 import { useTranslation } from "react-i18next"
 export default function Welcome({ activities, onClose, ...props }) {
   const [checked, setChecked] = useState(0)

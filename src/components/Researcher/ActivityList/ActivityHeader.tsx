@@ -1,16 +1,15 @@
 import React, { useCallback, useState, useEffect } from "react"
-import {
-  Grid,
-  ButtonBase,
-  Icon,
-  TextField,
-  Tooltip,
-  Box,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Divider,
-} from "@material-ui/core"
+import Grid from "@material-ui/core/Grid"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import Icon from "@material-ui/core/Icon"
+import TextField from "@material-ui/core/TextField"
+import Tooltip from "@material-ui/core/Tooltip"
+import Box from "@material-ui/core/Box"
+import MenuItem from "@material-ui/core/MenuItem"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import Divider from "@material-ui/core/Divider"
+
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"

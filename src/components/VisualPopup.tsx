@@ -1,16 +1,15 @@
 import React from "react"
-import {
-  Dialog,
-  DialogProps,
-  DialogContent,
-  makeStyles,
-  Theme,
-  createStyles,
-  DialogActions,
-  Box,
-  Fab,
-  Grid,
-} from "@material-ui/core"
+import Dialog from "@material-ui/core/Dialog"
+import { DialogProps } from "@material-ui/core/Dialog" // TypeScript type
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogActions from "@material-ui/core/DialogActions"
+import Box from "@material-ui/core/Box"
+import Fab from "@material-ui/core/Fab"
+import Grid from "@material-ui/core/Grid"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>

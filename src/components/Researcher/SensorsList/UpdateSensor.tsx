@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
 import { Service } from "../../DBService/DBService"
-import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>

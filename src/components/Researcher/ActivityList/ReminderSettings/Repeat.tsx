@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { MenuItem, Select, FormControl, makeStyles, Theme, createStyles, Grid } from "@material-ui/core"
+import MenuItem from "@material-ui/core/MenuItem"
+import Select from "@material-ui/core/Select"
+import FormControl from "@material-ui/core/FormControl"
+import Grid from "@material-ui/core/Grid"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

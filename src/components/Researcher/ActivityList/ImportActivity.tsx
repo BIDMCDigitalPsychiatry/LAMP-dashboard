@@ -1,30 +1,30 @@
 // Core Imports
 import React, { useState, useEffect, useCallback } from "react"
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  MenuItem,
-  DialogTitle,
-  Grid,
-  Container,
-  Typography,
-  Select,
-  makeStyles,
-  Theme,
-  createStyles,
-  FormControl,
-  InputLabel,
-  Backdrop,
-  AppBar,
-  Toolbar,
-  Icon,
-  Link,
-  Divider,
-  CircularProgress,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Button from "@material-ui/core/Button"
+import Dialog from "@material-ui/core/Dialog"
+import DialogActions from "@material-ui/core/DialogActions"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import MenuItem from "@material-ui/core/MenuItem"
+import Grid from "@material-ui/core/Grid"
+import Container from "@material-ui/core/Container"
+import Typography from "@material-ui/core/Typography"
+import Select from "@material-ui/core/Select"
+import FormControl from "@material-ui/core/FormControl"
+import InputLabel from "@material-ui/core/InputLabel"
+import Backdrop from "@material-ui/core/Backdrop"
+import AppBar from "@material-ui/core/AppBar"
+import Toolbar from "@material-ui/core/Toolbar"
+import Icon from "@material-ui/core/Icon"
+import Link from "@material-ui/core/Link"
+import Divider from "@material-ui/core/Divider"
+import CircularProgress from "@material-ui/core/CircularProgress"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
 import { useSnackbar } from "notistack"
 import { useDropzone } from "react-dropzone"
 import { useTranslation } from "react-i18next"

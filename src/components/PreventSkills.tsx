@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from "react"
-import {
-  Box,
-  Icon,
-  Typography,
-  TableCell,
-  Table,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableContainer,
-  makeStyles,
-  Theme,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  createStyles,
-  NativeSelect,
-  Chip,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Typography from "@material-ui/core/Typography"
+import TableCell from "@material-ui/core/TableCell"
+import Table from "@material-ui/core/Table"
+import TableRow from "@material-ui/core/TableRow"
+import TableHead from "@material-ui/core/TableHead"
+import TableBody from "@material-ui/core/TableBody"
+import TableContainer from "@material-ui/core/TableContainer"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // For TypeScript
+import Accordion from "@material-ui/core/Accordion"
+import AccordionDetails from "@material-ui/core/AccordionDetails"
+import AccordionSummary from "@material-ui/core/AccordionSummary"
+import NativeSelect from "@material-ui/core/NativeSelect"
+import Chip from "@material-ui/core/Chip"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import Grid from "@material-ui/core/Grid"
 import { useTranslation } from "react-i18next"
 import { getDates, getDateVal } from "./PreventDBT"
 import { getDateString } from "./PreventDBT"

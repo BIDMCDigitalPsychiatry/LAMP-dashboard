@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import ExportActivity from "./ExportActivity"

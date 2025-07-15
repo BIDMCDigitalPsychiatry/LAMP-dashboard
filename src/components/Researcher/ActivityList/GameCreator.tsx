@@ -1,29 +1,30 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
-import {
-  Grid,
-  Container,
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-  Theme,
-  createStyles,
-  Box,
-  Typography,
-  Icon,
-} from "@material-ui/core"
+import React, { useState, useEffect, lazy, Suspense } from "react"
+import Grid from "@material-ui/core/Grid"
+import Container from "@material-ui/core/Container"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Icon from "@material-ui/core/Icon"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
-import DynamicForm from "../../shared/DynamicForm"
+// import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
 import { Service } from "../../DBService/DBService"
+const DynamicForm = lazy(() => import("../../shared/DynamicForm"))
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -614,13 +615,15 @@ export default function GameCreator({
         )}
         {((value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
           Object.keys(schemaListObj).includes(activitySpecId)) && (
-          <DynamicForm
-            schema={schemaListObj[activitySpecId]}
-            initialData={data}
-            onChange={(x) => {
-              updateSettings(x)
-            }}
-          />
+          <Suspense fallback={<div>Loading form...</div>}>
+            <DynamicForm
+              schema={schemaListObj[activitySpecId]}
+              initialData={data}
+              onChange={(x) => {
+                updateSettings(x)
+              }}
+            />
+          </Suspense>
         )}
       </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data ?? []} />

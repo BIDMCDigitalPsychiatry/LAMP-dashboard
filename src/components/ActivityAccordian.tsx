@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, AccordionDetails, Grid } from "@mui/material"
-import {
-  Typography,
-  Card,
-  Box,
-  ButtonBase,
-  makeStyles,
-  Theme,
-  createStyles,
-  Button,
-  Backdrop,
-  CircularProgress,
-  Fab,
-  Tooltip,
-  Icon,
-} from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import Box from "@material-ui/core/Box"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Fab from "@material-ui/core/Fab"
+import Tooltip from "@material-ui/core/Tooltip"
+import Icon from "@material-ui/core/Icon"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"

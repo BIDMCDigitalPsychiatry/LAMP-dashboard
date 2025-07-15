@@ -4,18 +4,15 @@ import LAMP from "lamp-core"
 import { addActivityEventForModule, getActivityEvents, sortModulesByCompletion } from "./ActivityBox"
 import { useTranslation } from "react-i18next"
 import ActivityPopup from "./ActivityPopup"
-import { makeStyles, Theme, createStyles } from "@material-ui/core"
-import {
-  Backdrop,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Grid,
-} from "@mui/material"
-import { extractIdsWithHierarchy } from "./helper"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import Backdrop from "@material-ui/core/Backdrop"
+import Button from "@material-ui/core/Button"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Dialog from "@material-ui/core/Dialog"
+import DialogActions from "@material-ui/core/DialogActions"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import Grid from "@material-ui/core/Grid"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -404,7 +401,7 @@ const ModuleActivity = ({ ...props }) => {
       <Backdrop className={classes.backdrop} open={loadingModules}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid marginTop={5} container className={classes.thumbContainer}>
+      <Grid container className={classes.thumbContainer} style={{ marginTop: 40 }}>
         <Grid item xs>
           <ActivityAccordian
             data={moduleData}

@@ -1,22 +1,21 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import {
-  Typography,
-  Icon,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  makeStyles,
-  Theme,
-  createStyles,
-  DialogProps,
-  Link,
-  Fab,
-  Tooltip,
-} from "@material-ui/core"
+// Components
+import Typography from "@material-ui/core/Typography"
+import Icon from "@material-ui/core/Icon"
+import Box from "@material-ui/core/Box"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogActions from "@material-ui/core/DialogActions"
+import IconButton from "@material-ui/core/IconButton"
+import Link from "@material-ui/core/Link"
+import Fab from "@material-ui/core/Fab"
+import Tooltip from "@material-ui/core/Tooltip"
+// Styles
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+// Types
+import { DialogProps } from "@material-ui/core/Dialog"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import InfoIcon from "../icons/Info.svg"

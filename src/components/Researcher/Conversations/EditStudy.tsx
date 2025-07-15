@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { Box, Fab, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Fab from "@material-ui/core/Fab"
+import Icon from "@material-ui/core/Icon"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import { useSnackbar } from "notistack"
 import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"

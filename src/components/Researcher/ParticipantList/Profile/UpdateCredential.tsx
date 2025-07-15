@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { Link, Icon, Box, Dialog, DialogContent, makeStyles, createStyles } from "@material-ui/core"
+import Link from "@material-ui/core/Link"
+import Icon from "@material-ui/core/Icon"
+import Box from "@material-ui/core/Box"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { CredentialManager } from "../../../CredentialManager"
 import { useTranslation } from "react-i18next"
 

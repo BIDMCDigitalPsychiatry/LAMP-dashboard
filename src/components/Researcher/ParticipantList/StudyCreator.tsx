@@ -1,24 +1,21 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Icon,
-  IconButton,
-  Button,
-  TextField,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogProps,
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-  FormControlLabel,
-  Checkbox,
-} from "@material-ui/core"
-
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import Button from "@material-ui/core/Button"
+import TextField from "@material-ui/core/TextField"
+import Typography from "@material-ui/core/Typography"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogActions from "@material-ui/core/DialogActions"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import { makeStyles } from "@material-ui/core/styles"
+import { DialogProps } from "@material-ui/core/Dialog"
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"

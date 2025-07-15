@@ -1,23 +1,20 @@
 import React from "react"
-import {
-  Box,
-  LinearProgress,
-  Typography,
-  Card,
-  Grid,
-  Switch,
-  Icon,
-  IconButton,
-  FormControl,
-  FormControlLabel,
-  RadioGroup,
-  Radio,
-  TextField,
-  Checkbox,
-  makeStyles,
-  Container,
-} from "@material-ui/core"
-import { jsPDF } from "jspdf"
+import Box from "@material-ui/core/Box"
+import LinearProgress from "@material-ui/core/LinearProgress"
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import Grid from "@material-ui/core/Grid"
+import Switch from "@material-ui/core/Switch"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import FormControl from "@material-ui/core/FormControl"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import RadioGroup from "@material-ui/core/RadioGroup"
+import Radio from "@material-ui/core/Radio"
+import TextField from "@material-ui/core/TextField"
+import Checkbox from "@material-ui/core/Checkbox"
+import Container from "@material-ui/core/Container"
+import makeStyles from "@material-ui/core/styles/makeStyles"
 import vegaEmbed from "vega-embed"
 import Vega from "./Vega"
 import Editor from "./Editor"
@@ -84,6 +81,7 @@ export default function QueryRender({ height = 0, ...props }) {
   //queryRes should be an array of objects
   //like what is returned from our calls below
   const saveVegaQueryResToPDF = async (queryRes, groupBy = "tag", graphsPerLine = 3, sortMethod = "height") => {
+    const { jsPDF } = await import("jspdf")
     let doc = new jsPDF()
     let name =
       groupBy === "tag"

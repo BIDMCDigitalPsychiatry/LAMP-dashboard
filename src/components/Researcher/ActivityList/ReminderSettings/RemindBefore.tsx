@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { MenuItem, Select, FormControl, makeStyles, Theme, createStyles, Grid } from "@material-ui/core"
+import MenuItem from "@material-ui/core/MenuItem"
+import Select from "@material-ui/core/Select"
+import FormControl from "@material-ui/core/FormControl"
+import Grid from "@material-ui/core/Grid"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import Repeat from "./Repeat"
 
 const useStyles = makeStyles((theme: Theme) =>

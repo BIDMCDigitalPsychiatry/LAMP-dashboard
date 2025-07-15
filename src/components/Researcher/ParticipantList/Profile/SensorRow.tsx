@@ -1,6 +1,10 @@
 // Core Imports
 import React from "react"
-import { Box, Typography, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Checkbox from "@material-ui/core/Checkbox"
+import Grid from "@material-ui/core/Grid"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import UpdateSensor from "../../SensorsList/UpdateSensor"
 const useStyles = makeStyles((theme) =>

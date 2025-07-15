@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react"
-import {
-  Grid,
-  makeStyles,
-  Theme,
-  createStyles,
-  NativeSelect,
-  Backdrop,
-  CircularProgress,
-  Card,
-  Divider,
-  Typography,
-} from "@material-ui/core"
+import Grid from "@material-ui/core/Grid"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import NativeSelect from "@material-ui/core/NativeSelect"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Card from "@material-ui/core/Card"
+import Divider from "@material-ui/core/Divider"
+import Typography from "@material-ui/core/Typography"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
 import { emotions } from "./charts/emotions_chart"

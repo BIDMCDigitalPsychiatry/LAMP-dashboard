@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react"
-import {
-  Box,
-  Typography,
-  makeStyles,
-  Theme,
-  createStyles,
-  FormControlLabel,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import DialogActions from "@material-ui/core/DialogActions"
+import Button from "@material-ui/core/Button"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 import { useTranslation } from "react-i18next"
 import SearchBox from "../../SearchBox"
 import Switch, { SwitchProps } from "@mui/material/Switch"

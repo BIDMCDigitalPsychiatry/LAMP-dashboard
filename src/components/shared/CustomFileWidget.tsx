@@ -1,5 +1,10 @@
 import React from "react"
-import { makeStyles, IconButton, Box, Icon, Button } from "@material-ui/core"
+import IconButton from "@material-ui/core/IconButton"
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Button from "@material-ui/core/Button"
+
+import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({

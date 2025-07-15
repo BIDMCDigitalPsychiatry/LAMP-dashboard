@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Chip, Tooltip, makeStyles } from "@material-ui/core"
+import Chip from "@material-ui/core/Chip"
+import Tooltip from "@material-ui/core/Tooltip"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
 import { getTimeAgo } from "./Index"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"

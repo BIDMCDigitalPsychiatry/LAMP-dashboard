@@ -1,15 +1,15 @@
 import React from "react"
-import {
-  Box,
-  TextField,
-  makeStyles,
-  withStyles,
-  createStyles,
-  Button,
-  InputBase,
-  Dialog,
-  Typography,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import TextField from "@material-ui/core/TextField"
+import Button from "@material-ui/core/Button"
+import InputBase from "@material-ui/core/InputBase"
+import Dialog from "@material-ui/core/Dialog"
+import Typography from "@material-ui/core/Typography"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import withStyles from "@material-ui/core/styles/withStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+
 import { useTranslation } from "react-i18next"
 import { Autocomplete } from "@material-ui/lab"
 

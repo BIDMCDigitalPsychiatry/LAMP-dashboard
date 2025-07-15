@@ -1,26 +1,26 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Tooltip,
-  Typography,
-  Grid,
-  Fab,
-  Divider,
-  Icon,
-  Button,
-  ButtonGroup,
-  TextField,
-  Menu,
-  MenuItem,
-  Container,
-  makeStyles,
-  Theme,
-  createStyles,
-  Switch,
-  FormControlLabel,
-  InputAdornment,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Tooltip from "@material-ui/core/Tooltip"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+import Fab from "@material-ui/core/Fab"
+import Divider from "@material-ui/core/Divider"
+import Icon from "@material-ui/core/Icon"
+import Button from "@material-ui/core/Button"
+import ButtonGroup from "@material-ui/core/ButtonGroup"
+import TextField from "@material-ui/core/TextField"
+import Menu from "@material-ui/core/Menu"
+import MenuItem from "@material-ui/core/MenuItem"
+import Container from "@material-ui/core/Container"
+import Switch from "@material-ui/core/Switch"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import InputAdornment from "@material-ui/core/InputAdornment"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useTranslation } from "react-i18next"
 import { availableActivitySpecs } from "./Index"

@@ -3,7 +3,8 @@ import DataPortalHome from "./DataPortalHome"
 import SignIn from "./SignIn"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
-import { makeStyles, Container } from "@material-ui/core"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import Container from "@material-ui/core/Container"
 
 const useStyles = makeStyles((theme) => ({
   portal: {

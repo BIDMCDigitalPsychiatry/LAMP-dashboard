@@ -1,5 +1,12 @@
 import React from "react"
-import { Box, Grid, Tooltip, Fab, Dialog, makeStyles, createStyles, Icon } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Grid from "@material-ui/core/Grid"
+import Tooltip from "@material-ui/core/Tooltip"
+import Fab from "@material-ui/core/Fab"
+import Dialog from "@material-ui/core/Dialog"
+import Icon from "@material-ui/core/Icon"
+
+import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import Messages from "../../../Messages"
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react"
-import { Box, makeStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import { makeStyles } from "@material-ui/core/styles"
 import Autosuggest from "react-autosuggest"
 import i18n from "./../../i18n"
 

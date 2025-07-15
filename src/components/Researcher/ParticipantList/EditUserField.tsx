@@ -1,6 +1,10 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
-import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-ui/core"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import TextField from "@material-ui/core/TextField"
+import Tooltip from "@material-ui/core/Tooltip"
+import InputAdornment from "@material-ui/core/InputAdornment"
 import { useSnackbar } from "notistack"
 
 // Local Imports

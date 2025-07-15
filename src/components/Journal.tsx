@@ -1,6 +1,15 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { Typography, makeStyles, Box, Grid, Container, useMediaQuery, useTheme, Icon } from "@material-ui/core"
+// Components
+import Typography from "@material-ui/core/Typography"
+import Box from "@material-ui/core/Box"
+import Grid from "@material-ui/core/Grid"
+import Container from "@material-ui/core/Container"
+import Icon from "@material-ui/core/Icon"
+// Hooks (must import from root in MUI v4)
+import { useMediaQuery, useTheme } from "@material-ui/core"
+// Styles
+import { makeStyles } from "@material-ui/core/styles"
 import WeekView from "./WeekView"
 import { DatePicker } from "@material-ui/pickers"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"

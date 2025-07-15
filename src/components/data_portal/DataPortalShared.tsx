@@ -1,5 +1,7 @@
 import React from "react"
-import { createStyles, makeStyles, Theme } from "@material-ui/core"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import LAMP from "lamp-core"
 
 export function useLocalStorage(key, initialValue) {

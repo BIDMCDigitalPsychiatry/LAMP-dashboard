@@ -1,16 +1,12 @@
 import React, { useState } from "react"
-import {
-  Box,
-  Icon,
-  Button,
-  Fab,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Button from "@material-ui/core/Button"
+import Fab from "@material-ui/core/Fab"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogActions from "@material-ui/core/DialogActions"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"

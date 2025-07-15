@@ -1,19 +1,17 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Typography,
-  makeStyles,
-  Theme,
-  createStyles,
-  Backdrop,
-  AppBar,
-  Toolbar,
-  Icon,
-  Link,
-  Divider,
-  CircularProgress,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+import Backdrop from "@material-ui/core/Backdrop"
+import AppBar from "@material-ui/core/AppBar"
+import Toolbar from "@material-ui/core/Toolbar"
+import Icon from "@material-ui/core/Icon"
+import Link from "@material-ui/core/Link"
+import Divider from "@material-ui/core/Divider"
+import CircularProgress from "@material-ui/core/CircularProgress"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import Journal from "./Journal"

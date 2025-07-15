@@ -1,18 +1,16 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-  Theme,
-  createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Button,
-  DialogContentText,
-  DialogTitle,
-} from "@material-ui/core"
+// Components
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Dialog from "@material-ui/core/Dialog"
+import DialogActions from "@material-ui/core/DialogActions"
+import DialogContent from "@material-ui/core/DialogContent"
+import Button from "@material-ui/core/Button"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import DialogTitle from "@material-ui/core/DialogTitle"
+// Styles
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"

@@ -1,6 +1,9 @@
 ﻿// Core Imports
 import React, { useState, useEffect } from "react"
-import { Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Container from "@material-ui/core/Container"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { Participant as ParticipantObj } from "lamp-core"
 import ActivityBox from "./ActivityBox"
 import { Service } from "./DBService/DBService"

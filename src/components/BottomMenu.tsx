@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Icon,
-  useMediaQuery,
-  useTheme,
-  Drawer,
-  BottomNavigationAction,
-  IconButton,
-  Typography,
-  makeStyles,
-  Theme,
-  createStyles,
-  withStyles,
-  Tooltip,
-} from "@material-ui/core"
+// Components
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Drawer from "@material-ui/core/Drawer"
+import BottomNavigationAction from "@material-ui/core/BottomNavigationAction"
+import IconButton from "@material-ui/core/IconButton"
+import Typography from "@material-ui/core/Typography"
+import Tooltip from "@material-ui/core/Tooltip"
+// Hooks
+import { useTheme, useMediaQuery } from "@material-ui/core"
+// Styles
+import { makeStyles, createStyles, withStyles, Theme } from "@material-ui/core/styles"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"

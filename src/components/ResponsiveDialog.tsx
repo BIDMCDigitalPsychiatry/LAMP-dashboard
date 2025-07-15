@@ -1,17 +1,15 @@
 // Core Imports
 import React from "react"
-import {
-  Dialog,
-  DialogProps,
-  Icon,
-  IconButton,
-  Slide,
-  useTheme,
-  useMediaQuery,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+import Dialog from "@material-ui/core/Dialog"
+import { DialogProps } from "@material-ui/core/Dialog"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import Slide from "@material-ui/core/Slide"
+import useTheme from "@material-ui/core/styles/useTheme"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

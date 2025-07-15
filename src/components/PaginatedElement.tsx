@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { Grid, TablePagination } from "@material-ui/core"
+import Grid from "@material-ui/core/Grid"
+import TablePagination from "@material-ui/core/TablePagination"
+;``
 import { useTranslation } from "react-i18next"
 
 export default function Pagination({

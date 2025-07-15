@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react"
-import { Fab, Icon, Typography, Box, makeStyles, Theme, createStyles, Badge } from "@material-ui/core"
+import Fab from "@material-ui/core/Fab"
+import Icon from "@material-ui/core/Icon"
+import Typography from "@material-ui/core/Typography"
+import Box from "@material-ui/core/Box"
+import Badge from "@material-ui/core/Badge"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 // Local Imports
 import { sensorEventUpdate } from "../../BottomMenu"
 import { Service } from "../../DBService/DBService"

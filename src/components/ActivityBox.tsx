@@ -1,6 +1,14 @@
 // Core Imports
 import React, { useEffect, useRef, useState } from "react"
-import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+import Icon from "@material-ui/core/Icon"
+import Card from "@material-ui/core/Card"
+import Box from "@material-ui/core/Box"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import Tab from "@material-ui/core/Tab"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"

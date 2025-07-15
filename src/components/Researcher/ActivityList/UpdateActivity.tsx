@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react"
-import { Icon, Fab, makeStyles, Theme, createStyles, Link, Tooltip } from "@material-ui/core"
+import Icon from "@material-ui/core/Icon"
+import Fab from "@material-ui/core/Fab"
+import Link from "@material-ui/core/Link"
+import Tooltip from "@material-ui/core/Tooltip"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import LAMP from "lamp-core"

@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react"
-import {
-  Fab,
-  Icon,
-  Typography,
-  Card,
-  CardHeader,
-  CardActions,
-  CardContent,
-  Box,
-  makeStyles,
-  Theme,
-  createStyles,
-  Checkbox,
-  Link,
-} from "@material-ui/core"
+import Fab from "@material-ui/core/Fab"
+import Icon from "@material-ui/core/Icon"
+import Typography from "@material-ui/core/Typography"
+import Card from "@material-ui/core/Card"
+import CardHeader from "@material-ui/core/CardHeader"
+import CardActions from "@material-ui/core/CardActions"
+import CardContent from "@material-ui/core/CardContent"
+import Box from "@material-ui/core/Box"
+import Checkbox from "@material-ui/core/Checkbox"
+import Link from "@material-ui/core/Link"
+
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+
 // Local Imports
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"

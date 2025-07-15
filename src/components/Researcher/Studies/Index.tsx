@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Icon,
-  Grid,
-  makeStyles,
-  Theme,
-  createStyles,
-  Backdrop,
-  CircularProgress,
-  Fab,
-  FormControlLabel,
-  Checkbox,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Icon from "@material-ui/core/Icon"
+import Grid from "@material-ui/core/Grid"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Fab from "@material-ui/core/Fab"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { TableCell, makeStyles, Theme, createStyles, Grid, FormControlLabel, Checkbox } from "@material-ui/core"
+import TableCell from "@material-ui/core/TableCell"
+import Grid from "@material-ui/core/Grid"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
 import { useTranslation } from "react-i18next"
 import { KeyboardTimePicker } from "@material-ui/pickers"
 const useStyles = makeStyles((theme: Theme) =>

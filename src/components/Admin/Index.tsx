@@ -1,15 +1,13 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Container,
-  useMediaQuery,
-  useTheme,
-} from "@material-ui/core"
+import Drawer from "@material-ui/core/Drawer"
+import List from "@material-ui/core/List"
+import ListItem from "@material-ui/core/ListItem"
+import ListItemIcon from "@material-ui/core/ListItemIcon"
+import ListItemText from "@material-ui/core/ListItemText"
+import Container from "@material-ui/core/Container"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import useTheme from "@material-ui/core/styles/useTheme"
 
 import LAMP from "lamp-core"
 import { ResponsivePaper } from "../Utils"

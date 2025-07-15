@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from "react"
-import {
-  MenuItem,
-  Icon,
-  IconButton,
-  TableCell,
-  TableRow,
-  Select,
-  Button,
-  FormControl,
-  FormHelperText,
-  makeStyles,
-  Theme,
-  createStyles,
-  createTheme,
-  MuiThemeProvider,
-  Box,
-} from "@material-ui/core"
+import MenuItem from "@material-ui/core/MenuItem"
+import Icon from "@material-ui/core/Icon"
+import IconButton from "@material-ui/core/IconButton"
+import TableCell from "@material-ui/core/TableCell"
+import TableRow from "@material-ui/core/TableRow"
+import Select from "@material-ui/core/Select"
+import Button from "@material-ui/core/Button"
+import FormControl from "@material-ui/core/FormControl"
+import FormHelperText from "@material-ui/core/FormHelperText"
+import Box from "@material-ui/core/Box"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import { createTheme, MuiThemeProvider } from "@material-ui/core/styles"
+
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"

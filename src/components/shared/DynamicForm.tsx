@@ -1,5 +1,11 @@
 import React from "react"
-import { Grid, Button, Icon, MuiThemeProvider, Box, Paper, makeStyles, createStyles, Theme } from "@material-ui/core"
+import Grid from "@material-ui/core/Grid"
+import Button from "@material-ui/core/Button"
+import Icon from "@material-ui/core/Icon"
+import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider"
+import Box from "@material-ui/core/Box"
+import Paper from "@material-ui/core/Paper"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Form from "@rjsf/material-ui"
 import {
   ObjectFieldTemplateProps,

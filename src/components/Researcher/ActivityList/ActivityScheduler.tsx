@@ -1,19 +1,19 @@
 import React, { useState } from "react"
-import {
-  Icon,
-  TableContainer,
-  Paper,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Table,
-  Box,
-  Fab,
-  makeStyles,
-  createStyles,
-  Theme,
-} from "@material-ui/core"
+import Icon from "@material-ui/core/Icon"
+import TableContainer from "@material-ui/core/TableContainer"
+import Paper from "@material-ui/core/Paper"
+import TableBody from "@material-ui/core/TableBody"
+import TableCell from "@material-ui/core/TableCell"
+import TableHead from "@material-ui/core/TableHead"
+import TableRow from "@material-ui/core/TableRow"
+import Table from "@material-ui/core/Table"
+import Box from "@material-ui/core/Box"
+import Fab from "@material-ui/core/Fab"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 import { useTranslation } from "react-i18next"
 import { updateSchedule } from "./ActivityMethods"
 import ScheduleRow from "./ScheduleRow"

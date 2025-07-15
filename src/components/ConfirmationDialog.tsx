@@ -1,14 +1,13 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Button,
-  DialogTitle,
-  DialogContentText,
-  DialogActions,
-  Dialog,
-  DialogContent,
-  DialogProps,
-} from "@material-ui/core"
+import Button from "@material-ui/core/Button"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import DialogActions from "@material-ui/core/DialogActions"
+// For types
+import { DialogProps } from "@material-ui/core/Dialog"
 import { useTranslation } from "react-i18next"
 
 export default function ConfirmationDialog({

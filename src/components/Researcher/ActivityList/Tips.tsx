@@ -1,19 +1,18 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Tooltip,
-  Grid,
-  Icon,
-  TextField,
-  Checkbox,
-  ButtonBase,
-  Container,
-  MenuItem,
-  CircularProgress,
-  Backdrop,
-  FormControlLabel,
-} from "@material-ui/core"
+import React, { useState, useEffect, lazy, Suspense } from "react"
+import Box from "@material-ui/core/Box"
+import Tooltip from "@material-ui/core/Tooltip"
+import Grid from "@material-ui/core/Grid"
+import Icon from "@material-ui/core/Icon"
+import TextField from "@material-ui/core/TextField"
+import Checkbox from "@material-ui/core/Checkbox"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import Container from "@material-ui/core/Container"
+import MenuItem from "@material-ui/core/MenuItem"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Backdrop from "@material-ui/core/Backdrop"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
 import ActivityStreak from "./ActivityStreak"
@@ -22,10 +21,11 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import TipFooter from "./TipFooter"
 import { Service } from "../../DBService/DBService"
-import DynamicForm from "../../shared/DynamicForm"
+// import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
 import ActivityTab from "./ActivityTab"
 import { createTheme } from "@material-ui/core/styles"
+const DynamicForm = lazy(() => import("../../shared/DynamicForm"))
 
 const theme = createTheme({
   palette: {
@@ -738,14 +738,16 @@ export default function Tips({
           )}
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
             Object.keys(newSchemaList).includes("lamp.tips")) && (
-            <DynamicForm
-              schema={newSchemaList["lamp.tips"]}
-              initialData={data}
-              onChange={(x) => {
-                setData(x)
-                validate()
-              }}
-            />
+            <Suspense fallback={<div>Loading form...</div>}>
+              <DynamicForm
+                schema={newSchemaList["lamp.tips"]}
+                initialData={data}
+                onChange={(x) => {
+                  setData(x)
+                  validate()
+                }}
+              />
+            </Suspense>
           )}
         </Container>
       </MuiThemeProvider>

@@ -1,5 +1,11 @@
 import * as React from "react"
-import { Box, Card, Switch, Typography, Divider, Grid, colors, useMediaQuery } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Card from "@material-ui/core/Card"
+import Switch from "@material-ui/core/Switch"
+import Typography from "@material-ui/core/Typography"
+import Divider from "@material-ui/core/Divider"
+import Grid from "@material-ui/core/Grid"
+import { colors, useMediaQuery } from "@material-ui/core"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,

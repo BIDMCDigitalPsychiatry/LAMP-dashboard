@@ -1,6 +1,11 @@
 // Core Imports
 import React from "react"
-import { Typography, makeStyles, Box, Grid, colors, CardContent } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import Box from "@material-ui/core/Box"
+import Grid from "@material-ui/core/Grid"
+import blue from "@material-ui/core/colors/blue"
+import CardContent from "@material-ui/core/CardContent"
 import LAMP, { Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
 import ActivityCard from "./ActivityCard"
@@ -78,7 +83,7 @@ export default function PreventData({
               minHeight={450}
               XAxisLabel={`${t("Time")}`}
               YAxisLabel="  "
-              color={colors.blue[500]}
+              color={blue[500]}
               data={events}
             />
           ) : (

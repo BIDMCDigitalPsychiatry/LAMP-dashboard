@@ -1,18 +1,18 @@
 import React, { useState, useCallback, useEffect } from "react"
-import {
-  makeStyles,
-  createStyles,
-  Theme,
-  Switch,
-  FormControlLabel,
-  Grid,
-  Divider,
-  Typography,
-  ButtonBase,
-  Icon,
-  Tooltip,
-  Box,
-} from "@material-ui/core"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
+import Switch from "@material-ui/core/Switch"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Grid from "@material-ui/core/Grid"
+import Divider from "@material-ui/core/Divider"
+import Typography from "@material-ui/core/Typography"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import Icon from "@material-ui/core/Icon"
+import Tooltip from "@material-ui/core/Tooltip"
+import Box from "@material-ui/core/Box"
+
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/VisualPopup/Jewels.svg"
 import Maze from "../../../icons/VisualPopup/Maze.svg"

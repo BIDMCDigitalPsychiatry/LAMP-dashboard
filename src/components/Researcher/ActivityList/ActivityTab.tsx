@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react"
-import {
-  Select,
-  OutlinedInput,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  makeStyles,
-  createStyles,
-  Theme,
-  FormControlLabel,
-  Typography,
-  Grid,
-} from "@material-ui/core"
+import Select from "@material-ui/core/Select"
+import OutlinedInput from "@material-ui/core/OutlinedInput"
+import MenuItem from "@material-ui/core/MenuItem"
+import Checkbox from "@material-ui/core/Checkbox"
+import ListItemText from "@material-ui/core/ListItemText"
+import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme"
+
 import { useTranslation } from "react-i18next"
 import { getDefaultTab } from "./ActivityMethods"
 

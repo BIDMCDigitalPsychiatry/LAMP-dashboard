@@ -1,34 +1,31 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Button,
-  AppBar,
-  Toolbar,
-  Tooltip,
-  MenuItem,
-  Badge,
-  IconButton,
-  Menu,
-  Icon,
-  Dialog,
-  DialogTitle,
-  useTheme,
-  useMediaQuery,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Typography,
-  colors,
-  Backdrop,
-  CircularProgress,
-  Container,
-  Popover,
-  Fab,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Button from "@material-ui/core/Button"
+import AppBar from "@material-ui/core/AppBar"
+import Toolbar from "@material-ui/core/Toolbar"
+import Tooltip from "@material-ui/core/Tooltip"
+import MenuItem from "@material-ui/core/MenuItem"
+import Badge from "@material-ui/core/Badge"
+import IconButton from "@material-ui/core/IconButton"
+import Menu from "@material-ui/core/Menu"
+import Icon from "@material-ui/core/Icon"
+import Dialog from "@material-ui/core/Dialog"
+import DialogTitle from "@material-ui/core/DialogTitle"
+import useTheme from "@material-ui/core/styles/useTheme"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import DialogActions from "@material-ui/core/DialogActions"
+import Typography from "@material-ui/core/Typography"
+import grey from "@material-ui/core/colors/grey"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import Container from "@material-ui/core/Container"
+import Popover from "@material-ui/core/Popover"
+import Fab from "@material-ui/core/Fab"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Theme } from "@material-ui/core/styles/createTheme"
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
@@ -465,7 +462,7 @@ export default function NavigationLayout({
                         window.open("https://docs.lamp.digital/privacy/", "_blank")
                       }}
                     >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
+                      <b style={{ color: grey["600"] }}>{`${t("Privacy Policy")}`}</b>
                     </MenuItem>
                   </Popover>
                 </Box>
@@ -588,7 +585,7 @@ export default function NavigationLayout({
                         window.open("https://docs.lamp.digital", "_blank")
                       }}
                     >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
+                      <b style={{ color: grey["600"] }}>{`${t("Help & Support")}`}</b>
                     </MenuItem>
                     <MenuItem
                       dense
@@ -597,7 +594,7 @@ export default function NavigationLayout({
                         window.open("mailto:team@digitalpsych.org", "_blank")
                       }}
                     >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
+                      <b style={{ color: grey["600"] }}>{`${t("Contact Us")}`}</b>
                     </MenuItem>
                   </Menu>
                 </Box>

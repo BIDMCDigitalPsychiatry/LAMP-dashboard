@@ -1,5 +1,11 @@
 import React from "react"
-import { Typography, Button, Icon, TextField, Container, Avatar, makeStyles } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Button from "@material-ui/core/Button"
+import Icon from "@material-ui/core/Icon"
+import TextField from "@material-ui/core/TextField"
+import Container from "@material-ui/core/Container"
+import Avatar from "@material-ui/core/Avatar"
+import makeStyles from "@material-ui/core/styles/makeStyles"
 import { ajaxRequest } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
 

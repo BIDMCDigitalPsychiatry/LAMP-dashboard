@@ -1,6 +1,9 @@
 // Core Imports
 import React from "react"
-import { Box, Paper, useTheme, useMediaQuery } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Paper from "@material-ui/core/Paper"
+import useTheme from "@material-ui/core/styles/useTheme"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
 
 // Convert underscore case into human-readable strings.
 export const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && " ") + $2.toUpperCase())

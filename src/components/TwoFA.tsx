@@ -1,20 +1,19 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Fab,
-  Box,
-  TextField,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  Button,
-  DialogActions,
-  Grid,
-  makeStyles,
-  createStyles,
-  Typography,
-  Theme,
-} from "@material-ui/core"
+import Fab from "@material-ui/core/Fab"
+import Box from "@material-ui/core/Box"
+import TextField from "@material-ui/core/TextField"
+import Dialog from "@material-ui/core/Dialog"
+import DialogContent from "@material-ui/core/DialogContent"
+import DialogContentText from "@material-ui/core/DialogContentText"
+import Button from "@material-ui/core/Button"
+import DialogActions from "@material-ui/core/DialogActions"
+import Grid from "@material-ui/core/Grid"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import Typography from "@material-ui/core/Typography"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+
 // Local Imports
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"

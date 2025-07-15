@@ -1,6 +1,8 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Icon } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Grid from "@material-ui/core/Grid"
+import Icon from "@material-ui/core/Icon"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"

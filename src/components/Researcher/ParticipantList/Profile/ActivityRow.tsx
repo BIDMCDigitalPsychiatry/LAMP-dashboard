@@ -1,6 +1,10 @@
 // Core Imports
 import React from "react"
-import { Box, Typography, Grid, Checkbox, makeStyles, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+import Checkbox from "@material-ui/core/Checkbox"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"
 import { useTranslation } from "react-i18next"

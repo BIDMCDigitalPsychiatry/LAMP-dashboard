@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Box, InputBase, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import InputBase from "@material-ui/core/InputBase"
+import Icon from "@material-ui/core/Icon"
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>

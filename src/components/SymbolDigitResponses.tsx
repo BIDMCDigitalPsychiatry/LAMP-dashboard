@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { makeStyles, Theme, createStyles, TableCell, Table, TableRow, TableHead, TableBody } from "@material-ui/core"
+import makeStyles from "@material-ui/core/styles/makeStyles"
+import createStyles from "@material-ui/core/styles/createStyles"
+import { Theme } from "@material-ui/core/styles/createTheme" // TypeScript type
+import TableCell from "@material-ui/core/TableCell"
+import Table from "@material-ui/core/Table"
+import TableRow from "@material-ui/core/TableRow"
+import TableHead from "@material-ui/core/TableHead"
+import TableBody from "@material-ui/core/TableBody"
 import { useTranslation } from "react-i18next"
 import Pagination from "./PaginatedElement"
 const useStyles = makeStyles((theme: Theme) =>

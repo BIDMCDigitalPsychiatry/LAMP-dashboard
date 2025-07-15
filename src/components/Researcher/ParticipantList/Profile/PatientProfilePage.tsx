@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  TextField,
-  Container,
-  Backdrop,
-  CircularProgress,
-  makeStyles,
-  createStyles,
-  AppBar,
-  Toolbar,
-  Icon,
-  Link,
-  Divider,
-} from "@material-ui/core"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Grid from "@material-ui/core/Grid"
+import Button from "@material-ui/core/Button"
+import TextField from "@material-ui/core/TextField"
+import Container from "@material-ui/core/Container"
+import Backdrop from "@material-ui/core/Backdrop"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import AppBar from "@material-ui/core/AppBar"
+import Toolbar from "@material-ui/core/Toolbar"
+import Icon from "@material-ui/core/Icon"
+import Link from "@material-ui/core/Link"
+import Divider from "@material-ui/core/Divider"
+
+import { makeStyles, createStyles } from "@material-ui/core/styles"
+
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"

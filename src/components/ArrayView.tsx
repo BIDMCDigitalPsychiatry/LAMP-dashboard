@@ -1,5 +1,12 @@
 import React from "react"
-import { Table, TableBody, TableHead, TableCell, TableRow, makeStyles, createStyles, Theme } from "@material-ui/core"
+// Components
+import Table from "@material-ui/core/Table"
+import TableBody from "@material-ui/core/TableBody"
+import TableHead from "@material-ui/core/TableHead"
+import TableCell from "@material-ui/core/TableCell"
+import TableRow from "@material-ui/core/TableRow"
+// Styles
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import { humanize } from "./Utils"
 
 import ReactMarkdown from "react-markdown"
