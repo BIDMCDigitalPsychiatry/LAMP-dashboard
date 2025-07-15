@@ -101,15 +101,15 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
-      iterateActivity()
+      iterateActivity(data?.forward)
     }
   }, [data])
 
-  const iterateActivity = () => {
-    let val = index + 1
+  const iterateActivity = (forward?: boolean | undefined) => {
+    let val = typeof forward == "undefined" || !!forward ? index + 1 : index - 1
     setCurrentActivity(null)
-    setIndex(val)
-    if (groupActivities.length === val) {
+    if (val >= 0) setIndex(val)
+    if (groupActivities.length === val || val == -1) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: new Date().getTime() - startTime,
@@ -135,8 +135,9 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
             participant={participant}
             favoriteActivities={favoriteActivities}
             onComplete={(a) => {
-              setResponse({})
+              setResponse(a)
             }}
+            forward={index < groupActivities.length}
             noBack={noBack}
             tab={tab}
           />
