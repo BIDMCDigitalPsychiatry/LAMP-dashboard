@@ -255,7 +255,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       setLoginClick(false)
       return
     }
-
     if (!mode) {
       await LAMP.Auth.set_identity({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
@@ -279,7 +278,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         }
         setLoginClick(false)
       })
-
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,

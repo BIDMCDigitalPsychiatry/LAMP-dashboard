@@ -164,8 +164,9 @@ function AppRouter({ setConfirmSession, ...props }) {
   const { t } = useTranslation()
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
   const [loading, setLoading] = useState(false)
-
+  const [participantSelected, setParticipantSelected] = useState(false)
   useEffect(() => {
+    setParticipantSelected(false)
     if (localStorage.getItem("demo_mode") === "try_it") {
       LAMP.initializeDemoDB(demo_db)
     } else if (localStorage.getItem("demo_mode") === "self_help") {
@@ -180,6 +181,7 @@ function AppRouter({ setConfirmSession, ...props }) {
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
+        setLoading(false)
         refreshPage()
         return
       }
@@ -226,6 +228,8 @@ function AppRouter({ setConfirmSession, ...props }) {
             window.location.href = "/#/"
             console.log(error)
           }
+        } else {
+          setLoading(false)
         }
       })()
     } else if (!state.identity) {
@@ -312,11 +316,11 @@ function AppRouter({ setConfirmSession, ...props }) {
     if (typeof localStorage.getItem("verified") !== undefined) {
       status = JSON.parse(localStorage.getItem("verified"))?.value ?? false
     }
-
     if (
       !!state.identity &&
       (serverAddressFro2FA.includes(state.auth?.serverAddress) || typeof state.auth?.serverAddress === "undefined") &&
       state.authType !== "participant" &&
+      !participantSelected &&
       !status &&
       isAuthenticated
     ) {
@@ -527,7 +531,9 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <Login
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
                     lastDomain={state.lastDomain}
-                    onComplete={() => props.history.replace("/")}
+                    onComplete={() => {
+                      props.history.replace("/")
+                    }}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
                   />
@@ -896,6 +902,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                       researcher={getResearcher(props.match.params.id)}
                       onParticipantSelect={(id) => {
                         ;(async () => {
+                          setParticipantSelected(true)
                           await Service.deleteUserDB()
                           setState((state) => ({
                             ...state,
