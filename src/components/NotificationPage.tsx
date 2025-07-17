@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { lazy, Suspense, useEffect, useState } from "react"
 import makeStyles from "@material-ui/core/styles/makeStyles"
 import Box from "@material-ui/core/Box"
 import Icon from "@material-ui/core/Icon"
@@ -22,8 +22,9 @@ import GroupActivity from "./GroupActivity"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
 import VisualPopup from "./VisualPopup"
-import ModuleActivity from "./ModuleActivity"
 import ResponsiveDialog from "./ResponsiveDialog"
+const ModuleActivity = lazy(() => import("./ModuleActivity"))
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -340,7 +341,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           localStorage.removeItem("activityFromModule")
         }}
       >
-        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
+        <Suspense fallback={<div>Loading activity...</div>}>
+          <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
+        </Suspense>
       </ResponsiveDialog>
     </div>
   )

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, lazy, Suspense } from "react"
 // Components
 import Backdrop from "@material-ui/core/Backdrop"
 import CircularProgress from "@material-ui/core/CircularProgress"
@@ -17,8 +17,10 @@ import { useSnackbar } from "notistack"
 import { sensorEventUpdate } from "./BottomMenu"
 import { Service } from "./DBService/DBService"
 import ResponsiveDialog from "./ResponsiveDialog"
-import ModuleActivity from "./ModuleActivity"
 import NotificationPage from "./NotificationPage"
+
+const ModuleActivity = lazy(() => import("./ModuleActivity"))
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -413,7 +415,9 @@ export default function EmbeddedActivity({
         }}
       >
         {secondaryActivity?.spec === "lamp.module" ? (
-          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+          <Suspense fallback={<div>Loading activity...</div>}>
+            <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+          </Suspense>
         ) : (
           <NotificationPage
             participant={participant?.id ?? participant}
