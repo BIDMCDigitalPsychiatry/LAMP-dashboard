@@ -273,7 +273,7 @@ export default function Participant({
         }
       })
     } else {
-      setLoading(false)
+      // setLoading(false)
     }
   }, [activities])
 
@@ -305,6 +305,8 @@ export default function Participant({
       }
     })
   }
+
+  console.log("loading", loading)
 
   const showStreak = (participant, activity) => {
     setVisualPopup(null)
