@@ -306,8 +306,6 @@ export default function Participant({
     })
   }
 
-  console.log("loading", loading)
-
   const showStreak = (participant, activity) => {
     setVisualPopup(null)
     Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
