@@ -209,6 +209,9 @@ export default function Participant({
         const hiddenActivities = (tag || []).flatMap((module) => module.activities)
         const updatedActivities = (activities || []).filter((activity) => !hiddenActivities.includes(activity.id))
         setActivities(updatedActivities)
+        if (updatedActivities.length === 0) {
+          setLoading(false)
+        }
         props.activeTab(tab, participant.id)
       })()
 
