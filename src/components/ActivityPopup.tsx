@@ -271,6 +271,19 @@ export default function ActivityPopup({
     }
   }
 
+  const handleTeamsLink = (link) => {
+    const webUrl = link
+    const teamsLink = link.replace("https://", "msteams://")
+    const win = isMobile ? window.open(teamsLink, "_self") : window.open(webUrl, "_blank")
+    setTimeout(() => {
+      if (win) {
+        win.focus()
+      } else {
+        window.location.href = webUrl
+      }
+    }, 1500)
+  }
+
   const openMeetingLink = (meetingActivity, evt) => {
     const now = new Date().getTime()
     LAMP.ActivityEvent.create(participant.id ?? participant, {
@@ -280,17 +293,19 @@ export default function ActivityPopup({
     })
     // updateIsCompleted(meetingActivity?.id, localStorage.getItem("parentString"))
     // onClose(evt, "backdropClick")
-
-    const win = isMobile
-      ? window.open(meetingActivity?.settings?.zoom_link, "_self")
-      : window.open(meetingActivity?.settings?.zoom_link, "_blank")
-    setTimeout(() => {
-      const elapsed = new Date().getTime() - now
-      if (elapsed < 2000) {
-        window.open(meetingActivity?.settings?.zoom_link, "_blank")
-      }
-    }, 1500)
-
+    if (meetingActivity?.settings?.zoom_link.indexOf("teams") !== -1) {
+      handleTeamsLink(meetingActivity?.settings?.zoom_link)
+    } else {
+      const win = isMobile
+        ? window.open(meetingActivity?.settings?.zoom_link, "_self")
+        : window.open(meetingActivity?.settings?.zoom_link, "_blank")
+      setTimeout(() => {
+        const elapsed = new Date().getTime() - now
+        if (elapsed < 2000) {
+          window.open(meetingActivity?.settings?.zoom_link, "_blank")
+        }
+      }, 1500)
+    }
     window.location.reload()
   }
 

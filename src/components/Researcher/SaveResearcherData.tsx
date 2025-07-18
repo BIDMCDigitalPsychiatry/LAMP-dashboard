@@ -10,7 +10,7 @@ interface StudyObject {
   activities: Array<any>
   sensors: Array<any>
 }
-export const fetchResult = async (authString, id, type, modal) => {
+export const fetchResult = async (id, type, modal) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
@@ -26,7 +26,7 @@ export const fetchResult = async (authString, id, type, modal) => {
   return result
 }
 
-export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
+export const fetchPostData = async (id, type, modal, methodType, bodyData) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
@@ -100,7 +100,7 @@ export const saveDemoData = () => {
   )
 }
 
-export const saveDataToCache = (authString, id) => {
+export const saveDataToCache = (id) => {
   Service.addData("researcher", [{ id: id }])
 
   LAMP.API.query(
@@ -136,11 +136,11 @@ export const saveDataToCache = (authString, id) => {
     })
     saveStudiesAndParticipants(data, studies, id)
     studies?.map((study) => {
-      fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
+      fetchResult(study.id, "participant/mode/1", "study").then((sensors) => {
         saveSettings(sensors, "accelerometer")
         saveSettings(sensors, "analytics")
         saveSettings(sensors, "gps")
-        fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
+        fetchResult(study.id, "participant/mode/2", "study").then((events) => {
           saveSettings(events, "active")
         })
       })

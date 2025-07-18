@@ -58,7 +58,6 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
-  "lamp.zoom_meeting": "Virtual Meeting",
 }
 
 export default function EmbeddedActivity({
@@ -133,28 +132,30 @@ export default function EmbeddedActivity({
       if (e.data !== null) {
         try {
           const data = JSON.parse(e.data)
-          const isSurvey = currentActivity?.spec === "lamp.survey"
-          const branchingSettings = currentActivity?.branchingSettings
-          const totalScore = data?.static_data?.totalScore
-          if (isSurvey && branchingSettings) {
-            const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
-            const hasActivityId = !!branchingSettings.activityId
-            if (meetsScoreThreshold && hasActivityId) {
-              setResponseActivity(branchingSettings.activityId)
-              localStorage.setItem("response", JSON.stringify(e.data))
-              setSurveyResponse(e)
-              skipSaveActivity = true
+          if (!!data?.clickBack) {
+            const isSurvey = currentActivity?.spec === "lamp.survey"
+            const branchingSettings = currentActivity?.branchingSettings
+            const totalScore = data?.static_data?.totalScore
+            if (isSurvey && branchingSettings) {
+              const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
+              const hasActivityId = !!branchingSettings.activityId
+              if (meetsScoreThreshold && hasActivityId) {
+                setResponseActivity(branchingSettings.activityId)
+                localStorage.setItem("response", JSON.stringify(e.data))
+                setSurveyResponse(e)
+                skipSaveActivity = true
+              }
             }
+            currentActivity.settings.map((setting, index) => {
+              if (!!setting.warnings && !!data["temporal_slices"][index]) {
+                setting.warnings.map((warning) => {
+                  if (warning.answer === data["temporal_slices"][index].value) {
+                    warnings.push(warning)
+                  }
+                })
+              }
+            })
           }
-          currentActivity.settings.map((setting, index) => {
-            if (!!setting.warnings && !!data["temporal_slices"][index]) {
-              setting.warnings.map((warning) => {
-                if (warning.answer === data["temporal_slices"][index].value) {
-                  warnings.push(warning)
-                }
-              })
-            }
-          })
         } catch {}
       }
 
@@ -198,7 +199,7 @@ export default function EmbeddedActivity({
             data["activity"] = currentActivity.id
             await updateFavorite(data)
             setSaved(true)
-            onComplete(null)
+            onComplete({ forward: data.forward, done: data.done, clickBack: data.clickBack })
             setLoading(false)
           })()
         }
@@ -247,6 +248,14 @@ export default function EmbeddedActivity({
             currentActivity.id,
             activityTimestamp
           )
+          const forward = data?.forward
+          const done = data?.done
+          if (data?.forward) {
+            delete data?.forward
+          }
+          if (data?.done) {
+            delete data?.done
+          }
           ;(async () => {
             const updated = await updateFavorite(data)
             if (!!updated) {
@@ -264,7 +273,9 @@ export default function EmbeddedActivity({
                     "true"
                   )
                   setSaved(true)
-                  onComplete(data)
+                  onComplete(
+                    typeof forward != "undefined" ? { ...data, forward: forward, done: done } : { ...data, done: done }
+                  )
                   setLoading(false)
                 })
             } else {
@@ -302,6 +313,7 @@ export default function EmbeddedActivity({
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
+        forward: props?.forward ?? false,
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
