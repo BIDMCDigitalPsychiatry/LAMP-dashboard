@@ -247,9 +247,14 @@ export default function EmbeddedActivity({
             activityTimestamp
           )
           const forward = data?.forward
+          const done = data?.done
           if (data?.forward) {
             delete data?.forward
           }
+          if (data?.done) {
+            delete data?.done
+          }
+          console.log(data)
           ;(async () => {
             const updated = await updateFavorite(data)
             if (!!updated) {
@@ -267,7 +272,9 @@ export default function EmbeddedActivity({
                     "true"
                   )
                   setSaved(true)
-                  onComplete(typeof forward != "undefined" ? { ...data, forward: forward } : data)
+                  onComplete(
+                    typeof forward != "undefined" ? { ...data, forward: forward, done: true } : { ...data, done: true }
+                  )
                   setLoading(false)
                 })
             } else {
@@ -299,6 +306,15 @@ export default function EmbeddedActivity({
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+      console.log({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+        forward: props?.forward ?? false,
+        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+      })
       setSettings({
         ...settings,
         activity: currentActivity,
