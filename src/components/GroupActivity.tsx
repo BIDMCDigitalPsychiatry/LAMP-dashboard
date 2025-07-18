@@ -53,7 +53,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
-    console.log(index, groupActivities)
     if (!!favoriteActivities && (groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
@@ -96,7 +95,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [])
 
   useEffect(() => {
-    console.log(data)
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
       iterateActivity(data?.forward, data?.done)
@@ -107,7 +105,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     let val =
       typeof forward == "undefined" || !!forward || (typeof done !== "undefined" && !!done) ? index + 1 : index - 1
     setCurrentActivity(null)
-    console.log(val)
     if (val >= 0) setIndex(val)
     if (groupActivities.length === val || val == -1) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {

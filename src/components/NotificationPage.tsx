@@ -277,7 +277,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             favoriteActivities={favoriteActivities}
             onComplete={(data) => {
               setStaticData(data?.static_data ?? {})
-              if (data === null) {
+              if (data === null || data?.clickBack === true) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
               } else if (!!data && !!data?.timestamp) {

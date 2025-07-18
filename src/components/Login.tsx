@@ -101,6 +101,7 @@ async function importPublicKey(pem) {
     )
   } catch (error) {
     console.error(error)
+    return null
   }
 }
 
@@ -130,7 +131,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
-  const [loginClick, setLoginClick] = useState(false)
+  const [loginClick, setLoginClick] = useState(true)
   const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -151,11 +152,18 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   useEffect(() => {
     setConfirmSession(false)
+    let lockoutTime = null
     const cached = localStorage.getItem("cachedOptions")
+    const loginAttempts = localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0"
+    if (typeof localStorage.getItem(LOCKOUT_TIME_KEY) != "undefined") {
+      lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    }
     localStorage.clear()
     localStorage.setItem("cachedOptions", cached)
-    // sessionStorage.clear()
-    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    if (!!lockoutTime) {
+      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutTime)
+    }
+    localStorage.setItem("loginAttempts", loginAttempts)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
       const now = Date.now()
@@ -173,6 +181,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
       }
     }
+    checkMAxAttempts()
   }, [])
 
   useEffect(() => {
@@ -198,6 +207,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       }
     }
   }, [])
+
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -232,13 +242,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     }
   }
 
-  let handleLogin = async (event: any, mode?: string) => {
-    event.preventDefault()
+  const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (attempts >= MAX_ATTEMPTS) {
       const lockoutUntil = Date.now() + LOCKOUT_DURATION
       localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
       setIsLockedOut(true)
+      return false
+    }
+    return true
+  }
+
+  let handleLogin = async (event: any, mode?: string) => {
+    event.preventDefault()
+    sessionStorage.clear()
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+    if (!checkMAxAttempts()) {
       return
     }
     setLoginClick(true)
@@ -247,12 +266,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
     setOptions(options)
-    setLoginClick(true)
+    // setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
         variant: "error",
       })
-      setLoginClick(false)
       return
     }
     if (!mode) {
@@ -267,6 +285,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
           const lockoutUntil = Date.now() + LOCKOUT_DURATION
           localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
           setIsLockedOut(true)
+          setLoginClick(false)
         } else {
           enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
             variant: "error",
@@ -276,7 +295,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               variant: "info",
             })
         }
-        setLoginClick(false)
       })
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
@@ -328,8 +346,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     })()
     if (!srcLocked)
       enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-    setLoginClick(false)
     onComplete()
+    setLoginClick(true)
     // .catch((err) => {
     //   // console.warn("error with auth request", err)
     //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -517,8 +535,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
-                      disabled={loginClick || isLockedOut}
+                      className={loginClick && isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick && isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input
@@ -533,7 +551,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                           width: "100%",
                           opacity: 0,
                         }}
-                        disabled={loginClick}
+                        disabled={loginClick && isLockedOut}
                       />
                     </Fab>
                   </Box>

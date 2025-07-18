@@ -132,28 +132,30 @@ export default function EmbeddedActivity({
       if (e.data !== null) {
         try {
           const data = JSON.parse(e.data)
-          const isSurvey = currentActivity?.spec === "lamp.survey"
-          const branchingSettings = currentActivity?.branchingSettings
-          const totalScore = data?.static_data?.totalScore
-          if (isSurvey && branchingSettings) {
-            const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
-            const hasActivityId = !!branchingSettings.activityId
-            if (meetsScoreThreshold && hasActivityId) {
-              setResponseActivity(branchingSettings.activityId)
-              localStorage.setItem("response", JSON.stringify(e.data))
-              setSurveyResponse(e)
-              skipSaveActivity = true
+          if (!!data?.clickBack) {
+            const isSurvey = currentActivity?.spec === "lamp.survey"
+            const branchingSettings = currentActivity?.branchingSettings
+            const totalScore = data?.static_data?.totalScore
+            if (isSurvey && branchingSettings) {
+              const meetsScoreThreshold = !!totalScore && totalScore >= branchingSettings.total_score
+              const hasActivityId = !!branchingSettings.activityId
+              if (meetsScoreThreshold && hasActivityId) {
+                setResponseActivity(branchingSettings.activityId)
+                localStorage.setItem("response", JSON.stringify(e.data))
+                setSurveyResponse(e)
+                skipSaveActivity = true
+              }
             }
+            currentActivity.settings.map((setting, index) => {
+              if (!!setting.warnings && !!data["temporal_slices"][index]) {
+                setting.warnings.map((warning) => {
+                  if (warning.answer === data["temporal_slices"][index].value) {
+                    warnings.push(warning)
+                  }
+                })
+              }
+            })
           }
-          currentActivity.settings.map((setting, index) => {
-            if (!!setting.warnings && !!data["temporal_slices"][index]) {
-              setting.warnings.map((warning) => {
-                if (warning.answer === data["temporal_slices"][index].value) {
-                  warnings.push(warning)
-                }
-              })
-            }
-          })
         } catch {}
       }
 
@@ -197,7 +199,7 @@ export default function EmbeddedActivity({
             data["activity"] = currentActivity.id
             await updateFavorite(data)
             setSaved(true)
-            onComplete({ forward: data.forward })
+            onComplete({ forward: data.forward, done: data.done, clickBack: data.clickBack })
             setLoading(false)
           })()
         }
@@ -254,7 +256,6 @@ export default function EmbeddedActivity({
           if (data?.done) {
             delete data?.done
           }
-          console.log(data)
           ;(async () => {
             const updated = await updateFavorite(data)
             if (!!updated) {
@@ -273,7 +274,7 @@ export default function EmbeddedActivity({
                   )
                   setSaved(true)
                   onComplete(
-                    typeof forward != "undefined" ? { ...data, forward: forward, done: true } : { ...data, done: true }
+                    typeof forward != "undefined" ? { ...data, forward: forward, done: done } : { ...data, done: done }
                   )
                   setLoading(false)
                 })
@@ -306,15 +307,6 @@ export default function EmbeddedActivity({
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        autoCorrect: !(exist === "true"),
-        noBack: noBack,
-        forward: props?.forward ?? false,
-        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,

@@ -95,11 +95,11 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
   const location: any = useLocation()
-  const isLoginPage = location.pathname === "/"
-  localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
 
   useEffect(() => {
-    console.log(window.location.href)
+    const isLoginPage = location.pathname === "/"
+    localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
+
     try {
       if (window.self !== window.top) {
         window.top?.location.replace(window.location.href)
@@ -174,7 +174,6 @@ function AppRouter({ setConfirmSession, ...props }) {
       LAMP.initializeDemoDB(self_help_db)
     }
     let query = window.location.hash.split("?")
-    console.log(query)
     if (!!query && query.length > 1) {
       setLoading(true)
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -182,14 +181,11 @@ function AppRouter({ setConfirmSession, ...props }) {
         enqueueSnackbar(`${t("You're using the src server to log into mindLAMP.", { src: src })}`, { variant: "info" })
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
-      console.log(values)
       if (!!values["mode"]) {
-        console.log("mode")
         refreshPage()
         setLoading(false)
         return
       }
-      console.log("log after return")
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
@@ -255,7 +251,6 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [])
 
   const refreshPage = () => {
-    console.log("refresh page")
     LAMP.Auth.refresh_identity().then((x) => {
       getAdminType()
       setState((state) => ({
@@ -1129,33 +1124,31 @@ export default function App({ ...props }) {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const moved = parseInt(localStorage.getItem("mousemoved") || "0")
-      const now = Date.now()
-      const inactiveMinutes = (now - moved) / 60000
-      if (
-        inactiveMinutes > 15 &&
-        !confirmSession &&
-        localStorage.getItem("isLoginPage") === "false" &&
-        localStorage.getItem("isParticipant") === "false"
-      ) {
-        setConfirmSession(true)
-      }
-    }, 60 * 1000)
+    if (confirmSession) {
+      const timeout = setTimeout(() => {
+        setConfirmSession(false)
+        goBackToHome()
+      }, 60 * 1000)
 
-    return () => clearInterval(interval)
+      return () => clearTimeout(timeout)
+    } else {
+      const interval = setInterval(() => {
+        const moved = parseInt(localStorage.getItem("mousemoved") || "0")
+        const now = Date.now()
+        const inactiveMinutes = (now - moved) / 60000
+        if (
+          inactiveMinutes > 15 &&
+          !confirmSession &&
+          localStorage.getItem("isLoginPage") === "false" &&
+          localStorage.getItem("isParticipant") === "false"
+        ) {
+          setConfirmSession(true)
+        }
+      }, 60 * 1000)
+
+      return () => clearInterval(interval)
+    }
   }, [confirmSession])
-
-  // useEffect(() => {
-  //   if (confirmSession) {
-  //     const timeout = setTimeout(() => {
-  //       setConfirmSession(false)
-  //       goBackToHome()
-  //     }, 60 * 1000)
-
-  //     return () => clearTimeout(timeout)
-  //   }
-  // }, [confirmSession])
 
   const goBackToHome = () => {
     setConfirmSession(false)

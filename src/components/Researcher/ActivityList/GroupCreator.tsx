@@ -231,6 +231,7 @@ export default function GroupCreator({
               (x) =>
                 x.spec !== "lamp.group" &&
                 x.spec !== "lamp.module" &&
+                x.spec !== "lamp.zoom_meeting" &&
                 (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
