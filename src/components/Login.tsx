@@ -73,6 +73,61 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+function str2ab(base64) {
+  const binary = atob(base64)
+  const len = binary.length
+  const bytes = new Uint8Array(len)
+  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes.buffer
+}
+async function importPublicKey(pem) {
+  try {
+    if (typeof pem !== "string") {
+      throw new Error("Public key must be a string in PEM format")
+    }
+    const binaryDer = str2ab(
+      pem
+        .replace(/-----BEGIN PUBLIC KEY-----/, "")
+        .replace(/-----END PUBLIC KEY-----/, "")
+        .replace(/\s/g, "")
+    )
+
+    return await window.crypto.subtle.importKey(
+      "spki",
+      binaryDer,
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-256",
+      },
+      true,
+      ["encrypt"]
+    )
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function generateB64(args: { id: string; password: string }) {
+  const password = args?.password?.trim()
+  const response = await LAMP.Credential.publicKey()
+  const key = await importPublicKey(response)
+  let base64
+  try {
+    const encrypted = await window.crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      key,
+      new TextEncoder().encode(password)
+    )
+    base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
+    return base64
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
@@ -80,7 +135,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
-  const [loginClick, setLoginClick] = useState(false)
+  const [loginClick, setLoginClick] = useState(true)
   const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -98,13 +153,21 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const LOGIN_ATTEMPTS_KEY = "loginAttempts"
   const LOCKOUT_TIME_KEY = "lockoutTime"
   const [isLockedOut, setIsLockedOut] = useState(false)
+
   useEffect(() => {
     setConfirmSession(false)
+    let lockoutTime = null
     const cached = localStorage.getItem("cachedOptions")
+    const loginAttempts = localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0"
+    if (typeof localStorage.getItem(LOCKOUT_TIME_KEY) != "undefined") {
+      lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    }
     localStorage.clear()
     localStorage.setItem("cachedOptions", cached)
-    // sessionStorage.clear()
-    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    if (!!lockoutTime) {
+      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutTime)
+    }
+    localStorage.setItem("loginAttempts", loginAttempts)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
       const now = Date.now()
@@ -122,6 +185,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
       }
     }
+    checkMAxAttempts()
   }, [])
 
   useEffect(() => {
@@ -147,6 +211,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       }
     }
   }, [])
+
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -161,59 +226,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  function str2ab(base64) {
-    const binary = atob(base64)
-    const len = binary.length
-    const bytes = new Uint8Array(len)
-    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
-    return bytes.buffer
-  }
-  async function importPublicKey(pem) {
-    try {
-      if (!pem || typeof pem !== "string") {
-        setLoginClick(false)
-        // throw new Error("Public key PEM is undefined or not a string.")
-      }
-      const binaryDer = str2ab(
-        pem
-          .replace(/-----BEGIN PUBLIC KEY-----/, "")
-          .replace(/-----END PUBLIC KEY-----/, "")
-          .replace(/\s/g, "")
-      )
-
-      return await window.crypto.subtle.importKey(
-        "spki",
-        binaryDer,
-        {
-          name: "RSA-OAEP",
-          hash: "SHA-256",
-        },
-        true,
-        ["encrypt"]
-      )
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   const generateTokens = async (args: { id: string; password: string }) => {
+    setLoginClick(false)
     const userName = args?.id?.trim()
     const password = args?.password?.trim()
-    const response = await LAMP.Credential.publicKey()
-    const key = await importPublicKey(response)
-    let base64
-    try {
-      const encrypted = await window.crypto.subtle.encrypt(
-        {
-          name: "RSA-OAEP",
-        },
-        key,
-        new TextEncoder().encode(password)
-      )
-      base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
-    } catch (error) {
-      console.error(error)
-    }
+    let base64 = await generateB64(args)
 
     if (userName && password) {
       try {
@@ -229,13 +246,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     }
   }
 
-  let handleLogin = async (event: any, mode?: string) => {
-    event.preventDefault()
+  const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (attempts >= MAX_ATTEMPTS) {
       const lockoutUntil = Date.now() + LOCKOUT_DURATION
       localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
       setIsLockedOut(true)
+      return false
+    }
+    return true
+  }
+
+  let handleLogin = async (event: any, mode?: string) => {
+    event.preventDefault()
+    sessionStorage.clear()
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+    if (!checkMAxAttempts()) {
       return
     }
     setLoginClick(true)
@@ -244,15 +270,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
     setOptions(options)
-    setLoginClick(true)
+    // setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
         variant: "error",
       })
-      setLoginClick(false)
       return
     }
-
     if (!mode) {
       await LAMP.Auth.set_identity({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
@@ -265,6 +289,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
           const lockoutUntil = Date.now() + LOCKOUT_DURATION
           localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
           setIsLockedOut(true)
+          setLoginClick(false)
         } else {
           enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
             variant: "error",
@@ -274,9 +299,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               variant: "info",
             })
         }
-        setLoginClick(false)
       })
-
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
         password: !!mode ? "demo" : state.password,
@@ -327,8 +350,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     })()
     if (!srcLocked)
       enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-    setLoginClick(false)
     onComplete()
+    setLoginClick(true)
     // .catch((err) => {
     //   // console.warn("error with auth request", err)
     //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -528,8 +551,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
-                      disabled={loginClick || isLockedOut}
+                      className={loginClick && isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick && isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input
@@ -544,7 +567,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                           width: "100%",
                           opacity: 0,
                         }}
-                        disabled={loginClick}
+                        disabled={loginClick && isLockedOut}
                       />
                     </Fab>
                   </Box>

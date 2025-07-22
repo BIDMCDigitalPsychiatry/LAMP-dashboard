@@ -213,7 +213,7 @@ export default function PatientStudyCreator({
       should_add_participant: createPatient ? createPatient : false,
       name: studyName,
     }
-    fetchPostData(authString, authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
+    fetchPostData(authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
       let newStudyId = studyData.data
       let newUriStudyID = "?study_id=" + newStudyId
       if (duplicateStudyName) {
@@ -226,14 +226,14 @@ export default function PatientStudyCreator({
             sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
           }
           Service.addData("studies", [newStudyData])
-          fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
+          fetchResult(authId, "activity" + newUriStudyID, "researcher").then((result) => {
             let filteredActivities = (result?.activities || []).filter(
               (eachActivities) => eachActivities.study_id === newStudyId
             )
             saveStudyData(filteredActivities, "activities")
           })
 
-          fetchResult(authString, authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
+          fetchResult(authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
             let filteredSensors = (resultData?.sensors || []).filter((eachSensors) => {
               return eachSensors.study_id === newStudyId
             })
@@ -241,7 +241,7 @@ export default function PatientStudyCreator({
           })
           let updatedNewStudy = newStudyData
           if (createPatient) {
-            fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
+            fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
               if (results.studies[0].participants.length > 0) {
                 let filteredParticipants = results.studies[0].participants.filter(
                   (eachParticipant) => eachParticipant.study_id === newStudyId
@@ -270,7 +270,7 @@ export default function PatientStudyCreator({
           sensor_count: 0,
         }
         if (createPatient) {
-          fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
+          fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
             if (results.studies[0].participants.length > 0) {
               let filteredParticipants = results.studies[0].participants.filter(
                 (eachParticipant) => eachParticipant.study_id === newStudyId

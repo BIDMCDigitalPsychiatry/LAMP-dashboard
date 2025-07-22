@@ -238,6 +238,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           moduleStartTime = await addActivityEventForModule(y, participant)
         }
         const initializeOpenedModule = isAuto ? true : false
+        setLoadingModules(true)
         addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false, fromActivityList)
       } else {
         localStorage.setItem("parentString", y?.parentString)
@@ -292,7 +293,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     if (!moduleStartTime) {
       moduleStartTime = await addActivityEventForModule(activity, participant)
     }
-
+    if (!fromLocalStore) {
+      setLoadingModules(true)
+    }
     const data = await LAMP.Activity.view(activity.id)
 
     await addActivityData(
@@ -406,7 +409,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     fromLocalStore,
     fromActivityList = false
   ) => {
-    setLoadingModules(true)
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null
@@ -470,6 +472,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       } catch (error) {
         console.error("Error fetching data for id:", id, error)
         arr.push(null)
+        setLoadingModules(false)
       }
     }
     const filteredArr = arr.filter((item) => item != null)
@@ -680,7 +683,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
       setTab("favorite")
     } else {
-      setTab("modules")
+      setTab(
+        (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other"
+      )
     }
   }, [favorites])
 
