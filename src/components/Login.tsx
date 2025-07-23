@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { width: "100%", height: 41, marginBottom: 10 },
     },
     textfieldStyle: {
-      backgroundColor: "#f5f5f5", 
+      backgroundColor: "#f5f5f5",
       borderRadius: 10,
       "& fieldset": { border: 0 },
       "& .MuiInputBase-inputAdornedEnd": { paddingRight: 48 },
@@ -72,6 +72,22 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+let cachedPublicKey: CryptoKey | null = null
+
+export async function getOrFetchPublicKey() {
+  if (cachedPublicKey) return cachedPublicKey
+
+  try {
+    const pem = await LAMP.Credential.publicKey()
+    const key = await importPublicKey(pem)
+    if (!key) throw new Error("Invalid public key")
+    cachedPublicKey = key
+    return key
+  } catch (err) {
+    console.error("Failed to load public key", err)
+    throw err
+  }
+}
 
 function str2ab(base64) {
   const binary = atob(base64)
@@ -108,10 +124,13 @@ async function importPublicKey(pem) {
   }
 }
 
-export async function generateB64(args: { id: string; password: string }) {
-  const password = args?.password?.trim()
-  const response = await LAMP.Credential.publicKey()
-  const key = await importPublicKey(response)
+export async function generateB64(password: string, key: CryptoKey) {
+  const passwd = password?.trim()
+  // const response = await LAMP.Credential.publicKey()
+  // const key = await importPublicKey(response)
+  if (!(key instanceof CryptoKey)) {
+    throw new TypeError("Invalid key passed to generateB64")
+  }
   let base64
   try {
     const encrypted = await window.crypto.subtle.encrypt(
@@ -119,7 +138,7 @@ export async function generateB64(args: { id: string; password: string }) {
         name: "RSA-OAEP",
       },
       key,
-      new TextEncoder().encode(password)
+      new TextEncoder().encode(passwd)
     )
     base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
     return base64
@@ -230,7 +249,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     setLoginClick(false)
     const userName = args?.id?.trim()
     const password = args?.password?.trim()
-    let base64 = await generateB64(args)
+    // let base64 = await generateB64(args)
+    const key = await getOrFetchPublicKey()
+    const base64 = await generateB64(password, key)
 
     if (userName && password) {
       try {
