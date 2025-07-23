@@ -577,6 +577,8 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
+
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -638,6 +640,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -674,6 +677,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -711,6 +715,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -747,6 +752,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -786,6 +792,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                     <TwoFA
                       onLogout={() => logout()}
                       onComplete={() => {
+                        localStorage.setItem("verified", JSON.stringify({ value: true }))
                         state.authType === "admin"
                           ? props.history.replace("/researcher")
                           : props.history.replace("/researcher/me/users")
@@ -829,6 +836,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -879,6 +887,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
