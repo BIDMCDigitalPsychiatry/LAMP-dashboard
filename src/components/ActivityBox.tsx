@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
@@ -27,6 +27,9 @@ import { getSelfHelpActivityEvents } from "./Participant"
 import { extractIdsWithHierarchy } from "./helper"
 import { tags_object } from "./data_portal/DataPortalShared"
 import { TabContext, TabList, TabPanel } from "@material-ui/lab"
+import ActivityListForModule from "./ActivityListForModule"
+import ResponsiveDialog from "./ResponsiveDialog"
+import { sub } from "date-fns"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -218,13 +221,15 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [shownActivities, setShownActivities] = useState([])
   const [loadingModules, setLoadingModules] = useState(true)
   const { t } = useTranslation()
-  const [parentModuleLevel, setParentModuleLevel] = useState(0)
+  // const [parentModuleLevel, setParentModuleLevel] = useState(0)
   const [showNotification, setShowNotification] = useState(false)
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const [pendingSubModules, setPendingSubModules] = useState([])
-  const [pendingSubModulesReady, setPendingSubModulesReady] = useState(false)
-  const [subModuleProcessCount, setSubModuleProcessCount] = useState(0)
+  const [subModuleData, setSubModuleData] = useState(null)
+  const [openSubModuleView, setOpenSubModuleView] = useState(false)
+  const [moduleInLocalStorage, setModuleInLocalStorage] = useState(null)
+  const [subModuleInLocalStorage, setSubModuleInLocalStorage] = useState([])
+  const [openSubModules, setOpenSubModules] = useState([])
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
@@ -253,6 +258,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
     })
   }
+
+  useEffect(() => {
+    if (!!subModuleData) {
+      setOpenSubModules((prev) => [...prev, subModuleData])
+    }
+  }, [subModuleData])
 
   const updateIsCompleted = (subActivityId, parentString) => {
     const updateRecursive = (activities) => {
@@ -288,25 +299,79 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     })
   }
 
-  const handleSubModule = async (activity, level, fromLocalStore = false) => {
+  const handleSubModule = async (activity) => {
     let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
     if (!moduleStartTime) {
       moduleStartTime = await addActivityEventForModule(activity, participant)
     }
-    if (!fromLocalStore) {
-      setLoadingModules(true)
-    }
+    setLoadingModules(true)
     const data = await LAMP.Activity.view(activity.id)
 
-    await addActivityData(
-      data,
-      level,
-      moduleStartTime,
-      activity?.parentModule,
-      activity?.parentString,
-      false,
-      fromLocalStore
-    )
+    await addSubModuleData(data, moduleStartTime, activity?.parentModule, activity?.parentString)
+  }
+
+  const addSubModuleData = async (data, startTime, parent, parentString) => {
+    let moduleActivityData = { ...data }
+    let moduleStartTime = startTime
+    let moduleStarted = moduleStartTime != null
+    const ids = data?.settings?.activities || []
+    const sequential = data?.settings?.sequential_ordering === true
+    const hideOnCompletion = data?.settings?.hide_on_completion === true
+    const trackProgress = data?.settings?.track_progress === true
+    let sequentialActivityAdded = false
+    const arr = []
+    for (const id of ids) {
+      try {
+        const [activityEvents, fetchedData] = await Promise.all([
+          moduleStartTime === null ? [] : getActivityEvents(participant, id, moduleStartTime),
+          LAMP.Activity.view(id),
+        ])
+
+        if (fetchedData.spec === "lamp.module") {
+          fetchedData["startTime"] = moduleStartTime
+        }
+        const parentsString = parentString ? parentString + ">" + data?.id : data?.id
+        fetchedData["parentString"] = parentsString
+        fetchedData["parentModule"] = data.id
+        const eventCreated =
+          fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
+        delete fetchedData.settings
+        if (
+          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+          (fetchedData.spec === "lamp.module" && eventCreated)
+        ) {
+          fetchedData["isCompleted"] = true
+          if (hideOnCompletion) {
+            fetchedData["isHidden"] = true
+          }
+        } else {
+          if (sequential && !sequentialActivityAdded) {
+            sequentialActivityAdded = true
+            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
+              setModuleForNotification(fetchedData)
+            }
+          } else if (sequential && sequentialActivityAdded) {
+            fetchedData["isHidden"] = true
+          }
+        }
+
+        arr.push(fetchedData)
+      } catch (error) {
+        console.error("Error fetching data for id:", id, error)
+        arr.push(null)
+        setLoadingModules(false)
+      }
+    }
+    const filteredArr = arr.filter((item) => item != null)
+    delete moduleActivityData.settings
+    setSubModuleData({
+      ...data,
+      isHidden: true,
+      subActivities: filteredArr,
+      sequentialOrdering: sequential,
+      trackProgress: trackProgress,
+    })
+    setLoadingModules(false)
   }
 
   const checkIsModuleCompleted = async (id) => {
@@ -453,20 +518,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             fetchedData["isHidden"] = true
           }
         }
-        if (
-          fetchedData.spec === "lamp.module" &&
-          activityEvents.filter((event) => event.activity === fetchedData.id)?.length > 0 &&
-          (initializeOpenedModule || fromLocalStore) &&
-          !fetchedData["isCompleted"] &&
-          level <= 1
-        ) {
-          const updatedModuleData = {
-            ...fetchedData,
-            level: level + 1,
-          }
-
-          setPendingSubModules((prevModules) => [...prevModules, updatedModuleData])
-        }
 
         arr.push(fetchedData)
       } catch (error) {
@@ -476,79 +527,21 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       }
     }
     const filteredArr = arr.filter((item) => item != null)
-
-    const updateSubActivities = (subActivities, itemLevel) => {
-      return subActivities.map((itm) => {
-        if (itm.id === moduleActivityData.id && level === itemLevel && itm.parentModule === parent) {
-          setParentModuleLevel(level + 1)
-          return {
-            ...itm,
-            isHidden: true,
-            subActivities: filteredArr,
-            level: level + 1,
-            sequentialOrdering: sequential,
-            trackProgress: trackProgress,
-          }
-        }
-        if (itm.subActivities?.length > 0) {
-          return {
-            ...itm,
-            subActivities: updateSubActivities(itm.subActivities, itm.level),
-          }
-        }
-        return itm
-      })
-    }
     delete moduleActivityData.settings
-    if (moduleData.length > 0 && !fromActivityList) {
-      setModuleData((prev) => {
-        const updatedData = prev.map((item) => {
-          if (item.id === moduleActivityData.id && item.level === level && item.parentModule === parent) {
-            setParentModuleLevel(level + 1)
-            return {
-              ...item,
-              isHidden: true,
-              level: level + 1,
-              subActivities: filteredArr,
-              sequentialOrdering: sequential,
-              trackProgress: trackProgress,
-            }
-          }
-          if (item.subActivities?.length > 0) {
-            return {
-              ...item,
-              subActivities: updateSubActivities(item.subActivities, item.level),
-            }
-          }
-          return item
-        })
-        const sortedData = sortModulesByCompletion(updatedData)
-        return sortModulesByCompletion(sortedData)
-      })
-    } else {
-      moduleActivityData.subActivities = filteredArr
-      moduleActivityData.level = level + 1
-      if (trackProgress) {
-        moduleActivityData.trackProgress = trackProgress
-      }
-      if (isModuleCompleted) {
-        moduleActivityData.isCompleted = true
-      }
-      if (sequential) {
-        moduleActivityData.sequentialOrdering = true
-      }
-      setParentModuleLevel(level + 1)
-      setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
+
+    moduleActivityData.subActivities = filteredArr
+    moduleActivityData.level = level + 1
+    if (trackProgress) {
+      moduleActivityData.trackProgress = trackProgress
     }
-    if (!initializeOpenedModule) {
-      if (!fromLocalStore) {
-        scrollToElement(parentString ? parentString + ">" + data.id : data.id)
-      } else {
-        if (parentString ? parentString + ">" + data.id : data.id === localStorage.getItem("parentString")) {
-          scrollToElement(localStorage.getItem("parentString"))
-        }
-      }
+    if (isModuleCompleted) {
+      moduleActivityData.isCompleted = true
     }
+    if (sequential) {
+      moduleActivityData.sequentialOrdering = true
+    }
+    // setParentModuleLevel(level + 1)
+    setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     if (!(fromLocalStore || initializeOpenedModule)) {
       setLoadingModules(false)
     }
@@ -562,43 +555,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
   }, [moduleForNotification, isParentModuleLoaded])
 
-  useEffect(() => {
-    if (pendingSubModulesReady && pendingSubModules?.length > 0) {
-      ;(async () => {
-        await processSubModules(pendingSubModules)
-      })()
-    }
-  }, [pendingSubModules, pendingSubModulesReady])
-
-  useEffect(() => {
-    if (pendingSubModulesReady && subModuleProcessCount === 0) {
-      setLoadingModules(false)
-      scrollToElement(localStorage.getItem("parentString"))
-    }
-  }, [subModuleProcessCount, pendingSubModulesReady])
-
-  async function processSubModules(subActivities) {
-    // Process each submodule one by one sequentially
-    for (const subModule of subActivities) {
-      if (subModule.spec === "lamp.module") {
-        const startTime = new Date(subModule.startTime).toString()
-        setSubModuleProcessCount((count) => count + 1)
-
-        await handleSubModule(
-          {
-            id: subModule.id,
-            startTime: startTime,
-            parentModule: subModule.parentModule,
-            parentString: subModule.parentString,
-          },
-          subModule.level,
-          true
-        )
-        setSubModuleProcessCount((count) => count - 1)
-      }
-    }
-    setPendingSubModules([])
-  }
   const [favorites, setFavorites] = useState([])
 
   useEffect(() => {
@@ -648,7 +604,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         } catch (err) {
           console.error("Error:", err)
         } finally {
-          setPendingSubModulesReady(true)
+          setLoadingModules(false)
+          if (localStorage.getItem("parentString")) {
+            const module = localStorage.getItem("parentString")
+            setModuleInLocalStorage(module.split(">")[0])
+            console.log("Module in local storage:", module.split(">").slice(1))
+            setSubModuleInLocalStorage(module.split(">").slice(1))
+            setTimeout(() => localStorage.removeItem("parentString"), 500)
+          }
         }
         setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b?.id === a?.id)))
       } else {
@@ -689,6 +652,10 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
   }, [favorites])
 
+  const handleClose = (indexToRemove) => {
+    setOpenSubModules((prev) => prev.filter((_, index) => index !== indexToRemove))
+  }
+
   useEffect(() => {
     if (tab === "favorite") {
       ;(async () => {
@@ -700,6 +667,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       })()
     }
   }, [tab])
+
   return (
     <Box>
       <TabContext value={tab}>
@@ -731,11 +699,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 })}
                 type={type}
                 tag={tag}
-                handleClickOpen={handleClickOpen}
                 handleSubModule={handleSubModule}
                 participant={participant}
-                favorites={favorites}
                 setFavorites={setFavorites}
+                moduleInLocalStorage={moduleInLocalStorage}
+                setModuleInLocalStorage={setModuleInLocalStorage}
               />
             ) : (
               <Grid container spacing={2}>
@@ -820,11 +788,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               })}
               type={type}
               tag={tag}
-              handleClickOpen={handleClickOpen}
               handleSubModule={handleSubModule}
               participant={participant}
               setFavorites={setFavorites}
-              favorites={favorites}
+              moduleInLocalStorage={moduleInLocalStorage}
+              setModuleInLocalStorage={setModuleInLocalStorage}
             />
           ) : (
             <Grid container spacing={2}>
@@ -1006,7 +974,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           <DialogActions>
             <Button
               onClick={() => {
-                handleSubModule(moduleForNotification, parentModuleLevel)
+                handleSubModule(moduleForNotification)
                 setShowNotification(false)
                 setModuleForNotification(null)
                 setIsParentModuleLoaded(false)
@@ -1018,6 +986,28 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           </DialogActions>
         </Dialog>
       )}
+      {openSubModules.map((moduleData, index) => (
+        <ResponsiveDialog
+          key={index} // if you have a unique ID, use that instead
+          transient
+          open
+          animate
+          fullScreen
+          onClose={() => handleClose(index)}
+        >
+          <ActivityListForModule
+            type={type}
+            tag={tag}
+            favorites={favorites}
+            handleClickOpen={handleClickOpen}
+            handleSubModule={handleSubModule}
+            classes={classes}
+            module={moduleData}
+            setSubModuleInLocalStorage={setSubModuleInLocalStorage}
+            subModuleInLocalStorage={subModuleInLocalStorage}
+          />
+        </ResponsiveDialog>
+      ))}
     </Box>
   )
 }

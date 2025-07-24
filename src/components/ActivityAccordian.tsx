@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Accordion, AccordionSummary, AccordionDetails, Grid } from "@mui/material"
+import { Accordion, AccordionSummary, Grid } from "@mui/material"
 import {
   Typography,
   Card,
@@ -8,8 +8,6 @@ import {
   makeStyles,
   Theme,
   createStyles,
-  Button,
-  Backdrop,
   CircularProgress,
   Fab,
   Tooltip,
@@ -29,6 +27,9 @@ import LAMP from "lamp-core"
 import { getActivityEvents } from "./ActivityBox"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import VideoMeeting from "../icons/Video.svg"
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos"
+import ResponsiveDialog from "./ResponsiveDialog"
+import ActivityListForModule from "./ActivityListForModule"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -140,6 +141,7 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#f8f8f8 !important",
       borderRadius: "18px !important",
       marginBottom: 16,
+      padding: 8,
       [theme.breakpoints.down("xs")]: {
         borderRadius: "12px !important",
         marginBottom: 8,
@@ -270,10 +272,26 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
+    arrowForword: {
+      background: "#fff",
+      boxShadow: "none",
+      width: 48,
+      height: 48,
+      color: "#7599FF",
+      [theme.breakpoints.down("sm")]: {
+        width: 40,
+        height: 40,
+      },
+      "& .material-icons": {
+        [theme.breakpoints.down("sm")]: {
+          fontSize: "1.2rem",
+        },
+      },
+    },
   })
 )
 
-const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick) => {
+const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule) => {
   // Function to get the status of the module
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -292,7 +310,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
 
   return (
     <Typography variant="h6">
-      <Grid container spacing={1}>
+      <Grid container spacing={0}>
         <Grid lg="auto" item>
           <Box
             className={classes.accordionHeadIcons}
@@ -348,107 +366,13 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
             )}
           </Box>
         </Grid>
+        <Grid display="flex" alignItems="center" pr={1}>
+          <Fab className={classes.arrowForword} onClick={() => handleSubModule(module)}>
+            <Icon>arrow_forward_ios</Icon>
+          </Fab>
+        </Grid>
       </Grid>
     </Typography>
-  )
-}
-
-//The function to renderActivities in accordian layout
-const renderActivities = (activities, type, tag, favorites, handleClickOpen, handleSubModule, classes, module) => {
-  return (
-    <>
-      {activities.map((activity) =>
-        !activity.isHidden ? (
-          <>
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={3}
-              lg={3}
-              onClick={() => {
-                if (
-                  activity.spec === "lamp.module" &&
-                  module.name != "Other activities" &&
-                  module.name != "Unstarted Modules"
-                ) {
-                  handleSubModule(activity, module.level)
-                } else {
-                  handleClickOpen(activity)
-                }
-              }}
-              className={classes.thumbMain}
-            >
-              {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
-                <Icon className={classes.favstar}>star_rounded</Icon>
-              )}
-              <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card
-                  className={
-                    classes.manage +
-                    " " +
-                    (type === "Manage"
-                      ? classes.manageH
-                      : type === "Assess"
-                      ? classes.assessH
-                      : type === "Learn"
-                      ? classes.learnH
-                      : classes.preventH)
-                  }
-                >
-                  {activity?.isCompleted && module?.trackProgress && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        fontSize: "small",
-                        top: 8,
-                        right: 8,
-                        zIndex: 1,
-                        color: "#4caf50", // Green
-                      }}
-                      className={classes.greentick}
-                    >
-                      <CheckCircleIcon fontSize="small" />
-                    </Box>
-                  )}
-                  <Box mt={2} mb={1}>
-                    <Box
-                      className={classes.mainIcons}
-                      style={{
-                        margin: "auto",
-                        background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
-                          ? `url(${
-                              tag?.filter((x) => x.id === activity?.id)[0]?.photo
-                            }) center center/contain no-repeat`
-                          : activity.spec === "lamp.breathe"
-                          ? `url(${BreatheIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.journal"
-                          ? `url(${JournalIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.scratch_image"
-                          ? `url(${ScratchCard}) center center/contain no-repeat`
-                          : activity?.spec === "lamp.zoom_meeting"
-                          ? `url(${VideoMeeting}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Box>
-                  <Typography className={classes.cardlabel}>
-                    <ReactMarkdown
-                      children={activity.name}
-                      skipHtml={false}
-                      remarkPlugins={[gfm, emoji]}
-                      components={{ link: LinkRenderer }}
-                    />
-                  </Typography>
-                </Card>
-              </ButtonBase>
-            </Grid>
-          </>
-        ) : (
-          <></>
-        )
-      )}
-    </>
   )
 }
 
@@ -457,14 +381,23 @@ const ActivityAccordion = ({
   data,
   type,
   tag,
-  handleClickOpen,
   handleSubModule,
   participant,
-  favorites,
   setFavorites,
+  moduleInLocalStorage,
+  setModuleInLocalStorage,
 }) => {
   const classes = useStyles()
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  useEffect(() => {
+    if (!!moduleInLocalStorage) {
+      const moduleData = data.find((mod) => mod.id === moduleInLocalStorage)
+      if (moduleData) {
+        handleSubModule(moduleData)
+      }
+      setTimeout(() => setModuleInLocalStorage(null), 500)
+    }
+  }, [moduleInLocalStorage])
 
   useEffect(() => {
     ;(async () => {
@@ -497,98 +430,17 @@ const ActivityAccordion = ({
   return (
     <div>
       {data.map((module, index) => (
-        <Accordion key={index} defaultExpanded className={classes.accordionMain}>
-          {type != "activity" ? (
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id}>
-              {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)}
-            </AccordionSummary>
-          ) : (
-            moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick)
-          )}
-          <AccordionDetails className={type == "activity" && classes.moduleContainer}>
-            <Grid container spacing={2}>
-              {module.subActivities.length ? (
-                renderActivities(
-                  module.subActivities,
-                  type,
-                  tag,
-                  favorites,
-                  handleClickOpen,
-                  handleSubModule,
-                  classes,
-                  module
-                )
-              ) : (
-                <Box display="flex" className={classes.blankMsg} ml={1}>
-                  <Typography>No activities available in the module</Typography>
-                </Box>
-              )}
-            </Grid>
-            {module.subActivities.map((activity) => (
-              <>
-                {activity.subActivities && activity.subActivities.length > 0 && (
-                  <Box marginTop={3} display="flex" flexDirection="column">
-                    <Accordion defaultExpanded className={classes.accordionMain}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />} id={module.id + ">" + activity.id}>
-                        {moduleAccordianContent(activity, classes, tag, favoriteIds, handleFavoriteClick)}
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Grid container spacing={2} direction="row" wrap="wrap">
-                          {renderActivities(
-                            activity.subActivities,
-                            type,
-                            tag,
-                            favorites,
-                            handleClickOpen,
-                            handleSubModule,
-                            classes,
-                            activity
-                          )}
-                        </Grid>
-                        {activity.subActivities.map((subActivity) => (
-                          <>
-                            {subActivity.subActivities && subActivity.subActivities.length > 0 && (
-                              <Box marginTop={4} display="flex" flexDirection="column">
-                                <Accordion defaultExpanded={true} className={classes.accordionMain}>
-                                  <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    id={module.id + ">" + activity.id + ">" + subActivity.id}
-                                  >
-                                    {moduleAccordianContent(
-                                      subActivity,
-                                      classes,
-                                      tag,
-                                      favoriteIds,
-                                      handleFavoriteClick
-                                    )}
-                                  </AccordionSummary>
-                                  <AccordionDetails>
-                                    <Grid container spacing={2} direction="row" wrap="wrap">
-                                      {renderActivities(
-                                        subActivity.subActivities,
-                                        type,
-                                        tag,
-                                        favorites,
-                                        handleClickOpen,
-                                        handleSubModule,
-                                        classes,
-                                        subActivity
-                                      )}
-                                    </Grid>
-                                  </AccordionDetails>
-                                </Accordion>
-                              </Box>
-                            )}
-                          </>
-                        ))}
-                      </AccordionDetails>
-                    </Accordion>
-                  </Box>
-                )}
-              </>
-            ))}
-          </AccordionDetails>
-        </Accordion>
+        <>
+          <Accordion key={index} defaultExpanded className={classes.accordionMain}>
+            {type != "activity" ? (
+              <AccordionSummary id={module.id}>
+                {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)}
+              </AccordionSummary>
+            ) : (
+              moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)
+            )}
+          </Accordion>
+        </>
       ))}
     </div>
   )
