@@ -67,7 +67,7 @@ export default function DeleteActivity({
         }
         if (activity.spec === "lamp.module" || activity.spec === "lamp.group") {
           let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0]
           let hidden = (tag || []).filter((t) => t.moduleId !== activity.id)
           await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)

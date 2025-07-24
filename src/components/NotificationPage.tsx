@@ -126,7 +126,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteActivities(tag)
     })()

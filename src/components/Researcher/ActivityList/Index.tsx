@@ -125,10 +125,12 @@ export default function ActivityList({
     let params = JSON.parse(localStorage.getItem("activities"))
     setPage(params?.page ?? 0)
     setRowCount(params?.rowCount ?? 40)
+    console.log(allActivities, params)
   }, [])
 
   useEffect(() => {
     if (selected !== selectedStudies) setSelected(selectedStudies)
+    console.log("Selected Studies Changed", selectedStudies, selected)
   }, [selectedStudies])
 
   useEffect(() => {
@@ -136,6 +138,7 @@ export default function ActivityList({
       typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
         ? JSON.parse(sessionStorage.getItem("tokenInfo"))
         : null
+    console.log(userToken, LAMP.Auth?._auth?.serverAddress)
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchActivities()

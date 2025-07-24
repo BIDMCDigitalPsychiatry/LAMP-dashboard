@@ -31,6 +31,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+import { clearLocalStorageItems } from "./helper"
 
 type SuggestedUrlOption = {
   label: string
@@ -176,17 +177,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   useEffect(() => {
     setConfirmSession(false)
     let lockoutTime = null
-    const cached = localStorage.getItem("cachedOptions")
-    const loginAttempts = localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0"
     if (typeof localStorage.getItem(LOCKOUT_TIME_KEY) != "undefined") {
       lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     }
-    localStorage.clear()
-    localStorage.setItem("cachedOptions", cached)
-    if (!!lockoutTime) {
-      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutTime)
-    }
-    localStorage.setItem("loginAttempts", loginAttempts)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
       const now = Date.now()
@@ -280,7 +273,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
-    sessionStorage.clear()
+    clearLocalStorageItems()
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (!checkMAxAttempts()) {
       return

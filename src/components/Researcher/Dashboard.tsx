@@ -196,6 +196,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   )
 
   useEffect(() => {
+    console.log("asd")
     if (LAMP.Auth._auth.id != "admin") {
       LAMP.Type.getAttachment(researcherId, "lamp.dashboard.credential_roles").then((data: any) => {
         if (data?.error || !data?.data || !LAMP?.Auth?._auth?.id) {
@@ -248,15 +249,18 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }, [order])
 
   useEffect(() => {
+    console.log(studies)
     filterStudies(studies)
   }, [studies])
 
   const filterStudies = async (studies) => {
+    console.log(studies)
     if (!!researcherId && studies !== null && (studies || []).length > 0) {
       let selected =
         localStorage.getItem("studies_" + researcherId) !== null
           ? JSON.parse(localStorage.getItem("studies_" + researcherId))
           : []
+      console.log(selected)
       if (selected.length > 0) {
         let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
         selected =

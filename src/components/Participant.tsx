@@ -33,7 +33,7 @@ export async function getImage(activityId: string, spec: string) {
       activityId,
       spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
     ),
-  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
+  ].map((y: any) => (!!y?.error ? undefined : y?.data))[0]
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -204,7 +204,7 @@ export default function Participant({
     LAMP.Activity.allByParticipant(participant.id, null, false).then((activities) => {
       ;(async () => {
         let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0]
         const hiddenActivities = (tag || []).flatMap((module) => module.activities)
         const updatedActivities = (activities || []).filter((activity) => !hiddenActivities.includes(activity.id))
