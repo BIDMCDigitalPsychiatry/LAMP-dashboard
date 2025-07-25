@@ -18,6 +18,22 @@ function geFeedBackSettings() {
     },
   }
 }
+
+function geProConsSettings() {
+  return {
+    pros: {
+      type: "string",
+      title: i18n.t("Pros"),
+      maxLength: 500,
+    },
+    cons: {
+      type: "string",
+      title: i18n.t("Cons"),
+      maxLength: 500,
+    },
+  }
+}
+
 function getContingencySettings() {
   const enumIds = localStorage.getItem("enumIds")
   const enumNames = localStorage.getItem("enumNames")
@@ -1087,6 +1103,7 @@ export const SchemaList = () => {
                                     },
                                   },
                                   ...geFeedBackSettings(),
+                                  ...geProConsSettings(),
                                   ...getContingencySettings(),
                                 },
                                 required: ["value"],
@@ -1132,6 +1149,7 @@ export const SchemaList = () => {
                                     },
                                   },
                                   ...geFeedBackSettings(),
+                                  ...geProConsSettings(),
                                   ...getContingencySettings(),
                                 },
                                 required: ["value", "description"],
@@ -1174,6 +1192,7 @@ export const SchemaList = () => {
                                     },
                                   },
                                   ...geFeedBackSettings(),
+                                  ...geProConsSettings(),
                                   ...getContingencySettings(),
                                 },
                                 required: ["value"],
@@ -1234,6 +1253,7 @@ export const SchemaList = () => {
                               default: "",
                             },
                             ...geFeedBackSettings(),
+                            ...geProConsSettings(),
                             ...getContingencySettings(),
                           },
                         },
@@ -1776,7 +1796,9 @@ export function spliceActivity({ raw, tag }) {
           type: question.type,
           required: question.required ?? false,
           description: tag?.questions?.[idx]?.description,
-          feedback_text: tag?.questions?.[idx]?.feedback_text ?? "",
+          // feedback_text: tag?.questions?.[idx]?.feedback_text ?? "",
+          // pros: tag?.questions?.[idx]?.pros ?? "",
+          // cons: tag?.questions?.[idx]?.cons ?? "",
           image: tag?.questions?.[idx]?.image,
           options:
             question.options === null
@@ -1785,6 +1807,8 @@ export function spliceActivity({ raw, tag }) {
               ? question.options?.map((z, idx2) => ({
                   value: z,
                   feedback_text: tag?.questions?.[idx]?.options?.[idx2]?.feedback_text ?? "",
+                  pros: tag?.questions?.[idx]?.options?.[idx2]?.pros ?? "",
+                  cons: tag?.questions?.[idx]?.options?.[idx2]?.cons ?? "",
                   description: tag?.questions?.[idx]?.options?.[idx2]?.description,
                   contigencySettings: tag?.questions?.[idx]?.options?.[idx2]?.contigencySettings,
                 }))
@@ -1842,12 +1866,14 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        feedback_text: y?.feedback_text ?? "",
+        // feedback_text: y?.feedback_text ?? "",
         image: y?.image,
         options: Array.isArray(y?.options)
           ? y.options.map((z) => ({
               description: z?.description ?? "",
               feedback_text: z?.feedback_text ?? "",
+              pros: z?.pros ?? "",
+              cons: z?.cons ?? "",
               contigencySettings: ["slider", "list", "multiselect", "rating", "boolean", "likert"].includes(y?.type)
                 ? z?.contigencySettings ?? {}
                 : undefined,
