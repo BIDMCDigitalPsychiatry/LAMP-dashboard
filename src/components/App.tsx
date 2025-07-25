@@ -8,7 +8,7 @@ import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
-import Login, { generateB64, getOrFetchPublicKey } from "./Login"
+import Login from "./Login"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -201,11 +201,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
               : "api.lamp.digital",
         })
-        const key = await getOrFetchPublicKey()
-        let base64 = await generateB64(password, key)
         if (userName && password) {
           try {
-            const res = await LAMP.Credential.login(userName, base64)
+            const res = await LAMP.Credential.login(userName, password)
             sessionStorage.setItem(
               "tokenInfo",
               JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })

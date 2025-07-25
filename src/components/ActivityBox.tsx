@@ -311,7 +311,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   const checkIsModuleCompleted = async (id) => {
     let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
-      !!y.error ? undefined : y.data
+      !!y?.error ? undefined : y?.data
     )[0]
     const isCompleted = (tag || []).filter((t) => t.moduleId === id && t.participants.includes(participant.id))
     return isCompleted.length > 0 ? true : false
@@ -319,7 +319,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   const createCompletedAttachment = async (id) => {
     let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
-      !!y.error ? undefined : y.data
+      !!y?.error ? undefined : y?.data
     )[0]
     let checkIsModule = (tag || []).filter((t) => t.moduleId === id)
     let checkNotModule = (tag || []).filter((t) => t.moduleId !== id)
@@ -614,7 +614,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
     })()
@@ -694,7 +694,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       ;(async () => {
         let tag =
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0] ?? []
         setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
       })()

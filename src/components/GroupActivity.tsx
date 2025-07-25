@@ -78,7 +78,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteActivities(tag)
     })()

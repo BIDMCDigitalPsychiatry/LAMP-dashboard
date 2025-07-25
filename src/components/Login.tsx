@@ -31,6 +31,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+import { clearLocalStorageItems } from "./helper"
 
 type SuggestedUrlOption = {
   label: string
@@ -72,80 +73,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-let cachedPublicKey: CryptoKey | null = null
-
-export async function getOrFetchPublicKey() {
-  if (cachedPublicKey) return cachedPublicKey
-
-  try {
-    const pem = await LAMP.Credential.publicKey()
-    const key = await importPublicKey(pem)
-    if (!key) throw new Error("Invalid public key")
-    cachedPublicKey = key
-    return key
-  } catch (err) {
-    console.error("Failed to load public key", err)
-    throw err
-  }
-}
-
-function str2ab(base64) {
-  const binary = atob(base64)
-  const len = binary.length
-  const bytes = new Uint8Array(len)
-  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
-  return bytes.buffer
-}
-async function importPublicKey(pem) {
-  try {
-    if (typeof pem !== "string") {
-      throw new Error("Public key must be a string in PEM format")
-    }
-    const binaryDer = str2ab(
-      pem
-        .replace(/-----BEGIN PUBLIC KEY-----/, "")
-        .replace(/-----END PUBLIC KEY-----/, "")
-        .replace(/\s/g, "")
-    )
-
-    return await window.crypto.subtle.importKey(
-      "spki",
-      binaryDer,
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256",
-      },
-      true,
-      ["encrypt"]
-    )
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
-
-export async function generateB64(password: string, key: CryptoKey) {
-  const passwd = password?.trim()
-  // const response = await LAMP.Credential.publicKey()
-  // const key = await importPublicKey(response)
-  if (!(key instanceof CryptoKey)) {
-    throw new TypeError("Invalid key passed to generateB64")
-  }
-  let base64
-  try {
-    const encrypted = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      key,
-      new TextEncoder().encode(passwd)
-    )
-    base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
-    return base64
-  } catch (error) {
-    console.error(error)
-  }
-}
 
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
@@ -176,17 +103,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   useEffect(() => {
     setConfirmSession(false)
     let lockoutTime = null
-    const cached = localStorage.getItem("cachedOptions")
-    const loginAttempts = localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0"
     if (typeof localStorage.getItem(LOCKOUT_TIME_KEY) != "undefined") {
       lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
     }
-    localStorage.clear()
-    localStorage.setItem("cachedOptions", cached)
-    if (!!lockoutTime) {
-      localStorage.setItem(LOCKOUT_TIME_KEY, lockoutTime)
-    }
-    localStorage.setItem("loginAttempts", loginAttempts)
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
       const now = Date.now()
@@ -249,13 +168,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     setLoginClick(false)
     const userName = args?.id?.trim()
     const password = args?.password?.trim()
-    // let base64 = await generateB64(args)
-    const key = await getOrFetchPublicKey()
-    const base64 = await generateB64(password, key)
 
     if (userName && password) {
       try {
-        const res = await LAMP.Credential.login(userName, base64)
+        const res = await LAMP.Credential.login(userName, password)
         sessionStorage.setItem(
           userTokenKey,
           JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
@@ -280,7 +196,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
-    sessionStorage.clear()
+    clearLocalStorageItems()
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (!checkMAxAttempts()) {
       return
