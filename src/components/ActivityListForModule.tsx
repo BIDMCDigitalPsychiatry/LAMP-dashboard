@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
     favstar: {
       position: "absolute",
-      top: 5,
+      top: 15,
       left: 24,
       zIndex: 1,
       color: "#f9d801",
@@ -315,7 +315,7 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
                 if (
                   activity.spec === "lamp.module" &&
                   module.name != "Other activities" &&
-                  module.name != "Unstarted Modules"
+                  module.name != "Unstarted modules"
                 ) {
                   handleSubModule(activity)
                 } else {
@@ -431,7 +431,7 @@ export default function ActivityListForModule({ ...props }) {
       if (moduleData) {
         handleSubModule(moduleData)
       }
-      setTimeout(() => setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1)), 500)
+      setTimeout(() => setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1)), 1000)
     }
   }, [subModuleInLocalStorage])
 
@@ -441,31 +441,39 @@ export default function ActivityListForModule({ ...props }) {
         {/* <Grid lg="auto" item>
           <Box className={classes.accordionHeadIcons}>sad</Box>
         </Grid> */}
-        <Grid item>
-          <Box display="flex" alignItems="center">
-            <Typography variant="h6">{module.name}</Typography>
-            <Fab className={classes.headerTitleIcon}>
-              {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && (
-                <Icon className={classes.favstar}>star_rounded</Icon>
-              )}
-            </Fab>
-          </Box>
-          <Box display="flex" alignItems="center" className={classes.progressDetails}>
-            <CircularProgress
-              variant="determinate"
-              thickness={8}
-              className={classes.progressCircle}
-              value={getPercentage(module)}
-            />
-            <Typography variant="body1">
-              {
-                <span>
-                  <span>{getStatus(module)}</span> Sections Complete
-                </span>
-              }
-            </Typography>
-          </Box>
-        </Grid>
+        {module.name != "Other activities" && module.name != "Unstarted modules" ? (
+          <Grid item>
+            <Box display="flex" alignItems="center">
+              <Typography variant="h6">{module.name}</Typography>
+              <Fab className={classes.headerTitleIcon}>
+                {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && (
+                  <Icon className={classes.favstar}>star_rounded</Icon>
+                )}
+              </Fab>
+            </Box>
+            <Box display="flex" alignItems="center" className={classes.progressDetails}>
+              <CircularProgress
+                variant="determinate"
+                thickness={8}
+                className={classes.progressCircle}
+                value={getPercentage(module)}
+              />
+              <Typography variant="body1">
+                {
+                  <span>
+                    <span>{getStatus(module)}</span> Sections Complete
+                  </span>
+                }
+              </Typography>
+            </Box>
+          </Grid>
+        ) : (
+          <Grid item>
+            <Box display="flex" alignItems="center" marginTop={1.5}>
+              <Typography variant="h6">{module.name}</Typography>
+            </Box>
+          </Grid>
+        )}
       </Grid>
       <Container fixed className={classes.activityDialogeContainer}>
         <Grid xl={10} container spacing={2}>

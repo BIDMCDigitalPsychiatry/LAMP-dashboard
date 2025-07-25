@@ -327,7 +327,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           <Box>
             <Box display="flex" alignItems="center">
               <Typography variant="h6">{module.name}</Typography>
-              {module.name !== "Other activities" && module.name !== "Unstarted Modules" && (
+              {module.name !== "Other activities" && module.name !== "Unstarted modules" && (
                 <Tooltip
                   title={
                     favoriteIds.includes(module.id)
@@ -347,7 +347,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
                 </Tooltip>
               )}
             </Box>
-            {module.name !== "Other activities" && module.name !== "Unstarted Modules" && module?.trackProgress && (
+            {module.name !== "Other activities" && module.name !== "Unstarted modules" && module?.trackProgress && (
               <Grid display="flex" alignItems="center" className={classes.progressDetails}>
                 <CircularProgress
                   variant="determinate"
