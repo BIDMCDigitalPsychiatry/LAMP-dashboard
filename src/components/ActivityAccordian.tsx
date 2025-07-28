@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Accordion, AccordionSummary, Grid } from "@mui/material"
 import {
   Typography,
-  Card,
   Box,
-  ButtonBase,
   makeStyles,
   Theme,
   createStyles,
@@ -13,78 +11,16 @@ import {
   Tooltip,
   Icon,
 } from "@material-ui/core"
-import ReactMarkdown from "react-markdown"
-import emoji from "remark-emoji"
-import gfm from "remark-gfm"
-import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
-import ScratchCard from "../icons/ScratchCard.svg"
 import InfoIcon from "../icons/Info.svg"
-import { useTranslation } from "react-i18next"
-import { LinkRenderer } from "./ActivityPopup"
-import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import LAMP from "lamp-core"
-import { getActivityEvents } from "./ActivityBox"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
-import VideoMeeting from "../icons/Video.svg"
-import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos"
-import ResponsiveDialog from "./ResponsiveDialog"
-import ActivityListForModule from "./ActivityListForModule"
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    cardlabel: {
-      fontSize: 14,
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-      height: "63px",
-      overflow: "auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      [theme.breakpoints.down("sm")]: {
-        fontSize: 13,
-        padding: "0 5px",
-        "& p": { marginBottom: "0", lineHeight: "16px" },
-      },
-      "& p": { margin: "0" },
-    },
-    scratch: {
-      "& h2": {
-        textAlign: "center !important",
-      },
-      "& h6": {
-        textAlign: "center !important",
-      },
-    },
-
     favstar: {
       position: "absolute",
       top: 24,
       left: 24,
       zIndex: 1,
       color: "#f9d801",
-    },
-    manage: {
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-      width: "100%",
-      "& svg": {
-        [theme.breakpoints.up("lg")]: {
-          width: 150,
-          height: 150,
-        },
-      },
-
-      [theme.breakpoints.up("lg")]: {
-        minHeight: 240,
-      },
     },
     accordionHeadIcons: {
       [theme.breakpoints.up("lg")]: {
@@ -100,42 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 65,
       },
     },
-    mainIcons: {
-      width: 80,
-      height: 80,
-      [theme.breakpoints.up("lg")]: {
-        width: 130,
-        height: 130,
-      },
-      [theme.breakpoints.down("sm")]: {
-        width: 75,
-        height: 75,
-      },
-      [theme.breakpoints.down("xs")]: {
-        width: 65,
-        height: 65,
-      },
-    },
-    thumbMain: { maxWidth: 255, position: "relative" },
-    fullwidthBtn: { width: "100%" },
-    blankMsg: {
-      marginBottom: "15px",
-      marginTop: "5px",
-      "& path": { fill: "#666" },
-      "& p": { margin: "2px 5px" },
-    },
-    assessH: {
-      background: "#E7F8F2 !important",
-    },
-    learnH: {
-      background: "#FFF9E5 !important",
-    },
-    manageH: {
-      background: "#FFEFEC !important",
-    },
-    preventH: {
-      background: "#ECF4FF !important",
-    },
+
     accordionMain: {
       boxShadow: "none !important",
       background: "#f8f8f8 !important",
@@ -152,10 +53,6 @@ const useStyles = makeStyles((theme: Theme) =>
           fontSize: 15,
           fontWeight: 500,
         },
-        // "& span": {
-        //   fontSize: 18,
-        //   fontWeight: "normal",
-        // },
       },
       "&::before": {
         display: "none",
@@ -179,41 +76,12 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
       "&.Mui-expanded": {
-        background: "#fff !important",
-        boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.20) !important",
+        // background: "#fff !important",
+        // boxShadow: "0px 0px 5px 0px rgba(0,0,0,0.20) !important",
         marginTop: "0 !important",
       },
     },
-    greentick: {
-      "& svg": {
-        width: 30,
-        height: 30,
-      },
-    },
-    moduleStart: {
-      marginBottom: 40,
-      "& button": {
-        marginLeft: 24,
-        backgroundColor: "#7599FF",
-        color: "#fff",
-      },
-    },
-    backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
-      color: "#fff",
-    },
-    moduleHeader: {
-      position: "fixed",
-      background: "#fff",
-      width: "100%",
-      zIndex: 1,
-      padding: "15px 60px",
-      left: 0,
-      top: 0,
-    },
-    moduleContainer: {
-      paddingTop: "30px !important",
-    },
+
     headerTitleIcon: {
       background: "none",
       boxShadow: "none",
@@ -431,7 +299,15 @@ const ActivityAccordion = ({
     <div>
       {data.map((module, index) => (
         <>
-          <Accordion key={index} defaultExpanded className={classes.accordionMain}>
+          <Accordion
+            expanded={false}
+            onChange={(event, expanded) => {
+              event.stopPropagation()
+              handleSubModule(module)
+            }}
+            key={index}
+            className={classes.accordionMain}
+          >
             {type != "activity" ? (
               <AccordionSummary id={module.id}>
                 {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)}

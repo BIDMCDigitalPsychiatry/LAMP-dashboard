@@ -300,7 +300,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity) => {
-    console.log("handleSubModule called with activity:", activity)
     if (activity.name === "Other activities" || activity.name === "Unstarted modules") {
       setSubModuleData(activity)
     } else {

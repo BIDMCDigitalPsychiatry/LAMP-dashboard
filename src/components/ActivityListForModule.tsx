@@ -438,34 +438,44 @@ export default function ActivityListForModule({ ...props }) {
   return (
     <>
       <Grid container spacing={0} className={classes.activityDialogeHeader}>
-        {/* <Grid lg="auto" item>
-          <Box className={classes.accordionHeadIcons}>sad</Box>
-        </Grid> */}
         {module.name != "Other activities" && module.name != "Unstarted modules" ? (
-          <Grid item>
-            <Box display="flex" alignItems="center">
-              <Typography variant="h6">{module.name}</Typography>
-              <Fab className={classes.headerTitleIcon}>
-                {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && (
-                  <Icon className={classes.favstar}>star_rounded</Icon>
-                )}
-              </Fab>
-            </Box>
-            <Box display="flex" alignItems="center" className={classes.progressDetails}>
-              <CircularProgress
-                variant="determinate"
-                thickness={8}
-                className={classes.progressCircle}
-                value={getPercentage(module)}
-              />
-              <Typography variant="body1">
-                {
-                  <span>
-                    <span>{getStatus(module)}</span> Sections Complete
-                  </span>
-                }
-              </Typography>
-            </Box>
+          <Grid container spacing={0}>
+            <Grid lg="auto" item>
+              <Box
+                className={classes.accordionHeadIcons}
+                style={{
+                  margin: "auto",
+                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                    ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                    : `url(${InfoIcon}) center center/contain no-repeat`,
+                }}
+              ></Box>
+            </Grid>
+            <Grid item>
+              <Box display="flex" alignItems="center">
+                <Typography variant="h6">{module.name}</Typography>
+                <Fab className={classes.headerTitleIcon}>
+                  {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && (
+                    <Icon className={classes.favstar}>star_rounded</Icon>
+                  )}
+                </Fab>
+              </Box>
+              <Box display="flex" alignItems="center" className={classes.progressDetails}>
+                <CircularProgress
+                  variant="determinate"
+                  thickness={8}
+                  className={classes.progressCircle}
+                  value={getPercentage(module)}
+                />
+                <Typography variant="body1">
+                  {
+                    <span>
+                      <span>{getStatus(module)}</span> Sections Complete
+                    </span>
+                  }
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
         ) : (
           <Grid item>
