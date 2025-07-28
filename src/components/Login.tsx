@@ -9,6 +9,7 @@ import {
   MenuItem,
   Icon,
   IconButton,
+  InputAdornment,
   colors,
   Grid,
   makeStyles,
@@ -30,6 +31,7 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
+import { clearLocalStorageItems } from "./helper"
 
 type SuggestedUrlOption = {
   label: string
@@ -55,8 +57,10 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { width: "100%", height: 41, marginBottom: 10 },
     },
     textfieldStyle: {
-      "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
+      backgroundColor: "#f5f5f5",
+      borderRadius: 10,
       "& fieldset": { border: 0 },
+      "& .MuiInputBase-inputAdornedEnd": { paddingRight: 48 },
     },
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
@@ -70,67 +74,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function str2ab(base64) {
-  const binary = atob(base64)
-  const len = binary.length
-  const bytes = new Uint8Array(len)
-  for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i)
-  return bytes.buffer
-}
-async function importPublicKey(pem) {
-  try {
-    if (typeof pem !== "string") {
-      throw new Error("Public key must be a string in PEM format")
-    }
-    const binaryDer = str2ab(
-      pem
-        .replace(/-----BEGIN PUBLIC KEY-----/, "")
-        .replace(/-----END PUBLIC KEY-----/, "")
-        .replace(/\s/g, "")
-    )
-
-    return await window.crypto.subtle.importKey(
-      "spki",
-      binaryDer,
-      {
-        name: "RSA-OAEP",
-        hash: "SHA-256",
-      },
-      true,
-      ["encrypt"]
-    )
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-export async function generateB64(args: { id: string; password: string }) {
-  const password = args?.password?.trim()
-  const response = await LAMP.Credential.publicKey()
-  const key = await importPublicKey(response)
-  let base64
-  try {
-    const encrypted = await window.crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      key,
-      new TextEncoder().encode(password)
-    )
-    base64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)))
-    return base64
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
+  const [showPassword, setShowPassword] = useState(false)
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
-  const [loginClick, setLoginClick] = useState(false)
+  const [loginClick, setLoginClick] = useState(true)
   const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -151,11 +102,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   useEffect(() => {
     setConfirmSession(false)
-    const cached = localStorage.getItem("cachedOptions")
-    localStorage.clear()
-    localStorage.setItem("cachedOptions", cached)
-    // sessionStorage.clear()
-    const lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    let lockoutTime = null
+    if (typeof localStorage.getItem(LOCKOUT_TIME_KEY) != "undefined") {
+      lockoutTime = localStorage.getItem(LOCKOUT_TIME_KEY)
+    }
     if (lockoutTime) {
       const lockoutEnd = parseInt(lockoutTime) + LOCKOUT_DURATION
       const now = Date.now()
@@ -173,6 +123,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         localStorage.removeItem(LOGIN_ATTEMPTS_KEY)
       }
     }
+    checkMAxAttempts()
   }, [])
 
   useEffect(() => {
@@ -198,6 +149,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       }
     }
   }, [])
+
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -216,11 +168,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     setLoginClick(false)
     const userName = args?.id?.trim()
     const password = args?.password?.trim()
-    let base64 = await generateB64(args)
 
     if (userName && password) {
       try {
-        const res = await LAMP.Credential.login(userName, base64)
+        const res = await LAMP.Credential.login(userName, password)
         sessionStorage.setItem(
           userTokenKey,
           JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
@@ -232,13 +183,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     }
   }
 
-  let handleLogin = async (event: any, mode?: string) => {
-    event.preventDefault()
+  const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (attempts >= MAX_ATTEMPTS) {
       const lockoutUntil = Date.now() + LOCKOUT_DURATION
       localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
       setIsLockedOut(true)
+      return false
+    }
+    return true
+  }
+
+  let handleLogin = async (event: any, mode?: string) => {
+    event.preventDefault()
+    clearLocalStorageItems()
+    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
+    if (!checkMAxAttempts()) {
       return
     }
     setLoginClick(true)
@@ -247,12 +207,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
     setOptions(options)
-    setLoginClick(true)
+    // setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
         variant: "error",
       })
-      setLoginClick(false)
       return
     }
     if (!mode) {
@@ -267,6 +226,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
           const lockoutUntil = Date.now() + LOCKOUT_DURATION
           localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
           setIsLockedOut(true)
+          setLoginClick(false)
         } else {
           enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
             variant: "error",
@@ -276,7 +236,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               variant: "info",
             })
         }
-        setLoginClick(false)
       })
       await generateTokens({
         id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
@@ -328,8 +287,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     })()
     if (!srcLocked)
       enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-    setLoginClick(false)
     onComplete()
+    setLoginClick(true)
     // .catch((err) => {
     //   // console.warn("error with auth request", err)
     //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -371,7 +330,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               dense
               onClick={() => {
                 setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital", "_blank")
+                window.open("https://docs.lamp.digital/troubleshooting", "_blank")
               }}
             >
               <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
@@ -497,7 +456,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                   <TextField
                     required
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     margin="normal"
                     variant="outlined"
                     style={{ width: "100%", height: 50, marginBottom: 40 }}
@@ -508,6 +467,18 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                       classes: {
                         root: classes.textfieldStyle,
                       },
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            onMouseDown={(event) => event.preventDefault()}
+                            edge="end"
+                          >
+                            <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
 
@@ -517,8 +488,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                       type="submit"
                       style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick || isLockedOut ? classes.loginDisabled : ""}
-                      disabled={loginClick || isLockedOut}
+                      className={loginClick && isLockedOut ? classes.loginDisabled : ""}
+                      disabled={loginClick && isLockedOut}
                     >
                       {`${t("Login")}`}
                       <input
@@ -533,7 +504,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                           width: "100%",
                           opacity: 0,
                         }}
-                        disabled={loginClick}
+                        disabled={loginClick && isLockedOut}
                       />
                     </Fab>
                   </Box>

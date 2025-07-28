@@ -444,7 +444,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital", "_blank")
+                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
                       }}
                     >
                       {`${t("Help & Support")}`}
@@ -585,7 +585,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital", "_blank")
+                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
                       }}
                     >
                       <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>

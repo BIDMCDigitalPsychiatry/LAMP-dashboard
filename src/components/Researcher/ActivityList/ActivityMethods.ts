@@ -9,7 +9,11 @@ function geFeedBackSettings() {
     feedback_text: {
       type: "string",
       title: i18n.t("Feedback Text"),
-      default: "",
+      maxLength: 500,
+      "ui:widget": "textarea",
+      "ui:options": {
+        rows: 3,
+      },
       description: i18n.t("This text will be shown to the participant after the input."),
     },
   }
@@ -1024,7 +1028,7 @@ export const SchemaList = () => {
                       type: {
                         enum: ["text", "short", "matrix"],
                       },
-                      ...geFeedBackSettings(),
+                      // ...geFeedBackSettings(),
                     },
                   },
                   {
@@ -1077,9 +1081,12 @@ export const SchemaList = () => {
                                     readOnly: true,
                                     title: i18n.t("Option Description"),
                                     type: "string",
+                                    "ui:widget": "textarea",
+                                    "ui:options": {
+                                      rows: 3,
+                                    },
                                   },
                                   ...geFeedBackSettings(),
-
                                   ...getContingencySettings(),
                                 },
                                 required: ["value"],
@@ -1119,6 +1126,10 @@ export const SchemaList = () => {
                                     readOnly: true,
                                     title: i18n.t("Option Description"),
                                     type: "string",
+                                    "ui:widget": "textarea",
+                                    "ui:options": {
+                                      rows: 3,
+                                    },
                                   },
                                   ...geFeedBackSettings(),
                                   ...getContingencySettings(),
@@ -1157,6 +1168,10 @@ export const SchemaList = () => {
                                     title: i18n.t("Option Description"),
                                     type: "string",
                                     default: "",
+                                    "ui:widget": "textarea",
+                                    "ui:options": {
+                                      rows: 3,
+                                    },
                                   },
                                   ...geFeedBackSettings(),
                                   ...getContingencySettings(),
@@ -1190,7 +1205,7 @@ export const SchemaList = () => {
                               enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
                               default: "standard",
                             },
-                            ...geFeedBackSettings(),
+                            // ...geFeedBackSettings(),
                           },
                         },
                       },

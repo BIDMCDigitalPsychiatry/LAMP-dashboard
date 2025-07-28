@@ -235,7 +235,7 @@ export default function ActivityPopup({
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteIds(tag)
     })()
@@ -264,7 +264,7 @@ export default function ActivityPopup({
       ;(async () => {
         let tag =
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0] ?? []
         setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
       })()

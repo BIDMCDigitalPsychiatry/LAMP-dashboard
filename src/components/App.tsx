@@ -8,7 +8,7 @@ import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
-import Login, { generateB64 } from "./Login"
+import Login from "./Login"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -95,10 +95,11 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
   const location: any = useLocation()
-  const isLoginPage = location.pathname === "/"
-  localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
 
   useEffect(() => {
+    const isLoginPage = location.pathname === "/"
+    localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
+
     try {
       if (window.self !== window.top) {
         window.top?.location.replace(window.location.href)
@@ -181,8 +182,8 @@ function AppRouter({ setConfirmSession, ...props }) {
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
-        setLoading(false)
         refreshPage()
+        setLoading(false)
         return
       }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
@@ -200,10 +201,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
               : "api.lamp.digital",
         })
-        let base64 = await generateB64({ id: userName, password: password })
         if (userName && password) {
           try {
-            const res = await LAMP.Credential.login(userName, base64)
+            const res = await LAMP.Credential.login(userName, password)
             sessionStorage.setItem(
               "tokenInfo",
               JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
@@ -234,6 +234,7 @@ function AppRouter({ setConfirmSession, ...props }) {
       })()
     } else if (!state.identity) {
       refreshPage()
+      setLoading(false)
     }
     document.addEventListener("visibilitychange", function logData() {
       if (document.visibilityState === "hidden") {
@@ -575,6 +576,8 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
+
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -636,6 +639,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -672,6 +676,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -709,6 +714,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -745,6 +751,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -784,6 +791,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                     <TwoFA
                       onLogout={() => logout()}
                       onComplete={() => {
+                        localStorage.setItem("verified", JSON.stringify({ value: true }))
                         state.authType === "admin"
                           ? props.history.replace("/researcher")
                           : props.history.replace("/researcher/me/users")
@@ -827,6 +835,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -877,6 +886,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                   <TwoFA
                     onLogout={() => logout()}
                     onComplete={() => {
+                      localStorage.setItem("verified", JSON.stringify({ value: true }))
                       state.authType === "admin"
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
@@ -1122,33 +1132,31 @@ export default function App({ ...props }) {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const moved = parseInt(localStorage.getItem("mousemoved") || "0")
-      const now = Date.now()
-      const inactiveMinutes = (now - moved) / 60000
-      if (
-        inactiveMinutes > 15 &&
-        !confirmSession &&
-        localStorage.getItem("isLoginPage") === "false" &&
-        localStorage.getItem("isParticipant") === "false"
-      ) {
-        setConfirmSession(true)
-      }
-    }, 60 * 1000)
+    if (confirmSession) {
+      const timeout = setTimeout(() => {
+        setConfirmSession(false)
+        goBackToHome()
+      }, 60 * 1000)
 
-    return () => clearInterval(interval)
+      return () => clearTimeout(timeout)
+    } else {
+      const interval = setInterval(() => {
+        const moved = parseInt(localStorage.getItem("mousemoved") || "0")
+        const now = Date.now()
+        const inactiveMinutes = (now - moved) / 60000
+        if (
+          inactiveMinutes > 15 &&
+          !confirmSession &&
+          localStorage.getItem("isLoginPage") === "false" &&
+          localStorage.getItem("isParticipant") === "false"
+        ) {
+          setConfirmSession(true)
+        }
+      }, 60 * 1000)
+
+      return () => clearInterval(interval)
+    }
   }, [confirmSession])
-
-  // useEffect(() => {
-  //   if (confirmSession) {
-  //     const timeout = setTimeout(() => {
-  //       setConfirmSession(false)
-  //       goBackToHome()
-  //     }, 60 * 1000)
-
-  //     return () => clearTimeout(timeout)
-  //   }
-  // }, [confirmSession])
 
   const goBackToHome = () => {
     setConfirmSession(false)

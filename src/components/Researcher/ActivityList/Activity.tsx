@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export const addHideSubactivities = async (settings, id) => {
   let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
-    !!y.error ? undefined : y.data
+    !!y?.error ? undefined : y?.data
   )[0]
   let hidden = (tag || []).filter((t) => t.moduleId !== id)
   if (!!settings.hide_sub_activities) {
@@ -139,7 +139,7 @@ export default function Activity({
         }
         if (activity.spec === "lamp.survey") {
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0]
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
           setActivity(dataActivity)
@@ -153,7 +153,7 @@ export default function Activity({
             return ds.concat(newD)
           }, [])
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0]
           setActivity(activity)
           setDetails(tag ?? [])
@@ -162,7 +162,7 @@ export default function Activity({
             delete activity.settings?.audio
           }
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-            !!y.error ? undefined : y.data
+            !!y?.error ? undefined : y?.data
           )[0]
           setDetails(tag ?? [])
         }
@@ -199,7 +199,7 @@ export default function Activity({
   const checkAndSetCompleted = async (settings, id) => {
     if (subActivities != settings.activities) {
       let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
-        !!y.error ? undefined : y.data
+        !!y?.error ? undefined : y?.data
       )[0]
       let newSet = (tag || []).filter((t) => t.moduleId !== id)
       await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", newSet)

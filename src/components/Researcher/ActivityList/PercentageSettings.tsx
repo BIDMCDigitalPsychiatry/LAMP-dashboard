@@ -73,7 +73,7 @@ export default function PercentageSettings({ activityId, ...props }) {
   useEffect(() => {
     ;(async () => {
       let tag = [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.percentage_settings")].map((y: any) =>
-        !!y.error ? undefined : y.data
+        !!y?.error ? undefined : y?.data
       )[0]
       if (!!tag) setSettings(tag)
     })()

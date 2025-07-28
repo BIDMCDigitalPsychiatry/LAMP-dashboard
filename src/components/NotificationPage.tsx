@@ -126,7 +126,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteActivities(tag)
     })()
@@ -280,6 +280,13 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
+              } else if (data?.clickBack === true) {
+                if (!!data && !!data?.timestamp) {
+                  showVisualPopup(activity)
+                } else {
+                  if (mode === null) window.location.href = "/#/"
+                  else history.back()
+                }
               } else if (!!data && !!data?.timestamp) {
                 showVisualPopup(activity)
               }

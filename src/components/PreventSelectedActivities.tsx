@@ -312,7 +312,7 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
     percentage.concat(
       activities.map(async (activity) => {
         let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0]
         if (!!tag) {
           const startTime = getStartTime(tag)

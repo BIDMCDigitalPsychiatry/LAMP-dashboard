@@ -53,7 +53,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
-
     if (!!favoriteActivities && (groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
@@ -79,7 +78,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
+          !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteActivities(tag)
     })()
@@ -98,12 +97,13 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
-      iterateActivity(data?.forward)
+      iterateActivity(data?.forward, data?.done)
     }
   }, [data])
 
-  const iterateActivity = (forward?: boolean | undefined) => {
-    let val = typeof forward == "undefined" || !!forward ? index + 1 : index - 1
+  const iterateActivity = (forward?: boolean | undefined, done?: boolean | undefined) => {
+    let val =
+      typeof forward == "undefined" || !!forward || (typeof done !== "undefined" && !!done) ? index + 1 : index - 1
     setCurrentActivity(null)
     if (val >= 0) setIndex(val)
     if (groupActivities.length === val || val == -1) {
