@@ -299,12 +299,22 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "8px 8px 8px 8px",
       display: "flex",
       alignItems: "center",
+      minHeight: 85,
+      [theme.breakpoints.down("xs")]: {
+        minHeight: 70,
+      },
     },
     progressMain: {
       borderTop: "#e7e7e7 solid 1px",
       borderBottom: "#e7e7e7 solid 1px",
       padding: "10px",
       justifyContent: "center",
+    },
+    activityHdOnly: {
+      paddingLeft: 30,
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 15,
+      },
     },
   })
 )
@@ -488,15 +498,17 @@ export default function ActivityListForModule({ ...props }) {
             </Grid>
           </>
         ) : (
-          <Grid item>
-            <Box display="flex" alignItems="center" marginTop={1.5}>
-              <Typography variant="h6">{module.name}</Typography>
-            </Box>
-          </Grid>
+          <Box ml={5} className={classes.activityHdOnly}>
+            <Grid item>
+              <Box display="flex" alignItems="center" marginTop={1.5}>
+                <Typography variant="h6">{module.name}</Typography>
+              </Box>
+            </Grid>
+          </Box>
         )}
       </Grid>
       <Container fixed className={classes.activityDialogeContainer}>
-        <Grid xl={10} container spacing={2}>
+        <Grid xl={10} container>
           <Grid container spacing={2} direction="row" wrap="wrap">
             {renderActivities(type, tag, favorites, handleClickOpen, handleSubModule, classes, module)}
           </Grid>
