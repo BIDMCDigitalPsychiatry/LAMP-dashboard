@@ -20,12 +20,12 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 48,
       zIndex: 99999,
       left: 15,
-      top: 9,
+      top: 24,
       position: "fixed",
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
         left: 10,
-        top: 10,
+        top: 16,
       },
     },
   })

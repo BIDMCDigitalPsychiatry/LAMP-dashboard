@@ -406,7 +406,7 @@ const ModuleActivity = ({ ...props }) => {
       </Backdrop>
       <Grid marginTop={5} container className={classes.thumbContainer}>
         <Grid item xs>
-          <ActivityAccordian
+          {/* <ActivityAccordian
             data={moduleData}
             type={props.type}
             tag={[]}
@@ -415,7 +415,7 @@ const ModuleActivity = ({ ...props }) => {
             handleSubModule={handleSubModule}
             participant={participant}
             setFavorites={setFavorites}
-          />
+          /> */}
           <ActivityPopup
             activity={activity}
             tag={null}
