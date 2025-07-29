@@ -612,7 +612,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           if (localStorage.getItem("parentString")) {
             const module = localStorage.getItem("parentString")
             setModuleInLocalStorage(module.split(">")[0])
-            console.log("Module in local storage:", module.split(">").slice(1))
             setSubModuleInLocalStorage(module.split(">").slice(1))
             setTimeout(() => localStorage.removeItem("parentString"), 500)
           }
