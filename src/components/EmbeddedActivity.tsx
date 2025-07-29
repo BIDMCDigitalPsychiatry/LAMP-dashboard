@@ -317,13 +317,9 @@ export default function EmbeddedActivity({
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      if (currentActivity.spec == "lamp.gyroscope") {
-        console.log("Loading gyroscope activity from demo")
-        response = atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      } else if (activitySpec?.executable?.startsWith("data:")) {
+      if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
-        console.log("Loading activity from executable URL")
         response = atob(await (await fetch(activitySpec.executable)).text())
       } else {
         response = await loadFallBack()
@@ -340,13 +336,7 @@ export default function EmbeddedActivity({
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      if (currentActivity.spec == "lamp.gyroscope") {
-        console.log("Loading gyroscope activity from demo")
-        return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      } else {
-        return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
-      }
-      // return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"
     }
