@@ -226,7 +226,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [moduleForNotification, setModuleForNotification] = useState(null)
   const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
   const [subModuleData, setSubModuleData] = useState(null)
-  const [openSubModuleView, setOpenSubModuleView] = useState(false)
   const [moduleInLocalStorage, setModuleInLocalStorage] = useState(null)
   const [subModuleInLocalStorage, setSubModuleInLocalStorage] = useState([])
   const [openSubModules, setOpenSubModules] = useState([])
@@ -248,6 +247,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       } else {
         localStorage.setItem("parentString", y?.parentString)
         localStorage.setItem("lastActiveTab", type)
+        localStorage.setItem("tab", tab)
         setActivity(data)
         setOpen(true)
         y.spec === "lamp.dbt_diary_card"
@@ -310,11 +310,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setLoadingModules(true)
       const data = await LAMP.Activity.view(activity.id)
 
-      await addSubModuleData(data, moduleStartTime, activity?.parentModule, activity?.parentString)
+      await addSubModuleData(data, moduleStartTime, activity?.parentString)
     }
   }
 
-  const addSubModuleData = async (data, startTime, parent, parentString) => {
+  const addSubModuleData = async (data, startTime, parentString) => {
     let moduleActivityData = { ...data }
     let moduleStartTime = startTime
     let moduleStarted = moduleStartTime != null
@@ -644,15 +644,22 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [tab, setTab] = useState("modules")
 
   useEffect(() => {
-    if (favorites.length > 0) {
-      if (typeof favorites[0]?.id == "undefined") {
-        setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
-      }
-      setTab("favorite")
+    if (localStorage.getItem("tab")) {
+      setTab(localStorage.getItem("tab"))
+      setTimeout(() => {
+        localStorage.removeItem("tab")
+      }, 1000)
     } else {
-      setTab(
-        (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other"
-      )
+      if (favorites.length > 0) {
+        if (typeof favorites[0]?.id == "undefined") {
+          setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
+        }
+        setTab("favorite")
+      } else {
+        setTab(
+          (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other"
+        )
+      }
     }
   }, [favorites])
 
@@ -1003,14 +1010,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </Dialog>
       )}
       {openSubModules.map((moduleData, index) => (
-        <ResponsiveDialog
-          key={index} // if you have a unique ID, use that instead
-          transient
-          open
-          animate
-          fullScreen
-          onClose={() => handleClose(index)}
-        >
+        <ResponsiveDialog key={index} transient open animate fullScreen onClose={() => handleClose(index)}>
           <ActivityListForModule
             type={type}
             tag={tag}

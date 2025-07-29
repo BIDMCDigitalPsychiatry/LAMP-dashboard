@@ -139,6 +139,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         borderRadius: "12px !important",
         marginBottom: 8,
+        padding: 0,
       },
       "& h6": {
         fontSize: 17,
@@ -261,7 +262,10 @@ const useStyles = makeStyles((theme: Theme) =>
     activityDialogeContainer: {
       display: "flex",
       justifyContent: "center",
-      paddingTop: 100,
+      paddingTop: 170,
+      [theme.breakpoints.down("sm")]: {
+        paddingTop: 145,
+      },
     },
     progressCircle: {
       width: "18px !important",
@@ -292,9 +296,15 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "fixed",
       background: "#fff",
       zIndex: 2,
-      padding: "8px 8px 8px 80px",
+      padding: "8px 8px 8px 8px",
       display: "flex",
       alignItems: "center",
+    },
+    progressMain: {
+      borderTop: "#e7e7e7 solid 1px",
+      borderBottom: "#e7e7e7 solid 1px",
+      padding: "10px",
+      justifyContent: "center",
     },
   })
 )
@@ -312,11 +322,7 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
               md={3}
               lg={3}
               onClick={() => {
-                if (
-                  activity.spec === "lamp.module" &&
-                  module.name != "Other activities" &&
-                  module.name != "Unstarted modules"
-                ) {
+                if (activity.spec === "lamp.module" && module.name != "Other activities") {
                   handleSubModule(activity)
                 } else {
                   handleClickOpen(activity)
@@ -439,28 +445,32 @@ export default function ActivityListForModule({ ...props }) {
     <>
       <Grid container spacing={0} className={classes.activityDialogeHeader}>
         {module.name != "Other activities" && module.name != "Unstarted modules" ? (
-          <Grid container spacing={0}>
-            <Grid lg="auto" item>
-              <Box
-                className={classes.accordionHeadIcons}
-                style={{
-                  margin: "auto",
-                  background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                    ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
-                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                }}
-              ></Box>
-            </Grid>
-            <Grid item>
-              <Box display="flex" alignItems="center">
-                <Typography variant="h6">{module.name}</Typography>
-                <Fab className={classes.headerTitleIcon}>
-                  {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && (
-                    <Icon className={classes.favstar}>star_rounded</Icon>
-                  )}
-                </Fab>
-              </Box>
-              <Box display="flex" alignItems="center" className={classes.progressDetails}>
+          <>
+            <Box ml={5}>
+              <Grid container spacing={0} alignItems="center">
+                <Grid lg="auto" item>
+                  <Box
+                    className={classes.accordionHeadIcons}
+                    style={{
+                      margin: "auto",
+                      background: tag.filter((x) => x.id === module?.id)[0]?.photo
+                        ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                        : `url(${InfoIcon}) center center/contain no-repeat`,
+                    }}
+                  ></Box>
+                </Grid>
+                <Grid item>
+                  <Box display="flex" alignItems="center">
+                    <Typography variant="h6">{module.name}</Typography>
+                    <Fab className={classes.headerTitleIcon}>
+                      {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && <Icon>star_rounded</Icon>}
+                    </Fab>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+            <Grid container className={classes.progressMain}>
+              <Box display="flex" alignItems="center" justifyContent="center" className={classes.progressDetails}>
                 <CircularProgress
                   variant="determinate"
                   thickness={8}
@@ -476,7 +486,7 @@ export default function ActivityListForModule({ ...props }) {
                 </Typography>
               </Box>
             </Grid>
-          </Grid>
+          </>
         ) : (
           <Grid item>
             <Box display="flex" alignItems="center" marginTop={1.5}>

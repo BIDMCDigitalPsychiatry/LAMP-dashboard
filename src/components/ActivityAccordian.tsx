@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         borderRadius: "12px !important",
         marginBottom: 8,
+        padding: 0,
       },
       "& h6": {
         fontSize: 17,
