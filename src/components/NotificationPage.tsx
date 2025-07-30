@@ -339,18 +339,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
-      <ResponsiveDialog
-        open={!!open}
-        transient={module != "" ? true : false}
-        animate
-        fullScreen
-        onClose={() => {
-          setOpen(false)
-          localStorage.removeItem("activityFromModule")
-        }}
-      >
-        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
-      </ResponsiveDialog>
+
+      {open && <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />}
+      {/* </ResponsiveDialog> */}
     </div>
   )
 }

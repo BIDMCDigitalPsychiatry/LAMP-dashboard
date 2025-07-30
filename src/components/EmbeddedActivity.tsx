@@ -407,32 +407,36 @@ export default function EmbeddedActivity({
           </Button>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog
-        open={!!open}
-        transient={secondaryActivity?.spec === "lamp.module"}
-        animate
-        fullScreen
-        onClose={() => {
-          setOpen(false)
-          localStorage.removeItem("activityFromModule")
-          const response =
-            typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
-          if (response) {
-            handleSaveData({ data: response })
-          }
-        }}
-      >
-        {secondaryActivity?.spec === "lamp.module" ? (
-          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
-        ) : (
+      {secondaryActivity?.spec === "lamp.module" && open ? (
+        <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+      ) : (
+        <ResponsiveDialog
+          open={!!open}
+          transient={secondaryActivity?.spec === "lamp.module"}
+          animate
+          fullScreen
+          onClose={() => {
+            setOpen(false)
+            localStorage.removeItem("activityFromModule")
+            const response =
+              typeof localStorage.getItem("response") != "undefined"
+                ? JSON.parse(localStorage.getItem("response"))
+                : null
+            if (response) {
+              handleSaveData({ data: response })
+            }
+          }}
+        >
+          (
           <NotificationPage
             participant={participant?.id ?? participant}
             activityId={responseActivity}
             mode={"dashboard"}
             tab={"activity"}
           />
-        )}
-      </ResponsiveDialog>
+          )
+        </ResponsiveDialog>
+      )}
       <Dialog
         open={!!showPopup}
         onClose={() => {

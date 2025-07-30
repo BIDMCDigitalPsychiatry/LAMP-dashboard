@@ -463,8 +463,8 @@ export default function ActivityListForModule({ ...props }) {
                     className={classes.accordionHeadIcons}
                     style={{
                       margin: "auto",
-                      background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                        ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+                      background: tag?.filter((x) => x.id === module?.id)[0]?.photo
+                        ? `url(${tag?.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
                         : `url(${InfoIcon}) center center/contain no-repeat`,
                     }}
                   ></Box>

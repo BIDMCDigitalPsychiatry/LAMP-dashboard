@@ -300,18 +300,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   const handleSubModule = async (activity) => {
-    if (activity.name === "Other activities" || activity.name === "Unstarted modules") {
-      setSubModuleData(activity)
-    } else {
-      let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
-      if (!moduleStartTime) {
-        moduleStartTime = await addActivityEventForModule(activity, participant)
-      }
-      setLoadingModules(true)
-      const data = await LAMP.Activity.view(activity.id)
-
-      await addSubModuleData(data, moduleStartTime, activity?.parentString)
+    let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
+    if (!moduleStartTime) {
+      moduleStartTime = await addActivityEventForModule(activity, participant)
     }
+    setLoadingModules(true)
+    const data = await LAMP.Activity.view(activity.id)
+
+    await addSubModuleData(data, moduleStartTime, activity?.parentString)
   }
 
   const addSubModuleData = async (data, startTime, parentString) => {
@@ -564,6 +560,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
     localStorage.removeItem("SurveyId")
+    localStorage.removeItem("parentStringForSurvey")
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i)
       if (key.startsWith("activity-survey-")) {
@@ -796,24 +793,35 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         )}
         <TabPanel value="modules" className={classes.tabPanelMain}>
           {(moduleData || []).length > 0 ? (
-            <ActivityAccordian
-              data={
-                shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0
-                  ? (moduleData || []).concat({
-                      name: "Unstarted modules",
-                      level: 1,
-                      subActivities: shownActivities.filter((activity) => activity.spec == "lamp.module"),
-                    })
-                  : moduleData
-              }
-              type={type}
-              tag={tag}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              setFavorites={setFavorites}
-              moduleInLocalStorage={moduleInLocalStorage}
-              setModuleInLocalStorage={setModuleInLocalStorage}
-            />
+            <>
+              <ActivityAccordian
+                data={moduleData}
+                type={type}
+                tag={tag}
+                handleSubModule={handleSubModule}
+                participant={participant}
+                setFavorites={setFavorites}
+                moduleInLocalStorage={moduleInLocalStorage}
+                setModuleInLocalStorage={setModuleInLocalStorage}
+              />
+              {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
+                <>
+                  <h3> Unstarted Modules</h3>
+                  <ActivityAccordian
+                    data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
+                    type={type}
+                    tag={tag}
+                    handleSubModule={handleSubModule}
+                    participant={participant}
+                    setFavorites={setFavorites}
+                    moduleInLocalStorage={moduleInLocalStorage}
+                    setModuleInLocalStorage={setModuleInLocalStorage}
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </>
           ) : (
             !loadingModules && (
               <Grid container spacing={2}>
