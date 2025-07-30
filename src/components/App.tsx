@@ -1148,7 +1148,8 @@ export default function App({ ...props }) {
           inactiveMinutes > 15 &&
           !confirmSession &&
           localStorage.getItem("isLoginPage") === "false" &&
-          localStorage.getItem("isParticipant") === "false"
+          localStorage.getItem("isParticipant") === "false" &&
+          location?.pathname !== "/"
         ) {
           setConfirmSession(true)
         }
