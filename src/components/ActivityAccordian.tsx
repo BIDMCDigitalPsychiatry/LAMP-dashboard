@@ -227,7 +227,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
                 <Typography variant="body1">
                   {
                     <span>
-                      <span>{getStatus(module)}</span> Sections Complete
+                      <span>{getStatus(module)}</span> Sections Completed
                     </span>
                   }
                 </Typography>
@@ -246,27 +246,9 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({
-  data,
-  type,
-  tag,
-  handleSubModule,
-  participant,
-  setFavorites,
-  moduleInLocalStorage,
-  setModuleInLocalStorage,
-}) => {
+const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setFavorites }) => {
   const classes = useStyles()
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  useEffect(() => {
-    if (!!moduleInLocalStorage) {
-      const moduleData = data.find((mod) => mod.id === moduleInLocalStorage)
-      if (moduleData) {
-        handleSubModule(moduleData)
-      }
-      setTimeout(() => setModuleInLocalStorage(null), 500)
-    }
-  }, [moduleInLocalStorage])
 
   useEffect(() => {
     ;(async () => {

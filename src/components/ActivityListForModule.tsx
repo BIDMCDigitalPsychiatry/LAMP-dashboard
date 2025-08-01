@@ -302,6 +302,13 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: 85,
       [theme.breakpoints.down("xs")]: {
         minHeight: 70,
+        justifyContent: "center",
+      },
+    },
+    moduleHeading: {
+      paddingLeft: 50,
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 0,
       },
     },
     progressMain: {
@@ -415,23 +422,14 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
 
 export default function ActivityListForModule({ ...props }) {
   const classes = useStyles()
-  const {
-    module,
-    type,
-    tag,
-    favorites,
-    handleClickOpen,
-    handleSubModule,
-    setSubModuleInLocalStorage,
-    subModuleInLocalStorage,
-  } = props
+  const { module, type, tag, favorites, handleClickOpen, handleSubModule } = props
   // Function to get the status of the module
   const getStatus = (module) => {
-    return module.name === "Other activities"
+    return module?.name === "Other activities"
       ? ""
-      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
+      : module?.subActivities?.filter((activity) => activity.isCompleted === true).length +
           "/" +
-          module.subActivities.length
+          module?.subActivities.length
   }
   // Function to calculate the percentage of completed sub-activities
   const getPercentage = (module) => {
@@ -441,22 +439,12 @@ export default function ActivityListForModule({ ...props }) {
     )
   }
 
-  useEffect(() => {
-    if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0) {
-      const moduleData = module.subActivities.find((mod) => mod.id === subModuleInLocalStorage[0])
-      if (moduleData) {
-        handleSubModule(moduleData)
-      }
-      setTimeout(() => setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1)), 1000)
-    }
-  }, [subModuleInLocalStorage])
-
   return (
     <>
       <Grid container spacing={0} className={classes.activityDialogeHeader}>
-        {module.name != "Other activities" && module.name != "Unstarted modules" ? (
+        {module?.name != "Other activities" && module?.name != "Unstarted modules" ? (
           <>
-            <Box ml={5}>
+            <Box className={classes.moduleHeading}>
               <Grid container spacing={0} alignItems="center">
                 <Grid lg="auto" item>
                   <Box
@@ -479,23 +467,25 @@ export default function ActivityListForModule({ ...props }) {
                 </Grid>
               </Grid>
             </Box>
-            <Grid container className={classes.progressMain}>
-              <Box display="flex" alignItems="center" justifyContent="center" className={classes.progressDetails}>
-                <CircularProgress
-                  variant="determinate"
-                  thickness={8}
-                  className={classes.progressCircle}
-                  value={getPercentage(module)}
-                />
-                <Typography variant="body1">
-                  {
-                    <span>
-                      <span>{getStatus(module)}</span> Sections Complete
-                    </span>
-                  }
-                </Typography>
-              </Box>
-            </Grid>
+            {module?.trackProgress && (
+              <Grid container className={classes.progressMain}>
+                <Box display="flex" alignItems="center" justifyContent="center" className={classes.progressDetails}>
+                  <CircularProgress
+                    variant="determinate"
+                    thickness={8}
+                    className={classes.progressCircle}
+                    value={getPercentage(module)}
+                  />
+                  <Typography variant="body1">
+                    {
+                      <span>
+                        <span>{getStatus(module)}</span> Sections Completed
+                      </span>
+                    }
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
           </>
         ) : (
           <Box ml={5} className={classes.activityHdOnly}>

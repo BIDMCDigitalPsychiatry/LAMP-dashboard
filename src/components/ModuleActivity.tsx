@@ -41,15 +41,17 @@ const ModuleActivity = ({ ...props }) => {
   const [subModuleInLocalStorage, setSubModuleInLocalStorage] = useState([])
   const [openSubModules, setOpenSubModules] = useState([])
   const [subModuleData, setSubModuleData] = useState(null)
+  const [parentString, setParentString] = useState("")
+  const [indexToLoad, setIndexToLoad] = useState(-1)
 
   useEffect(() => {
     const fetchData = async () => {
       if (participant != null) {
-        if (localStorage.getItem("parentStringForSurvey")) {
-          const module = localStorage.getItem("parentStringForSurvey")
-          await handleClickOpen({ spec: "lamp.module", id: module.split(">")[0] })
-          setSubModuleInLocalStorage(module.split(">").slice(1))
-          setTimeout(() => localStorage.removeItem("parentStringForSurvey"), 500)
+        const module = localStorage.getItem("parentStringForSurvey")
+        if (module) {
+          const splitData = module.split(">")
+          await handleClickOpen({ spec: "lamp.module", id: splitData[0] })
+          setSubModuleInLocalStorage(splitData.slice(1))
         } else {
           handleClickOpen({ spec: "lamp.module", id: moduleId })
         }
@@ -60,6 +62,24 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleId, participant])
 
   useEffect(() => {
+    const run = async () => {
+      console.log("SubModuleInLocalStorage:", subModuleInLocalStorage)
+      if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0 && openSubModules.length > 0) {
+        const data = openSubModules[openSubModules.length - 1].subActivities.find(
+          (mod) => mod.id === subModuleInLocalStorage[0]
+        )
+        if (data) {
+          await handleSubModule(data)
+          setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1))
+        }
+      }
+    }
+    run()
+  }, [subModuleInLocalStorage, openSubModules])
+
+  console.log("indextoload:", indexToLoad)
+
+  useEffect(() => {
     if (!!moduleForNotification && isParentModuleLoaded) {
       setTimeout(() => {
         setShowNotification(true)
@@ -68,6 +88,7 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleForNotification, isParentModuleLoaded])
 
   const handleSubModule = async (activity) => {
+    console.log("handleSubModule called with:", activity)
     if (activity.name === "Other activities" || activity.name === "Unstarted modules") {
       setSubModuleData(activity)
     } else {
@@ -91,6 +112,7 @@ const ModuleActivity = ({ ...props }) => {
     const hideOnCompletion = data?.settings?.hide_on_completion === true
     const trackProgress = data?.settings?.track_progress === true
     let sequentialActivityAdded = false
+    const parentsString = parentString ? parentString + ">" + data?.id : data?.id
     const arr = []
     for (const id of ids) {
       try {
@@ -102,7 +124,6 @@ const ModuleActivity = ({ ...props }) => {
         if (fetchedData.spec === "lamp.module") {
           fetchedData["startTime"] = moduleStartTime
         }
-        const parentsString = parentString ? parentString + ">" + data?.id : data?.id
         fetchedData["parentString"] = parentsString
         fetchedData["parentModule"] = data.id
         const eventCreated =
@@ -143,7 +164,17 @@ const ModuleActivity = ({ ...props }) => {
       sequentialOrdering: sequential,
       trackProgress: trackProgress,
     })
-    setLoadingModules(false)
+    const splitData = parentsString.split(">")
+    if (!!localStorage.getItem("parentStringForSurvey")) {
+      if (localStorage.getItem("parentStringForSurvey") === parentsString) {
+        localStorage.removeItem("parentStringForSurvey")
+        setIndexToLoad(splitData.length - 1)
+        setLoadingModules(false)
+      }
+    } else {
+      setLoadingModules(false)
+      setIndexToLoad(indexToLoad + 1)
+    }
   }
 
   const getModuleStartTime = async (id, startTime = null) => {
@@ -160,6 +191,7 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClickOpen = (y: any): Promise<void> => {
+    console.log("handleClickOpen called with:", y)
     return LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
         let moduleStartTime = await getModuleStartTime(y.id)
@@ -169,7 +201,8 @@ const ModuleActivity = ({ ...props }) => {
         await addActivityData(data, 0, moduleStartTime, null)
       } else {
         localStorage.setItem("activityFromModule", moduleId)
-        localStorage.setItem("parentStringForSurvey", y?.parentString)
+        setParentString(y?.parentString || "")
+
         setActivity(data)
         setOpen(true)
         if (y.spec === "lamp.dbt_diary_card") {
@@ -335,6 +368,7 @@ const ModuleActivity = ({ ...props }) => {
     }
     setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     setOpenSubModules([moduleActivityData])
+    if (!localStorage.getItem("parentStringForSurvey")) setIndexToLoad(indexToLoad + 1)
     setLoadingModules(false)
   }
 
@@ -356,7 +390,6 @@ const ModuleActivity = ({ ...props }) => {
         if (activity.id === subActivityId && activity.parentString === parentString) {
           return { ...activity, isCompleted: true }
         }
-
         if (activity.subActivities && activity.subActivities.length > 0) {
           const updatedSubActivities = updateRecursive(activity.subActivities)
           return { ...activity, subActivities: updatedSubActivities }
@@ -370,8 +403,14 @@ const ModuleActivity = ({ ...props }) => {
     setModuleData(updatedData)
   }
 
-  const handleClose = (indexToRemove) => {
-    setOpenSubModules((prev) => prev.filter((_, index) => index !== indexToRemove))
+  const handleClose = () => {
+    const newArr = openSubModules.slice(0, -1)
+    setOpenSubModules(newArr)
+    setIndexToLoad(indexToLoad - 1)
+  }
+
+  const updateLocalStorage = () => {
+    if (!!parentString) localStorage.setItem("parentStringForSurvey", parentString)
   }
 
   return (
@@ -391,6 +430,7 @@ const ModuleActivity = ({ ...props }) => {
             showStreak={null}
             participant={participant?.id ?? participant}
             updateIsCompleted={updateIsCompleted}
+            updateLocalStorage={updateLocalStorage}
           />
           {!!moduleForNotification && (
             <Dialog
@@ -420,8 +460,8 @@ const ModuleActivity = ({ ...props }) => {
           )}
         </Grid>
       </Grid>
-      {openSubModules.map((moduleData, index) => (
-        <ResponsiveDialog key={index} transient open animate fullScreen onClose={() => handleClose(index)}>
+      {indexToLoad > -1 && !!openSubModules[indexToLoad] && (
+        <ResponsiveDialog transient open animate fullScreen onClose={() => handleClose()}>
           <ActivityListForModule
             type={null}
             tag={null}
@@ -429,12 +469,10 @@ const ModuleActivity = ({ ...props }) => {
             handleClickOpen={handleClickOpen}
             handleSubModule={handleSubModule}
             classes={classes}
-            module={moduleData}
-            setSubModuleInLocalStorage={setSubModuleInLocalStorage}
-            subModuleInLocalStorage={subModuleInLocalStorage}
+            module={openSubModules[indexToLoad]}
           />
         </ResponsiveDialog>
-      ))}
+      )}
     </>
   )
 }
