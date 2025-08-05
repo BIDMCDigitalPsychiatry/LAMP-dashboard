@@ -723,17 +723,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
               .length ? (
               <ActivityAccordian
-                data={(
-                  moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []
-                ).concat(
-                  shownActivities.filter((activity) => favorites.includes(activity)).length > 0
-                    ? {
-                        name: "Other activities",
-                        level: 1,
-                        subActivities: shownActivities.filter((activity) => favorites.includes(activity)),
-                      }
-                    : []
-                )}
+                data={moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []}
                 type={type}
                 tag={tag}
                 handleSubModule={handleSubModule}
@@ -741,10 +731,14 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 setFavorites={setFavorites}
               />
             ) : (
-              !loadingModules && (
+              <></>
+            )}
+            {shownActivities.filter((activity) => favorites.includes(activity)).length > 0 && (
+              <>
+                <h2> Other activities</h2>
                 <Grid container spacing={2}>
-                  {(favorites || []).length ? (
-                    (favorites || []).map((activity) => (
+                  {(shownActivities.filter((activity) => favorites.includes(activity)) || []).length ? (
+                    (shownActivities.filter((activity) => favorites.includes(activity)) || []).map((activity) => (
                       <Grid
                         item
                         xs={6}
@@ -811,7 +805,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     </Box>
                   )}
                 </Grid>
-              )
+              </>
             )}
           </TabPanel>
         )}
@@ -827,7 +821,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             />
           ) : shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
             <>
-              <h3> Unstarted Modules</h3>
+              <h2> Unstarted Modules</h2>
               <ActivityAccordian
                 data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                 type={type}

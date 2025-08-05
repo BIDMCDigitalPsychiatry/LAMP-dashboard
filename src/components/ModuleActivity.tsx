@@ -63,7 +63,6 @@ const ModuleActivity = ({ ...props }) => {
 
   useEffect(() => {
     const run = async () => {
-      console.log("SubModuleInLocalStorage:", subModuleInLocalStorage)
       if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0 && openSubModules.length > 0) {
         const data = openSubModules[openSubModules.length - 1].subActivities.find(
           (mod) => mod.id === subModuleInLocalStorage[0]
@@ -77,8 +76,6 @@ const ModuleActivity = ({ ...props }) => {
     run()
   }, [subModuleInLocalStorage, openSubModules])
 
-  console.log("indextoload:", indexToLoad)
-
   useEffect(() => {
     if (!!moduleForNotification && isParentModuleLoaded) {
       setTimeout(() => {
@@ -88,7 +85,6 @@ const ModuleActivity = ({ ...props }) => {
   }, [moduleForNotification, isParentModuleLoaded])
 
   const handleSubModule = async (activity) => {
-    console.log("handleSubModule called with:", activity)
     if (activity.name === "Other activities" || activity.name === "Unstarted modules") {
       setSubModuleData(activity)
     } else {
@@ -191,7 +187,6 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClickOpen = (y: any): Promise<void> => {
-    console.log("handleClickOpen called with:", y)
     return LAMP.Activity.view(y.id).then(async (data) => {
       if (y.spec === "lamp.module") {
         let moduleStartTime = await getModuleStartTime(y.id)
@@ -404,9 +399,13 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClose = () => {
+    // if (indexToLoad - 1 < 0) {
+    //   window.location.reload()
+    // } else {
     const newArr = openSubModules.slice(0, -1)
     setOpenSubModules(newArr)
     setIndexToLoad(indexToLoad - 1)
+    // }
   }
 
   const updateLocalStorage = () => {

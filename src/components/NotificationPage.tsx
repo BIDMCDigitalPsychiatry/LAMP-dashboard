@@ -175,12 +175,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     const activityFromModule = localStorage.getItem("activityFromModule")
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
-    else if (mode === "responseActivity") {
-      const surveyId = localStorage.getItem("SurveyId")
-      window.location.replace(`/#/participant/${participant}/assess `)
-      window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
-      localStorage.removeItem("SurveyId")
-    } else if (!!activityFromModule && !!tab) {
+    else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
     } else if (tab === null || typeof tab === "undefined")
@@ -257,7 +252,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       )}
       {!response &&
         !loading &&
-        (activity?.spec === "lamp.group" || activity?.spec === "lamp.module" ? (
+        (activity?.spec === "lamp.group" ? (
           <GroupActivity
             activity={activity}
             participant={participant}
@@ -339,9 +334,19 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
-
-      {open && <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />}
-      {/* </ResponsiveDialog> */}
+      <ResponsiveDialog
+        open={!!open}
+        transient={module != "" ? true : false}
+        animate
+        fullScreen
+        onClose={() => {
+          setOpen(false)
+          localStorage.removeItem("activityFromModule")
+          // window.location.reload()
+        }}
+      >
+        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
+      </ResponsiveDialog>
     </div>
   )
 }
