@@ -204,6 +204,7 @@ export default function ActivityPopup({
   savedActivities,
   updateIsCompleted,
   tab,
+  updateLocalStorage,
   ...props
 }: {
   activity: any
@@ -216,6 +217,7 @@ export default function ActivityPopup({
   setFavorites?: any
   savedActivities?: any
   updateIsCompleted: Function
+  updateLocalStorage: Function
   tab?: any
 } & DialogProps) {
   const classes = useStyles()
@@ -430,6 +432,7 @@ export default function ActivityPopup({
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
+                updateLocalStorage()
                 if (activity?.spec == "lamp.zoom_meeting") {
                   openMeetingLink(activity, evt)
                 } else {
@@ -461,7 +464,15 @@ export default function ActivityPopup({
           </Box>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog open={!!open} animate fullScreen onClose={() => setOpen(false)}>
+      <ResponsiveDialog
+        open={!!open}
+        animate
+        fullScreen
+        onClose={() => {
+          console.log("in onclose activity popup")
+          setOpen(false)
+        }}
+      >
         <NotificationPage
           participant={participant?.id ?? participant}
           activityId={activity?.id}

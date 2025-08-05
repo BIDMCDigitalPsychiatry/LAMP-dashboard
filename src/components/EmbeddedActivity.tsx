@@ -420,14 +420,15 @@ export default function EmbeddedActivity({
           if (response) {
             handleSaveData({ data: response })
           }
+          setResponseActivity(null)
         }}
       >
         {secondaryActivity?.spec === "lamp.module" ? (
-          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+          <ModuleActivity type="activity" moduleId={secondaryActivity?.id} participant={participant} />
         ) : (
           <NotificationPage
             participant={participant?.id ?? participant}
-            activityId={responseActivity}
+            activityId={secondaryActivity?.id}
             mode={"dashboard"}
             tab={"activity"}
           />
