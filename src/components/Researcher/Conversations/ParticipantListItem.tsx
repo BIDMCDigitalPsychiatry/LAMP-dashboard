@@ -137,7 +137,6 @@ export default function ParticipantListItem({
   }
 
   const refreshMessages = async () => {
-    console.log("Fetching messages...")
     setConversations(
       Object.fromEntries(
         (
