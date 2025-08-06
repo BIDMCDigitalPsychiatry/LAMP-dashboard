@@ -236,7 +236,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           </Box>
         </Grid>
         <Grid display="flex" alignItems="center" pr={1}>
-          <Fab className={classes.arrowForword} onClick={() => handleSubModule(module)}>
+          <Fab className={classes.arrowForword}>
             <Icon>arrow_forward_ios</Icon>
           </Fab>
         </Grid>
