@@ -236,7 +236,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           </Box>
         </Grid>
         <Grid display="flex" alignItems="center" pr={1}>
-          <Fab className={classes.arrowForword}>
+          <Fab className={classes.arrowForword} onClick={() => handleSubModule(module)}>
             <Icon>arrow_forward_ios</Icon>
           </Fab>
         </Grid>
@@ -282,14 +282,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
     <div>
       {data.map((module, index) => (
         <>
-          <Accordion
-            expanded={false}
-            onChange={(event, expanded) => {
-              handleSubModule(module)
-            }}
-            key={index}
-            className={classes.accordionMain}
-          >
+          <Accordion expanded={false} key={index} className={classes.accordionMain}>
             {type != "activity" ? (
               <AccordionSummary id={module.id}>
                 {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)}
