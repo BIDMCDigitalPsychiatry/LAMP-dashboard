@@ -587,7 +587,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
 
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
-    localStorage.removeItem("SurveyId")
     localStorage.removeItem("parentStringForSurvey")
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i)
@@ -735,7 +734,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
             {shownActivities.filter((activity) => favorites.includes(activity)).length > 0 && (
               <>
-                <h2> Other activities</h2>
+                <h3> Other activities</h3>
                 <Grid container spacing={2}>
                   {(shownActivities.filter((activity) => favorites.includes(activity)) || []).length ? (
                     (shownActivities.filter((activity) => favorites.includes(activity)) || []).map((activity) => (
@@ -819,9 +818,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               participant={participant}
               setFavorites={setFavorites}
             />
-          ) : shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
+          ) : (
+            <></>
+          )}
+          {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
             <>
-              <h2> Unstarted Modules</h2>
+              <h3> Unstarted Modules</h3>
               <ActivityAccordian
                 data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                 type={type}
@@ -832,75 +834,15 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               />
             </>
           ) : (
-            !loadingModules && (
-              <Grid container spacing={2}>
-                {(savedActivities || []).filter((activity) => activity.spec == "lamp.module").length ? (
-                  (savedActivities || [])
-                    .filter((activity) => activity.spec == "lamp.module")
-                    .map((activity) => (
-                      <Grid
-                        item
-                        xs={6}
-                        sm={4}
-                        md={3}
-                        lg={3}
-                        onClick={() => {
-                          handleClickOpen(activity)
-                        }}
-                        className={classes.thumbMain}
-                      >
-                        {favorites?.filter((f) => f?.id == activity?.id)?.length > 0 && (
-                          <Icon className={classes.favstar}>star_rounded</Icon>
-                        )}
-
-                        <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                          <Card
-                            className={
-                              classes.manage +
-                              " " +
-                              (type === "Manage"
-                                ? classes.manageH
-                                : type === "Assess"
-                                ? classes.assessH
-                                : type === "Learn"
-                                ? classes.learnH
-                                : classes.preventH)
-                            }
-                          >
-                            <Box mt={2} mb={1}>
-                              <Box
-                                className={classes.mainIcons}
-                                style={{
-                                  margin: "auto",
-                                  background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                    ? `url(${
-                                        tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                      }) center center/contain no-repeat`
-                                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                                }}
-                              ></Box>
-                            </Box>
-                            <Typography className={classes.cardlabel}>
-                              <ReactMarkdown
-                                children={t(activity.name)}
-                                skipHtml={false}
-                                remarkPlugins={[gfm, emoji]}
-                                components={{ link: LinkRenderer }}
-                              />
-                            </Typography>
-                          </Card>
-                        </ButtonBase>
-                      </Grid>
-                    ))
-                ) : (
-                  <Box display="flex" className={classes.blankMsg} ml={1}>
-                    <Icon>info</Icon>
-                    <p>{`${t("No modules available")}`}</p>
-                  </Box>
-                )}
-              </Grid>
-            )
+            <></>
           )}
+          {(shownActivities || []).filter((activity) => activity.spec == "lamp.module").length === 0 &&
+            (moduleData || []).length === 0 && (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <Icon>info</Icon>
+                <p>{`${t(message)}`}</p>
+              </Box>
+            )}
         </TabPanel>
         <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
