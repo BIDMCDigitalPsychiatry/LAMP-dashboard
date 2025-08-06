@@ -241,7 +241,24 @@ export default function ImportActivity({ ...props }) {
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
-      .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
+      .filter(
+        (activity) =>
+          Array.isArray(activity.settings) &&
+          activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0
+      ).length
+    console.log(
+      allIDs,
+      _importFile
+        .filter((activity) => activity.spec === "lamp.group")
+        .filter(
+          (activity) =>
+            Array.isArray(activity.settings) &&
+            activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0
+        )
+    )
+    // activity.settings.filter((x) =>
+    // !Object.keys(allIDs).includes(x)).length > 0).length
+    console.log(brokenGroupsCount)
     if (brokenGroupsCount > 0) {
       enqueueSnackbar(`${t("Couldn't import the Activities because some Activities are misconfigured or missing.")}`, {
         variant: "error",
@@ -279,8 +296,12 @@ export default function ImportActivity({ ...props }) {
     }
 
     // CTests only.
-    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
+    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.module", "lamp.survey"].includes(x.spec))) {
       try {
+        // if (!isValidGroupImport(x, allIDs, selectedStudy, activities)) {
+        //   status = false
+        //   continue
+        // }
         let newItem = await saveCTestActivity({
           ...x,
           id: undefined,
@@ -303,14 +324,25 @@ export default function ImportActivity({ ...props }) {
     }
 
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
-    for (let x of _importFile.filter((x) => ["lamp.group"].includes(x.spec))) {
+    for (let x of _importFile.filter((x) => ["lamp.module"].includes(x.spec))) {
       try {
+        if (!isValidModuleImport(x, allIDs, selectedStudy, activities)) {
+          status = false
+          continue
+        }
+
         let newItem = await saveCTestActivity({
           ...x,
           id: undefined,
           tableData: undefined,
           studyID: selectedStudy,
-          settings: x.settings.map((y) => allIDs[y]),
+          // settings: x.settings.map((y) => allIDs[y]),
+          settings: {
+            ...x.settings,
+            activities: Array.isArray(x.settings?.activities)
+              ? x.settings.activities.map((id) => allIDs[id] ?? id)
+              : [],
+          },
         })
         if (!!newItem.data) {
           addActivity(
@@ -323,9 +355,11 @@ export default function ImportActivity({ ...props }) {
           )
         }
       } catch (e) {
+        console.log("Error importing group activity:", e)
         status = false
       }
     }
+    console.log("Import status:", status, allIDs)
     if (status) {
       setLoading(false)
       enqueueSnackbar(`${t("The selected Activities were successfully imported.")}`, {
@@ -336,6 +370,19 @@ export default function ImportActivity({ ...props }) {
       enqueueSnackbar(`${t("Couldn't import one of the selected Activity groups.")}`, { variant: "error" })
     }
     history.back()
+  }
+
+  const isValidModuleImport = (group, allIDs, selectedStudyId, existingActivities) => {
+    const importedActivityIds = Object.keys(allIDs)
+    const existingStudyActivities = existingActivities
+      .filter((activity) => activity.study_id === selectedStudyId)
+      .map((activity) => activity.id)
+    console.log("Existing study activities:", existingStudyActivities)
+    const allValidIds = [...importedActivityIds, ...existingStudyActivities]
+
+    return Array.isArray(group.settings?.activities)
+      ? group.settings.activities.every((id) => allValidIds.includes(id))
+      : true
   }
 
   const checkDuplicateUpdateActivity = (obj, activitiesList, selectedStudyId) => {

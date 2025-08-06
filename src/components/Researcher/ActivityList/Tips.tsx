@@ -458,15 +458,19 @@ export default function Tips({
       (typeof text !== "undefined" && text?.trim() !== "")
     ) {
       duplicates = categoryArray.filter((x) => {
-        return !!value
-          ? x.name?.toLowerCase() === text?.trim().toLowerCase()
-          : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
+        if (!!value) {
+          // EDIT MODE
+          const isSameName = x.name?.toLowerCase() === text?.trim().toLowerCase()
+          const isSameItem = x.id === value.id
+          return isSameName && !isSameItem
+        } else {
+          // CREATE MODE
+          return x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
+        }
       })
 
       if (duplicates.length > 0) {
-        enqueueSnackbar("This TIP name already exists. Please choose a different name.", {
-          variant: "warning",
-        })
+        enqueueSnackbar(`${t("Activity with same name already exist.")}`, { variant: "error" })
         return true
       }
     }
