@@ -836,6 +836,13 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           ) : (
             <></>
           )}
+          {(shownActivities || []).filter((activity) => activity.spec == "lamp.module").length === 0 &&
+            (moduleData || []).length === 0 && (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <Icon>info</Icon>
+                <p>{`${t(message)}`}</p>
+              </Box>
+            )}
         </TabPanel>
         <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
