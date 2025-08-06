@@ -350,7 +350,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         onClose={() => {
           setOpen(false)
           localStorage.removeItem("activityFromModule")
-          window.location.reload()
         }}
       >
         <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
