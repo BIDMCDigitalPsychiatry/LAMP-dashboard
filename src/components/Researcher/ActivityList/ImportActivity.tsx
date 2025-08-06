@@ -239,74 +239,23 @@ export default function ImportActivity({ ...props }) {
     let status = true
     const _importFile = [...importFile] // clone it so we can close the dialog first
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
-    let brokenGroupsCount = _importFile
-      .filter((activity) => activity.spec === "lamp.group")
-      .filter(
-        (activity) =>
-          Array.isArray(activity.settings) &&
-          activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0
-      ).length
-    console.log(
-      allIDs,
-      _importFile
-        .filter((activity) => activity.spec === "lamp.group")
-        .filter(
-          (activity) =>
-            Array.isArray(activity.settings) &&
-            activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0
-        )
-    )
-    // activity.settings.filter((x) =>
-    // !Object.keys(allIDs).includes(x)).length > 0).length
-    console.log(brokenGroupsCount)
-    if (brokenGroupsCount > 0) {
-      enqueueSnackbar(`${t("Couldn't import the Activities because some Activities are misconfigured or missing.")}`, {
-        variant: "error",
-      })
-      setLoading(false)
-      return
-    }
-
     // checking and updating duplicate activities under same group
     checkDuplicateUpdateActivity(_importFile, activities, selectedStudy)
-
-    // Surveys only.
-    for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
+    // CTests and Surveys.
+    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.module"].includes(x.spec))) {
       try {
-        let newItem = await saveSurveyActivity({
-          ...x,
-          id: undefined,
-          studyID: selectedStudy,
-          tableData: undefined,
-        })
-        if (!!newItem.data) {
-          allIDs[x.id] = newItem.data
-          addActivity(
-            {
-              ...x,
-              id: newItem.data,
-              studyID: selectedStudy,
-            },
-            studies
-          )
-        }
-      } catch (e) {
-        status = false
-      }
-    }
-
-    // CTests only.
-    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.module", "lamp.survey"].includes(x.spec))) {
-      try {
-        // if (!isValidGroupImport(x, allIDs, selectedStudy, activities)) {
-        //   status = false
-        //   continue
-        // }
-        let newItem = await saveCTestActivity({
-          ...x,
-          id: undefined,
-          studyID: selectedStudy,
-        })
+        let newItem =
+          x.spec === "lamp.survey"
+            ? await saveSurveyActivity({
+                ...x,
+                id: undefined,
+                studyID: selectedStudy,
+              })
+            : await saveCTestActivity({
+                ...x,
+                id: undefined,
+                studyID: selectedStudy,
+              })
         if (!!newItem.data) {
           allIDs[x.id] = newItem.data
           addActivity(
@@ -324,7 +273,7 @@ export default function ImportActivity({ ...props }) {
     }
 
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
-    for (let x of _importFile.filter((x) => ["lamp.module"].includes(x.spec))) {
+    for (let x of _importFile.filter((x) => ["lamp.module", "lamp.group"].includes(x.spec))) {
       try {
         if (!isValidModuleImport(x, allIDs, selectedStudy, activities)) {
           status = false
@@ -336,7 +285,6 @@ export default function ImportActivity({ ...props }) {
           id: undefined,
           tableData: undefined,
           studyID: selectedStudy,
-          // settings: x.settings.map((y) => allIDs[y]),
           settings: {
             ...x.settings,
             activities: Array.isArray(x.settings?.activities)
@@ -359,7 +307,6 @@ export default function ImportActivity({ ...props }) {
         status = false
       }
     }
-    console.log("Import status:", status, allIDs)
     if (status) {
       setLoading(false)
       enqueueSnackbar(`${t("The selected Activities were successfully imported.")}`, {
@@ -377,7 +324,6 @@ export default function ImportActivity({ ...props }) {
     const existingStudyActivities = existingActivities
       .filter((activity) => activity.study_id === selectedStudyId)
       .map((activity) => activity.id)
-    console.log("Existing study activities:", existingStudyActivities)
     const allValidIds = [...importedActivityIds, ...existingStudyActivities]
 
     return Array.isArray(group.settings?.activities)
