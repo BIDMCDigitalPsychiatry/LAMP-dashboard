@@ -285,7 +285,6 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
           <Accordion
             expanded={false}
             onChange={(event, expanded) => {
-              event.stopPropagation()
               handleSubModule(module)
             }}
             key={index}
