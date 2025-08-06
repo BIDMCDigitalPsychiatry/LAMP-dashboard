@@ -175,7 +175,15 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     const activityFromModule = localStorage.getItem("activityFromModule")
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
-    else if (!!activityFromModule && !!tab) {
+    else if (mode === "responseActivity") {
+      const surveyId = localStorage.getItem("SurveyId")
+      if (surveyId) {
+        window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
+        localStorage.removeItem("SurveyId")
+      } else {
+        window.location.href = `/#/participant/${participant}/assess `
+      }
+    } else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
     } else if (tab === null || typeof tab === "undefined")

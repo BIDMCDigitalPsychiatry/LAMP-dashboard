@@ -282,15 +282,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
     <div>
       {data.map((module, index) => (
         <>
-          <Accordion
-            expanded={false}
-            onChange={(event, expanded) => {
-              event.stopPropagation()
-              handleSubModule(module)
-            }}
-            key={index}
-            className={classes.accordionMain}
-          >
+          <Accordion expanded={false} key={index} className={classes.accordionMain}>
             {type != "activity" ? (
               <AccordionSummary id={module.id}>
                 {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)}
