@@ -177,9 +177,12 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
       const surveyId = localStorage.getItem("SurveyId")
-      window.location.replace(`/#/participant/${participant}/assess `)
-      window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
-      localStorage.removeItem("SurveyId")
+      if (surveyId) {
+        window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
+        localStorage.removeItem("SurveyId")
+      } else {
+        window.location.href = `/#/participant/${participant}/assess `
+      }
     } else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
