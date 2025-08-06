@@ -399,13 +399,13 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClose = () => {
-    if (indexToLoad - 1 < 0) {
-      window.location.reload()
-    } else {
-      const newArr = openSubModules.slice(0, -1)
-      setOpenSubModules(newArr)
-      setIndexToLoad(indexToLoad - 1)
-    }
+    // if (indexToLoad - 1 < 0) {
+    //   window.location.reload()
+    // } else {
+    const newArr = openSubModules.slice(0, -1)
+    setOpenSubModules(newArr)
+    setIndexToLoad(indexToLoad - 1)
+    // }
   }
 
   const updateLocalStorage = () => {
