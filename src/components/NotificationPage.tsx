@@ -166,7 +166,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       }
     })()
   }, [activityId, favoriteActivities])
-
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 

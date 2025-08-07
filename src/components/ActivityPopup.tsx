@@ -31,6 +31,7 @@ import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LAMP from "lamp-core"
 import { isMobile } from "react-device-detect"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -225,6 +226,7 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     if (!!activity) {
@@ -310,7 +312,6 @@ export default function ActivityPopup({
     }
     window.location.reload()
   }
-
   return (
     <React.Fragment>
       <Dialog
@@ -432,6 +433,18 @@ export default function ActivityPopup({
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
+                // const isEmptyGroupActivity =
+                //   Array.isArray(activity?.settings?.activities) && activity.settings.activities.length === 0
+                // if (isEmptyGroupActivity) {
+                //   evt.preventDefault()
+                //   enqueueSnackbar(
+                //     "There are currently no activities under this activity group. Please contact your researcher.",
+                //     {
+                //       variant: "error",
+                //     }
+                //   )
+                //   return
+                // }
                 updateLocalStorage()
                 if (activity?.spec == "lamp.zoom_meeting") {
                   openMeetingLink(activity, evt)
