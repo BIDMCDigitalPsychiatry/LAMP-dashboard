@@ -174,6 +174,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const returnResult = () => {
     setStreak(0)
     const activityFromModule = localStorage.getItem("activityFromModule")
+    const moduleId = localStorage.getItem("moduleId")
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
@@ -187,6 +188,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     } else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
+    } else if (moduleId && !!tab) {
+      window.location.href = `/#/participant/${participant?.id ?? participant}/module/${moduleId}`
+      localStorage.removeItem("moduleId")
     } else if (tab === null || typeof tab === "undefined")
       window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) {

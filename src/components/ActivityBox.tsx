@@ -726,11 +726,30 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleSubModule={handleSubModule}
                 participant={participant}
                 setFavorites={setFavorites}
+                tab={tab}
               />
             ) : (
               <></>
             )}
-            {shownActivities.filter((activity) => favorites.includes(activity)).length > 0 && (
+            {shownActivities.filter((activity) => favorites.includes(activity)).length > 0 ? (
+              <>
+                <h3> Unstarted Modules</h3>
+                <ActivityAccordian
+                  data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
+                  type={type}
+                  tag={tag}
+                  handleSubModule={handleSubModule}
+                  participant={participant}
+                  setFavorites={setFavorites}
+                  tab={tab}
+                />
+              </>
+            ) : (
+              <></>
+            )}
+            {shownActivities
+              .filter((activity) => activity.spec != "lamp.module")
+              .filter((activity) => favorites.includes(activity)).length > 0 && (
               <>
                 <h3> Other activities</h3>
                 <Grid container spacing={2}>
@@ -815,6 +834,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               handleSubModule={handleSubModule}
               participant={participant}
               setFavorites={setFavorites}
+              tab={tab}
             />
           ) : (
             <></>
@@ -829,6 +849,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 handleSubModule={handleSubModule}
                 participant={participant}
                 setFavorites={setFavorites}
+                tab={tab}
               />
             </>
           ) : (

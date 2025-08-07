@@ -59,6 +59,9 @@ const ModuleActivity = ({ ...props }) => {
       }
     }
     fetchData()
+    if (props.fromTab) {
+      localStorage.setItem("moduleId", moduleId)
+    }
   }, [moduleId, participant])
 
   useEffect(() => {
@@ -195,7 +198,7 @@ const ModuleActivity = ({ ...props }) => {
         }
         await addActivityData(data, 0, moduleStartTime, null)
       } else {
-        localStorage.setItem("activityFromModule", moduleId)
+        if (!props.fromTab) localStorage.setItem("activityFromModule", moduleId)
         setParentString(y?.parentString || "")
 
         setActivity(data)
@@ -363,7 +366,8 @@ const ModuleActivity = ({ ...props }) => {
     }
     setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     setOpenSubModules([moduleActivityData])
-    if (!localStorage.getItem("parentStringForSurvey")) setIndexToLoad(indexToLoad + 1)
+    const splitData = localStorage.getItem("parentStringForSurvey")?.split(">")
+    if (!splitData || splitData.length <= 1) setIndexToLoad(indexToLoad + 1)
     setLoadingModules(false)
   }
 
@@ -399,13 +403,13 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClose = () => {
-    // if (indexToLoad - 1 < 0) {
-    //   window.location.reload()
-    // } else {
-    const newArr = openSubModules.slice(0, -1)
-    setOpenSubModules(newArr)
-    setIndexToLoad(indexToLoad - 1)
-    // }
+    if (props.fromTab && indexToLoad - 1 < 0) {
+      window.location.href = `/#/participant/${participant}/${props.tab}`
+    } else {
+      const newArr = openSubModules.slice(0, -1)
+      setOpenSubModules(newArr)
+      setIndexToLoad(indexToLoad - 1)
+    }
   }
 
   const updateLocalStorage = () => {
