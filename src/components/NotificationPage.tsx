@@ -172,6 +172,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
 
   const [module, setModule] = useState("")
   const returnResult = () => {
+    setStreak(0)
     const activityFromModule = localStorage.getItem("activityFromModule")
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
