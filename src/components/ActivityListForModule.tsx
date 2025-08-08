@@ -24,6 +24,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -422,7 +423,8 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
 
 export default function ActivityListForModule({ ...props }) {
   const classes = useStyles()
-  const { module, type, tag, favorites, handleClickOpen, handleSubModule } = props
+  const { module, type, tag, favorites, setFavorites, participant, handleClickOpen, handleSubModule } = props
+
   // Function to get the status of the module
   const getStatus = (module) => {
     return module?.name === "Other activities"
@@ -439,6 +441,23 @@ export default function ActivityListForModule({ ...props }) {
     )
   }
 
+  const handleFavoriteClick = async (activityId: string) => {
+    try {
+      const result: any = await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")
+      let tag: string[] = !!result.error ? [] : result.data ?? []
+      const isCurrentlyFavorite = tag.includes(activityId)
+      let updatedTag
+      if (isCurrentlyFavorite) {
+        updatedTag = tag.filter((id) => id !== activityId)
+      } else {
+        updatedTag = [...tag, activityId]
+      }
+      await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", updatedTag)
+      setFavorites(updatedTag)
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error)
+    }
+  }
   return (
     <>
       <Grid container spacing={0} className={classes.activityDialogeHeader}>
@@ -460,8 +479,16 @@ export default function ActivityListForModule({ ...props }) {
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Typography variant="h6">{module.name}</Typography>
-                    <Fab className={classes.headerTitleIcon}>
-                      {(favorites || []).filter((f) => f?.id == module?.id).length > 0 && <Icon>star_rounded</Icon>}
+                    <Fab
+                      className={`${classes.headerTitleIcon} ${
+                        (favorites || []).filter((f) => f?.id == module?.id).length > 0 ? "active" : ""
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleFavoriteClick(module.id)
+                      }}
+                    >
+                      <Icon>star_rounded</Icon>
                     </Fab>
                   </Box>
                 </Grid>

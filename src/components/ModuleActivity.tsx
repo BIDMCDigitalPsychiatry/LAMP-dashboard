@@ -468,6 +468,8 @@ const ModuleActivity = ({ ...props }) => {
           type={null}
           tag={null}
           favorites={favorites}
+          setFavorites={setFavorites}
+          participant={participant?.id ?? participant}
           handleClickOpen={handleClickOpen}
           handleSubModule={handleSubModule}
           classes={classes}

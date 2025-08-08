@@ -973,6 +973,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             type={type}
             tag={tag}
             favorites={favorites}
+            participant={participant?.id ?? participant}
+            setFavorites={setFavorites}
             handleClickOpen={handleClickOpen}
             handleSubModule={handleSubModule}
             classes={classes}

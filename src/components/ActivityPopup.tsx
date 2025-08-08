@@ -390,7 +390,7 @@ export default function ActivityPopup({
                     <Icon>star_rounded</Icon>
                   </Fab>
                 </Tooltip>
-              )}{" "}
+              )}
             </Typography>
           </div>
         </DialogTitle>
@@ -482,7 +482,6 @@ export default function ActivityPopup({
         animate
         fullScreen
         onClose={() => {
-          console.log("in onclose activity popup")
           setOpen(false)
         }}
       >
