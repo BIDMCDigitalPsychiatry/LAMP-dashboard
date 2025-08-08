@@ -365,48 +365,40 @@ export default function Participant({
     return hasManageActivities
   }
   const checkPortalActivities = (updatedActivities) => {
-    let activities = updatedActivities
-    let hasPortalActivities = false
-    getActivityEvents(participant, activities, hiddenEvents, startDate, endDate).then((activityEvents) => {
-      if (Object.keys(activityEvents).length !== 0) {
-        let activityEventCount = getActivityEventCount(activityEvents)
-        hasPortalActivities = activities.some(
-          (x: any) =>
-            activityEventCount[x.name] > 0 &&
-            x.spec !== "lamp.group" &&
-            x.spec !== "lamp.tips" &&
-            x.spec !== "lamp.module" &&
-            x.spec !== "lamp.zoom_meeting"
-        )
-        setEmptyPortalTab(!hasPortalActivities)
-      }
-    })
+    const hasPortalActivities = updatedActivities.some((x: any) => !!x?.category && x?.category.includes("prevent"))
+    setEmptyPortalTab(!hasPortalActivities)
     return hasPortalActivities
   }
 
   useEffect(() => {
     setDisplayTab()
-  }, [emptyAssessTab, emptyLearnTab, emptyManageTab, allEmpty])
+  }, [emptyAssessTab, emptyLearnTab, emptyManageTab, emptyPortalTab, allEmpty])
 
   const setDisplayTab = () => {
-    if (allEmpty && props.tabValue !== "portal") {
+    if (allEmpty) {
       _setTab("feed")
-      // props.activeTab("feed", participant.id)
       return
+    }
+    if (props.tabValue === "portal" && emptyPortalTab) {
+      if (!emptyAssessTab) {
+        _setTab("assess")
+      } else if (!emptyLearnTab) {
+        _setTab("learn")
+      } else if (!emptyManageTab) {
+        _setTab("manage")
+      } else {
+        _setTab("feed")
+      }
     }
     if (props.tabValue !== "portal") {
       if (!emptyAssessTab) {
         _setTab("assess")
-        // props.activeTab("assess", participant.id)
       } else if (!emptyLearnTab) {
         _setTab("learn")
-        // props.activeTab("learn", participant.id)
       } else if (!emptyManageTab) {
         _setTab("manage")
-        // props.activeTab("manage", participant.id)
       } else {
         _setTab("feed")
-        // props.activeTab("feed", participant.id)
       }
     }
   }
@@ -563,7 +555,7 @@ export default function Participant({
           onClose={closePopup}
           open={allEmpty}
           confirmAction={null}
-          confirmationMsg={t("Your administrator has not added any mindLAMP activities for you")}
+          confirmationMsg={t("Your administrator has not added any mindLAMP activities for you.")}
         />
       ) : (
         <>
