@@ -12,7 +12,7 @@ import {
   createStyles,
 } from "@material-ui/core"
 // Local Imports
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+// import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -26,6 +26,13 @@ import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import locale_lang from "../locale_map.json"
 import VisualPopup from "./VisualPopup"
+import NoActivityPopup from "./NoActivityPopup"
+import LAMP, {
+  Participant as ParticipantObj,
+  Activity as ActivityObj,
+  ActivityEvent as ActivityEventObj,
+  SensorEvent as SensorEventObj,
+} from "lamp-core"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -158,6 +165,97 @@ export async function getEvents(participant: any, activityId: string) {
   return streak > 0 ? streak : 1
 }
 
+export const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+  "lamp.spin_wheel",
+  "lamp.maze_game",
+  "lamp.emotion_recognition",
+  "lamp.symbol_digit_substitution",
+  "lamp.gyroscope",
+  "lamp.dcog",
+  "lamp.funny_memory",
+  "lamp.trails_b",
+  "lamp.voice_survey",
+  "lamp.fragmented_letters",
+  "lamp.digit_span",
+  "lamp.memory_game",
+]
+
+function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
+  return Object.assign(
+    {},
+    ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
+      [k]: v.length,
+    }))
+  )
+}
+
+async function getActivityEvents(
+  participant: ParticipantObj,
+  _activities: ActivityObj[],
+  _hidden: string[],
+  from: number,
+  to: number
+): Promise<{ [groupName: string]: ActivityEventObj[] }> {
+  let original = (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
+    ? await getSelfHelpAllActivityEvents(from, to)
+    : await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to, null, true)
+  )
+    .map((x) => ({
+      ...x,
+      activity: _activities.find((y) => x.activity === y.id),
+    }))
+    .filter((x) => (!!x.activity ? !_hidden?.includes(`${x.timestamp}/${x.activity.id}`) : true))
+    .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
+    .map((x) => ({
+      ...x,
+      activity: (x.activity || { name: "" }).name || x.static_data?.survey_name,
+    }))
+    .groupBy("activity") as any
+  let customEvents = _activities
+    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
+    .map((x) =>
+      x?.settings?.map((y, idx) =>
+        original?.[y.activity]
+          ?.map((z) => ({
+            idx: idx,
+            timestamp: z.timestamp,
+            duration: z.duration,
+            activity: x.name,
+            slices: z.temporal_slices.find((a) => a.item === y.question),
+          }))
+          .filter((y) => y.slices !== undefined)
+      )
+    )
+    .filter((x) => x !== undefined)
+    .flat(2)
+    .groupBy("activity")
+  let customGroups = Object.entries(customEvents).map(([k, x]) => [
+    k,
+    Object.values(x.groupBy("timestamp")).map((z: any) => ({
+      timestamp: z?.[0].timestamp,
+      duration: z?.[0].duration,
+      activity: z?.[0].activity,
+      static_data: {},
+      temporal_slices: Array.from(
+        z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
+          length:
+            z
+              .map((a) => a.idx)
+              .sort()
+              .slice(-1)[0] + 1,
+        })
+      ).map((a) => (a === undefined ? {} : a)),
+    })),
+  ])
+  return Object.fromEntries([...Object.entries(original), ...customGroups])
+}
+
 export default function Participant({
   participant,
   ...props
@@ -189,6 +287,30 @@ export default function Participant({
   const [currentActivity, setCurrentActivity] = useState(null)
   const { t, i18n } = useTranslation()
 
+  const [emptyLearnTab, setEmptyLearnTab] = useState(false)
+  const [emptyAssessTab, setEmptyAssessTab] = useState(false)
+  const [emptyManageTab, setEmptyManageTab] = useState(false)
+  const [emptyPortalTab, setEmptyPortalTab] = useState(false)
+
+  const [allEmpty, setAllEmpty] = useState(false)
+
+  let currentDate = new Date()
+  let prevDate = new Date()
+  let endTime = currentDate.getTime()
+  let startTime = prevDate.getTime()
+  const [startDate, setStartDate] = React.useState<number>(startTime)
+  const [endDate, setEndDate] = React.useState<number>(endTime)
+
+  useEffect(() => {
+    setLoading(true)
+    if (allEmpty) {
+      _setTab("feed")
+      setLoading(false)
+    } else {
+      setLoading(false)
+    }
+  }, [])
+
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -197,6 +319,96 @@ export default function Participant({
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
+  }
+
+  const checkEmptyActivities = (updatedActivities) => {
+    const hasLearnActivities = checkLearnActivities(updatedActivities)
+    const hasAssessActivities = checkAssessActivities(updatedActivities)
+    const hasManageActivities = checkManageActivities(updatedActivities)
+    const hasPortalActivities = checkPortalActivities(updatedActivities)
+    if (!hasLearnActivities && !hasAssessActivities && !hasManageActivities && !hasPortalActivities) {
+      setAllEmpty(true)
+    }
+  }
+
+  const checkLearnActivities = (updatedActivities) => {
+    const hasLearnActivities = updatedActivities.some(
+      (x) =>
+        (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
+        (!!x?.category && x?.category.includes("learn"))
+    )
+    setEmptyLearnTab(!hasLearnActivities)
+    return hasLearnActivities
+  }
+  const checkAssessActivities = (updatedActivities) => {
+    const hasAssessActivities = updatedActivities.some(
+      (x) =>
+        ((games.includes(x.spec) ||
+          x.spec === "lamp.group" ||
+          x.spec === "lamp.dbt_diary_card" ||
+          x.spec === "lamp.recording" ||
+          x.spec === "lamp.survey") &&
+          (typeof x?.category === "undefined" || x?.category === null)) ||
+        (!!x?.category && x?.category.includes("assess"))
+    )
+    setEmptyAssessTab(!hasAssessActivities)
+    return hasAssessActivities
+  }
+  const checkManageActivities = (updatedActivities) => {
+    const hasManageActivities = updatedActivities.some(
+      (x: any) =>
+        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
+          (typeof x?.category === "undefined" || x?.category === null)) ||
+        (!!x?.category && x?.category.includes("manage"))
+    )
+    setEmptyManageTab(!hasManageActivities)
+    return hasManageActivities
+  }
+  const checkPortalActivities = (updatedActivities) => {
+    let activities = updatedActivities
+    let hasPortalActivities = false
+    getActivityEvents(participant, activities, hiddenEvents, startDate, endDate).then((activityEvents) => {
+      if (Object.keys(activityEvents).length !== 0) {
+        let activityEventCount = getActivityEventCount(activityEvents)
+        hasPortalActivities = activities.some(
+          (x: any) =>
+            activityEventCount[x.name] > 0 &&
+            x.spec !== "lamp.group" &&
+            x.spec !== "lamp.tips" &&
+            x.spec !== "lamp.module" &&
+            x.spec !== "lamp.zoom_meeting"
+        )
+        setEmptyPortalTab(!hasPortalActivities)
+      }
+    })
+    return hasPortalActivities
+  }
+
+  useEffect(() => {
+    setDisplayTab()
+  }, [emptyAssessTab, emptyLearnTab, emptyManageTab, allEmpty])
+
+  const setDisplayTab = () => {
+    if (allEmpty && props.tabValue !== "portal") {
+      _setTab("feed")
+      // props.activeTab("feed", participant.id)
+      return
+    }
+    if (props.tabValue !== "portal") {
+      if (!emptyAssessTab) {
+        _setTab("assess")
+        // props.activeTab("assess", participant.id)
+      } else if (!emptyLearnTab) {
+        _setTab("learn")
+        // props.activeTab("learn", participant.id)
+      } else if (!emptyManageTab) {
+        _setTab("manage")
+        // props.activeTab("manage", participant.id)
+      } else {
+        _setTab("feed")
+        // props.activeTab("feed", participant.id)
+      }
+    }
   }
 
   const loadData = () => {
@@ -209,10 +421,15 @@ export default function Participant({
         const hiddenActivities = (tag || []).flatMap((module) => module.activities)
         const updatedActivities = (activities || []).filter((activity) => !hiddenActivities.includes(activity.id))
         setActivities(updatedActivities)
+        checkEmptyActivities(updatedActivities)
+        checkLearnActivities(updatedActivities)
+        checkAssessActivities(updatedActivities)
+        checkManageActivities(updatedActivities)
+        checkPortalActivities(updatedActivities)
         if (updatedActivities.length === 0) {
           setLoading(false)
         }
-        props.activeTab(tab, participant.id)
+        // props.activeTab(tab, participant.id)
       })()
 
       let language = !!localStorage.getItem("LAMP_user_" + participant.id)
@@ -326,110 +543,135 @@ export default function Participant({
     })
   }
 
+  const closePopup = () => {
+    setAllEmpty(false)
+    setLoading(true)
+
+    if (activities !== null) {
+      _setTab("feed")
+      setLoading(false)
+    }
+  }
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {activities !== null && !loading && (
-        <Box>
-          <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
-            <Box mt={1} mb={4}>
-              <Learn
-                participant={participant}
-                activities={activities}
+      {allEmpty ? (
+        <NoActivityPopup
+          onClose={closePopup}
+          open={allEmpty}
+          confirmAction={null}
+          confirmationMsg={t("Your administrator has not added any mindLAMP activities for you")}
+        />
+      ) : (
+        <>
+          {activities !== null && !loading && (
+            <Box>
+              <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
+                <Box mt={1} mb={4}>
+                  <Learn
+                    participant={participant}
+                    activities={activities}
+                    activeTab={activeTab}
+                    showStreak={showVisualPopup}
+                  />
+                </Box>
+              </Slide>
+              <Slide in={tab === "assess"} direction={tabDirection(1)} mountOnEnter unmountOnExit>
+                <Box mt={1} mb={4}>
+                  <Survey participant={participant} activities={activities} showStreak={showVisualPopup} />
+                </Box>
+              </Slide>
+              <Slide in={tab === "manage"} direction={tabDirection(2)} mountOnEnter unmountOnExit>
+                <Box mt={1} mb={4}>
+                  <Manage
+                    participant={participant}
+                    activities={activities}
+                    activeTab={activeTab}
+                    showStreak={showVisualPopup}
+                  />
+                </Box>
+              </Slide>
+              <Slide in={tab === "portal"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+                <Box mt={1} mb={4}>
+                  <Prevent
+                    participant={participant}
+                    activeTab={activeTab}
+                    allActivities={activities}
+                    hiddenEvents={hiddenEvents}
+                    enableEditMode={!_patientMode()}
+                    showStreak={showVisualPopup}
+                    activitySubmitted={openComplete}
+                    onEditAction={(activity, data) => {
+                      setVisibleActivities([
+                        {
+                          ...activity,
+                          prefillData: [
+                            data.slice.map(({ item, value }) => ({
+                              item,
+                              value,
+                            })),
+                          ],
+                          prefillTimestamp: new Date(
+                            data.x
+                          ).getTime() /* post-increment later to avoid double-reporting events! */,
+                        },
+                      ])
+                    }}
+                    onCopyAction={(activity, data) => {
+                      setVisibleActivities([
+                        {
+                          ...activity,
+                          prefillData: [
+                            data.slice.map(({ item, value }) => ({
+                              item,
+                              value,
+                            })),
+                          ],
+                        },
+                      ])
+                    }}
+                    onDeleteAction={(activity, data) => hideEvent(new Date(data.x).getTime(), activity.id)}
+                  />
+                </Box>
+              </Slide>
+              <Slide in={tab === "feed"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+                <Box mt={1} mb={4}>
+                  <Feed
+                    participant={participant}
+                    activeTab={activeTab}
+                    activities={activities}
+                    visibleActivities={visibleActivities}
+                    setVisibleActivities={setVisibleActivities}
+                    showStreak={showVisualPopup}
+                  />
+                </Box>
+              </Slide>
+              <BottomMenu
                 activeTab={activeTab}
-                showStreak={showVisualPopup}
-              />
-            </Box>
-          </Slide>
-          <Slide in={tab === "assess"} direction={tabDirection(1)} mountOnEnter unmountOnExit>
-            <Box mt={1} mb={4}>
-              <Survey participant={participant} activities={activities} showStreak={showVisualPopup} />
-            </Box>
-          </Slide>
-          <Slide in={tab === "manage"} direction={tabDirection(2)} mountOnEnter unmountOnExit>
-            <Box mt={1} mb={4}>
-              <Manage
+                tabValue={tab}
                 participant={participant}
-                activities={activities}
-                activeTab={activeTab}
-                showStreak={showVisualPopup}
+                showWelcome={openDialog}
+                setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
+                emptyLearnTab={emptyLearnTab}
+                emptyAssessTab={emptyAssessTab}
+                emptyManageTab={emptyManageTab}
+                emptyPortalTab={emptyPortalTab}
               />
+              <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
+                <Welcome
+                  activities={activities}
+                  onClose={() => {
+                    setOpen(false)
+                    setShowWelcome(participant)
+                  }}
+                />
+              </ResponsiveDialog>
             </Box>
-          </Slide>
-          <Slide in={tab === "portal"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-            <Box mt={1} mb={4}>
-              <Prevent
-                participant={participant}
-                activeTab={activeTab}
-                allActivities={activities}
-                hiddenEvents={hiddenEvents}
-                enableEditMode={!_patientMode()}
-                showStreak={showVisualPopup}
-                activitySubmitted={openComplete}
-                onEditAction={(activity, data) => {
-                  setVisibleActivities([
-                    {
-                      ...activity,
-                      prefillData: [
-                        data.slice.map(({ item, value }) => ({
-                          item,
-                          value,
-                        })),
-                      ],
-                      prefillTimestamp: new Date(
-                        data.x
-                      ).getTime() /* post-increment later to avoid double-reporting events! */,
-                    },
-                  ])
-                }}
-                onCopyAction={(activity, data) => {
-                  setVisibleActivities([
-                    {
-                      ...activity,
-                      prefillData: [
-                        data.slice.map(({ item, value }) => ({
-                          item,
-                          value,
-                        })),
-                      ],
-                    },
-                  ])
-                }}
-                onDeleteAction={(activity, data) => hideEvent(new Date(data.x).getTime(), activity.id)}
-              />
-            </Box>
-          </Slide>
-          <Slide in={tab === "feed"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-            <Box mt={1} mb={4}>
-              <Feed
-                participant={participant}
-                activeTab={activeTab}
-                activities={activities}
-                visibleActivities={visibleActivities}
-                setVisibleActivities={setVisibleActivities}
-                showStreak={showVisualPopup}
-              />
-            </Box>
-          </Slide>
-          <BottomMenu
-            activeTab={activeTab}
-            tabValue={tab}
-            participant={participant}
-            showWelcome={openDialog}
-            setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
-          />
-          <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
-            <Welcome
-              activities={activities}
-              onClose={() => {
-                setOpen(false)
-                setShowWelcome(participant)
-              }}
-            />
-          </ResponsiveDialog>
-        </Box>
+          )}
+        </>
       )}
       <Streak
         open={openComplete}
@@ -439,6 +681,13 @@ export default function Participant({
         activity={streakActivity}
         streak={streak}
       />
+
+      {/* <ConfirmationDialog
+        onClose={() => setConfirm(false)}
+        open={confirm}
+        confirmAction={loadData}
+        confirmationMsg={t("Would you like to resume this activity where you left off?")}
+      /> */}
       {!!visualPopup?.checked && (
         <VisualPopup
           open={visualPopup?.checked ?? false}
