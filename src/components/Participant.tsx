@@ -375,6 +375,9 @@ export default function Participant({
   }, [emptyAssessTab, emptyLearnTab, emptyManageTab, emptyPortalTab, allEmpty])
 
   const setDisplayTab = () => {
+    if (emptyPortalTab && (!emptyAssessTab || !emptyLearnTab || !emptyManageTab)) {
+      setEmptyPortalTab(false)
+    }
     if (allEmpty) {
       _setTab("feed")
       return
