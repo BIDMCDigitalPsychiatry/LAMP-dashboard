@@ -124,6 +124,12 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
 
   useEffect(() => {
+    if (!!activityId) {
+      setId(activityId)
+    }
+  }, [activityId])
+
+  useEffect(() => {
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
