@@ -284,7 +284,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             tab={tab}
             favoriteActivities={favoriteActivities}
             onComplete={(data) => {
-              console.log(mode, data)
               setStaticData(data?.static_data ?? {})
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
