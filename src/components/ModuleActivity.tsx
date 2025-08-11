@@ -404,7 +404,8 @@ const ModuleActivity = ({ ...props }) => {
 
   const handleClose = () => {
     if (props.fromTab && indexToLoad - 1 < 0) {
-      window.location.href = `/#/participant/${participant}/${props.tab}`
+      const lastActiveTab = localStorage.getItem("lastActiveTab").toLowerCase()
+      window.location.href = `/#/participant/${participant}/${lastActiveTab}`
     } else {
       const newArr = openSubModules.slice(0, -1)
       setOpenSubModules(newArr)

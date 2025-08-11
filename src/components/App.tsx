@@ -832,7 +832,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                 ) : state.authType === "researcher" ? (
                   <Redirect to="/researcher/me/users" />
                 ) : (
-                  <Redirect to="/participant/me/assess" />
+                  <Redirect to="/participant/me/learn" />
                 )
               ) : (
                 <React.Fragment />

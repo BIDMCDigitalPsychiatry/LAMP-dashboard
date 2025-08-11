@@ -160,7 +160,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab) => {
+const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type) => {
   // Function to get the status of the module
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -240,6 +240,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
             className={classes.arrowForword}
             onClick={() => {
               localStorage.setItem("tab", tab)
+              localStorage.setItem("lastActiveTab", type)
               window.location.href = `/#/participant/${participant?.id ?? participant}/module/${module?.id}`
             }}
           >
@@ -291,10 +292,10 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
           <Accordion expanded={false} key={index} className={classes.accordionMain}>
             {type != "activity" ? (
               <AccordionSummary id={module.id}>
-                {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab)}
+                {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type)}
               </AccordionSummary>
             ) : (
-              moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab)
+              moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type)
             )}
           </Accordion>
         </>

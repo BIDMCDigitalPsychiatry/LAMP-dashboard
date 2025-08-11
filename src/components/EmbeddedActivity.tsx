@@ -127,7 +127,7 @@ export default function EmbeddedActivity({
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
-      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      // localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
       let warnings = []
       if (e.data !== null) {
         try {

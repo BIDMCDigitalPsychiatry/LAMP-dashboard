@@ -592,6 +592,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         localStorage.removeItem(key)
       }
     }
+    localStorage.removeItem("moduleId")
     localStorage.removeItem("lastAnsweredIndex")
     ;(async () => {
       let tag =
