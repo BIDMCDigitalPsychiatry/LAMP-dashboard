@@ -193,7 +193,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search?.trim()?.length > 0) {
-        data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
+        data = (data || []).filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
         setResearchers(data)
       } else {
         setResearchers(data)

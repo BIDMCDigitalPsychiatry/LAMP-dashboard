@@ -166,7 +166,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       }
     })()
   }, [activityId, favoriteActivities])
-
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 
@@ -284,6 +283,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             tab={tab}
             favoriteActivities={favoriteActivities}
             onComplete={(data) => {
+              console.log(mode, data)
               setStaticData(data?.static_data ?? {})
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"

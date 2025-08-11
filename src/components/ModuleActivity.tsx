@@ -464,17 +464,22 @@ const ModuleActivity = ({ ...props }) => {
         </Grid>
       </Grid>
       {indexToLoad > -1 && !!openSubModules[indexToLoad] && (
-        <ResponsiveDialog transient open animate fullScreen onClose={() => handleClose()}>
-          <ActivityListForModule
-            type={null}
-            tag={null}
-            favorites={favorites}
-            handleClickOpen={handleClickOpen}
-            handleSubModule={handleSubModule}
-            classes={classes}
-            module={openSubModules[indexToLoad]}
-          />
-        </ResponsiveDialog>
+        // <ResponsiveDialog transient open animate fullScreen onClose={() => {
+        //   console.log("Closing dialog")
+        //   handleClose()
+        // }}>
+        <ActivityListForModule
+          type={null}
+          tag={null}
+          favorites={favorites}
+          setFavorites={setFavorites}
+          participant={participant?.id ?? participant}
+          handleClickOpen={handleClickOpen}
+          handleSubModule={handleSubModule}
+          classes={classes}
+          module={openSubModules[indexToLoad]}
+        />
+        // </ResponsiveDialog>
       )}
     </>
   )
