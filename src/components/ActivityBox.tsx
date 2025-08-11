@@ -717,7 +717,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         </Box>
         {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {((moduleData || []).filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
+            {((moduleData || [])?.filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
               .length ? (
               <ActivityAccordian
                 data={moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []}
@@ -731,7 +731,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             ) : (
               <></>
             )}
-            {shownActivities.filter((activity) => favorites.includes(activity)).length > 0 ? (
+            {shownActivities
+              .filter((activity) => activity.spec == "lamp.module")
+              ?.filter((activity) => favorites.includes(activity)).length > 0 ? (
               <>
                 <h3> Unstarted Modules</h3>
                 <ActivityAccordian
@@ -749,7 +751,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
             {shownActivities
               .filter((activity) => activity.spec != "lamp.module")
-              .filter((activity) => favorites.includes(activity)).length > 0 && (
+              ?.filter((activity) => favorites.includes(activity)).length > 0 && (
               <>
                 <h3> Other activities</h3>
                 <Grid container spacing={2}>
