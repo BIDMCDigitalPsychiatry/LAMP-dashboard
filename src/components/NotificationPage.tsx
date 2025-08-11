@@ -110,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
+  const [id, setId] = useState(activityId)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -136,11 +137,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      if (!!favoriteActivities && !!activityId && !!LAMP.Auth) {
-        LAMP.Activity.view(activityId)
+      if (!!favoriteActivities && !!id && !!LAMP.Auth) {
+        LAMP.Activity.view(id)
           .then((data: any) => {
             if (!!data) {
-              Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
+              Service.getUserDataByKey("activitytags", [id], "id").then((tags) => {
                 setTag(tags[0])
                 const tag = tags[0]
                 data =
@@ -165,7 +166,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           })
       }
     })()
-  }, [activityId, favoriteActivities])
+  }, [id, favoriteActivities])
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 
@@ -354,6 +355,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         fullScreen
         onClose={() => {
           setOpen(false)
+          setId(localStorage.getItem("SurveyId") ?? "")
           localStorage.removeItem("activityFromModule")
         }}
       >

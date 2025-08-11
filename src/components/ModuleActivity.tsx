@@ -463,11 +463,7 @@ const ModuleActivity = ({ ...props }) => {
           )}
         </Grid>
       </Grid>
-      {indexToLoad > -1 && !!openSubModules[indexToLoad] && (
-        // <ResponsiveDialog transient open animate fullScreen onClose={() => {
-        //   console.log("Closing dialog")
-        //   handleClose()
-        // }}>
+      {!props.fromTab && indexToLoad == 0 && !!openSubModules[indexToLoad] ? (
         <ActivityListForModule
           type={null}
           tag={null}
@@ -479,7 +475,31 @@ const ModuleActivity = ({ ...props }) => {
           classes={classes}
           module={openSubModules[indexToLoad]}
         />
-        // </ResponsiveDialog>
+      ) : ((!props.fromTab && indexToLoad > 0) || (props.fromTab && indexToLoad > -1)) &&
+        !!openSubModules[indexToLoad] ? (
+        <ResponsiveDialog
+          transient
+          open
+          animate
+          fullScreen
+          onClose={() => {
+            handleClose()
+          }}
+        >
+          <ActivityListForModule
+            type={null}
+            tag={null}
+            favorites={favorites}
+            setFavorites={setFavorites}
+            participant={participant?.id ?? participant}
+            handleClickOpen={handleClickOpen}
+            handleSubModule={handleSubModule}
+            classes={classes}
+            module={openSubModules[indexToLoad]}
+          />
+        </ResponsiveDialog>
+      ) : (
+        <></>
       )}
     </>
   )
