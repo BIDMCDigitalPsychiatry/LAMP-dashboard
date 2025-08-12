@@ -110,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
+  const [id, setId] = useState(activityId)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -121,6 +122,12 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [visualPopup, setVisualPopup] = useState(null)
   const [staticData, setStaticData] = useState(0)
   const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
+
+  useEffect(() => {
+    if (!!activityId) {
+      setId(activityId)
+    }
+  }, [activityId])
 
   useEffect(() => {
     ;(async () => {
@@ -136,11 +143,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     setLoading(true)
     setResponse(false)
     ;(async () => {
-      if (!!favoriteActivities && !!activityId && !!LAMP.Auth) {
-        LAMP.Activity.view(activityId)
+      if (!!favoriteActivities && !!id && !!LAMP.Auth) {
+        LAMP.Activity.view(id)
           .then((data: any) => {
             if (!!data) {
-              Service.getUserDataByKey("activitytags", [activityId], "id").then((tags) => {
+              Service.getUserDataByKey("activitytags", [id], "id").then((tags) => {
                 setTag(tags[0])
                 const tag = tags[0]
                 data =
@@ -165,7 +172,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           })
       }
     })()
-  }, [activityId, favoriteActivities])
+  }, [id, favoriteActivities])
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
 
@@ -173,6 +180,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const returnResult = () => {
     setStreak(0)
     const activityFromModule = localStorage.getItem("activityFromModule")
+    const moduleId = localStorage.getItem("moduleId")
     setModule(activityFromModule)
     if (mode === null) setResponse(true)
     else if (mode === "responseActivity") {
@@ -186,6 +194,9 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     } else if (!!activityFromModule && !!tab) {
       setModuleActivity(activityFromModule)
       setOpen(true)
+    } else if (moduleId && !!tab) {
+      window.location.href = `/#/participant/${participant?.id ?? participant}/module/${moduleId}`
+      localStorage.removeItem("moduleId")
     } else if (tab === null || typeof tab === "undefined")
       window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) {
@@ -279,7 +290,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             tab={tab}
             favoriteActivities={favoriteActivities}
             onComplete={(data) => {
-              console.log(mode, data)
               setStaticData(data?.static_data ?? {})
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
@@ -350,6 +360,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         fullScreen
         onClose={() => {
           setOpen(false)
+          setId(localStorage.getItem("SurveyId") ?? "")
           localStorage.removeItem("activityFromModule")
         }}
       >
