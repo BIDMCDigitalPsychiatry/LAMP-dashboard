@@ -127,7 +127,7 @@ export default function EmbeddedActivity({
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
-      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      // localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
       let warnings = []
       if (e.data !== null) {
         try {
@@ -414,7 +414,6 @@ export default function EmbeddedActivity({
         fullScreen
         onClose={() => {
           setOpen(false)
-          console.log("Closing dialog parent")
           localStorage.removeItem("activityFromModule")
           const response =
             typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
