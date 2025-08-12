@@ -381,28 +381,9 @@ export default function Participant({
     if (allEmpty) {
       _setTab("feed")
       return
-    }
-    if (props.tabValue === "portal" && emptyPortalTab) {
-      if (!emptyAssessTab) {
-        _setTab("assess")
-      } else if (!emptyLearnTab) {
-        _setTab("learn")
-      } else if (!emptyManageTab) {
-        _setTab("manage")
-      } else {
-        _setTab("feed")
-      }
-    }
-    if (props.tabValue !== "portal") {
-      if (!emptyAssessTab) {
-        _setTab("assess")
-      } else if (!emptyLearnTab) {
-        _setTab("learn")
-      } else if (!emptyManageTab) {
-        _setTab("manage")
-      } else {
-        _setTab("feed")
-      }
+    } else {
+      let currentTab = tab === "assess" && emptyAssessTab ? (emptyLearnTab ? "manage" : "learn") : tab
+      _setTab(currentTab)
     }
   }
 
@@ -415,12 +396,14 @@ export default function Participant({
         )[0]
         const hiddenActivities = (tag || []).flatMap((module) => module.activities)
         const updatedActivities = (activities || []).filter((activity) => !hiddenActivities.includes(activity.id))
-        setActivities(updatedActivities)
-        checkEmptyActivities(updatedActivities)
-        checkLearnActivities(updatedActivities)
-        checkAssessActivities(updatedActivities)
-        checkManageActivities(updatedActivities)
-        checkPortalActivities(updatedActivities)
+        if (tab !== undefined || tab !== null) {
+          setActivities(updatedActivities)
+          checkEmptyActivities(updatedActivities)
+          checkLearnActivities(updatedActivities)
+          checkAssessActivities(updatedActivities)
+          checkManageActivities(updatedActivities)
+          checkPortalActivities(updatedActivities)
+        }
         if (updatedActivities.length === 0) {
           setLoading(false)
         }
