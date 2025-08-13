@@ -59,7 +59,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     initialize_opened: false,
   })
   const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
-  const [showPopup, setShowPopUp] = useState(false)
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
@@ -84,9 +83,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     if (groupActivities.length > 0) {
       setIndex(0)
-      setShowPopUp(false)
     } else {
-      setShowPopUp(true)
       setLoading(false)
     }
   }, [groupActivities])
@@ -157,32 +154,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
           />
         </Box>
       )}
-      <Dialog
-        open={!!showPopup}
-        onClose={() => {
-          setShowPopUp(false)
-        }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{`${t("Activity Group")}`}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t("There are currently no activities under this activity group. Please contact your researcher.")}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              window.location.href = `/#/participant/${participant}/assess`
-            }}
-            color="primary"
-            autoFocus
-          >
-            {`${t("Ok")}`}
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

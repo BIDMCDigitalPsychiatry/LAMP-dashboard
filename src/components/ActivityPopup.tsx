@@ -16,6 +16,8 @@ import {
   Link,
   Fab,
   Tooltip,
+  Button,
+  DialogContentText,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -226,6 +228,8 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [showPopup, setShowPopUp] = useState(false)
+
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -433,24 +437,21 @@ export default function ActivityPopup({
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
-                // const isEmptyGroupActivity =
-                //   Array.isArray(activity?.settings?.activities) && activity.settings.activities.length === 0
-                // if (isEmptyGroupActivity) {
-                //   evt.preventDefault()
-                //   enqueueSnackbar(
-                //     "There are currently no activities under this activity group. Please contact your researcher.",
-                //     {
-                //       variant: "error",
-                //     }
-                //   )
-                //   return
-                // }
+                const isEmptyGroupActivity =
+                  Array.isArray(activity?.settings?.activities) && activity?.settings?.activities?.length === 0
+                if (isEmptyGroupActivity) {
+                  evt.preventDefault()
+                  setShowPopUp(true)
+                  return
+                }
                 updateLocalStorage()
                 if (activity?.spec == "lamp.zoom_meeting") {
                   openMeetingLink(activity, evt)
+                  setShowPopUp(false)
                 } else {
                   setTimeout(() => {
                     setOpen(true)
+                    setShowPopUp(false)
                     onClose(evt, "escapeKeyDown")
                   }, 100)
                 }
@@ -492,6 +493,32 @@ export default function ActivityPopup({
           tab={"activity"}
         />
       </ResponsiveDialog>
+      <Dialog
+        open={!!showPopup}
+        onClose={() => {
+          setShowPopUp(false)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{`${t("Activity Group")}`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`${t("There are currently no activities under this activity group. Please contact your researcher.")}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+            }}
+            color="primary"
+            autoFocus
+          >
+            {`${t("Ok")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   )
 }

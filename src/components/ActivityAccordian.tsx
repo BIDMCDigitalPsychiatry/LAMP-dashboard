@@ -160,7 +160,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type) => {
+const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule) => {
   // Function to get the status of the module
   const getStatus = (module) => {
     return module.name === "Other activities"
@@ -196,7 +196,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           <Box>
             <Box display="flex" alignItems="center">
               <Typography variant="h6">{module.name}</Typography>
-              {module.name !== "Other activities" && (
+              {module.name !== "Other activities" && module.name !== "Unstarted modules" && (
                 <Tooltip
                   title={
                     favoriteIds.includes(module.id)
@@ -236,14 +236,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           </Box>
         </Grid>
         <Grid display="flex" alignItems="center" pr={1}>
-          <Fab
-            className={classes.arrowForword}
-            onClick={() => {
-              localStorage.setItem("tab", tab)
-              localStorage.setItem("lastActiveTab", type)
-              window.location.href = `/#/participant/${participant?.id ?? participant}/module/${module?.id}`
-            }}
-          >
+          <Fab className={classes.arrowForword} onClick={() => handleSubModule(module)}>
             <Icon>arrow_forward_ios</Icon>
           </Fab>
         </Grid>
@@ -253,7 +246,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setFavorites, tab }) => {
+const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setFavorites }) => {
   const classes = useStyles()
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
@@ -292,10 +285,10 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
           <Accordion expanded={false} key={index} className={classes.accordionMain}>
             {type != "activity" ? (
               <AccordionSummary id={module.id}>
-                {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type)}
+                {moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)}
               </AccordionSummary>
             ) : (
-              moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, participant, tab, type)
+              moduleAccordianContent(module, classes, tag, favoriteIds, handleFavoriteClick, handleSubModule)
             )}
           </Accordion>
         </>

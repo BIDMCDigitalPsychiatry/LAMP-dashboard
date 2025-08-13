@@ -127,7 +127,7 @@ export default function EmbeddedActivity({
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
-      // localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
       let warnings = []
       if (e.data !== null) {
         try {
@@ -305,6 +305,7 @@ export default function EmbeddedActivity({
   const activateEmbeddedActivity = async (activity) => {
     let response = "about:blank"
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
+    const lastActiveTab = localStorage.getItem("lastActiveTab")
     try {
       setSaved(false)
       setSettings({
@@ -315,6 +316,7 @@ export default function EmbeddedActivity({
         noBack: noBack,
         forward: props?.forward ?? false,
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+        activeTab: lastActiveTab,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
@@ -414,6 +416,7 @@ export default function EmbeddedActivity({
         fullScreen
         onClose={() => {
           setOpen(false)
+          console.log("Closing dialog parent")
           localStorage.removeItem("activityFromModule")
           const response =
             typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null

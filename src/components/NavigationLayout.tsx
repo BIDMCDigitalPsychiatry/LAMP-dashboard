@@ -37,6 +37,10 @@ import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
 import { useLocation } from "react-router-dom"
+import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
+import { Position } from "monaco-editor"
+import Notifications from "./Notifications"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -79,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         display: "block",
         float: "right",
+      },
+      "& .material-icons": {
+        marginRight: 8,
       },
     },
     backbtn: {
@@ -132,6 +139,12 @@ const useStyles = makeStyles((theme: Theme) =>
         [theme.breakpoints.down("sm")]: {
           paddingTop: 38,
           paddingBottom: 20,
+        },
+      },
+      "& .MuiIconButton-root": {
+        padding: 8,
+        "& .material-icons": {
+          marginRight: 0,
         },
       },
     },
@@ -190,6 +203,63 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    notificatioOuter: {
+      borderRadius: 16,
+      overflow: "visible",
+      background: "#fff",
+      marginLeft: 15,
+      marginTop: 15,
+      border: "1px solid #ebebeb",
+      "&::after": {
+        content: "''",
+        position: "absolute",
+        borderLeft: "15px solid transparent",
+        borderRight: "15px solid transparent",
+        borderBottom: "15px solid #fff",
+        top: -14,
+        right: 20,
+      },
+      "&::before": {
+        content: "''",
+        position: "absolute",
+        borderLeft: "18px solid transparent",
+        borderRight: "18px solid transparent",
+        borderBottom: "17px solid #ebebeb",
+        top: -17,
+        right: 17,
+      },
+    },
+    notificationMain: {
+      width: 400,
+      borderRadius: 16,
+      maxHeight: 400,
+      overflow: "auto",
+      "& h5": {
+        fontSize: "1.3rem",
+        display: "flex",
+        alignItems: "center",
+        fontWeight: "600  ",
+      },
+      "& .MuiDivider-root": {
+        margin: "2px 0",
+      },
+    },
+    notificationList: {
+      cursor: "pointer",
+      borderRadius: 8,
+      "& p": {
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        width: "100%",
+      },
+      "& *": {
+        cursor: "pointer",
+      },
+      "&:hover": {
+        background: "#f6f6f6",
+      },
+    },
   })
 )
 
@@ -238,8 +308,9 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
   const [researcherId, setResId] = useState(null)
   const [username, setName] = useState(null)
+  const [notifications, setNotification] = useState([])
+  const [notificationLoader, setNotificationLoader] = useState(true)
   const location = useLocation()
-
   useEffect(() => {
     LAMP.Type.getAttachment(id, "lamp.name").then((res: any) => {
       setName(res?.data ?? "")
@@ -321,7 +392,6 @@ export default function NavigationLayout({
   }
 
   const refreshMessages = async () => {
-    console.log("Fetching messages...")
     setConversations(
       Object.fromEntries(
         (
@@ -362,7 +432,27 @@ export default function NavigationLayout({
       window.location.href = `/#/researcher/${researcherId}/users`
     }
   }
+  const fetchNotifications = async (id: string) => {
+    try {
+      const result: any = await LAMP.Type.getAttachment(id, "lamp.messaging")
 
+      if (result?.message !== "404.object-not-found") {
+        setNotification(result?.data || [])
+        setNotificationLoader(false)
+      } else {
+        setNotification([])
+        setNotificationLoader(false)
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+      setNotification([])
+      setNotificationLoader(false)
+    }
+  }
+  const handleNotificationClick = (event) => {
+    handleClick(event)
+    if (id) fetchNotifications(id)
+  }
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
@@ -535,7 +625,7 @@ export default function NavigationLayout({
                 // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
                 <Box className={classes.headerRight}>
                   {hideNotifications.indexOf(activeTab) < 0 ? (
-                    <Tooltip title={`${t("Notifications")}`}>
+                    <Tooltip title={`${t("Messages")}`}>
                       <Badge
                         badgeContent={msgCount > 0 ? msgCount : undefined}
                         color="primary"
@@ -547,6 +637,44 @@ export default function NavigationLayout({
                         <Icon>comment</Icon>
                       </Badge>
                     </Tooltip>
+                  ) : (
+                    ""
+                  )}
+                </Box>
+              )}
+              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
+                <Box className={classes.headerRight}>
+                  {hideNotifications.indexOf(activeTab) < 0 ? (
+                    <>
+                      <Tooltip title={`${t("Notifications")}`}>
+                        <IconButton aria-describedby="notificationPopover" onClick={handleNotificationClick}>
+                          <Icon>notifications</Icon>
+                        </IconButton>
+                      </Tooltip>
+                      <Popover
+                        id="notificationPopover"
+                        classes={{
+                          paper: classes.notificatioOuter,
+                        }}
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={handleClose}
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "right",
+                        }}
+                        transformOrigin={{
+                          vertical: "top",
+                          horizontal: "right",
+                        }}
+                      >
+                        <Notifications
+                          notifications={notifications}
+                          notificationLoader={notificationLoader}
+                          handleClose={handleClose}
+                        />
+                      </Popover>
+                    </>
                   ) : (
                     ""
                   )}
