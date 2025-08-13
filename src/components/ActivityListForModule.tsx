@@ -13,7 +13,7 @@ import ButtonBase from "@material-ui/core/ButtonBase"
 import Grid from "@material-ui/core/Grid"
 import Icon from "@material-ui/core/Icon"
 import Box from "@mui/material/Box/Box"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import CheckCircleIcon from "@material-ui/icons/CheckCircle"
 import ReactMarkdown from "react-markdown"
 import { LinkRenderer } from "./ActivityPopup"
@@ -424,6 +424,18 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
 export default function ActivityListForModule({ ...props }) {
   const classes = useStyles()
   const { module, type, tag, favorites, setFavorites, participant, handleClickOpen, handleSubModule } = props
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+
+  useEffect(() => {
+    // Fetch favorite activities for the participant
+    ;(async () => {
+      const tag: string[] =
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+          !!y?.error ? undefined : y?.data
+        )[0] ?? []
+      setFavoriteIds(module.subActivities.filter((activity) => tag?.includes(activity.id)))
+    })()
+  }, [module])
 
   // Function to get the status of the module
   const getStatus = (module) => {
@@ -452,6 +464,7 @@ export default function ActivityListForModule({ ...props }) {
       } else {
         updatedTag = [...tag, activityId]
       }
+      // Update the favorite activities for the participant
       await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", updatedTag)
       setFavorites(updatedTag)
     } catch (error) {
@@ -481,7 +494,7 @@ export default function ActivityListForModule({ ...props }) {
                     <Typography variant="h6">{module.name}</Typography>
                     <Fab
                       className={`${classes.headerTitleIcon} ${
-                        (favorites || []).filter((f) => f?.id == module?.id).length > 0 ? "active" : ""
+                        (favorites || []).filter((f) => f == module?.id).length > 0 ? "active" : ""
                       }`}
                       onClick={(e) => {
                         e.stopPropagation()
@@ -527,7 +540,7 @@ export default function ActivityListForModule({ ...props }) {
       <Container fixed className={classes.activityDialogeContainer}>
         <Grid xl={10} container>
           <Grid container spacing={2} direction="row" wrap="wrap">
-            {renderActivities(type, tag, favorites, handleClickOpen, handleSubModule, classes, module)}
+            {renderActivities(type, tag, favoriteIds, handleClickOpen, handleSubModule, classes, module)}
           </Grid>
         </Grid>
       </Container>
