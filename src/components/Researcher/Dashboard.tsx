@@ -31,6 +31,7 @@ import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
 import Conversations from "./Conversations/Index"
+import Settings from "./Settings/Index"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -363,6 +364,19 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
+                {/* {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={tab === "settings"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/settings`)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <DataPortalIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`${t("Settings")}`} />
+                  </ListItem>
+                )} */}
                 {role == "message_coordinator" && (
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
@@ -459,6 +473,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 order={order}
               />
             )}
+            {tab === "settings" && <Settings title={null} researcherId={researcherId} />}
           </ResponsivePaper>
         )}
       </Container>

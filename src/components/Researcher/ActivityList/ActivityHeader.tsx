@@ -19,7 +19,7 @@ import ActivityStreak from "./ActivityStreak"
 import ActivityImage from "./ActivityImage"
 import BranchingSettings from "./BranchingSettings"
 
-function compress(file, width, height) {
+export function compress(file, width, height) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)

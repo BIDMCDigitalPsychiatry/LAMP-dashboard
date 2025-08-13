@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles, Icon, Link } from "@material-ui/core"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"
@@ -29,6 +29,15 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: "-50vw",
     },
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
+    settingslink: {
+      background: "#fff",
+      width: 40,
+      height: 40,
+      borderRadius: "50%",
+      padding: 8,
+      color: "#7599FF",
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -60,10 +69,16 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">{`${t("Users")}`}</Typography>
         </Box>
+
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} order={order} />
         </Box>
         <SearchBox searchData={searchData} />
+        <Box>
+          <Link href={`/#/researcher/${researcherId}/settings`} underline="none" className={classes.settingslink}>
+            <Icon>settings</Icon>
+          </Link>
+        </Box>
         <Box>
           <AddButton
             researcherId={researcherId}

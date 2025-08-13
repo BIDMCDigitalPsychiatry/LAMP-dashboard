@@ -31,11 +31,13 @@ import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
 import { getDate } from "./Researcher/ActivityList/ScheduleRow"
 import { Service } from "./DBService/DBService"
+import BannerImg from "../icons/bannerImg.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
+      overflowX: "hidden",
     },
     learn: {
       background: "#FFF9E5",
@@ -311,6 +313,64 @@ const useStyles = makeStyles((theme: Theme) =>
       "& path": { fill: "#666" },
       "& p": { margin: "2px 5px" },
     },
+    containerMain: {
+      maxWidth: "1055px !important",
+    },
+    bannerMain: {
+      background: "linear-gradient(90deg, #3E6457 0%, #61886D 49.94%, #A3B98B 95.72%)",
+      padding: "20px 150px 20px 15px",
+      borderRadius: 16,
+      position: "relative",
+      [theme.breakpoints.up("lg")]: {
+        padding: "40px 150px 40px 40px",
+      },
+      "& h6": {
+        color: "#fff",
+        [theme.breakpoints.up("lg")]: {
+          fontSize: "1rem",
+        },
+      },
+      "& h5": {
+        color: "#fff",
+        fontWeight: 400,
+        fontSize: 20,
+        "& span": {
+          fontWeight: 700,
+          [theme.breakpoints.up("lg")]: {
+            fontSize: 24,
+          },
+        },
+      },
+      "& p": {
+        color: "#fff",
+        fontWeight: 400,
+        marginTop: 24,
+        [theme.breakpoints.up("lg")]: {
+          fontSize: "1.1rem",
+        },
+      },
+    },
+    bannerImageContainer: {
+      width: 184,
+      height: 184,
+      background: "#ccc",
+      borderRadius: "50%",
+      position: "absolute",
+      right: -50,
+      overflow: "hidden",
+      display: "flex",
+      justifyContent: "center",
+      top: "8%",
+      [theme.breakpoints.up("lg")]: {
+        top: "12%",
+      },
+      "& svg": {
+        height: "100%",
+      },
+    },
+    bannerBottomContent: {
+      marginTop: 56,
+    },
   })
 )
 import locale_lang from "../locale_map.json"
@@ -324,6 +384,8 @@ import esLocale from "date-fns/locale/es"
 import enLocale from "date-fns/locale/en-US"
 import hiLocale from "date-fns/locale/hi"
 import { getSelfHelpAllActivityEvents } from "./Participant"
+import { Container } from "@mui/material"
+import { Height } from "@material-ui/icons"
 
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
@@ -810,6 +872,24 @@ export default function Feed({
 
   return (
     <div className={classes.root}>
+      <Container className={classes.containerMain}>
+        <Box className={classes.bannerMain}>
+          <Grid>
+            <Grid item>
+              <Typography variant="subtitle2"> Good Afternoon, [User]</Typography>
+            </Grid>
+            <Grid item className={classes.bannerBottomContent}>
+              <Typography variant="h5">
+                <span>Level Up:</span> Boost Your Life Skills
+              </Typography>
+              <Typography variant="body1">Select what to work on today</Typography>
+            </Grid>
+          </Grid>
+          <Box className={classes.bannerImageContainer}>
+            <img src={BannerImg} />
+          </Box>
+        </Box>
+      </Container>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
 
       <Backdrop className={classes.backdrop} open={loading}>
