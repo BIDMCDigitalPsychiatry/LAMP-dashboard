@@ -368,16 +368,15 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const [favorites, setFavorites] = useState([])
-
   useEffect(() => {
     ;(async () => {
       let tag =
-        [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0] ?? []
-      setFavorites(moduleData.filter((activity) => tag?.includes(activity.id)))
+      setFavorites(openSubModules.filter((activity) => tag?.includes(activity.id)).map((activity) => activity.id))
     })()
-  }, [])
+  }, [openSubModules])
 
   const updateIsCompleted = (subActivityId, parentString) => {
     const updateRecursive = (activities) => {
