@@ -253,7 +253,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
 }
 
 //function to create collapsible layout when module activity is selected
-const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setFavorites, tab }) => {
+const ActivityAccordion = ({ data, type, tag, participant, setFavorites, tab }) => {
   const classes = useStyles()
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 

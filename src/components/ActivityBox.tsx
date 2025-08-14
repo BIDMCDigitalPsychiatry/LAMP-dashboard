@@ -724,7 +724,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 data={moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []}
                 type={type}
                 tag={tag}
-                handleSubModule={handleSubModule}
                 participant={participant}
                 setFavorites={setFavorites}
                 tab={tab}
@@ -741,7 +740,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                   data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                   type={type}
                   tag={tag}
-                  handleSubModule={handleSubModule}
                   participant={participant}
                   setFavorites={setFavorites}
                   tab={tab}
@@ -834,7 +832,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               data={moduleData}
               type={type}
               tag={tag}
-              handleSubModule={handleSubModule}
               participant={participant}
               setFavorites={setFavorites}
               tab={tab}
@@ -849,7 +846,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                 type={type}
                 tag={tag}
-                handleSubModule={handleSubModule}
                 participant={participant}
                 setFavorites={setFavorites}
                 tab={tab}
