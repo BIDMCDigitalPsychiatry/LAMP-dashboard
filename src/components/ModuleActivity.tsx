@@ -59,6 +59,9 @@ const ModuleActivity = ({ ...props }) => {
       }
     }
     fetchData()
+    if (props.fromTab) {
+      localStorage.setItem("moduleId", moduleId)
+    }
   }, [moduleId, participant])
 
   useEffect(() => {
@@ -195,7 +198,7 @@ const ModuleActivity = ({ ...props }) => {
         }
         await addActivityData(data, 0, moduleStartTime, null)
       } else {
-        localStorage.setItem("activityFromModule", moduleId)
+        if (!props.fromTab) localStorage.setItem("activityFromModule", moduleId)
         setParentString(y?.parentString || "")
 
         setActivity(data)
@@ -363,7 +366,8 @@ const ModuleActivity = ({ ...props }) => {
     }
     setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     setOpenSubModules([moduleActivityData])
-    if (!localStorage.getItem("parentStringForSurvey")) setIndexToLoad(indexToLoad + 1)
+    const splitData = localStorage.getItem("parentStringForSurvey")?.split(">")
+    if (!splitData || splitData.length <= 1) setIndexToLoad(indexToLoad + 1)
     setLoadingModules(false)
   }
 
@@ -398,13 +402,14 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const handleClose = () => {
-    // if (indexToLoad - 1 < 0) {
-    //   window.location.reload()
-    // } else {
-    const newArr = openSubModules.slice(0, -1)
-    setOpenSubModules(newArr)
-    setIndexToLoad(indexToLoad - 1)
-    // }
+    if (props.fromTab && indexToLoad - 1 < 0) {
+      const lastActiveTab = localStorage.getItem("lastActiveTab").toLowerCase()
+      window.location.href = `/#/participant/${participant}/${lastActiveTab}`
+    } else {
+      const newArr = openSubModules.slice(0, -1)
+      setOpenSubModules(newArr)
+      setIndexToLoad(indexToLoad - 1)
+    }
   }
 
   const updateLocalStorage = () => {
@@ -458,11 +463,7 @@ const ModuleActivity = ({ ...props }) => {
           )}
         </Grid>
       </Grid>
-      {indexToLoad > -1 && !!openSubModules[indexToLoad] && (
-        // <ResponsiveDialog transient open animate fullScreen onClose={() => {
-        //   console.log("Closing dialog")
-        //   handleClose()
-        // }}>
+      {!props.fromTab && indexToLoad == 0 && !!openSubModules[indexToLoad] ? (
         <ActivityListForModule
           type={null}
           tag={null}
@@ -474,7 +475,31 @@ const ModuleActivity = ({ ...props }) => {
           classes={classes}
           module={openSubModules[indexToLoad]}
         />
-        // </ResponsiveDialog>
+      ) : ((!props.fromTab && indexToLoad > 0) || (props.fromTab && indexToLoad > -1)) &&
+        !!openSubModules[indexToLoad] ? (
+        <ResponsiveDialog
+          transient
+          open
+          animate
+          fullScreen
+          onClose={() => {
+            handleClose()
+          }}
+        >
+          <ActivityListForModule
+            type={null}
+            tag={null}
+            favorites={favorites}
+            setFavorites={setFavorites}
+            participant={participant?.id ?? participant}
+            handleClickOpen={handleClickOpen}
+            handleSubModule={handleSubModule}
+            classes={classes}
+            module={openSubModules[indexToLoad]}
+          />
+        </ResponsiveDialog>
+      ) : (
+        <></>
       )}
     </>
   )

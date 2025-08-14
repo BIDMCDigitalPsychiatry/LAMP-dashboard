@@ -28,6 +28,7 @@ import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
+import ModuleActivity from "./ModuleActivity"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -607,6 +608,34 @@ function AppRouter({ setConfirmSession, ...props }) {
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
                     }}
+                  />
+                </React.Fragment>
+              )
+            }
+          />
+
+          <Route
+            exact
+            path="/participant/:id/module/:moduleId"
+            render={(props) =>
+              !state.identity ? (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+                  <Login
+                    setIdentity={async (identity) => !!identity && (await reset(identity))}
+                    lastDomain={state.lastDomain}
+                    onComplete={() => props.history.replace("/")}
+                    setAuthenticated={setAuthenticated}
+                    setConfirmSession={setConfirmSession}
+                  />
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <ModuleActivity
+                    participant={props.match.params.id}
+                    moduleId={props.match.params.moduleId}
+                    fromTab={true}
+                    tab={state.activeTab}
                   />
                 </React.Fragment>
               )
