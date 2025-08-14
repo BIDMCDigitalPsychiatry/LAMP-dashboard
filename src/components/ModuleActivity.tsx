@@ -378,9 +378,9 @@ const ModuleActivity = ({ ...props }) => {
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0] ?? []
-      setFavorites(moduleData.filter((activity) => tag?.includes(activity.id)).map((activity) => activity.id))
+      setFavorites(openSubModules.filter((activity) => tag?.includes(activity.id)).map((activity) => activity.id))
     })()
-  }, [moduleData])
+  }, [openSubModules])
 
   const updateIsCompleted = (subActivityId, parentString) => {
     const updateRecursive = (activities) => {
