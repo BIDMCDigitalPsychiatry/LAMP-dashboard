@@ -490,6 +490,7 @@ export default function Feed({
   const [tag, setTag] = useState(null)
   const { t } = useTranslation()
   const [showFeed, setShowFeed] = useState(false)
+  const [userSettings, setUserSettings] = useState(null)
 
   useEffect(() => {
     ;(async () => {
@@ -876,17 +877,25 @@ export default function Feed({
         <Box className={classes.bannerMain}>
           <Grid>
             <Grid item>
-              <Typography variant="subtitle2"> Good Afternoon, [User]</Typography>
+              <Typography variant="subtitle2">
+                {userSettings?.bannerGreeting ?? "Good Afternoon" + ", " + participant?.id}
+              </Typography>
             </Grid>
             <Grid item className={classes.bannerBottomContent}>
               <Typography variant="h5">
-                <span>Level Up:</span> Boost Your Life Skills
+                {userSettings?.bannerHeading ?? (
+                  <>
+                    <span>Level Up:</span> Boost Your Life Skills
+                  </>
+                )}
               </Typography>
-              <Typography variant="body1">Select what to work on today</Typography>
+              <Typography variant="body1">
+                {userSettings?.bannerSubheading ?? "Select what to work on today"}
+              </Typography>
             </Grid>
           </Grid>
           <Box className={classes.bannerImageContainer}>
-            <img src={BannerImg} />
+            <img src={userSettings?.photo ?? BannerImg} />
           </Box>
         </Box>
       </Container>
