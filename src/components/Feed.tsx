@@ -386,6 +386,7 @@ import hiLocale from "date-fns/locale/hi"
 import { getSelfHelpAllActivityEvents } from "./Participant"
 import { Container } from "@mui/material"
 import { Height } from "@material-ui/icons"
+import { useLocation } from "react-router-dom"
 
 const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN"]
 
@@ -491,6 +492,14 @@ export default function Feed({
   const { t } = useTranslation()
   const [showFeed, setShowFeed] = useState(false)
   const [userSettings, setUserSettings] = useState(null)
+  const [name, setName] = useState(null)
+  const location = useLocation()
+
+  useEffect(() => {
+    LAMP.Type.getAttachment(participant?.id, "lamp.name").then((res: any) => {
+      setName(res?.data ?? "")
+    })
+  }, [location.pathname])
 
   useEffect(() => {
     ;(async () => {
@@ -878,7 +887,7 @@ export default function Feed({
           <Grid>
             <Grid item>
               <Typography variant="subtitle2">
-                {userSettings?.bannerGreeting ?? "Good Afternoon" + ", " + participant?.id}
+                {userSettings?.bannerGreeting ?? "Good Afternoon, " + (name ?? participant?.id)}
               </Typography>
             </Grid>
             <Grid item className={classes.bannerBottomContent}>

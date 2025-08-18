@@ -364,6 +364,19 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemText primary={`${t("Data Portal")}`} />
                   </ListItem>
                 )}
+                {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={tab === "settings"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/settings`)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Sensors />
+                    </ListItemIcon>
+                    <ListItemText primary={`${t("Settings")}`} />
+                  </ListItem>
+                )}
                 {/* {mode === "researcher" && (
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
