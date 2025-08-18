@@ -145,7 +145,7 @@ export default function Activity({
           setActivity(dataActivity)
           setDetails(tag ?? [])
         } else if (activity.spec === "lamp.tips") {
-          activity.settings = activity.settings.reduce((ds, d) => {
+          activity.settings = activity?.settings?.reduce((ds, d) => {
             let newD = d
             if (d.image === "") {
               newD = Object.assign({}, d, { image: defaultBase64 })

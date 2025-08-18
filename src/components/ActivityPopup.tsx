@@ -16,6 +16,8 @@ import {
   Link,
   Fab,
   Tooltip,
+  Button,
+  DialogContentText,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -31,6 +33,7 @@ import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LAMP from "lamp-core"
 import { isMobile } from "react-device-detect"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -204,6 +207,7 @@ export default function ActivityPopup({
   savedActivities,
   updateIsCompleted,
   tab,
+  updateLocalStorage,
   ...props
 }: {
   activity: any
@@ -216,6 +220,7 @@ export default function ActivityPopup({
   setFavorites?: any
   savedActivities?: any
   updateIsCompleted: Function
+  updateLocalStorage: Function
   tab?: any
 } & DialogProps) {
   const classes = useStyles()
@@ -223,6 +228,9 @@ export default function ActivityPopup({
   const [moduleActivity, setModuleActivity] = useState("")
   const [open, setOpen] = useState(false)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [showPopup, setShowPopUp] = useState(false)
+
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     if (!!activity) {
@@ -308,7 +316,6 @@ export default function ActivityPopup({
     }
     window.location.reload()
   }
-
   return (
     <React.Fragment>
       <Dialog
@@ -387,7 +394,7 @@ export default function ActivityPopup({
                     <Icon>star_rounded</Icon>
                   </Fab>
                 </Tooltip>
-              )}{" "}
+              )}
             </Typography>
           </div>
         </DialogTitle>
@@ -430,11 +437,21 @@ export default function ActivityPopup({
                   : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
               }
               onClick={(evt) => {
+                const isEmptyGroupActivity =
+                  Array.isArray(activity?.settings?.activities) && activity?.settings?.activities?.length === 0
+                if (isEmptyGroupActivity) {
+                  evt.preventDefault()
+                  setShowPopUp(true)
+                  return
+                }
+                updateLocalStorage()
                 if (activity?.spec == "lamp.zoom_meeting") {
                   openMeetingLink(activity, evt)
+                  setShowPopUp(false)
                 } else {
                   setTimeout(() => {
                     setOpen(true)
+                    setShowPopUp(false)
                     onClose(evt, "escapeKeyDown")
                   }, 100)
                 }
@@ -461,7 +478,14 @@ export default function ActivityPopup({
           </Box>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog open={!!open} animate fullScreen onClose={() => setOpen(false)}>
+      <ResponsiveDialog
+        open={!!open}
+        animate
+        fullScreen
+        onClose={() => {
+          setOpen(false)
+        }}
+      >
         <NotificationPage
           participant={participant?.id ?? participant}
           activityId={activity?.id}
@@ -469,6 +493,32 @@ export default function ActivityPopup({
           tab={"activity"}
         />
       </ResponsiveDialog>
+      <Dialog
+        open={!!showPopup}
+        onClose={() => {
+          setShowPopUp(false)
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{`${t("Activity Group")}`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {`${t("There are currently no activities under this activity group. Please contact your researcher.")}`}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowPopUp(false)
+            }}
+            color="primary"
+            autoFocus
+          >
+            {`${t("Ok")}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </React.Fragment>
   )
 }

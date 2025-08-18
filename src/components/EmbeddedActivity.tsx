@@ -127,7 +127,7 @@ export default function EmbeddedActivity({
       setResponseActivity(e?.data?.activityId)
     } else {
       let skipSaveActivity = false
-      localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
+      // localStorage.removeItem("activity-" + demoActivities[currentActivity?.spec] + "-" + currentActivity?.id)
       let warnings = []
       if (e.data !== null) {
         try {
@@ -305,6 +305,7 @@ export default function EmbeddedActivity({
   const activateEmbeddedActivity = async (activity) => {
     let response = "about:blank"
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
+    const lastActiveTab = localStorage.getItem("lastActiveTab")
     try {
       setSaved(false)
       setSettings({
@@ -315,6 +316,7 @@ export default function EmbeddedActivity({
         noBack: noBack,
         forward: props?.forward ?? false,
         is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+        activeTab: lastActiveTab,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
@@ -420,14 +422,15 @@ export default function EmbeddedActivity({
           if (response) {
             handleSaveData({ data: response })
           }
+          setResponseActivity(null)
         }}
       >
         {secondaryActivity?.spec === "lamp.module" ? (
-          <ModuleActivity type="activity" moduleId={responseActivity} participant={participant} />
+          <ModuleActivity type="activity" moduleId={secondaryActivity?.id} participant={participant} />
         ) : (
           <NotificationPage
             participant={participant?.id ?? participant}
-            activityId={responseActivity}
+            activityId={secondaryActivity?.id}
             mode={"dashboard"}
             tab={"activity"}
           />

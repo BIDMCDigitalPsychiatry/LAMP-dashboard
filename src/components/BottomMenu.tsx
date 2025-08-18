@@ -390,128 +390,136 @@ export default function BottomMenu({ ...props }) {
               onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </FeedTooltip>
-          <LearnTooltip
-            open={tabVal == 0 && (typeof tabValues[0] === "undefined" || !!tabValues[0])}
-            interactive={true}
-            className={classes.btnCursor}
-            title={
-              <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(0)}>
-                  <Icon>close</Icon>
-                </IconButton>
-                <Typography variant="h6">{`${t("Welcome to the Learn section")}`}</Typography>
-                <Typography variant="body1">{`${t(
-                  "Find useful information and practice healthy habits."
-                )}`}</Typography>
-              </React.Fragment>
-            }
-            arrow={true}
-            placement={supportsSidebar ? "right" : "top"}
-          >
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 0}
-              label={`${t("Learn")}`}
-              value={0}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationLearnSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<Learn />}
-              onChange={(_, newTab) => openTabUpdate(newTab)}
-            />
-          </LearnTooltip>
-          <AssesTooltip
-            open={tabVal == 1 && (typeof tabValues[1] === "undefined" || !!tabValues[1])}
-            interactive={true}
-            className={classes.btnCursor}
-            title={
-              <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(1)}>
-                  <Icon>close</Icon>
-                </IconButton>
-                <Typography variant="h6">{`${t("Welcome to the Assess section")}`}</Typography>
-                <Typography variant="body1">{`${t("Log feelings, behavior, and activity.")}`}</Typography>
-              </React.Fragment>
-            }
-            arrow={true}
-            placement={supportsSidebar ? "right" : "top"}
-          >
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 1}
-              label={`${t("Assess")}`}
-              value={1}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationAssessSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<Assess />}
-              onChange={(_, newTab) => openTabUpdate(newTab)}
-            />
-          </AssesTooltip>
-          <ManageTooltip
-            open={tabVal == 2 && (typeof tabValues[2] === "undefined" || !!tabValues[2])}
-            interactive={true}
-            className={classes.btnCursor}
-            title={
-              <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(2)}>
-                  <Icon>close</Icon>
-                </IconButton>
-                <Typography variant="h6">{`${t("Welcome to the Manage section")}`}</Typography>
-                <Typography variant="body1">{`${t("Take steps to refocus, reflect, and recover.")}`}</Typography>
-              </React.Fragment>
-            }
-            arrow={true}
-            placement={supportsSidebar ? "right" : "top"}
-          >
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 2}
-              label={`${t("Manage")}`}
-              value={2}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationManageSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<Manage />}
-              onChange={(_, newTab) => openTabUpdate(newTab)}
-            />
-          </ManageTooltip>
-          <PreventTooltip
-            open={tabVal == 3 && (typeof tabValues[3] === "undefined" || !!tabValues[3])}
-            interactive={true}
-            className={classes.btnCursor}
-            title={
-              <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(3)}>
-                  <Icon>close</Icon>
-                </IconButton>
-                <Typography variant="h6">{`${t("Welcome to the Portal section")}`}</Typography>
-                <Typography variant="body1">{`${t("Track progress and make connections.")}`}</Typography>
-              </React.Fragment>
-            }
-            arrow={true}
-            placement={supportsSidebar ? "right" : "top"}
-          >
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 3}
-              label={`${t("Portal")}`}
-              value={3}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationPreventSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<PreventIcon />}
-              onChange={(_, newTab) => openTabUpdate(newTab)}
-            />
-          </PreventTooltip>
+          {!props.emptyLearnTab && (
+            <LearnTooltip
+              open={tabVal == 0 && (typeof tabValues[0] === "undefined" || !!tabValues[0])}
+              interactive={true}
+              className={classes.btnCursor}
+              title={
+                <React.Fragment>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(0)}>
+                    <Icon>close</Icon>
+                  </IconButton>
+                  <Typography variant="h6">{`${t("Welcome to the Learn section")}`}</Typography>
+                  <Typography variant="body1">{`${t(
+                    "Find useful information and practice healthy habits."
+                  )}`}</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 0}
+                label={`${t("Learn")}`}
+                value={0}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationLearnSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Learn />}
+                onChange={(_, newTab) => openTabUpdate(newTab)}
+              />
+            </LearnTooltip>
+          )}
+          {!props.emptyAssessTab && (
+            <AssesTooltip
+              open={tabVal == 1 && (typeof tabValues[1] === "undefined" || !!tabValues[1])}
+              interactive={true}
+              className={classes.btnCursor}
+              title={
+                <React.Fragment>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(1)}>
+                    <Icon>close</Icon>
+                  </IconButton>
+                  <Typography variant="h6">{`${t("Welcome to the Assess section")}`}</Typography>
+                  <Typography variant="body1">{`${t("Log feelings, behavior, and activity.")}`}</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 1}
+                label={`${t("Assess")}`}
+                value={1}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationAssessSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Assess />}
+                onChange={(_, newTab) => openTabUpdate(newTab)}
+              />
+            </AssesTooltip>
+          )}
+          {!props.emptyManageTab && (
+            <ManageTooltip
+              open={tabVal == 2 && (typeof tabValues[2] === "undefined" || !!tabValues[2])}
+              interactive={true}
+              className={classes.btnCursor}
+              title={
+                <React.Fragment>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(2)}>
+                    <Icon>close</Icon>
+                  </IconButton>
+                  <Typography variant="h6">{`${t("Welcome to the Manage section")}`}</Typography>
+                  <Typography variant="body1">{`${t("Take steps to refocus, reflect, and recover.")}`}</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 2}
+                label={`${t("Manage")}`}
+                value={2}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationManageSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Manage />}
+                onChange={(_, newTab) => openTabUpdate(newTab)}
+              />
+            </ManageTooltip>
+          )}
+          {!props.emptyPortalTab && (
+            <PreventTooltip
+              open={tabVal == 3 && (typeof tabValues[3] === "undefined" || !!tabValues[3])}
+              interactive={true}
+              className={classes.btnCursor}
+              title={
+                <React.Fragment>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(3)}>
+                    <Icon>close</Icon>
+                  </IconButton>
+                  <Typography variant="h6">{`${t("Welcome to the Portal section")}`}</Typography>
+                  <Typography variant="body1">{`${t("Track progress and make connections.")}`}</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 3}
+                label={`${t("Portal")}`}
+                value={3}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationPreventSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<PreventIcon />}
+                onChange={(_, newTab) => openTabUpdate(newTab)}
+              />
+            </PreventTooltip>
+          )}
         </Drawer>
       </Box>
     </div>

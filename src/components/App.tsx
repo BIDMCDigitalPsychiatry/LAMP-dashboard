@@ -27,6 +27,8 @@ import TwoFA from "./TwoFA"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
+import Notifications from "./Notifications"
+import ModuleActivity from "./ModuleActivity"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -552,7 +554,31 @@ function AppRouter({ setConfirmSession, ...props }) {
               )
             }
           />
-
+          {/* <Route
+            exact
+            path="/participant/:id/notifications"
+            render={(props) =>
+              !state.identity ? (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
+                  <Login
+                    setIdentity={async (identity) => !!identity && (await reset(identity))}
+                    lastDomain={state.lastDomain}
+                    onComplete={() => {
+                      props.history.replace("/")
+                    }}
+                    setAuthenticated={setAuthenticated}
+                    setConfirmSession={setConfirmSession}
+                  />
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | {`${t("Notifications")}`}</PageTitle>
+                  <Notifications participant={getParticipant(props.match.params.id)?.id ?? null} from ="app"/>
+                </React.Fragment>
+              )
+            }
+          /> */}
           <Route
             exact
             path="/2fa"
@@ -582,6 +608,34 @@ function AppRouter({ setConfirmSession, ...props }) {
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
                     }}
+                  />
+                </React.Fragment>
+              )
+            }
+          />
+
+          <Route
+            exact
+            path="/participant/:id/module/:moduleId"
+            render={(props) =>
+              !state.identity ? (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+                  <Login
+                    setIdentity={async (identity) => !!identity && (await reset(identity))}
+                    lastDomain={state.lastDomain}
+                    onComplete={() => props.history.replace("/")}
+                    setAuthenticated={setAuthenticated}
+                    setConfirmSession={setConfirmSession}
+                  />
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <ModuleActivity
+                    participant={props.match.params.id}
+                    moduleId={props.match.params.moduleId}
+                    fromTab={true}
+                    tab={state.activeTab}
                   />
                 </React.Fragment>
               )
@@ -1148,7 +1202,8 @@ export default function App({ ...props }) {
           inactiveMinutes > 15 &&
           !confirmSession &&
           localStorage.getItem("isLoginPage") === "false" &&
-          localStorage.getItem("isParticipant") === "false"
+          localStorage.getItem("isParticipant") === "false" &&
+          location?.pathname !== "/"
         ) {
           setConfirmSession(true)
         }
