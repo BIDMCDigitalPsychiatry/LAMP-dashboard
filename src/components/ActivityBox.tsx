@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
@@ -582,7 +582,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }, [moduleForNotification, isParentModuleLoaded])
 
   const [favorites, setFavorites] = useState([])
-
+  const prevFavoritesLength = useRef(favorites.length)
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
     localStorage.removeItem("parentStringForSurvey")
@@ -664,16 +664,27 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         localStorage.removeItem("tab")
       }, 1000)
     } else {
-      if (favorites.length > 0) {
-        if (typeof favorites[0]?.id == "undefined") {
-          setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
+      const prevFavCount = prevFavoritesLength.current
+      const currFavCount = favorites.length
+
+      const isUnfavoritingWhileOnModules = tab === "modules" && currFavCount < prevFavCount
+
+      if (!isUnfavoritingWhileOnModules) {
+        if (favorites.length > 0) {
+          if (typeof favorites[0]?.id == "undefined") {
+            setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
+          }
+          setTab("favorite")
+        } else {
+          setTab(
+            (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
+              ? "modules"
+              : "other"
+          )
         }
-        setTab("favorite")
-      } else {
-        setTab(
-          (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0 ? "modules" : "other"
-        )
       }
+
+      prevFavoritesLength.current = currFavCount
     }
   }, [favorites])
 
@@ -698,7 +709,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const updateLocalStorage = () => {
     if (!!parentString) localStorage.setItem("parentString", parentString)
   }
-
   return (
     <Box>
       <TabContext value={tab}>
@@ -736,7 +746,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
               .filter((activity) => activity.spec == "lamp.module")
               ?.filter((activity) => favorites.includes(activity)).length > 0 ? (
               <>
-                <h3> Unstarted Modules</h3>
+                <h3>Unstarted Modules</h3>
                 <ActivityAccordian
                   data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                   type={type}
@@ -844,7 +854,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           )}
           {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
             <>
-              <h3> Unstarted Modules</h3>
+              <h3>Unstarted Modules</h3>
               <ActivityAccordian
                 data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
                 type={type}
