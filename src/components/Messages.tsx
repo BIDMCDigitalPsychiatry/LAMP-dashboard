@@ -207,7 +207,6 @@ export default function Messages({
   }
 
   const refreshMessages = async () => {
-    console.log("Fetching messages...")
     setConversations(
       Object.fromEntries(
         (
@@ -223,13 +222,13 @@ export default function Messages({
       )
     )
   }
-
   useEffect(() => {
     getMessages()
   }, [conversations])
 
   const getMessages = () => {
     let x = (conversations || {})[participant || ""] || []
+
     return !Array.isArray(x) ? [] : x
   }
 

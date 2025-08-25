@@ -190,7 +190,6 @@ export default function Messages({
   }
 
   const refreshMessages = async () => {
-    console.log("Fetching messages...")
     setConversations(
       Object.fromEntries(
         (

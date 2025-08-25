@@ -291,7 +291,6 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
     },
     languageObjects[getSelectedLanguage()]
   )
-
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form

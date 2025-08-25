@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Grid, Tooltip, Icon, Fab, makeStyles, Theme, createStyles, ThemeProvider } from "@material-ui/core"
 import { createTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
@@ -28,7 +28,17 @@ const theme = createTheme({
   },
 })
 
-export default function TipFooter({ value, isError, isDuplicate, duplicateTipText, validate, handleType, ...props }) {
+export default function TipFooter({
+  value,
+  isError,
+  isDuplicate,
+  validate,
+  handleType,
+  text,
+  setIsDuplicate,
+  checkForDuplicateName,
+  ...props
+}) {
   const { t } = useTranslation()
   const classes = useStyles()
 
@@ -39,7 +49,6 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
   useEffect(() => {
     validate()
   }, [isError])
-
   return (
     <Grid
       container
@@ -57,9 +66,9 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
                 aria-label="Duplicate"
                 variant="extended"
                 onClick={() => {
-                  if (validate()) handleType(1)
+                  if (validate()) handleType(1, true)
                 }}
-                disabled={!isError || (value && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""}
+                disabled={!isError || !value || text === "" || value.name === text}
               >
                 {`${t("Duplicate")}`}
                 <span style={{ width: 8 }} />
@@ -79,9 +88,11 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
               aria-label="Save"
               variant="extended"
               onClick={() => {
-                if (validate()) handleType(2)
+                const hasDuplicate = checkForDuplicateName()
+                if (hasDuplicate) return
+                if (validate()) handleType(2, false)
               }}
-              disabled={!isError}
+              disabled={!isError || text === ""}
             >
               {`${t("Save")}`}
               <span style={{ width: 8 }} />

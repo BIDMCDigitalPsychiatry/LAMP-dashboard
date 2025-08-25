@@ -1,6 +1,17 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { makeStyles, Box, Backdrop, CircularProgress } from "@material-ui/core"
+import {
+  makeStyles,
+  Box,
+  Backdrop,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core"
 import LAMP from "lamp-core"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
@@ -48,7 +59,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     initialize_opened: false,
   })
   const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
-
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
@@ -71,7 +81,11 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [index, favoriteActivities])
 
   useEffect(() => {
-    if (groupActivities.length > 0) setIndex(0)
+    if (groupActivities.length > 0) {
+      setIndex(0)
+    } else {
+      setLoading(false)
+    }
   }, [groupActivities])
 
   useEffect(() => {

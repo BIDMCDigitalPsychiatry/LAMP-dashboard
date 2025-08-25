@@ -150,7 +150,6 @@ export default function Tips({
   const [loading, setLoading] = useState(false)
   const [categoryArray, setCategoryArray] = useState([])
   const [newTipText, setNewTipText] = useState("")
-  const [duplicateTipText, setDuplicateTipText] = useState("")
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [isDuplicate, setIsDuplicate] = useState(false)
@@ -206,10 +205,6 @@ export default function Tips({
   useEffect(() => {
     if (category === "add_new") validate()
   }, [newTipText])
-
-  useEffect(() => {
-    if (isDuplicate) validate()
-  }, [duplicateTipText])
 
   useEffect(() => {
     setLoading(true)
@@ -360,11 +355,11 @@ export default function Tips({
     let duplicates = []
     if (
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
-      (typeof duplicateTipText !== "undefined" && duplicateTipText?.trim() !== "")
+      (typeof text !== "undefined" && text?.trim() !== "")
     ) {
       duplicates = categoryArray.filter((x) =>
         !!value
-          ? x.name?.toLowerCase() === duplicateTipText?.trim().toLowerCase()
+          ? x.name?.toLowerCase() === text?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       )
       if (duplicates.length > 0) {
@@ -372,7 +367,7 @@ export default function Tips({
         return false
       }
     }
-    let settingsObj = data.settings.reduce((ds, d) => {
+    let settingsObj = data?.settings?.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -384,7 +379,7 @@ export default function Tips({
       ? onSave(
           {
             id: undefined,
-            name: duplicate ? duplicateTipText : newTipText,
+            name: duplicate ? text : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,
@@ -416,7 +411,7 @@ export default function Tips({
 
   const handleSaveTipsData = () => {
     let duplicate = isDuplicate
-    let settingsObj = data.settings.reduce((ds, d) => {
+    let settingsObj = data?.settings?.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -427,7 +422,7 @@ export default function Tips({
       category === "add_new" || duplicate
         ? {
             id: undefined,
-            name: duplicate ? duplicateTipText : newTipText,
+            name: duplicate ? text : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,
@@ -439,6 +434,7 @@ export default function Tips({
           }
         : {
             id: value?.id || category ? category : undefined,
+            name: text,
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,
@@ -455,6 +451,32 @@ export default function Tips({
     validate()
   }, [data])
 
+  const checkForDuplicateName = () => {
+    let duplicates = []
+    if (
+      (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
+      (typeof text !== "undefined" && text?.trim() !== "")
+    ) {
+      duplicates = categoryArray.filter((x) => {
+        if (!!value) {
+          // EDIT MODE
+          const isSameName = x.name?.toLowerCase() === text?.trim().toLowerCase()
+          const isSameItem = x.id === value.id
+          return isSameName && !isSameItem
+        } else {
+          // CREATE MODE
+          return x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
+        }
+      })
+
+      if (duplicates.length > 0) {
+        enqueueSnackbar(`${t("Activity with same name already exist.")}`, { variant: "error" })
+        return true
+      }
+    }
+
+    return false
+  }
   const validate = () => {
     let validationData = false
     if (Object.keys(data.settings).length > 0) {
@@ -489,47 +511,53 @@ export default function Tips({
     let duplicates = []
     if (
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
-      (typeof duplicateTipText !== "undefined" && duplicateTipText?.trim() !== "")
+      (typeof text !== "undefined" && text?.trim() !== "")
     ) {
       duplicates = categoryArray.filter((x) => {
         return !!value
-          ? x.name?.toLowerCase() === duplicateTipText?.trim().toLowerCase()
+          ? x.name?.toLowerCase() === text?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       })
     }
     !(
-      typeof studyId == "undefined" ||
-      studyId === null ||
-      studyId === "" ||
-      typeof category == "undefined" ||
-      category === null ||
-      category === "" ||
-      (category == "add_new" && (newTipText === null || newTipText === "")) ||
-      validationData ||
-      (data.settings && data.settings.length === 0) ||
-      duplicates.length > 0
+      (
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        typeof category == "undefined" ||
+        category === null ||
+        category === "" ||
+        (category == "add_new" && (newTipText === null || newTipText === "")) ||
+        validationData ||
+        (data.settings && data.settings.length === 0)
+      )
+      // ||
+      // duplicates.length > 0
     )
       ? setIsError(true)
       : setIsError(false)
 
     return !(
-      typeof studyId == "undefined" ||
-      studyId === null ||
-      studyId === "" ||
-      typeof category == "undefined" ||
-      category === null ||
-      category === "" ||
-      (category == "add_new" && (newTipText === null || newTipText === "")) ||
-      (data.settings && data.settings.length === 0) ||
-      validationData ||
-      duplicates.length > 0
+      (
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        typeof category == "undefined" ||
+        category === null ||
+        category === "" ||
+        (category == "add_new" && (newTipText === null || newTipText === "")) ||
+        (data.settings && data.settings.length === 0) ||
+        validationData
+      )
+      // ||
+      // duplicates.length > 0
     )
   }
 
-  const handleType = (val) => {
+  const handleType = (val, isDuplicate) => {
+    setIsDuplicate(isDuplicate)
     val === 1 ? handleSaveTips(isDuplicate) : handleSaveTipsData()
   }
-
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -608,55 +636,78 @@ export default function Tips({
                   </TextField>
                 </Grid>
 
-                <Grid item lg={6} sm={4} xs={12}>
-                  <TextField
-                    error={typeof category == "undefined" || category === null || category === "" ? true : false}
-                    id="filled-select-currency"
-                    select
-                    label={`${t("Tip")}`}
-                    value={category || ""}
-                    onChange={(event) => {
-                      setCategory(event.target.value)
-                      validate()
-                    }}
-                    helperText={
-                      typeof category == "undefined" || category === null || category === ""
-                        ? `${t("Please select the tip")}`
-                        : ""
-                    }
-                    variant="filled"
-                    disabled={!!value ? true : false}
-                  >
-                    <MenuItem value="add_new" key="add_new">
-                      {`${t("Add New")}`}
-                    </MenuItem>
-                    {categoryArray.map((x, idx) => (
-                      <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs sm={12}>
-                  {category === "add_new" ? (
-                    <TextField
-                      error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
-                      fullWidth
-                      variant="filled"
-                      label={`${t("New Tip")}`}
-                      defaultValue={newTipText}
-                      onChange={(event) => {
-                        setNewTipText(event.target.value)
-                      }}
-                      helperText={
-                        category == "add_new" && (newTipText === null || newTipText === "")
-                          ? `${t("Please add new tip.")}`
-                          : ""
-                      }
-                    />
-                  ) : (
-                    ""
-                  )}
-                </Grid>
-                {!!value ? (
+                {study !== null || value !== null ? (
+                  <>
+                    <Grid item lg={6} sm={4} xs={12}>
+                      <TextField
+                        error={text === "" || text === null || text === undefined ? true : false}
+                        fullWidth
+                        variant="filled"
+                        label={`${t("Tip")}`}
+                        value={text || ""}
+                        onChange={(event) => {
+                          setText(event.target.value)
+                          setNewTipText(event.target.value)
+                        }}
+                        helperText={
+                          text === "" || text === null || text === undefined ? `${t("Tip name cannot be empty.")}` : ""
+                        }
+                      />
+                    </Grid>
+                  </>
+                ) : (
+                  <>
+                    <Grid item lg={6} sm={4} xs={12}>
+                      <TextField
+                        error={typeof category == "undefined" || category === null || category === "" ? true : false}
+                        id="filled-select-currency"
+                        select
+                        label={`${t("Tip")}`}
+                        value={category || ""}
+                        onChange={(event) => {
+                          setCategory(event.target.value)
+                          validate()
+                        }}
+                        helperText={
+                          typeof category == "undefined" || category === null || category === ""
+                            ? `${t("Please select the tip")}`
+                            : ""
+                        }
+                        variant="filled"
+                        disabled={!!value ? true : false}
+                      >
+                        <MenuItem value="add_new" key="add_new">
+                          {`${t("Add New")}`}
+                        </MenuItem>
+                        {categoryArray.map((x, idx) => (
+                          <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs sm={12}>
+                      {category === "add_new" ? (
+                        <TextField
+                          error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
+                          fullWidth
+                          variant="filled"
+                          label={`${t("New Tip")}`}
+                          defaultValue={newTipText}
+                          onChange={(event) => {
+                            setNewTipText(event.target.value)
+                          }}
+                          helperText={
+                            category == "add_new" && (newTipText === null || newTipText === "")
+                              ? `${t("Please add new tip.")}`
+                              : ""
+                          }
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </Grid>
+                  </>
+                )}
+                {/* {!!value ? (
                   <Grid container>
                     <Grid item xs sm={6} md={4} lg={3}>
                       <Box mt={2}>
@@ -699,7 +750,7 @@ export default function Tips({
                   </Grid>
                 ) : (
                   ""
-                )}
+                )} */}
               </Grid>
               <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
             </Grid>
@@ -753,9 +804,11 @@ export default function Tips({
         value={value}
         isError={isError}
         isDuplicate={isDuplicate}
-        duplicateTipText={duplicateTipText}
         validate={validate}
         handleType={handleType}
+        text={text}
+        setIsDuplicate={setIsDuplicate}
+        checkForDuplicateName={checkForDuplicateName}
       />
     </Grid>
   )
