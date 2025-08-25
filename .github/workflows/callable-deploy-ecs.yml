@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       env:
-        description: Target environment of deployment. (stg, prod)
+        description: Target environment of deployment. (dev, stg, prod)
         required: true
         type: string
       container_digest:

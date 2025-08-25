@@ -18,12 +18,12 @@ jobs:
     with:
       push: true
 
-  deploy-env-stg:
-    name: "Deploy Staging"
+  deploy-env-dev:
+    name: "Deploy Development"
     uses: ./.github/workflows/callable-deploy-ecs.yml
     secrets: inherit
     with:
-      env: stg
+      env: dev
       container_digest: ${{ needs.build-docker.outputs.container_image_digest }}
     needs: 
       - build-docker

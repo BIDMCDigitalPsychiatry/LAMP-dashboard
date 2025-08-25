@@ -8,7 +8,7 @@ on:
         description: Git sha (long format) to build and deploy
       env:
         type: environment
-        default: stg
+        default: dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.sha }}
