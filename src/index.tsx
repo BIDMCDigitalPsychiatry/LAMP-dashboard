@@ -50,7 +50,9 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
   ;(window.CustomEvent as any) = CustomEvent
 })()
 
-if (process.env.USE_HTTPS) {
+// Enable lamp-core's dev mode in order to make server requests over http
+console.log(process.env, process.env.USE_HTTPS)
+if (process.env.REACT_APP_USE_HTTPS === "false") {
   LAMP.enableDevMode()
 }
 
