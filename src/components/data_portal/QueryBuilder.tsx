@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next"
 import { useDrop } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
+import { buildLampServerRequestUrl } from "../../utilities"
 
 const useStyles = makeStyles((theme) => ({
   loadingBackdrop: {
@@ -170,13 +171,14 @@ export default function QueryBuilder(props) {
     setSelectedSharedTags([])
     setSharedTags([])
     setLoadingStatuses(false)
+    const baseUrl = buildLampServerRequestUrl(props.token.server)
     if (props.focusMe && typeof props.focusMe === "function") props.focusMe()
     props.setQueryResult("")
     if (currentQuery.target.length !== 0) {
       let testQuery = `$LAMP.Tag.list('${currentQuery.target}')`
       let tagSending = {
         method: "POST",
-        url: `https://${props.token.server}/`,
+        url: baseUrl,
         headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
         data: testQuery,
         callback: function (res) {
@@ -192,7 +194,7 @@ export default function QueryBuilder(props) {
         ].toLowerCase()}_tags'))`
         let sharedSending = {
           method: "POST",
-          url: `https://${props.token.server}/`,
+          url: baseUrl,
           headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
           data: sharedQuery,
           callback: function (res) {
@@ -229,7 +231,7 @@ export default function QueryBuilder(props) {
 
       let sending = {
         method: "POST",
-        url: `https://${props.token.server}/`,
+        url: buildLampServerRequestUrl(props.token.server),
         headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
         data: tagQuery,
         callback: function (res) {
@@ -383,7 +385,7 @@ export default function QueryBuilder(props) {
 
           let sending = {
             method: "POST",
-            url: `https://${props.token.server}/`,
+            url: buildLampServerRequestUrl(props.token.server),
             headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
             data: tagQuery,
             callback: function (res) {

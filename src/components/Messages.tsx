@@ -19,6 +19,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Alert } from "@mui/material"
+import { buildLampServerRequestUrl } from "../utilities"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -132,7 +133,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const fetchCoordinators = async (participant) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${participant}/cordinators`, {

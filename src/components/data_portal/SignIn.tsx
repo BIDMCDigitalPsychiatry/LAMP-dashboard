@@ -2,6 +2,7 @@ import React from "react"
 import { Typography, Button, Icon, TextField, Container, Avatar, makeStyles } from "@material-ui/core"
 import { ajaxRequest } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
+import { buildLampServerRequestUrl } from "../../utilities"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -55,7 +56,7 @@ export default function SignIn({ onSubmit, ...props }) {
           let sending = {
             method: "GET",
             //@ts-ignore: This property will be created by the form (see line 37)
-            url: `https://${data.server}/researcher/me`,
+            url: buildLampServerRequestUrl(data.server, "/researcher/me"),
             //@ts-ignore: This property will be created by the form (see line 37)
             headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
             callback: readyUser,
@@ -95,7 +96,7 @@ export default function SignIn({ onSubmit, ...props }) {
     let sending = {
       method: "GET",
       //@ts-ignore: This property will be created by the form (see line 37)
-      url: `https://${data.server}/type/me/parent`,
+      url: buildLampServerRequestUrl(data.server, "/type/me/parent"),
       //@ts-ignore: This property will be created by the form (see line 37)
       headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
       callback: setUser,

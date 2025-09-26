@@ -8,3 +8,7 @@ build-storybook.log
 build
 storybook-static
 .env
+
+# Editor config files
+.idea
+.vscode

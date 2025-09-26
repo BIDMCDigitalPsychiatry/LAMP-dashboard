@@ -67,6 +67,7 @@ function writeFile() {
                 `REACT_APP_GIT_SHA=${description}`,
                 `REACT_APP_LATEST_LAMP=${latest}`,
                 isDev ? "BROWSER=none" : "CI=false",
+                `USE_HTTPS=${isDev ? false : true}`,
               ].join("\r\n")
             )
               .then(() => resolve(true))
