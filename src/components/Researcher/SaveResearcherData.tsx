@@ -12,7 +12,7 @@ interface StudyObject {
   sensors: Array<any>
 }
 export const fetchResult = async (id, type, modal) => {
-  const baseUrl = "http://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {

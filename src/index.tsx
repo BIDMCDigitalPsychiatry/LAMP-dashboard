@@ -51,7 +51,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
 })()
 
 // Enable lamp-core's dev mode in order to make server requests over http
-console.log(process.env, process.env.USE_HTTPS)
 if (process.env.REACT_APP_USE_HTTPS === "false") {
   LAMP.enableDevMode()
 }
