@@ -3,6 +3,7 @@ import { Typography, Button, Icon, TextField, Container, Avatar, makeStyles } fr
 import { ajaxRequest } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
 import { buildLampServerRequestUrl } from "../../utilities"
+import { useAuthContext } from "../AuthProvider"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -29,7 +30,7 @@ export default function SignIn({ onSubmit, ...props }) {
   const [isLoading, setLoading] = React.useState(false)
   const [error, setError] = React.useState("")
   const { t } = useTranslation()
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+  const { authorizationHeader } = useAuthContext()
   function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
@@ -58,7 +59,7 @@ export default function SignIn({ onSubmit, ...props }) {
             //@ts-ignore: This property will be created by the form (see line 37)
             url: buildLampServerRequestUrl(data.server, "/researcher/me"),
             //@ts-ignore: This property will be created by the form (see line 37)
-            headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+            headers: [["Authorization", authorizationHeader]],
             callback: readyUser,
           }
           ajaxRequest(sending)
@@ -98,7 +99,7 @@ export default function SignIn({ onSubmit, ...props }) {
       //@ts-ignore: This property will be created by the form (see line 37)
       url: buildLampServerRequestUrl(data.server, "/type/me/parent"),
       //@ts-ignore: This property will be created by the form (see line 37)
-      headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+      headers: [["Authorization", authorizationHeader]],
       callback: setUser,
       alternateCallback: testAdmin,
     }

@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { useAuthContext } from "../../AuthProvider"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -163,6 +164,7 @@ export default function Conversations({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const { isLoggedIn } = useAuthContext()
 
   const { t } = useTranslation()
 
@@ -186,11 +188,7 @@ export default function Conversations({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+    if (isLoggedIn || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchParticipants()
       } else {
@@ -200,7 +198,7 @@ export default function Conversations({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected, isLoggedIn])
 
   const handleChange = (participant, checked) => {
     if (checked) {

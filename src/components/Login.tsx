@@ -32,6 +32,7 @@ import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
 import { clearLocalStorageItems } from "./helper"
+import { useAuthContext } from "./AuthProvider"
 
 type SuggestedUrlOption = {
   label: string
@@ -87,7 +88,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
-  const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -99,6 +99,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const LOGIN_ATTEMPTS_KEY = "loginAttempts"
   const LOCKOUT_TIME_KEY = "lockoutTime"
   const [isLockedOut, setIsLockedOut] = useState(false)
+  const { setIsLoggedIn } = useAuthContext()
 
   useEffect(() => {
     setConfirmSession(false)
@@ -164,25 +165,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  const generateTokens = async (args: { id: string; password: string }) => {
-    setLoginClick(false)
-    const userName = args?.id?.trim()
-    const password = args?.password?.trim()
-
-    if (userName && password) {
-      try {
-        const res = await LAMP.Credential.login(userName, password)
-        sessionStorage.setItem(
-          userTokenKey,
-          JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-        )
-        props?.setAuthenticated(true)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
-
   const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (attempts >= MAX_ATTEMPTS) {
@@ -214,12 +196,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       })
       return
     }
+
+    let res: any
     if (!mode) {
-      await LAMP.Auth.set_identity({
-        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-        password: !!mode ? "demo" : state.password,
-        serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-      }).catch((err) => {
+      try {
+        res = await setIdentity({
+          id: state.id,
+          password: state.password,
+          serverAddress: state.serverAddress,
+        })
+      } catch (err) {
+        // Failed login throws an error
         const currentAttempts = attempts + 1
         localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
         if (currentAttempts >= MAX_ATTEMPTS) {
@@ -236,17 +223,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               variant: "info",
             })
         }
-      })
-      await generateTokens({
-        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-        password: !!mode ? "demo" : state.password,
+      }
+      setLoginClick(false)
+    } else {
+      res = await setIdentity({
+        id: `${mode}@demo.lamp.digital`,
+        password: "demo",
+        serverAddress: "demo.lamp.digital",
       })
     }
-    const res = await setIdentity({
-      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-      password: !!mode ? "demo" : state.password,
-      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-    })
 
     if (res.authType === "participant") {
       await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))

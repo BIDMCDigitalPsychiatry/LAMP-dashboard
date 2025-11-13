@@ -33,6 +33,7 @@ import LAMP, {
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
+import { useAuthContext } from "./AuthProvider"
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -300,6 +301,7 @@ export default function Participant({
   let startTime = prevDate.getTime()
   const [startDate, setStartDate] = React.useState<number>(startTime)
   const [endDate, setEndDate] = React.useState<number>(endTime)
+  const { isLoggedIn } = useAuthContext()
 
   useEffect(() => {
     setLoading(true)
@@ -422,16 +424,12 @@ export default function Participant({
     tempHideCareTeam(participant).then(setHideCareTeam)
   }
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+    if (isLoggedIn || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       loadData()
     } else {
       window.location.href = "/#/"
     }
-  }, [sessionStorage.getItem("tokenInfo")])
+  }, [isLoggedIn])
 
   useEffect(() => {
     loadData()

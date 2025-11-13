@@ -39,7 +39,7 @@ export default function NewPatientDetail({ id, ...props }: { id: string }) {
                   variant="outlined"
                   size="small"
                   label={`${t("Temporary email address")}`}
-                  value={`${id}@lamp.com`}
+                  value={`${id}@digitalpsych.org`}
                 />
                 <Box style={{ height: 16 }} />
                 <TextField variant="outlined" size="small" label={`${t("Temporary password")}`} value={`${id}`} />
@@ -49,14 +49,14 @@ export default function NewPatientDetail({ id, ...props }: { id: string }) {
                     label={`${t("One-time login link")}`}
                     style={{ marginTop: 16 }}
                     variant="outlined"
-                    value={_qrLink(`${id}@lamp.com`, id)}
+                    value={_qrLink(`${id}@digitalpsych.org`, id)}
                     onChange={(event) => {}}
                   />
                   <Tooltip
                     title={`${t("Scan this QR code on a mobile device to automatically open a user dashboard.")}`}
                   >
                     <Grid container justifyContent="center" style={{ padding: 16 }}>
-                      <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
+                      <QRCode size={256} level="H" value={_qrLink(`${id}@digitalpsych.org`, id)} />
                     </Grid>
                   </Tooltip>
                 </Grid>
