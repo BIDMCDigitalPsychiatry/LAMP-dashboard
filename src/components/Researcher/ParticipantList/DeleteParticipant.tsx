@@ -35,13 +35,13 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
   const [confirmationDialog, setConfirmationDialog] = useState(0)
   let deleteParticipants = async (status) => {
     if (status === "Yes") {
-      const participantIds = participants.map((p) => {
+      const participantIds = participants?.map((p) => {
         return p.id
       })
       for (let participant of participants) {
         await LAMP.Credential.list(participant.id).then((cred) => {
-          cred = cred.filter((c) => c.hasOwnProperty("origin"))
-          cred.map(async (each) => {
+          cred = cred?.filter((c) => c.hasOwnProperty("origin"))
+          cred?.map(async (each) => {
             await LAMP.Credential.delete(participant.id, each["access_key"])
           })
         })

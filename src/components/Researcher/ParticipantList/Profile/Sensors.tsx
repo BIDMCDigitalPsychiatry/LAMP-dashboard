@@ -7,6 +7,7 @@ import SensorRow from "./SensorRow"
 import DeleteSensor from "../../SensorsList/DeleteSensor"
 import { sortData } from "../../Dashboard"
 import Pagination from "../../../PaginatedElement"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -43,6 +44,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
   const [paginatedSensors, setPaginatedSensors] = useState([])
   const [rowCount, setRowCount] = useState(10)
   const [page, setPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
 
   useEffect(() => {
     let params = JSON.parse(localStorage.getItem("profile-sensors"))
@@ -51,23 +53,27 @@ export default function Sensors({ participant, studies, ...props }: { participan
     onChangeSensors()
   }, [])
 
-  const onChangeSensors = () => {
-    Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
-      let result = sortData(sensors, [participant.study_name], "name")
-      setSensors(result)
+  const onChangeSensors = async () => {
+    // Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
+    //   let result = sortData(sensors, [participant.study_name], "name")
+    //   setSensors(result)
+    // })
+    await LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
+      setSensors(sensors)
     })
     setSelectedSensors([])
   }
 
   useEffect(() => {
-    setPaginatedSensors((sensors || []).slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedSensors((sensors || [])?.slice(page * rowCount, page * rowCount + rowCount))
+    setTotalCount(sensors?.length)
   }, [sensors])
 
   const deleteSensors = () => {
-    const sensorIds = selectedSensors.map((s) => {
+    const sensorIds = selectedSensors?.map((s) => {
       return s.id
     })
-    let newSensors = (sensors || []).filter((i) => sensorIds.includes(i.id))
+    let newSensors = (sensors || [])?.filter((i) => sensorIds.includes(i.id))
     setSensors(newSensors)
   }
 
@@ -76,7 +82,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
       setSelectedSensors((prevState) => [...prevState, sensor])
     } else {
       let selected = selectedSensors
-      selected = selected.filter((item) => item.id != sensor.id)
+      selected = selected?.filter((item) => item.id != sensor.id)
       setSelectedSensors(selected)
     }
   }
@@ -85,7 +91,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
     setRowCount(rowCount)
     setPage(page)
     localStorage.setItem("profile-sensors", JSON.stringify({ page: page, rowCount: rowCount }))
-    setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedSensors(sensors?.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -100,7 +106,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
           <AddSensor studies={studies} studyId={participant.study_id} setSensors={onChangeSensors} />
         </Box>
       </Box>
-      {(selectedSensors || []).length > 0 && (
+      {(selectedSensors || [])?.length > 0 && (
         <Box className={classes.optionsMain}>
           <DeleteSensor
             sensors={selectedSensors}
@@ -115,7 +121,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
       <Grid container spacing={0}>
         <Grid item xs={12} sm={12}>
           <Box p={1}>
-            {(sensors || []).length > 0 ? (
+            {(sensors || [])?.length > 0 ? (
               <Grid container>
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
@@ -135,7 +141,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
             )}
           </Box>
           <Grid container>
-            {(paginatedSensors ?? []).map((item, index) => (
+            {(paginatedSensors ?? [])?.map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <SensorRow
                   studies={studies}
@@ -155,6 +161,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
                 currentRowCount={rowCount}
                 currentPage={page}
                 type={1}
+                totalCount={totalCount}
               />
             )}
           </Grid>

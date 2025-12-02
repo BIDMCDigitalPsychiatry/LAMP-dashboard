@@ -47,46 +47,71 @@ export default function DeleteActivity({
 
   useEffect(() => {
     if (!!profile) {
-      LAMP.Participant.allByStudy(activities[0].study_id).then((result) => {
-        setParticipantCount(result.length)
-      })
+      const studyId = activities && activities[0]?.studyId
+      if (studyId) {
+        LAMP.Participant.allByStudy(studyId).then((result) => {
+          setParticipantCount(result?.length)
+        })
+      }
     }
   }, [])
 
+  // const confirmAction = async (status) => {
+  //   if (status === "Yes") {
+  //     let activityIds = activities?.map((a) => {
+  //       return a.id
+  //     })
+  //     for (let activity of activities) {
+  //       let tag
+  //       if (activity.spec === "lamp.survey") {
+  //         tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
+  //       } else {
+  //         tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
+  //       }
+  //       if (activity.spec === "lamp.module" || activity.spec === "lamp.group") {
+  //         let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")]?.map((y: any) =>
+  //           !!y?.error ? undefined : y?.data
+  //         )[0]
+  //         let hidden = (tag || []).filter((t) => t.moduleId !== activity.id)
+  //         await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
+  //       }
+  //       await LAMP.Activity.delete(activity.id)
+  //       if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital")
+  //         Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
+  //     }
+  //     if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") Service.delete("activities", activityIds)
+  //     setActivities()
+  //     enqueueSnackbar(`${t("Successfully deleted the selected Activities.")}`, {
+  //       variant: "success",
+  //     })
+  //   }
+  //   setConfirmationDialog(0)
+  // }
   const confirmAction = async (status) => {
     if (status === "Yes") {
-      let activityIds = activities.map((a) => {
+      let activityIds = activities?.map((a) => {
         return a.id
       })
-      for (let activity of activities) {
-        let tag
-        if (activity.spec === "lamp.survey") {
-          tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
-        } else {
-          tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
+      if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+        for (let activity of activities) {
+          Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
         }
-        if (activity.spec === "lamp.module" || activity.spec === "lamp.group") {
-          let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
-            !!y?.error ? undefined : y?.data
-          )[0]
-          let hidden = (tag || []).filter((t) => t.moduleId !== activity.id)
-          await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
-        }
-        console.dir("deleted tag " + JSON.stringify(tag))
-        await LAMP.Activity.delete(activity.id)
-        Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
+        Service.delete("activities", activityIds)
+      } else {
+        LAMP.Activity.deleteActivities({ activities: activityIds })
       }
-      Service.delete("activities", activityIds)
       setActivities()
       enqueueSnackbar(`${t("Successfully deleted the selected Activities.")}`, {
         variant: "success",
       })
+    } else {
+      setActivities()
+      setConfirmationDialog(0)
     }
-    setConfirmationDialog(0)
   }
 
   return (
-    <span>
+    <>
       <Fab
         variant="extended"
         size="small"
@@ -108,6 +133,6 @@ export default function DeleteActivity({
             : `${t("Are you sure you want to delete this Activity?.")}`
         }
       />
-    </span>
+    </>
   )
 }

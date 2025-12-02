@@ -134,18 +134,25 @@ export default function PatientProfile({
       let ext = ((await LAMP.Type.getAttachment(participantId, `${prefix}.external`)) as any).data
       let int = ((await LAMP.Type.getAttachment(participantId, `${prefix}`)) as any).data
       setExt(Object.keys(ext ?? {}))
-      setAllRoles(Object.assign(ext ?? {}, int ?? {}))
+      setAllRoles(Object?.assign(ext ?? {}, int ?? {}))
       setLoading(false)
     })()
   }
 
   useEffect(() => {
-    Service.getDataByKey("participants", [participantId], "id").then((data) => {
-      setParticipant(data[0])
+    LAMP.Participant.view(participantId).then((data) => {
+      setParticipant(data)
     })
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-    })
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      Service.getAll("studies").then((studies: any[]) => {
+        setStudies(studies)
+      })
+    } else {
+      LAMP.Study.allByResearcher(researcherId).then((studies: any[]) => {
+        setStudies(studies)
+      })
+    }
+
     onChangeAccounts()
     LAMP.Type.getAttachment(participantId, "lamp.name").then((res: any) => {
       setNickname(!!res.data ? res.data : null)
@@ -209,7 +216,7 @@ export default function PatientProfile({
               <Button className={classes.buttonContainer} onClick={() => updateName()}>
                 <Typography className={classes.buttonText}>{`${t("Save")}`}</Typography>
               </Button>
-              <Button className={classes.backContainer}>
+              <Button className={classes.backContainer} onClick={() => history.back()}>
                 {/* onClick={() => onClose(nickname ?? "")} */}
                 <Typography className={classes.backText}>{`${t("Cancel")}`}</Typography>
               </Button>

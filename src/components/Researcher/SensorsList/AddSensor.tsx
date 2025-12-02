@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) =>
 export function addSensorItem(x, studies) {
   Service.updateCount("studies", x.studyID, "sensor_count")
   x["study_id"] = x.studyID
-  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+  x["study_name"] = studies?.filter((study) => study.id === x.studyID)[0]?.name
   delete x["studyID"]
   Service.addData("sensors", [x])
 }
@@ -52,21 +52,6 @@ export default function AddSensor({
   const classes = useStyles()
   const { t } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
-  const [allSensors, setAllSensors] = useState<Array<Object>>([])
-
-  useEffect(() => {
-    getAllStudies()
-  }, [])
-
-  useEffect(() => {
-    getAllStudies()
-  }, [sensorDialog])
-
-  const getAllStudies = () => {
-    Service.getAll("sensors").then((sensorObj: any) => {
-      setAllSensors(sensorObj)
-    })
-  }
 
   const addOrUpdateSensor = () => {
     setSensorDialog(false)
@@ -78,15 +63,18 @@ export default function AddSensor({
       <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
         <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
       </Fab>
-      <SensorDialog
-        studies={studies}
-        onClose={() => setSensorDialog(false)}
-        open={sensorDialog}
-        type="add"
-        studyId={studyId ?? null}
-        addOrUpdateSensor={addOrUpdateSensor}
-        allSensors={allSensors}
-      />
+      {!!sensorDialog ? (
+        <SensorDialog
+          studies={studies}
+          onClose={() => setSensorDialog(false)}
+          open={sensorDialog}
+          type="add"
+          studyId={studyId ?? null}
+          addOrUpdateSensor={addOrUpdateSensor}
+        />
+      ) : (
+        <></>
+      )}
     </Box>
   )
 }

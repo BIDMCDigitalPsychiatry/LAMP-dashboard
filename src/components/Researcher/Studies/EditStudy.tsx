@@ -39,7 +39,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, research
   const updateStudyName = (data) => {
     setEditStudy(false)
     setAliasStudyName(data)
-    let oldNameArray = Object.assign({}, studyArray)
+    let oldNameArray = Object?.assign({}, studyArray)
     oldNameArray[editStudyName] = data
     setStudyNameArray(oldNameArray)
     upatedDataStudy(oldNameArray)

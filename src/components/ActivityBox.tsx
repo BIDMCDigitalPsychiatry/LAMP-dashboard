@@ -1,9 +1,22 @@
 // Core Imports
 import React, { useEffect, useRef, useState } from "react"
-import { Typography, Grid, Icon, Card, Box, ButtonBase, makeStyles, Theme, createStyles, Tab } from "@material-ui/core"
+import {
+  Typography,
+  Grid,
+  Icon,
+  Card,
+  Box,
+  ButtonBase,
+  makeStyles,
+  Theme,
+  createStyles,
+  Tab,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
-import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+import BreatheIcon from "../icons/Breathe.svg"
+import JournalIcon from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { useTranslation } from "react-i18next"
@@ -12,21 +25,7 @@ import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
-import ActivityAccordian from "./ActivityAccordian"
-import VideoMeeting from "../icons/Video.svg"
-import {
-  Backdrop,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-} from "@mui/material"
 import { getSelfHelpActivityEvents } from "./Participant"
-import { TabContext, TabList, TabPanel } from "@material-ui/lab"
-import ActivityListForModule from "./ActivityListForModule"
-import ResponsiveDialog from "./ResponsiveDialog"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -176,7 +175,7 @@ export const getActivityEvents = async (participant: any, activityId, moduleStar
 export const sortModulesByCompletion = (modules) => {
   if (!Array.isArray(modules)) return []
   return modules
-    .map((module) => {
+    ?.map((module) => {
       const processedSubActivities = Array.isArray(module?.subActivities)
         ? sortModulesByCompletion(module?.subActivities)
         : []
@@ -184,15 +183,15 @@ export const sortModulesByCompletion = (modules) => {
         ...module,
         subActivities: module?.sequentialOrdering
           ? module?.subActivities // keep original order if sequentialOrdering is true
-          : processedSubActivities.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0)),
+          : processedSubActivities?.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0)),
       }
     })
-    .sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0))
+    ?.sort((a, b) => (a.isCompleted ? 1 : 0) - (b.isCompleted ? 1 : 0))
 }
 
 const checkIsBegin = async (module, participant) => {
   const activityEvents = await getActivityEvents(participant, module.id, module.startTime)
-  return activityEvents.length === 0
+  return activityEvents?.length === 0
 }
 
 export const addActivityEventForModule = async (module, participant) => {
@@ -214,751 +213,193 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [open, setOpen] = useState(false)
   const [questionCount, setQuestionCount] = React.useState(0)
   const [message, setMessage] = useState("")
-  const [moduleData, setModuleData] = useState<any[]>([])
-  const [shownActivities, setShownActivities] = useState([])
+  const [activitiesList, setActivityList] = useState<any>({})
   const [loadingModules, setLoadingModules] = useState(true)
+
   const { t } = useTranslation()
-  const [showNotification, setShowNotification] = useState(false)
-  const [moduleForNotification, setModuleForNotification] = useState(null)
-  const [isParentModuleLoaded, setIsParentModuleLoaded] = useState(false) // Track parent module load
-  const [subModuleData, setSubModuleData] = useState(null)
-  const [moduleInLocalStorage, setModuleInLocalStorage] = useState(null)
-  const [subModuleInLocalStorage, setSubModuleInLocalStorage] = useState([])
-  const [openSubModules, setOpenSubModules] = useState([])
-  const [indexToLoad, setIndexToLoad] = useState(-1)
-  const [parentString, setParentString] = useState("")
 
   const handleClickOpen = (y: any, isAuto = false) => {
     LAMP.Activity.view(y.id).then(async (data) => {
-      if (y.spec === "lamp.module") {
-        if (!isAuto) {
-          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
-        }
-        let moduleStartTime = await getModuleStartTime(y.id)
-        if (!moduleStartTime) {
-          moduleStartTime = await addActivityEventForModule(y, participant)
-        }
-        const initializeOpenedModule = isAuto ? true : false
-        setLoadingModules(true)
-        addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false)
-      } else {
-        setParentString(y?.parentString || "")
-        localStorage.setItem("lastActiveTab", type)
-        localStorage.setItem("tab", tab)
-        setActivity(data)
-        setOpen(true)
-        y.spec === "lamp.dbt_diary_card"
-          ? setQuestionCount(7)
-          : y.spec === "lamp.survey"
-          ? setQuestionCount(data.settings?.length ?? 0)
-          : setQuestionCount(0)
-      }
+      setActivity(data)
+      setOpen(true)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(7)
+        : y.spec === "lamp.survey"
+        ? setQuestionCount(data.settings?.length ?? 0)
+        : setQuestionCount(0)
     })
   }
 
   useEffect(() => {
-    if (!!subModuleData) {
-      setOpenSubModules((prev) => [...prev, subModuleData])
-    }
-  }, [subModuleData])
-
-  const updateIsCompleted = (subActivityId, parentString) => {
-    const updateRecursive = (activities) => {
-      return activities.map((activity) => {
-        if (activity.id === subActivityId && activity.parentString === parentString) {
-          return { ...activity, isCompleted: true }
-        }
-
-        if (activity.subActivities && activity.subActivities.length > 0) {
-          const updatedSubActivities = updateRecursive(activity.subActivities)
-          return { ...activity, subActivities: updatedSubActivities }
-        }
-
-        return activity
-      })
-    }
-
-    const updatedData = updateRecursive(moduleData)
-    setModuleData(updatedData)
-  }
-
-  const handleInitializeOpenedModules = (y: any, isAuto = false) => {
-    return LAMP.Activity.view(y.id).then(async (data) => {
-      if (y.spec === "lamp.module") {
-        if (!isAuto) {
-          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
-        }
-        const moduleStartTime = await getModuleStartTime(y.id)
-        const initializeOpenedModule = isAuto ? true : false
-        await addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false)
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (!!moduleInLocalStorage) {
-      const data = moduleData.find((mod) => mod.id === moduleInLocalStorage)
-      if (data) {
-        handleSubModule(data)
-      }
-      setTimeout(() => setModuleInLocalStorage(null), 500)
-    }
-  }, [moduleInLocalStorage])
-
-  useEffect(() => {
-    if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0 && openSubModules.length > 0) {
-      const data = openSubModules[openSubModules.length - 1].subActivities.find(
-        (mod) => mod.id === subModuleInLocalStorage[0]
-      )
-      if (data) {
-        handleSubModule(data)
-      }
-      setTimeout(() => setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1)), 1000)
-    }
-  }, [subModuleInLocalStorage, openSubModules])
-
-  const handleSubModule = async (activity) => {
-    let moduleStartTime = await getModuleStartTime(activity?.id, activity?.startTime)
-    if (!moduleStartTime) {
-      moduleStartTime = await addActivityEventForModule(activity, participant)
-    }
-    setLoadingModules(true)
-    const data = await LAMP.Activity.view(activity.id)
-
-    await addSubModuleData(data, moduleStartTime, activity?.parentString)
-  }
-
-  const addSubModuleData = async (data, startTime, parentString) => {
-    let moduleActivityData = { ...data }
-    let moduleStartTime = startTime
-    let moduleStarted = moduleStartTime != null
-    const ids = data?.settings?.activities || []
-    const sequential = data?.settings?.sequential_ordering === true
-    const hideOnCompletion = data?.settings?.hide_on_completion === true
-    const trackProgress = data?.settings?.track_progress === true
-    let sequentialActivityAdded = false
-    const parentsString = parentString ? parentString + ">" + data?.id : data?.id
-    const arr = []
-    for (const id of ids) {
+    if (!participant?.id) return
+    const fetchData = async () => {
       try {
-        const [activityEvents, fetchedData] = await Promise.all([
-          moduleStartTime === null ? [] : getActivityEvents(participant, id, moduleStartTime),
-          LAMP.Activity.view(id),
-        ])
+        const batchSize = 50
+        const tab = String(type || "").toLowerCase()
 
-        if (fetchedData.spec === "lamp.module") {
-          fetchedData["startTime"] = moduleStartTime
+        const firstBatchResponse: any = await (LAMP.Activity.listActivities as any)(
+          participant.id,
+          tab,
+          null,
+          batchSize,
+          0
+        )
+        if (!firstBatchResponse || !firstBatchResponse.data) {
+          setLoadingModules(false)
+          return
         }
-        fetchedData["parentString"] = parentsString
-        fetchedData["parentModule"] = data.id
-        const eventCreated =
-          fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
-        delete fetchedData.settings
-        if (
-          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
-          (fetchedData.spec === "lamp.module" && eventCreated)
-        ) {
-          fetchedData["isCompleted"] = true
-          if (hideOnCompletion) {
-            fetchedData["isHidden"] = true
+        // Extract data and total from response
+        let firstBatchData: any = firstBatchResponse.data ?? {}
+        let total = firstBatchResponse.total || 0
+        setLoadingModules(false)
+        setActivityList(firstBatchData)
+        const totalBatches = Math.ceil(total / batchSize)
+        // If there's only one batch, we're done
+        if (totalBatches <= 1) {
+          return
+        }
+        // Create array of promises for remaining batches (batch 2 onwards)
+        const remainingBatches = Array.from({ length: totalBatches - 1 }, (_, i) => {
+          const offset = (i + 1) * batchSize
+          return (LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, offset)
+        })
+        const remainingResults: any[] = await Promise.all(remainingBatches)
+        const mergedData = remainingResults?.reduce((acc: any, result: any) => {
+          if (!result || !result.data) return acc
+          const data = result.data
+          return {
+            otherActivities: [...(acc.otherActivities || []), ...(data.otherActivities || [])],
           }
-        } else {
-          if (sequential && !sequentialActivityAdded) {
-            sequentialActivityAdded = true
-            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
-              setModuleForNotification(fetchedData)
+        }, firstBatchData)
+        // Remove duplicates from each array based on activity id
+        const removeDuplicates = (activities: any[]): any[] => {
+          if (!Array.isArray(activities)) return []
+          const uniqueMap = new Map<string, any>()
+          activities.forEach((activity: any) => {
+            if (activity && activity.id) {
+              // Keep the first occurrence of each activity
+              if (!uniqueMap.has(activity.id)) {
+                uniqueMap.set(activity.id, activity)
+              }
             }
-          } else if (sequential && sequentialActivityAdded) {
-            fetchedData["isHidden"] = true
-          }
-        }
-
-        arr.push(fetchedData)
-      } catch (error) {
-        console.error("Error fetching data for id:", id, error)
-        arr.push(null)
-        setLoadingModules(false)
-      }
-    }
-    const filteredArr = arr.filter((item) => item != null)
-    delete moduleActivityData.settings
-    setSubModuleData({
-      ...data,
-      isHidden: true,
-      subActivities: filteredArr,
-      sequentialOrdering: sequential,
-      trackProgress: trackProgress,
-    })
-
-    const splitData = parentsString.split(">")
-    if (!!localStorage.getItem("parentString")) {
-      if (localStorage.getItem("parentString") === parentsString) {
-        localStorage.removeItem("parentString")
-        setIndexToLoad(splitData.length - 1)
-        setLoadingModules(false)
-      }
-    } else {
-      setLoadingModules(false)
-      setIndexToLoad(indexToLoad + 1)
-    }
-  }
-
-  const checkIsModuleCompleted = async (id) => {
-    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
-      !!y.error ? undefined : y.data
-    )[0]
-    const isCompleted = (tag || []).filter((t) => t.moduleId === id && t.participants.includes(participant.id))
-    return isCompleted.length > 0 ? true : false
-  }
-
-  const createCompletedAttachment = async (id) => {
-    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
-      !!y.error ? undefined : y.data
-    )[0]
-    let checkIsModule = (tag || []).filter((t) => t.moduleId === id)
-    let checkNotModule = (tag || []).filter((t) => t.moduleId !== id)
-    if (!checkIsModule.length) {
-      checkNotModule.push({ moduleId: id, participants: [participant?.id] })
-    } else {
-      checkIsModule.forEach((item) => {
-        if (!item.participants.includes(participant?.id)) {
-          item.participants.push(participant?.id)
-        }
-      })
-    }
-    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", checkNotModule.concat(checkIsModule))
-  }
-
-  const getModuleStartTime = async (id, startTime = null) => {
-    let moduleStartTime
-    await getActivityEvents(participant, id, startTime).then((res) => {
-      if (res?.length) {
-        const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
-        moduleStartTime = smallestTimestamp
-      } else {
-        moduleStartTime = null
-      }
-    })
-    return moduleStartTime
-  }
-
-  const addModuleActivityEvent = async (data) => {
-    let activityEventCreated = false
-    let moduleStartTime = null
-    if (data?.startTime) {
-      moduleStartTime = await getModuleStartTime(data.id, data?.startTime)
-    } else {
-      moduleStartTime = await getModuleStartTime(data.id)
-    }
-    if (moduleStartTime != null) {
-      let arr = []
-      let ids = data?.settings?.activities || []
-      let validIds = []
-      for (const id of ids) {
-        try {
-          const fetchedData = await LAMP.Activity.view(id)
-          if (fetchedData != null) {
-            validIds.push(id)
-          }
-          if (fetchedData.spec === "lamp.module") {
-            fetchedData["startTime"] = moduleStartTime
-          }
-          const activityEvents =
-            moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
-          if (
-            (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
-            (fetchedData.spec === "lamp.module" && (await addModuleActivityEvent(fetchedData)))
-          ) {
-            arr.push(id)
-          }
-        } catch (error) {
-          console.error("Error fetching data for id:", id, error)
-        }
-      }
-      if (arr.length === validIds.length) {
-        if (await checkIsModuleCompleted(data.id)) {
-          activityEventCreated = true
-        } else {
-          LAMP.ActivityEvent.create(participant.id ?? participant, {
-            timestamp: new Date().getTime(),
-            duration: new Date().getTime() - moduleStartTime,
-            activity: data.id,
-            static_data: {},
           })
-          createCompletedAttachment(data.id)
-          activityEventCreated = true
+          return Array.from(uniqueMap.values())
         }
+
+        const deduplicatedData = {
+          otherActivities: removeDuplicates(mergedData.otherActivities || []),
+        }
+        setActivityList(deduplicatedData)
+      } catch (err) {
+        setLoadingModules(false)
+        console.log("Error fetching activities:", err)
+      } finally {
+        setLoadingModules(false)
       }
     }
-    return activityEventCreated
-  }
-
-  const addActivityData = async (
-    data,
-    level,
-    startTime,
-    parent,
-    parentString,
-    initializeOpenedModule,
-    fromLocalStore
-  ) => {
-    let moduleActivityData = { ...data }
-    let moduleStartTime = startTime
-    let moduleStarted = moduleStartTime != null
-    const ids = data?.settings?.activities || []
-    const sequential = data?.settings?.sequential_ordering === true
-    const hideOnCompletion = data?.settings?.hide_on_completion === true
-    const trackProgress = data?.settings?.track_progress === true
-    let sequentialActivityAdded = false
-    let isModuleCompleted = await addModuleActivityEvent(data)
-    const arr = []
-    for (const id of ids) {
-      try {
-        const [activityEvents, fetchedData] = await Promise.all([
-          moduleStartTime === null ? [] : getActivityEvents(participant, id, moduleStartTime),
-          LAMP.Activity.view(id),
-        ])
-
-        if (fetchedData.spec === "lamp.module") {
-          fetchedData["startTime"] = moduleStartTime
-        }
-        const parentsString = parentString ? parentString + ">" + data?.id : data?.id
-        fetchedData["parentString"] = parentsString
-        fetchedData["parentModule"] = data.id
-        const eventCreated =
-          fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
-        delete fetchedData.settings
-        if (
-          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
-          (fetchedData.spec === "lamp.module" && eventCreated)
-        ) {
-          fetchedData["isCompleted"] = true
-          if (hideOnCompletion) {
-            fetchedData["isHidden"] = true
-          }
-        } else {
-          if (sequential && !sequentialActivityAdded) {
-            sequentialActivityAdded = true
-            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
-              setModuleForNotification(fetchedData)
-            }
-          } else if (sequential && sequentialActivityAdded) {
-            fetchedData["isHidden"] = true
-          }
-        }
-
-        arr.push(fetchedData)
-      } catch (error) {
-        console.error("Error fetching data for id:", id, error)
-        arr.push(null)
-      }
+    if (LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital") {
+      fetchData()
     }
-    const filteredArr = arr.filter((item) => item != null)
-    delete moduleActivityData.settings
+  }, [participant?.id, type, savedActivities])
 
-    moduleActivityData.subActivities = filteredArr
-    moduleActivityData.level = level + 1
-    if (trackProgress) {
-      moduleActivityData.trackProgress = trackProgress
-    }
-    if (isModuleCompleted) {
-      moduleActivityData.isCompleted = true
-    }
-    if (sequential) {
-      moduleActivityData.sequentialOrdering = true
-    }
-    setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
-    if (!(fromLocalStore || initializeOpenedModule)) {
-      setLoadingModules(false)
-    }
-  }
-
-  useEffect(() => {
-    if (!!moduleForNotification) {
-      setTimeout(() => {
-        setShowNotification(true)
-      }, 300)
-    }
-  }, [moduleForNotification, isParentModuleLoaded])
-
-  const [favorites, setFavorites] = useState([])
-  const prevFavoritesLength = useRef(favorites.length)
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
     localStorage.removeItem("parentStringForSurvey")
-    for (let i = localStorage.length - 1; i >= 0; i--) {
+    for (let i = localStorage?.length - 1; i >= 0; i--) {
       const key = localStorage.key(i)
       if (key.startsWith("activity-survey-")) {
         localStorage.removeItem(key)
       }
     }
-    localStorage.removeItem("moduleId")
-    localStorage.removeItem("lastAnsweredIndex")
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0] ?? []
-      setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
-    })()
-    setShownActivities(savedActivities)
-
-    const runAsync = async () => {
-      const activitiesList = savedActivities
-      const moduleActivities = activitiesList.filter((activity) => activity.spec === "lamp.module")
-
-      const initializeOpenedModules = await Promise.all(
-        moduleActivities.map(async (module) => {
-          const moduleStartTime = await getModuleStartTime(module.id)
-          if (!!moduleStartTime) {
-            return module
-          }
-          return null // or undefined
-        })
-      )
-
-      // Filter out null or undefined values
-      const filteredModules = initializeOpenedModules.filter(Boolean)
-
-      if (filteredModules.length > 0) {
-        setLoadingModules(true)
-        const tasks = []
-        for (const activity of filteredModules) {
-          tasks.push(handleInitializeOpenedModules(activity, true))
-        }
-        try {
-          await Promise.all(tasks)
-        } catch (err) {
-          console.error("Error:", err)
-        } finally {
-          if (localStorage.getItem("parentString")) {
-            const module = localStorage.getItem("parentString")
-            if (!!module) {
-              const splitData = module.split(">")
-              setModuleInLocalStorage(splitData[0])
-              setSubModuleInLocalStorage(splitData.slice(1))
-            }
-          }
-          setLoadingModules(false)
-        }
-        setShownActivities(savedActivities.filter((a) => !initializeOpenedModules.some((b) => b?.id === a?.id)))
-      } else {
-        setShownActivities(savedActivities)
-        setLoadingModules(false)
+    if (LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      const dataForSelfHelp = {
+        otherActivities: Array.from(savedActivities || [])?.filter((activity: any) => activity?.spec !== "lamp.module"),
       }
-    }
 
-    runAsync()
+      setActivityList(dataForSelfHelp)
+
+      setLoadingModules(false)
+    }
   }, [savedActivities])
 
   useEffect(() => {
     setMessage("There are no " + type + " activities available.")
   }, [type])
 
-  const [tab, setTab] = useState("modules")
-
-  useEffect(() => {
-    if (localStorage.getItem("tab")) {
-      setTab(localStorage.getItem("tab"))
-      setTimeout(() => {
-        localStorage.removeItem("tab")
-      }, 1000)
-    } else {
-      const prevFavCount = prevFavoritesLength.current
-      const currFavCount = favorites.length
-
-      const isUnfavoritingWhileOnModules = tab === "modules" && currFavCount < prevFavCount
-
-      if (!isUnfavoritingWhileOnModules) {
-        if (favorites.length > 0) {
-          if (typeof favorites[0]?.id == "undefined") {
-            setFavorites(savedActivities.filter((activity) => favorites.includes(activity.id)))
-          }
-          setTab("favorite")
-        } else {
-          setTab(
-            (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
-              ? "modules"
-              : "other"
-          )
-        }
-      }
-
-      prevFavoritesLength.current = currFavCount
-    }
-  }, [favorites])
-
-  const handleClose = () => {
-    const newArr = openSubModules.slice(0, -1)
-    setOpenSubModules(newArr)
-    setIndexToLoad(indexToLoad - 1)
-  }
-
-  useEffect(() => {
-    if (tab === "favorite") {
-      ;(async () => {
-        let tag =
-          [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-            !!y.error ? undefined : y.data
-          )[0] ?? []
-        setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
-      })()
-    }
-  }, [tab])
-
-  const updateLocalStorage = () => {
-    if (!!parentString) localStorage.setItem("parentString", parentString)
-  }
   return (
     <Box>
-      <TabContext value={tab}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          {(favorites || []).length > 0 ? (
-            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-              <Tab label="Favorites" value="favorite" />
-              <Tab label="Modules" value="modules" />
-              <Tab label="Other Activities" value="other" />
-            </TabList>
-          ) : (
-            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-              <Tab label="Modules" value="modules" />
-              <Tab label="Other Activities" value="other" />
-            </TabList>
-          )}
-        </Box>
-        {(favorites || []).length > 0 && (
-          <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {((moduleData || [])?.filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
-              .length ? (
-              <ActivityAccordian
-                data={moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []}
-                type={type}
-                tag={tag}
-                handleSubModule={handleSubModule}
-                participant={participant}
-                setFavorites={setFavorites}
-                tab={tab}
-              />
-            ) : (
-              <></>
-            )}
-            {shownActivities
-              .filter((activity) => activity.spec == "lamp.module")
-              ?.filter((activity) => favorites.includes(activity)).length > 0 ? (
-              <>
-                <h3>Unstarted Modules</h3>
-                <ActivityAccordian
-                  data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
-                  type={type}
-                  tag={tag}
-                  handleSubModule={handleSubModule}
-                  participant={participant}
-                  setFavorites={setFavorites}
-                  tab={tab}
-                />
-              </>
-            ) : (
-              <></>
-            )}
-            {shownActivities
-              .filter((activity) => activity.spec != "lamp.module")
-              ?.filter((activity) => favorites.includes(activity)).length > 0 && (
-              <>
-                <h3> Other activities</h3>
-                <Grid container spacing={2}>
-                  {(shownActivities.filter((activity) => favorites.includes(activity)) || []).length ? (
-                    (shownActivities.filter((activity) => favorites.includes(activity)) || []).map((activity) => (
-                      <Grid
-                        item
-                        xs={6}
-                        sm={4}
-                        md={3}
-                        lg={3}
-                        onClick={() => {
-                          handleClickOpen(activity)
-                        }}
-                        className={classes.thumbMain}
-                      >
-                        <Icon className={classes.favstar}>star_rounded</Icon>
-                        <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                          <Card
-                            className={
-                              classes.manage +
-                              " " +
-                              (type === "Manage"
-                                ? classes.manageH
-                                : type === "Assess"
-                                ? classes.assessH
-                                : type === "Learn"
-                                ? classes.learnH
-                                : classes.preventH)
-                            }
-                          >
-                            <Box mt={2} mb={1}>
-                              <Box
-                                className={classes.mainIcons}
-                                style={{
-                                  margin: "auto",
-                                  background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                    ? `url(${
-                                        tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                      }) center center/contain no-repeat`
-                                    : activity?.spec === "lamp.breathe"
-                                    ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                    : activity?.spec === "lamp.journal"
-                                    ? `url(${JournalIcon}) center center/contain no-repeat`
-                                    : activity?.spec === "lamp.scratch_image"
-                                    ? `url(${ScratchCard}) center center/contain no-repeat`
-                                    : activity?.spec === "lamp.zoom_meeting"
-                                    ? `url(${VideoMeeting}) center center/contain no-repeat`
-                                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                                }}
-                              ></Box>
-                            </Box>
-                            <Typography className={classes.cardlabel}>
-                              <ReactMarkdown
-                                children={t(activity?.name)}
-                                skipHtml={false}
-                                remarkPlugins={[gfm, emoji]}
-                                components={{ link: LinkRenderer }}
-                              />
-                            </Typography>
-                          </Card>
-                        </ButtonBase>
-                      </Grid>
-                    ))
-                  ) : (
-                    <Box display="flex" className={classes.blankMsg} ml={1}>
-                      <Icon>info</Icon>
-                      <p>{`${t(message)}`}</p>
-                    </Box>
-                  )}
-                </Grid>
-              </>
-            )}
-          </TabPanel>
+      <Grid container spacing={2}>
+        {loadingModules ? (
+          <Backdrop className={classes.backdrop} open={loadingModules}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        ) : activitiesList?.otherActivities?.length ? (
+          activitiesList?.otherActivities?.map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                handleClickOpen(activity)
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card
+                  className={
+                    classes.manage +
+                    " " +
+                    (type === "Manage"
+                      ? classes.manageH
+                      : type === "Assess"
+                      ? classes.assessH
+                      : type === "Learn"
+                      ? classes.learnH
+                      : classes.preventH)
+                  }
+                >
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                          ? `url(${
+                              tag?.filter((x) => x.id === activity?.id)[0]?.photo
+                            }) center center/contain no-repeat`
+                          : activity.spec === "lamp.breathe"
+                          ? `url(${BreatheIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.journal"
+                          ? `url(${JournalIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.scratch_image"
+                          ? `url(${ScratchCard}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>
+                    <ReactMarkdown
+                      children={t(activity.name)}
+                      skipHtml={false}
+                      remarkPlugins={[gfm, emoji]}
+                      components={{ link: LinkRenderer }}
+                    />
+                  </Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))
+        ) : (
+          type !== "Portal" && (
+            <Box display="flex" className={classes.blankMsg} ml={1}>
+              <Icon>info</Icon>
+              <p>{`${t(message)}`}</p>
+            </Box>
+          )
         )}
-        <TabPanel value="modules" className={classes.tabPanelMain}>
-          {(moduleData || []).length > 0 ? (
-            <ActivityAccordian
-              data={moduleData}
-              type={type}
-              tag={tag}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              setFavorites={setFavorites}
-              tab={tab}
-            />
-          ) : (
-            <></>
-          )}
-          {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
-            <>
-              <h3>Unstarted Modules</h3>
-              <ActivityAccordian
-                data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
-                type={type}
-                tag={tag}
-                handleSubModule={handleSubModule}
-                participant={participant}
-                setFavorites={setFavorites}
-                tab={tab}
-              />
-            </>
-          ) : (
-            <></>
-          )}
-          {(shownActivities || []).filter((activity) => activity.spec == "lamp.module").length === 0 &&
-            (moduleData || []).length === 0 && (
-              <Box display="flex" className={classes.blankMsg} ml={1}>
-                <Icon>info</Icon>
-                <p>{`${t(message)}`}</p>
-              </Box>
-            )}
-        </TabPanel>
-        <TabPanel value="other" className={classes.tabPanelMain}>
-          <Grid container spacing={2}>
-            {(savedActivities || []).filter((activity) => activity.spec != "lamp.module").length ? (
-              (savedActivities || [])
-                .filter((activity) => activity.spec != "lamp.module")
-                .map((activity) => (
-                  <Grid
-                    item
-                    xs={6}
-                    sm={4}
-                    md={3}
-                    lg={3}
-                    onClick={() => {
-                      handleClickOpen(activity)
-                    }}
-                    className={classes.thumbMain}
-                  >
-                    {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
-                      <Icon className={classes.favstar}>star_rounded</Icon>
-                    )}
-
-                    <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                      <Card
-                        className={
-                          classes.manage +
-                          " " +
-                          (type === "Manage"
-                            ? classes.manageH
-                            : type === "Assess"
-                            ? classes.assessH
-                            : type === "Learn"
-                            ? classes.learnH
-                            : classes.preventH)
-                        }
-                      >
-                        <Box mt={2} mb={1}>
-                          <Box
-                            className={classes.mainIcons}
-                            style={{
-                              margin: "auto",
-                              background: tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                ? `url(${
-                                    tag.filter((x) => x.id === activity?.id)[0]?.photo
-                                  }) center center/contain no-repeat`
-                                : activity.spec === "lamp.breathe"
-                                ? `url(${BreatheIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.journal"
-                                ? `url(${JournalIcon}) center center/contain no-repeat`
-                                : activity.spec === "lamp.scratch_image"
-                                ? `url(${ScratchCard}) center center/contain no-repeat`
-                                : activity?.spec === "lamp.zoom_meeting"
-                                ? `url(${VideoMeeting}) center center/contain no-repeat`
-                                : `url(${InfoIcon}) center center/contain no-repeat`,
-                            }}
-                          ></Box>
-                        </Box>
-                        <Typography className={classes.cardlabel}>
-                          <ReactMarkdown
-                            children={t(activity.name)}
-                            skipHtml={false}
-                            remarkPlugins={[gfm, emoji]}
-                            components={{ link: LinkRenderer }}
-                          />
-                        </Typography>
-                      </Card>
-                    </ButtonBase>
-                  </Grid>
-                ))
-            ) : (
-              <Box display="flex" className={classes.blankMsg} ml={1}>
-                <Icon>info</Icon>
-                <p>{`${t(message)}`}</p>
-              </Box>
-            )}
-          </Grid>
-        </TabPanel>
-      </TabContext>
-      {loadingModules && (
-        <Backdrop className={classes.backdrop} open={loadingModules}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      )}
-
+      </Grid>
       <ActivityPopup
         activity={activity}
         tag={tag}
@@ -968,55 +409,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         type={type}
         showStreak={showStreak}
         participant={participant}
-        setFavorites={setFavorites}
-        savedActivities={savedActivities}
-        tab={tab}
-        updateIsCompleted={updateIsCompleted}
-        updateLocalStorage={updateLocalStorage}
       />
-      {!!moduleForNotification && (
-        <Dialog
-          open={showNotification}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {`${t("The " + moduleForNotification?.name + " module is now available for you to start.")}`}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                handleSubModule(moduleForNotification)
-                setShowNotification(false)
-                setModuleForNotification(null)
-                setIsParentModuleLoaded(false)
-              }}
-              color="primary"
-            >
-              {`${t("OK")}`}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
-      {/* {openSubModules.map((moduleData, index) => ( */}
-      {indexToLoad > -1 && !!openSubModules[indexToLoad] && (
-        <ResponsiveDialog transient open animate fullScreen onClose={() => handleClose()}>
-          <ActivityListForModule
-            type={type}
-            tag={tag}
-            favorites={favorites}
-            participant={participant?.id ?? participant}
-            setFavorites={setFavorites}
-            handleClickOpen={handleClickOpen}
-            handleSubModule={handleSubModule}
-            classes={classes}
-            module={openSubModules[indexToLoad]}
-          />
-        </ResponsiveDialog>
-      )}
-      {/* ))} */}
     </Box>
   )
 }

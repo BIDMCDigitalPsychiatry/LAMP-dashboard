@@ -72,7 +72,7 @@ const ObjectFieldTemplate = ({
   const { t } = useTranslation()
   return (
     <>
-      {/* {!!properties && (properties || []).length > 0 && (uiSchema["ui:title"] || title) && (
+      {/* {!!properties && (properties || [])?.length > 0 && (uiSchema["ui:title"] || title) && (
         <TitleFieldTemplate id={`${idSchema.$id}-title`} title={t(title)} required={required} registry={registry} schema={schema} />
       )} */}
       {description && (
@@ -84,7 +84,7 @@ const ObjectFieldTemplate = ({
         />
       )}
       <Grid container={true} spacing={2} style={{ marginTop: 10 }} {...(uiSchema?.["ui:grid"] ?? {})}>
-        {properties.map((element: any, index: number) => (
+        {properties?.map((element: any, index: number) => (
           <Grid
             item={true}
             xs={12}
@@ -144,7 +144,7 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
           />
         )}
       </Box>
-      {props.items.map((element, index) => (
+      {props.items?.map((element, index) => (
         <Grid container={true} alignItems="center">
           <Grid item={true} xs style={{ overflow: "auto" }}>
             <Box mb={2}>
@@ -210,9 +210,9 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
 // Helper function to recursively extract dependencies (can be objects or arrays)
 function _extractDependencies(dependencies) {
   if (Array.isArray(dependencies)) {
-    return dependencies.map((dep) => _extract(dep))
+    return dependencies?.map((dep) => _extract(dep))
   } else if (typeof dependencies === "object") {
-    return Object.fromEntries(Object.entries(dependencies).map(([key, value]) => [key, _extract(value)]))
+    return Object.fromEntries(Object.entries(dependencies)?.map(([key, value]) => [key, _extract(value)]))
   }
   return dependencies // In case it's not an object or array, return as-is
 }
@@ -224,19 +224,19 @@ function _extractDependencies(dependencies) {
 function _extract(schema) {
   /* prettier-ignore */
   return {
-    ...Object.fromEntries(Object.entries(schema).filter(([k, v]) => k.startsWith("ui:"))),
-    ...(!!schema.properties ? Object.fromEntries(Object.entries(schema.properties).map(([k, v]) => [k, _extract(v)])) : {}),
+    ...Object.fromEntries(Object.entries(schema)?.filter(([k, v]) => k.startsWith("ui:"))),
+    ...(!!schema.properties ? Object.fromEntries(Object.entries(schema.properties)?.map(([k, v]) => [k, _extract(v)])) : {}),
     ...(!!schema.items?.properties ? {
-      items: Object.fromEntries(Object.entries(schema.items.properties).map(([k, v]) => [k, _extract(v)])),
+      items: Object.fromEntries(Object.entries(schema.items.properties)?.map(([k, v]) => [k, _extract(v)])),
     } : {}),
     // Handle "dependencies" (which can be an object or an array of schemas)
     ...(schema.items?.dependencies ? { dependencies: _extractDependencies(schema.items?.dependencies) } : {}),
     // Handle "oneOf", "allOf", and "anyOf" (arrays of schemas)
-    ...(schema.oneOf ? { oneOf: schema.oneOf.map(_extract) } : {}),
-    ...(schema.allOf ? { allOf: schema.allOf.map(_extract) } : {}),
-    ...(schema.anyOf ? { anyOf: schema.anyOf.map(_extract) } : {}),
+    ...(schema.oneOf ? { oneOf: schema.oneOf?.map(_extract) } : {}),
+    ...(schema.allOf ? { allOf: schema.allOf?.map(_extract) } : {}),
+    ...(schema.anyOf ? { anyOf: schema.anyOf?.map(_extract) } : {}),
      // Handle "enum" if it's present in the schema (to process enums)
-     ...(schema.enum ? { enum: schema.enum.map(e => e) } : {}),
+     ...(schema.enum ? { enum: schema.enum?.map(e => e) } : {}),
     
      // Handle "title", "description", etc.
      ...(schema.title ? { title: schema.title } : {}),
@@ -250,8 +250,8 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
   const { t, i18n } = useTranslation()
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
 

@@ -133,9 +133,9 @@ export default function EditStudyField({
     }
   }
   const validate = (val) => {
-    let studyDuplicateCount = allStudies.filter(
+    let studyDuplicateCount = allStudies?.filter(
       (studyItem) => studyItem.name?.trim().toLowerCase() === val?.trim().toLowerCase() && studyItem.id !== study
-    ).length
+    )?.length
     let status = true
     if (studyDuplicateCount > 0) {
       enqueueSnackbar(
@@ -145,7 +145,7 @@ export default function EditStudyField({
         { variant: "error" }
       )
       status = false
-    } else if (val?.trim().length === 0) {
+    } else if (val?.trim()?.length === 0) {
       enqueueSnackbar(
         `${t("Failed to change participantId's alias: Group name required", {
           participantId: study,

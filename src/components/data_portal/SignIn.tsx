@@ -2,6 +2,7 @@ import React from "react"
 import { Typography, Button, Icon, TextField, Container, Avatar, makeStyles } from "@material-ui/core"
 import { ajaxRequest } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
+import { getBasicToken } from "../helper"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -35,12 +36,12 @@ export default function SignIn({ onSubmit, ...props }) {
     setError("")
     let data = Object.values(e.target)
       //@ts-ignore: {} is an object. Therefore, I can create a spread from it.
-      .reduce((x, { name, value }) => ({ ...x, [name]: value }), {})
+      ?.reduce((x, { name, value }) => ({ ...x, [name]: value }), {})
 
     //Default server is api.lamp.digital
     if (data["server"] === "") data["server"] = "api.lamp.digital"
     function setUser(result) {
-      let parentCount = Object.keys(JSON.parse(result)["data"]).length
+      let parentCount = Object.keys(JSON.parse(result)["data"])?.length
       switch (parentCount) {
         case 0:
           const readyUser = (result) => {
@@ -50,14 +51,14 @@ export default function SignIn({ onSubmit, ...props }) {
               name: json[0].name,
               id: json[0].id,
             }
-            onSubmit(Object.assign(data, userInfo))
+            onSubmit(Object?.assign(data, userInfo))
           }
           let sending = {
             method: "GET",
             //@ts-ignore: This property will be created by the form (see line 37)
             url: `https://${data.server}/researcher/me`,
             //@ts-ignore: This property will be created by the form (see line 37)
-            headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+            headers: [["Authorization", getBasicToken()]],
             callback: readyUser,
           }
           ajaxRequest(sending)
@@ -86,7 +87,7 @@ export default function SignIn({ onSubmit, ...props }) {
           name: "Administrator",
           id: "Administrator",
         }
-        onSubmit(Object.assign(data, userInfo))
+        onSubmit(Object?.assign(data, userInfo))
       }
       setLoading(false)
     }
@@ -97,7 +98,7 @@ export default function SignIn({ onSubmit, ...props }) {
       //@ts-ignore: This property will be created by the form (see line 37)
       url: `https://${data.server}/type/me/parent`,
       //@ts-ignore: This property will be created by the form (see line 37)
-      headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+      headers: [["Authorization", getBasicToken()]],
       callback: setUser,
       alternateCallback: testAdmin,
     }
@@ -163,7 +164,7 @@ export default function SignIn({ onSubmit, ...props }) {
           >
             {isLoading ? `${t("Loading...")}` : `${t("Sign In")}`}
           </Button>
-          {error.length > 0 && <Typography style={{ color: "red" }}>{error}</Typography>}
+          {error?.length > 0 && <Typography style={{ color: "red" }}>{error}</Typography>}
         </form>
       </div>
     </Container>

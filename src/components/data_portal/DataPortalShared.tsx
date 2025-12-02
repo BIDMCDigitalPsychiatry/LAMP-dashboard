@@ -1,6 +1,7 @@
 import React from "react"
 import { createStyles, makeStyles, Theme } from "@material-ui/core"
 import LAMP from "lamp-core"
+import { getBasicToken } from "../helper"
 
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = React.useState(() => {
@@ -59,7 +60,7 @@ export const jsonataFetch = async (query, access_key, secret_key, server) => {
     let res = await fetch(`https://${server}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${userToken.accessToken}`,
+        Authorization: getBasicToken(),
       },
       credentials: "include",
       body: query,
@@ -250,33 +251,33 @@ export async function generate_ids(id_set, return_with_names = false) {
       let res = await LAMP.Participant.allByStudy(id_set)
       if (return_with_names) {
         let resObj = (await Promise.all(
-          res.map((part) => {
+          res?.map((part) => {
             return LAMP.Type.getAttachment(part.id, "lamp.name").then((result) => {
               return { [part.id]: result["data"] ? result["data"] : null }
             })
           })
         )) as Array<object>
-        return resObj.reduce((acc, elem) => {
+        return resObj?.reduce((acc, elem) => {
           return { ...acc, ...elem }
         }, {})
-      } else return res.map((participant) => participant.id)
+      } else return res?.map((participant) => participant.id)
     }
     //if nothing exists, this is a researcher, so we recursively call
     else {
       let res = await LAMP.Study.allByResearcher(id_set)
       return await generate_ids(
-        res.map((study) => study.id),
+        res?.map((study) => study.id),
         return_with_names
       )
     }
   } else if (Array.isArray(id_set)) {
-    const res = await Promise.all(id_set.map((id) => generate_ids(id, return_with_names)))
+    const res = await Promise.all(id_set?.map((id) => generate_ids(id, return_with_names)))
     //now, res is an array of arrays, or an array of objects. let's combine them
     if (return_with_names) {
-      return res.reduce((acc, obj) => {
+      return res?.reduce((acc, obj) => {
         return { ...acc, ...obj }
       }, {})
-    } else return res.reduce((acc, array) => acc.concat(array), [])
+    } else return res?.reduce((acc, array) => acc?.concat(array), [])
   } else {
     return [id_set]
   }
@@ -298,12 +299,12 @@ export async function generate_study_ids(id_set) {
     //under their purview and return that
     else {
       let res = await LAMP.Study.allByResearcher(id_set)
-      return res.map((study) => study.id)
+      return res?.map((study) => study.id)
     }
   } else if (Array.isArray(id_set)) {
-    const res = await Promise.all(id_set.map((id) => generate_study_ids(id)))
+    const res = await Promise.all(id_set?.map((id) => generate_study_ids(id)))
     //now, res is an array of arrays. let's combine them
-    return res.reduce((acc, array) => acc.concat(array), [])
+    return res?.reduce((acc, array) => acc?.concat(array), [])
   } else {
     return [id_set]
   }
@@ -326,16 +327,16 @@ export async function generate_activity_dict(
   //it fetches too much information and is inefficient.
   //Let's use a jsonata query instead!
   const res = await Promise.all(
-    id_list.map((id) =>
+    id_list?.map((id) =>
       jsonataFetch(queryDictionary["activityFromStudy"](id), token.username, token.password, token.server)
     )
   )
   //flatten the array of arrays
   let studyArray = res
-    .filter((elem) => Array.isArray(elem))
-    .reduce((acc, array) => (acc as Array<any>).concat(array), [])
+    ?.filter((elem) => Array.isArray(elem))
+    ?.reduce((acc, array) => (acc as Array<any>)?.concat(array), [])
   //return a dictionary with activity ids and names
-  return (studyArray as Array<any>).reduce((acc, example) => {
+  return (studyArray as Array<any>)?.reduce((acc, example) => {
     let result_obj = {}
     included_details.forEach((key) => {
       if (example[key]) result_obj[key] = example[key]
@@ -369,12 +370,12 @@ export async function generate_participant_tag_info(id_set, keys_are_tagnames = 
   let id_list = await generate_ids(id_set)
   let result_dict = {}
   await Promise.all(
-    id_list.map(async (id) => {
+    id_list?.map(async (id) => {
       let res = await LAMP.Type.listAttachments(id)
       if (res["data"]) {
         keys_are_tagnames
           ? res["data"].forEach((tag) => {
-              result_dict[tag] ? (result_dict[tag] = result_dict[tag].concat([id])) : (result_dict[tag] = [id])
+              result_dict[tag] ? (result_dict[tag] = result_dict[tag]?.concat([id])) : (result_dict[tag] = [id])
             })
           : (result_dict[id] = res["data"])
       } else {
@@ -417,12 +418,12 @@ export const queryDictionary = {
 
 export function formatGraphName(tagName) {
   let newName = tagName
-    .slice(tagName.lastIndexOf(".") + 1, tagName.length)
+    ?.slice(tagName.lastIndexOf(".") + 1, tagName?.length)
     .replace(/_/g, " ")
     .replace(/graph/g, "")
   return newName
     .split(" ")
-    .map((elem) => elem.slice(0, 1).toUpperCase() + elem.slice(1))
+    ?.map((elem) => elem?.slice(0, 1).toUpperCase() + elem?.slice(1))
     .join(" ")
 }
 
@@ -430,8 +431,8 @@ export function formatTagName(tagName, returnCategoryOnly = true) {
   let categoryIndex = tagName.lastIndexOf(".")
   let newName = tagName
     .split(".")
-    .map((elem) => elem.slice(0, 1).toUpperCase() + elem.slice(1))
+    ?.map((elem) => elem?.slice(0, 1).toUpperCase() + elem?.slice(1))
     .join("-")
-  if (returnCategoryOnly) return newName.slice(0, categoryIndex)
+  if (returnCategoryOnly) return newName?.slice(0, categoryIndex)
   else return newName
 }

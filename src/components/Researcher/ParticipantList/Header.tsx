@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles, Icon, Link, Tooltip } from "@material-ui/core"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"
@@ -29,6 +29,28 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: "-50vw",
     },
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
+    settingslink: {
+      background: "#f4f4f4",
+      width: 48,
+      height: 48,
+      borderRadius: "50%",
+      padding: 10,
+      color: "#333",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+      cursor: "pointer",
+      "&:hover": {
+        background: "#fff",
+        boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+        "& svg": {
+          "& path": {
+            fill: "#7599FF",
+          },
+        },
+      },
+    },
   })
 )
 
@@ -44,6 +66,9 @@ export default function Header({
   mode,
   order,
   setOrder,
+  loading,
+  participants,
+  participantCount,
   ...props
 }) {
   const classes = useStyles()
@@ -60,10 +85,12 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">{`${t("Users")}`}</Typography>
         </Box>
+
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} order={order} />
         </Box>
         <SearchBox searchData={searchData} />
+
         <Box>
           <AddButton
             researcherId={researcherId}
@@ -84,10 +111,12 @@ export default function Header({
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
             setSelectedStudies={setSelectedStudies}
+            participants={participants}
+            participantCount={participantCount}
           />
         </Box>
       )}
-      {(selectedParticipants || []).length > 0 && (
+      {(selectedParticipants || [])?.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box
             className={classes.optionsSub}

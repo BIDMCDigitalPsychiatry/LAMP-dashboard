@@ -1,23 +1,15 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
-import {
-  makeStyles,
-  Box,
-  Backdrop,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Button,
-  DialogContentText,
-  DialogTitle,
-} from "@material-ui/core"
+import React, { useEffect, useState, lazy, Suspense } from "react"
+import { makeStyles, Box, Backdrop, CircularProgress } from "@material-ui/core"
 import LAMP from "lamp-core"
-import EmbeddedActivity from "./EmbeddedActivity"
+
 import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
+import { lazyRetry } from "../helper/functions"
+
+const EmbeddedActivity = lazy(lazyRetry(() => import("./EmbeddedActivity")))
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,12 +50,12 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     hide_on_completion: false,
     initialize_opened: false,
   })
-  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
+
   useEffect(() => {
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
-    if (!!favoriteActivities && (groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
+    if ((groupActivities || [])?.length > 0 && index <= (groupActivities || [])?.length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
@@ -78,10 +70,10 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
         })
       })
     }
-  }, [index, favoriteActivities])
+  }, [index])
 
   useEffect(() => {
-    if (groupActivities.length > 0) {
+    if (groupActivities?.length > 0) {
       setIndex(0)
     } else {
       setLoading(false)
@@ -89,13 +81,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [groupActivities])
 
   useEffect(() => {
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0] ?? []
-      setFavoriteActivities(tag)
-    })()
     LAMP.Activity.view(activity.id).then((data) => {
       setIndex(-1)
       if (Array.isArray(data.settings)) {
@@ -111,23 +96,23 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
-      iterateActivity(data?.forward, data?.done)
+      iterateActivity()
     }
   }, [data])
 
-  const iterateActivity = (forward?: boolean | undefined, done?: boolean | undefined) => {
-    let val =
-      typeof forward == "undefined" || !!forward || (typeof done !== "undefined" && !!done) ? index + 1 : index - 1
+  const iterateActivity = () => {
+    let val = index + 1
     setCurrentActivity(null)
     if (val >= 0) setIndex(val)
-    if (groupActivities.length === val || val == -1) {
+    if (groupActivities?.length === val || val == -1) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: new Date().getTime() - startTime,
         activity: activity.id,
         static_data: {},
+      }).then((x) => {
+        props.onComplete({ timestamp: new Date().getTime(), response: x })
       })
-      props.onComplete({ timestamp: new Date().getTime() })
     }
   }
 
@@ -137,21 +122,22 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
         <Box>
           {groupActivitySettings && !!groupActivitySettings?.track_progress && (
             <Box className={classes.activityLevel}>
-              Activity {index + 1} of {groupActivities.length}
+              Activity {index + 1} of {groupActivities?.length}
             </Box>
           )}
-          <EmbeddedActivity
-            name={currentActivity?.name}
-            activity={currentActivity}
-            participant={participant}
-            favoriteActivities={favoriteActivities}
-            onComplete={(a) => {
-              setResponse(a)
-            }}
-            forward={index < groupActivities.length}
-            noBack={noBack}
-            tab={tab}
-          />
+          <Suspense fallback={<div />}>
+            <EmbeddedActivity
+              name={currentActivity?.name}
+              activity={currentActivity}
+              participant={participant}
+              onComplete={(a) => {
+                setResponse(!a ? {} : a)
+              }}
+              forward={index < groupActivities?.length}
+              noBack={noBack}
+              tab={tab}
+            />
+          </Suspense>
         </Box>
       )}
       <Backdrop className={classes.backdrop} open={loading}>

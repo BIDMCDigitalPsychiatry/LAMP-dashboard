@@ -144,7 +144,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 const sortStudies = (studies, order) => {
-  return (studies || []).sort((a, b) => {
+  return (studies || [])?.sort((a, b) => {
     return !!order
       ? a["name"] > b["name"]
         ? 1
@@ -161,14 +161,14 @@ const sortStudies = (studies, order) => {
 
 export const sortData = (data, studies, key) => {
   let result = []
-  ;(studies || []).map((study) => {
-    let filteredData = data.filter((d) => d.study_name === study)
-    filteredData.sort((a, b) => {
+  ;(studies || [])?.map((study) => {
+    let filteredData = data?.filter((d) => d.study_name === study)
+    filteredData?.sort((a, b) => {
       return a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0
     })
-    result = result.concat(filteredData)
+    result = result?.concat(filteredData)
   })
-  return [...new Map(result.map((item) => [item["id"], item])).values()]
+  return [...new Map(result?.map((item) => [item["id"], item])).values()]
 }
 
 export default function Dashboard({ onParticipantSelect, researcherId, mode, tab, ...props }) {
@@ -186,12 +186,14 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [role, setRole] = useState(null)
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(40)
+
   useInterval(
     () => {
       setLoading(true)
-      getDBStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
 
@@ -210,8 +212,8 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }, [])
 
   useEffect(() => {
-    getAllStudies()
-  }, [researcher, sessionStorage.getItem("tokenInfo")])
+    if (researcher) getAllStudies()
+  }, [researcher, search, order, page, limit, newStudy])
 
   useEffect(() => {
     if (!!newStudy) getAllStudies()
@@ -237,8 +239,9 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }
 
   const getAllStudies = async () => {
-    Service.getAll("studies").then((studies) => {
+    await LAMP.Study.allByResearcher(researcherId).then((studies) => {
       setStudies(sortStudies(studies, order))
+      setLoading(false)
     })
   }
 
@@ -248,29 +251,10 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }, [order])
 
   useEffect(() => {
-    filterStudies(studies)
-  }, [studies])
-
-  const filterStudies = async (studies) => {
-    if (!!researcherId && studies !== null && (studies || []).length > 0) {
-      let selected =
-        localStorage.getItem("studies_" + researcherId) !== null
-          ? JSON.parse(localStorage.getItem("studies_" + researcherId))
-          : []
-      if (selected.length > 0) {
-        let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
-        selected =
-          selected.length === 0 || filtered.length === 0
-            ? (studies ?? []).map((study) => {
-                return study.name
-              })
-            : filtered
-      }
-      selected.sort()
-      if (!order) selected.reverse()
-      setSelectedStudies(selected)
+    if (studies && selectedStudies?.length === 0) {
+      setSelectedStudies(studies?.map((study) => study.name))
     }
-  }
+  }, [studies])
 
   return (
     <Container maxWidth={false}>

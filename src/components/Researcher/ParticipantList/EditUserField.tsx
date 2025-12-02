@@ -36,10 +36,12 @@ export default function EditUserField({
     if (!!alias) return
     LAMP.Type.getAttachment(participant.id, "lamp.name")
       .then((res: any) =>
-        res.error === undefined && typeof res.data === "string" && res.data?.trim().length > 0 ? res.data : null
+        res.error === undefined && typeof res.data === "string" && res.data?.trim()?.length > 0 ? res.data : null
       )
       .then((res) => {
-        if (!unmounted) setAlias((oldValue.current = res))
+        if (!unmounted && res != null) {
+          setAlias((oldValue.current = res))
+        }
       })
       .catch((err) =>
         enqueueSnackbar(
@@ -108,7 +110,6 @@ export default function EditUserField({
     setEditing(false)
     setEditComplete(true)
   }
-
   return (
     <div>
       {editData && editUserId === participant.id && !editComplete ? (

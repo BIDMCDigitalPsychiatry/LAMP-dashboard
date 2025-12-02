@@ -139,8 +139,8 @@ export default function Root({ updateStore, adminType, ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 

@@ -60,7 +60,7 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
           localStorage.getItem("studies_" + researcherId) !== null
             ? JSON.parse(localStorage.getItem("studies_" + researcherId))
             : []
-        let data = selectedStudies.filter((d) => d !== study.name)
+        let data = selectedStudies?.filter((d) => d !== study.name)
         localStorage.setItem("studies_" + researcherId, JSON.stringify(data))
         enqueueSnackbar(`${t("Successfully deleted group.", { studyId: studyId })}`, { variant: "success" })
       })

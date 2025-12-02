@@ -20,6 +20,7 @@ import { Service } from "../../DBService/DBService"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
+import { getBasicToken } from "../../helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -102,7 +103,7 @@ export default function StudiesList({
       setLoading(true)
       getAllStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
 
@@ -112,9 +113,9 @@ export default function StudiesList({
   }, [newStudy])
 
   useEffect(() => {
-    if ((studies || []).length > 0) {
+    if ((studies || [])?.length > 0) {
       setAllStudies(studies)
-      const enabledIds = studies.filter((study) => study.isMessagingEnabled).map((study) => study.id)
+      const enabledIds = studies?.filter((study) => study.isMessagingEnabled)?.map((study) => study.id)
       setEnabledMessagingStudyIds(enabledIds)
     } else {
       setAllStudies([])
@@ -123,8 +124,8 @@ export default function StudiesList({
   }, [studies])
   const searchFilterStudies = async () => {
     if (!!search && search !== "") {
-      let studiesList: any = await Service.getAll("studies")
-      let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
+      // let studiesList: any = await Service.getAll("studies")
+      const newStudies = studies?.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
       setAllStudies(newStudies)
     } else {
       getAllStudies()
@@ -137,16 +138,13 @@ export default function StudiesList({
   }, [allStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
+    const userToken: any = getBasicToken()
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       searchFilterStudies()
     } else {
       window.location.href = "/#/"
     }
-  }, [search, sessionStorage.getItem("tokenInfo")])
+  }, [search])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)
@@ -174,7 +172,7 @@ export default function StudiesList({
     const isChecked = event.target.checked
     // Update local state if needed
     setEnabledMessagingStudyIds((prevIds) =>
-      isChecked ? [...prevIds, studyId] : prevIds.filter((id) => id !== studyId)
+      isChecked ? [...prevIds, studyId] : prevIds?.filter((id) => id !== studyId)
     )
 
     // Prepare update payload
@@ -215,8 +213,8 @@ export default function StudiesList({
         />
         <Box className={classes.tableContainer} py={4}>
           <Grid container spacing={3}>
-            {allStudies !== null && (allStudies || []).length > 0 ? (
-              (allStudies || []).map((study) => (
+            {allStudies !== null && (allStudies || [])?.length > 0 ? (
+              (allStudies || [])?.map((study) => (
                 <Grid item lg={6} xs={12} key={study.id}>
                   <Box display="flex" p={1} className={classes.studyMain}>
                     <Box flexGrow={1}>

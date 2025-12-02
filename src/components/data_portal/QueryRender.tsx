@@ -113,9 +113,9 @@ export default function QueryRender({ height = 0, ...props }) {
     ]
 
     function numberSuffix(num) {
-      if (num.toString().slice(-1) === "1" && num !== 11) return "st"
-      else if (num.toString().slice(-1) === "2" && num !== 12) return "nd"
-      else if (num.toString().slice(-1) === "3" && num !== 13) return "rd"
+      if (num.toString()?.slice(-1) === "1" && num !== 11) return "st"
+      else if (num.toString()?.slice(-1) === "2" && num !== 12) return "nd"
+      else if (num.toString()?.slice(-1) === "3" && num !== 13) return "rd"
       else return "th"
     }
 
@@ -132,10 +132,10 @@ export default function QueryRender({ height = 0, ...props }) {
 
     let chunkWidth = docWidth / graphsPerLine
 
-    queryRes = queryRes.filter((elem) => elem["result"] !== null)
+    queryRes = queryRes?.filter((elem) => elem["result"] !== null)
     const promises = []
     //add our queries in to array
-    for (let index = 0; index < queryRes.length; index++) {
+    for (let index = 0; index < queryRes?.length; index++) {
       let spec = queryRes[index]["result"]
       let canvas = document.createElement("div")
       canvas.id = "canvasID"
@@ -162,7 +162,9 @@ export default function QueryRender({ height = 0, ...props }) {
             return {
               type: "image",
               imgStream: imgStream,
-              name: queryRes[index][groupBy].slice(queryRes[index][groupBy].lastIndexOf(".") + 1).replace("_graph", ""),
+              name: queryRes[index][groupBy]
+                ?.slice(queryRes[index][groupBy].lastIndexOf(".") + 1)
+                .replace("_graph", ""),
               width: cWidth,
               height: cHeight,
             }
@@ -176,23 +178,23 @@ export default function QueryRender({ height = 0, ...props }) {
     }
     //after promises complete, store all data in pdf
     await Promise.all(promises).then((res: Array<any>) => {
-      res = res.filter((obj) => !(obj["type"] === "invalid"))
+      res = res?.filter((obj) => !(obj["type"] === "invalid"))
       let graphArray
       switch (sortMethod) {
         case "height":
-          graphArray = res.sort((x, y) => x.height - y.height)
+          graphArray = res?.sort((x, y) => x.height - y.height)
           break
         case "width":
-          graphArray = res.sort((x, y) => x.width - y.width)
+          graphArray = res?.sort((x, y) => x.width - y.width)
           break
         default:
           graphArray = res
       }
       //res is now an array of images with 4 parameters we can use to build our pdf
       //So that we can chunk, we avoid using foreach.
-      for (let i = 0; i < graphArray.length; i += graphsPerLine) {
-        let singleLine = graphArray.slice(i, i + graphsPerLine)
-        let maxHeight = singleLine.reduce((acc, x) => Math.max(acc, x.height), 0)
+      for (let i = 0; i < graphArray?.length; i += graphsPerLine) {
+        let singleLine = graphArray?.slice(i, i + graphsPerLine)
+        let maxHeight = singleLine?.reduce((acc, x) => Math.max(acc, x.height), 0)
 
         //if we would overflow the page, we add a new one, and reset our cursor
         if (cursorYLoc + 15 + maxHeight > docHeight) {
@@ -275,8 +277,8 @@ export default function QueryRender({ height = 0, ...props }) {
     if (
       !Array.isArray(props.queryResult) ||
       !(
-        props.queryResult.filter((obj) => typeof obj === "object" && "result" in obj).length ===
-        props.queryResult.length
+        props.queryResult?.filter((obj) => typeof obj === "object" && "result" in obj)?.length ===
+        props.queryResult?.length
       )
     ) {
       return
@@ -284,8 +286,8 @@ export default function QueryRender({ height = 0, ...props }) {
     //Whether we sort by id or tag, let's pull the list here
     let filter = groupByID ? "id" : "tag"
     let subfilter = groupByID ? "tag" : "id"
-    let targetList = props.queryResult.reduce(
-      (acc, obj) => (acc.includes(obj[filter]) ? acc : acc.concat(obj[filter])),
+    let targetList = props.queryResult?.reduce(
+      (acc, obj) => (acc.includes(obj[filter]) ? acc : acc?.concat(obj[filter])),
       []
     )
 
@@ -297,12 +299,12 @@ export default function QueryRender({ height = 0, ...props }) {
       currentTitle.replace(/ +/g, " ")
       //we get the width of each card
       let cardWidth = boxDimensions.width / (12 / parseInt(scale))
-      return currentTitle.split(" ").reduce(
+      return currentTitle.split(" ")?.reduce(
         (acc, elem) => {
-          if (acc[acc.length - 1].length + elem.length > cardWidth / 11) {
+          if (acc[acc?.length - 1]?.length + elem?.length > cardWidth / 11) {
             acc.push("")
           }
-          acc[acc.length - 1] = `${acc[acc.length - 1]} ${elem}`.replace(/ +/g, " ")
+          acc[acc?.length - 1] = `${acc[acc?.length - 1]} ${elem}`.replace(/ +/g, " ")
           return acc
         },
         [""]
@@ -312,24 +314,24 @@ export default function QueryRender({ height = 0, ...props }) {
     const formatName = (name) => {
       if (name.indexOf("lamp") !== -1) {
         name = name
-          .slice(name.lastIndexOf(".") + 1)
+          ?.slice(name.lastIndexOf(".") + 1)
           .replace(/_/g, " ")
           .replace(/gps/gi, "GPS")
       }
-      let split = name.split(" ").map((elem) => elem.slice(0, 1).toUpperCase() + elem.slice(1))
-      return split.reduce((acc, elem) => `${acc} ${elem}`, "").slice(1)
+      let split = name.split(" ")?.map((elem) => elem?.slice(0, 1).toUpperCase() + elem?.slice(1))
+      return split?.reduce((acc, elem) => `${acc} ${elem}`, "")?.slice(1)
     }
     setResult(
-      targetList.map((target) => {
-        let selection = props.queryResult.filter((obj) => obj[filter] === target)
+      targetList?.map((target) => {
+        let selection = props.queryResult?.filter((obj) => obj[filter] === target)
 
         //if all elements are null
-        if (selection.length === selection.filter((obj) => obj["result"] === null).length && !displayMissingData)
+        if (selection?.length === selection?.filter((obj) => obj["result"] === null)?.length && !displayMissingData)
           return null
 
         let targetName = groupByID ? (selection[0]["alias"] ? `${selection[0]["alias"]} (${target})` : target) : target
 
-        if (stringFilter.length && groupByID && !(targetName.indexOf(stringFilter) !== -1)) return null
+        if (stringFilter?.length && groupByID && !(targetName.indexOf(stringFilter) !== -1)) return null
 
         async function saveIndividualToPDF(graphsPerRow, groupBy) {
           await saveVegaQueryResToPDF(selection, subfilter, graphsPerRow, groupBy)
@@ -434,7 +436,7 @@ export default function QueryRender({ height = 0, ...props }) {
               alignContent={"flex-start"}
               style={{ height: "100%", width: "100%", margin: "5px 0" }}
             >
-              {selection.map((elem) => {
+              {selection?.map((elem) => {
                 if (elem["result"] == null && !displayMissingData) return null
 
                 let subFilterName
@@ -444,7 +446,7 @@ export default function QueryRender({ height = 0, ...props }) {
                   subFilterName = elem[subfilter]
                 }
 
-                if (!groupByID && stringFilter.length && !(subFilterName.indexOf(stringFilter) !== -1)) return null
+                if (!groupByID && stringFilter?.length && !(subFilterName.indexOf(stringFilter) !== -1)) return null
 
                 let result = elem["result"]
                 let height = 0
@@ -540,8 +542,8 @@ export default function QueryRender({ height = 0, ...props }) {
     // want to display it as a string anyway
     case "array":
       if (
-        props.queryResult.filter((obj) => typeof obj === "object" && "result" in obj).length ===
-        props.queryResult.length
+        props.queryResult?.filter((obj) => typeof obj === "object" && "result" in obj)?.length ===
+        props.queryResult?.length
       ) {
         return (
           <Container ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%", maxHeight: "100%" }}>

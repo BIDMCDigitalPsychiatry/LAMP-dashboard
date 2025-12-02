@@ -38,7 +38,7 @@ function getContingencySettings() {
   const enumIds = localStorage.getItem("enumIds")
   const enumNames = localStorage.getItem("enumNames")
 
-  if (!enumIds || JSON.parse(enumIds).length === 0) return {}
+  if (!enumIds || JSON.parse(enumIds)?.length === 0) return {}
 
   return {
     contigencySettings: {
@@ -1035,6 +1035,7 @@ export const SchemaList = () => {
           },
           items: {
             required: ["text", "type"],
+
             type: "object",
             dependencies: {
               type: {
@@ -1042,167 +1043,38 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "short", "matrix"],
+                        enum: ["text", "boolean", "short", "likert", "matrix"],
                       },
-                      // ...geFeedBackSettings(),
                     },
                   },
                   {
-                    type: "object",
                     properties: {
                       type: {
-                        // type: "string",
-                        enum: ["likert", "boolean", "list", "multiselect"],
-                        // default: "list"
+                        enum: ["list", "multiselect"],
+                      },
+                      options: {
+                        type: "array",
+                        title: i18n.t("Response Options"),
+                        minItems: 1,
+                        items: {
+                          type: "object",
+                          properties: {
+                            value: {
+                              title: i18n.t("Option Text"),
+                              type: "string",
+                              minLength: 1,
+                              default: "",
+                            },
+                            description: {
+                              title: i18n.t("Option Description"),
+                              type: "string",
+                              default: "",
+                            },
+                          },
+                        },
                       },
                     },
-                    required: ["type", "options"],
-                    allOf: [
-                      // Likert type
-                      {
-                        if: {
-                          properties: { type: { const: "likert" } },
-                        },
-                        then: {
-                          required: ["options"],
-
-                          properties: {
-                            options: {
-                              type: "array",
-                              title: i18n.t("Response Options"),
-                              minItems: 4,
-                              maxItems: 4,
-                              default: [
-                                { value: "3", description: "Nearly All the Time", contigencySettings: {} },
-                                { value: "2", description: "More than Half the Time", contigencySettings: {} },
-                                { value: "1", description: "Several Times", contigencySettings: {} },
-                                { value: "0", description: "Not at all", contigencySettings: {} },
-                              ],
-                              items: {
-                                type: "object",
-                                properties: {
-                                  value: {
-                                    title: "Value",
-                                    readOnly: true,
-                                    type: "string",
-                                    enum: ["3", "2", "1", "0"],
-                                    enumNames: [
-                                      i18n.t("Nearly All the Time"),
-                                      i18n.t("More than Half the Time"),
-                                      i18n.t("Several Times"),
-                                      i18n.t("Not at all"),
-                                    ],
-                                  },
-                                  description: {
-                                    readOnly: true,
-                                    title: i18n.t("Option Description"),
-                                    type: "string",
-                                    "ui:widget": "textarea",
-                                    "ui:options": {
-                                      rows: 3,
-                                    },
-                                  },
-                                  ...geFeedBackSettings(),
-                                  ...geProConsSettings(),
-                                  ...getContingencySettings(),
-                                },
-                                required: ["value"],
-                              },
-                            },
-                          },
-                        },
-                      },
-
-                      // Boolean type
-                      {
-                        if: {
-                          properties: { type: { const: "boolean" } },
-                        },
-                        then: {
-                          properties: {
-                            options: {
-                              type: "array",
-                              title: i18n.t("Response Options"),
-                              minItems: 2,
-                              maxItems: 2,
-                              default: [
-                                { value: "Yes", description: "Yes", contigencySettings: {} },
-                                { value: "No", description: "No", contigencySettings: {} },
-                              ],
-                              items: {
-                                type: "object",
-                                properties: {
-                                  value: {
-                                    readOnly: true,
-                                    title: i18n.t("Option Text"),
-                                    type: "string",
-                                    enum: ["Yes", "No"],
-                                    enumNames: [i18n.t("Yes"), i18n.t("No")],
-                                  },
-                                  description: {
-                                    readOnly: true,
-                                    title: i18n.t("Option Description"),
-                                    type: "string",
-                                    "ui:widget": "textarea",
-                                    "ui:options": {
-                                      rows: 3,
-                                    },
-                                  },
-                                  ...geFeedBackSettings(),
-                                  ...geProConsSettings(),
-                                  ...getContingencySettings(),
-                                },
-                                required: ["value", "description"],
-                              },
-                            },
-                          },
-                          required: ["options"],
-                        },
-                      },
-                      {
-                        if: {
-                          properties: {
-                            type: {
-                              enum: ["list", "multiselect"],
-                            },
-                          },
-                        },
-                        then: {
-                          properties: {
-                            options: {
-                              type: "array",
-                              title: i18n.t("Response Options"),
-                              minItems: 1,
-                              items: {
-                                type: "object",
-                                properties: {
-                                  value: {
-                                    title: i18n.t("Option Text"),
-                                    type: "string",
-                                    minLength: 1,
-                                    default: "",
-                                  },
-                                  description: {
-                                    title: i18n.t("Option Description"),
-                                    type: "string",
-                                    default: "",
-                                    "ui:widget": "textarea",
-                                    "ui:options": {
-                                      rows: 3,
-                                    },
-                                  },
-                                  ...geFeedBackSettings(),
-                                  ...geProConsSettings(),
-                                  ...getContingencySettings(),
-                                },
-                                required: ["value"],
-                              },
-                            },
-                          },
-                          required: ["options"],
-                        },
-                      },
-                    ],
+                    required: ["options"],
                   },
                   {
                     properties: {
@@ -1224,7 +1096,6 @@ export const SchemaList = () => {
                               enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
                               default: "standard",
                             },
-                            // ...geFeedBackSettings(),
                           },
                         },
                       },
@@ -1252,9 +1123,6 @@ export const SchemaList = () => {
                               type: "string",
                               default: "",
                             },
-                            ...geFeedBackSettings(),
-                            ...geProConsSettings(),
-                            ...getContingencySettings(),
                           },
                         },
                       },
@@ -1270,20 +1138,7 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Text"),
                 minLength: 1,
-                maxLength: 500,
                 default: "",
-              },
-              image: {
-                title: i18n.t("Tips Image"),
-                description: i18n.t(
-                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
-                ),
-                type: "string",
-                format: "data-url",
-                "ui:widget": "file",
-                "ui:options": {
-                  accept: ".gif,.jpg,.png,.svg",
-                },
               },
               required: {
                 title: i18n.t("Required"),
@@ -1294,7 +1149,6 @@ export const SchemaList = () => {
                 type: "string",
                 title: i18n.t("Question Description"),
                 default: "",
-                maxLength: 500,
               },
               type: {
                 type: "string",
@@ -1702,26 +1556,6 @@ export const SchemaList = () => {
         },
       },
     },
-    "lamp.zoom_meeting": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Details"),
-          type: "object",
-          required: ["zoom_link"],
-          properties: {
-            zoom_link: {
-              title: i18n.t("Meeting Link"),
-              type: "string",
-              "ui:widget": "textarea",
-              "ui:options": {
-                rows: 5,
-              },
-            },
-          },
-        },
-      },
-    },
     "lamp.breathe": {
       type: "object",
       properties: {
@@ -1775,13 +1609,13 @@ export const SchemaList = () => {
 }
 
 // Splice a raw Activity object with its ActivityDescription object.
-export function spliceActivity({ raw, tag }) {
+export function spliceActivity({ raw, tag, mainactivity }: { raw: any; tag: any; mainactivity?: any }) {
   return {
     id: raw.id,
     study_id: raw.study_id,
     category: raw.category,
     spec: "lamp.survey",
-    name: raw.name,
+    name: mainactivity?.spec === "lamp.group" || mainactivity?.spec === "lamp.module" ? mainactivity?.name : raw.name,
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
@@ -1791,7 +1625,7 @@ export function spliceActivity({ raw, tag }) {
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
-      : raw.settings.map((question, idx) => ({
+      : raw.settings?.map((question, idx) => ({
           text: question.text,
           type: question.type,
           required: question.required ?? false,
@@ -1869,7 +1703,7 @@ export function unspliceActivity(x) {
         // feedback_text: y?.feedback_text ?? "",
         image: y?.image,
         options: Array.isArray(y?.options)
-          ? y.options.map((z) => ({
+          ? y.options?.map((z) => ({
               description: z?.description ?? "",
               feedback_text: z?.feedback_text ?? "",
               pros: z?.pros ?? "",
@@ -1904,12 +1738,12 @@ export function unspliceCTActivity(x) {
   }
 }
 
-export function spliceCTActivity({ raw, tag }) {
+export function spliceCTActivity({ raw, tag, mainactivity }: { raw: any; tag: any; mainactivity?: any }) {
   return {
     id: raw.id,
     study_id: raw.study_id,
     spec: raw.spec,
-    name: raw.name,
+    name: mainactivity?.spec === "lamp.group" ? mainactivity?.name : raw.name,
     description: tag?.description,
     photo: tag?.photo,
     streak: tag?.streak,
@@ -1931,6 +1765,7 @@ export async function saveTipActivity(x) {
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
+      description: x.description,
     })
   } else {
     result = (await LAMP.Activity.update(x.id, {
@@ -1940,6 +1775,7 @@ export async function saveTipActivity(x) {
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
+      description: x.description,
     })
   }
   return result
@@ -1979,8 +1815,7 @@ export async function getDefaultTab(spec) {
       spec === "lamp.group" ||
       spec === "lamp.dbt_diary_card" ||
       spec === "lamp.recording" ||
-      spec === "lamp.survey" ||
-      spec === "lamp.zoom_meeting"
+      spec === "lamp.survey"
     ) {
       return "assess"
     }
@@ -2075,6 +1910,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         id: x.id,
         name: x.name,
         icon: x.icon,
+        description: x.description,
         studyID: selectedActivity?.study_id,
         spec: "lamp.tips",
         settings: x.settings,
@@ -2092,6 +1928,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         streak: x.streak,
         visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
+        description: x.description,
       })
       return result
     }
@@ -2100,7 +1937,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
 export function addActivity(x, studies) {
   Service.updateCount("studies", x.studyID, "activity_count")
   x["study_id"] = x.studyID
-  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+  x["study_name"] = studies?.filter((study) => study.id === x.studyID)[0]?.name
   delete x["studyID"]
   Service.addData("activities", [x])
 }

@@ -21,12 +21,12 @@ export default function ParticipantName({ participant, updateParticipant, openSe
   const [aliasName, setAliasName] = useState("")
   const [name, setName] = useState(participant.name ?? "")
 
-  useEffect(() => {
-    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      setAliasName(data[0]?.name ?? participant.id ?? "")
-      setName(data[0]?.name ?? participant.id ?? "")
-    })
-  }, [participant])
+  // useEffect(() => {
+  //   Service.getDataByKey("participants", [participant.id], "id").then((data) => {
+  //     setAliasName(data[0]?.name ?? participant.id ?? "")
+  //     setName(data[0]?.name ?? participant.id ?? "")
+  //   })
+  // }, [participant])
 
   useEffect(() => {
     if (openSettings) setEditData(false)
@@ -54,9 +54,9 @@ export default function ParticipantName({ participant, updateParticipant, openSe
             editUserId={editUserId}
             updateName={updateName}
           />
-        ) : aliasName && editUserId === participant.id && aliasName?.trim().length > 0 ? (
+        ) : aliasName && editUserId === participant.id && aliasName?.trim()?.length > 0 ? (
           aliasName
-        ) : name && name?.trim().length > 0 ? (
+        ) : name && name?.trim()?.length > 0 ? (
           name
         ) : (
           participant.id

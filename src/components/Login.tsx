@@ -89,8 +89,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const [open, setOpen] = useState(false)
   const userTokenKey = "tokenInfo"
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
@@ -137,13 +137,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         { label: "mindlamp-qa.dmh.lacounty.gov" },
       ]
     } else {
-      options = (JSON.parse(cachedOptions) || []).filter((o) => typeof o?.label !== "undefined")
+      options = (JSON.parse(cachedOptions) || [])?.filter((o) => typeof o?.label !== "undefined")
     }
     setOptions(options)
     let query = window.location.hash.split("?")
-    if (!!query && query.length > 1) {
+    if (!!query && query?.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
-      if (typeof src === "string" && src.length > 0) {
+      if (typeof src === "string" && src?.length > 0) {
         setState((state) => ({ ...state, serverAddress: src }))
         setSrcLocked(true)
       }
@@ -164,24 +164,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  const generateTokens = async (args: { id: string; password: string }) => {
-    setLoginClick(false)
-    const userName = args?.id?.trim()
-    const password = args?.password?.trim()
+  // const generateTokens = async (args: { id: string; password: string }) => {
+  //   setLoginClick(false)
+  //   const userName = args?.id?.trim()
+  //   const password = args?.password?.trim()
 
-    if (userName && password) {
-      try {
-        const res = await LAMP.Credential.login(userName, password)
-        sessionStorage.setItem(
-          userTokenKey,
-          JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-        )
-        props?.setAuthenticated(true)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
+  //   if (userName && password) {
+  //     try {
+  //       // const res = await LAMP.Credential.login(userName, password)
+  //       // sessionStorage.setItem(
+  //       //   userTokenKey,
+  //       //   JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+  //       // )
+  //       props?.setAuthenticated(true)
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
+  // }
 
   const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
@@ -194,110 +194,78 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     return true
   }
 
-  let handleLogin = async (event: any, mode?: string) => {
+  let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
-    clearLocalStorageItems()
-    const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
-    if (!checkMAxAttempts()) {
-      return
-    }
-    setLoginClick(true)
     if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
       options.push({ label: state.serverAddress })
       localStorage.setItem("cachedOptions", JSON.stringify(options))
     }
     setOptions(options)
-    // setLoginClick(true)
+    setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
         variant: "error",
       })
+      setLoginClick(false)
       return
     }
-    if (!mode) {
-      await LAMP.Auth.set_identity({
-        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-        password: !!mode ? "demo" : state.password,
-        serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-      }).catch((err) => {
-        const currentAttempts = attempts + 1
-        localStorage.setItem(LOGIN_ATTEMPTS_KEY, currentAttempts.toString())
-        if (currentAttempts >= MAX_ATTEMPTS) {
-          const lockoutUntil = Date.now() + LOCKOUT_DURATION
-          localStorage.setItem(LOCKOUT_TIME_KEY, lockoutUntil.toString())
-          setIsLockedOut(true)
-          setLoginClick(false)
-        } else {
-          enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
-            variant: "error",
-          })
-          if (!srcLocked)
-            enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, {
-              variant: "info",
-            })
-        }
-      })
-      await generateTokens({
-        id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-        password: !!mode ? "demo" : state.password,
-      })
-    }
-    const res = await setIdentity({
+    setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
-
-    if (res.authType === "participant") {
-      await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
-      await LAMP.SensorEvent.create(res.identity.id, {
-        timestamp: Date.now(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "login",
-          device_type: "Dashboard",
-          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-        },
-      } as any).then((res) => console.dir(res))
-      await LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
-    }
-    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
-      let studiesSelected =
-        localStorage.getItem("studies_" + res.identity.id) !== null
-          ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
-          : []
-      if (studiesSelected.length === 0) {
-        let studiesList = [res.identity.name]
-        localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
-        localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
-      }
-    }
-    process.env.REACT_APP_LATEST_LAMP === "true"
-      ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
-      : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
-    localStorage.setItem(
-      "LAMP_user_" + res?.identity?.id,
-      JSON.stringify({
-        language: selectedLanguage,
+      .then((res) => {
+        if (res.authType === "participant") {
+          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
+          LAMP.SensorEvent.create(res.identity.id, {
+            timestamp: Date.now(),
+            sensor: "lamp.analytics",
+            data: {
+              type: "login",
+              device_type: "Dashboard",
+              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+            },
+          } as any).then((res) => console.dir(res))
+          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
+        }
+        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+          let studiesSelected =
+            localStorage.getItem("studies_" + res.identity.id) !== null
+              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+              : []
+          if (studiesSelected?.length === 0) {
+            let studiesList = [res.identity.name]
+            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+          }
+        }
+        process.env.REACT_APP_LATEST_LAMP === "true"
+          ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
+          : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
+        localStorage.setItem(
+          "LAMP_user_" + res.identity.id,
+          JSON.stringify({
+            language: selectedLanguage,
+          })
+        )
+        ;(async () => {
+          await Service.deleteDB()
+          if (mode != "selfHelp") {
+            await Service.deleteUserDB()
+          }
+        })()
+        setLoginClick(false)
+        onComplete()
       })
-    )
-    ;(async () => {
-      await Service.deleteDB()
-      await Service.deleteUserDB()
-    })()
-    if (!srcLocked)
-      enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-    onComplete()
-    setLoginClick(true)
-    // .catch((err) => {
-    //   // console.warn("error with auth request", err)
-    //   enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
-    //     variant: "error",
-    //   })
-    //   if (!srcLocked)
-    //     enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
-    //   setLoginClick(false)
-    // })
+      .catch((err) => {
+        // console.warn("error with auth request", err)
+        enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
+          variant: "error",
+        })
+        if (!srcLocked)
+          enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
+        setLoginClick(false)
+      })
   }
   const handleSubmit = () => {
     LAMP.initializeDemoDB(self_help_db)
@@ -404,7 +372,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                     variant="filled"
                     value={selectedLanguage || "en-US"}
                   >
-                    {Object.keys(locale_lang).map((key, value) => {
+                    {Object.keys(locale_lang)?.map((key, value) => {
                       if (userLanguages.includes(key)) {
                         return (
                           <MenuItem key={key} value={key}>

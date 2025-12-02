@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react"
 import { TextField, makeStyles, createStyles, Theme, Grid, Divider, Typography, MenuItem } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
+import LAMP from "lamp-core"
+import { getActivitiesByStudyWithDeduplication } from "../../../helper/functions"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menuitemsul: {
@@ -34,16 +35,9 @@ export default function BranchingSettings({ ...props }) {
     updateActivityList()
   }, [props.studyId])
 
-  const updateActivityList = () => {
-    Service.getAll("activities").then((activities) => {
-      setEnumGrpActivities(
-        (activities || [])
-          .filter(
-            (data) => data.study_id == props.studyId && (data.spec === "lamp.group" || data.spec === "lamp.module")
-          )
-          .map((data) => ({ id: data.id, name: data.name }))
-      )
-    })
+  const updateActivityList = async () => {
+    const activities = await getActivitiesByStudyWithDeduplication(props.studyId)
+    setEnumGrpActivities((activities || [])?.map((data) => ({ id: data.id, name: data.name })))
   }
 
   return (
@@ -75,7 +69,7 @@ export default function BranchingSettings({ ...props }) {
               }}
               variant="filled"
             >
-              {(enumGrpActivities || []).map((option) => (
+              {(enumGrpActivities || [])?.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {t(option.name)}
                 </MenuItem>

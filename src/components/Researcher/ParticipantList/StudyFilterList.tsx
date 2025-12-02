@@ -3,7 +3,6 @@ import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-u
 // Local Imports
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
 
 export interface NewStudy {
   id?: string
@@ -60,6 +59,9 @@ export default function StudyFilterList({
   setSelectedStudies,
   selectedStudies,
   updateCount,
+  participants,
+  filterData,
+  participantCount,
   ...props
 }: {
   studies?: Array<any>
@@ -69,6 +71,9 @@ export default function StudyFilterList({
   setSelectedStudies?: Function
   selectedStudies?: Array<string>
   updateCount?: number
+  participants?: Array<any>
+  filterData?: any
+  participantCount?: any
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -85,13 +90,8 @@ export default function StudyFilterList({
   }, [studies])
 
   const refreshStudies = () => {
-    Service.getAll("studies").then((data: any) => {
-      setStuds(data || [])
-      let studiesArray = (data || []).map(function (obj) {
-        return obj.name
-      })
-      setAllStudies(studiesArray)
-    })
+    setStuds(studies)
+    setAllStudies(studies?.map((s) => s.name))
   }
 
   useEffect(() => {
@@ -105,18 +105,18 @@ export default function StudyFilterList({
   useEffect(() => {
     let studiesData = filterStudyData(studs)
     setStudiesCount(studiesData)
-  }, [studs])
+  }, [studs, filterData])
 
   const filterStudyData = (dataArray) => {
-    return Object.assign(
+    return Object?.assign(
       {},
-      ...dataArray.map((item) => ({
+      ...dataArray?.map((item) => ({
         [item.name]:
           type === "activities" || updateCount === 2
-            ? item.activity_count
+            ? filterData[item.id] ?? 0
             : type === "sensors" || updateCount === 3
-            ? item.sensor_count
-            : item.participant_count,
+            ? filterData[item.id] ?? 0
+            : participantCount[item.id] ?? 0,
       }))
     )
   }
@@ -132,7 +132,7 @@ export default function StudyFilterList({
       {showFilterStudies === true && (
         <Box mt={1}>
           <Box className={classes.filterChips}>
-            {[`${t("Select All")}`, `${t("Deselect All")}`].map((item) => (
+            {[`${t("Select All")}`, `${t("Deselect All")}`]?.map((item) => (
               <Tooltip key={item} style={{ margin: 4 }} title={item}>
                 <Chip
                   classes={{
@@ -148,9 +148,9 @@ export default function StudyFilterList({
                   color={
                     (getFilterTypeStorage() === 1 &&
                       item === "Select All" &&
-                      selectedStudies.length === studies.length) ||
-                    (getFilterTypeStorage() === 2 && item === "Deselect All" && selectedStudies.length === 0) ||
-                    (item === "Deselect All" && selectedStudies.length === 0)
+                      selectedStudies?.length === studies?.length) ||
+                    (getFilterTypeStorage() === 2 && item === "Deselect All" && selectedStudies?.length === 0) ||
+                    (item === "Deselect All" && selectedStudies?.length === 0)
                       ? "primary"
                       : undefined
                   }
@@ -184,14 +184,14 @@ export default function StudyFilterList({
             {
               <MultipleSelect
                 selected={selectedStudies}
-                items={(studs || []).map((x) => `${x.name}`)}
+                items={(studs || [])?.map((x) => `${x.name}`)}
                 showZeroBadges={false}
                 badges={studiesCount}
                 onChange={(x) => {
                   localStorage.setItem("studies_" + researcherId, JSON.stringify(x))
                   setSelectedStudies(x)
                   let flagData = 0 // 0 = "", 1 = "Select All", 2 = "Deselect All"
-                  if (allStudies.length == x.length) {
+                  if (allStudies?.length == x?.length) {
                     flagData = 1
                   }
                   localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(flagData))

@@ -51,7 +51,7 @@ const ModuleActivity = ({ ...props }) => {
         if (module) {
           const splitData = module.split(">")
           await handleClickOpen({ spec: "lamp.module", id: splitData[0] })
-          setSubModuleInLocalStorage(splitData.slice(1))
+          setSubModuleInLocalStorage(splitData?.slice(1))
         } else {
           handleClickOpen({ spec: "lamp.module", id: moduleId })
         }
@@ -66,13 +66,13 @@ const ModuleActivity = ({ ...props }) => {
 
   useEffect(() => {
     const run = async () => {
-      if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0 && openSubModules.length > 0) {
-        const data = openSubModules[openSubModules.length - 1].subActivities.find(
+      if (!!subModuleInLocalStorage && subModuleInLocalStorage?.length > 0 && openSubModules?.length > 0) {
+        const data = openSubModules[openSubModules?.length - 1].subActivities.find(
           (mod) => mod.id === subModuleInLocalStorage[0]
         )
         if (data) {
           await handleSubModule(data)
-          setSubModuleInLocalStorage(subModuleInLocalStorage.slice(1))
+          setSubModuleInLocalStorage(subModuleInLocalStorage?.slice(1))
         }
       }
     }
@@ -129,7 +129,7 @@ const ModuleActivity = ({ ...props }) => {
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
         if (
-          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+          (moduleStarted && activityEvents?.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
         ) {
           fetchedData["isCompleted"] = true
@@ -139,7 +139,7 @@ const ModuleActivity = ({ ...props }) => {
         } else {
           if (sequential && !sequentialActivityAdded) {
             sequentialActivityAdded = true
-            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
+            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents?.length === 0) {
               setModuleForNotification(fetchedData)
             }
           } else if (sequential && sequentialActivityAdded) {
@@ -154,7 +154,7 @@ const ModuleActivity = ({ ...props }) => {
         setLoadingModules(false)
       }
     }
-    const filteredArr = arr.filter((item) => item != null)
+    const filteredArr = arr?.filter((item) => item != null)
     delete moduleActivityData.settings
     setSubModuleData({
       ...data,
@@ -167,7 +167,7 @@ const ModuleActivity = ({ ...props }) => {
     if (!!localStorage.getItem("parentStringForSurvey")) {
       if (localStorage.getItem("parentStringForSurvey") === parentsString) {
         localStorage.removeItem("parentStringForSurvey")
-        setIndexToLoad(splitData.length - 1)
+        setIndexToLoad(splitData?.length - 1)
         setLoadingModules(false)
       }
     } else {
@@ -180,7 +180,7 @@ const ModuleActivity = ({ ...props }) => {
     let moduleStartTime
     await getActivityEvents(participant, id, startTime).then((res) => {
       if (res?.length) {
-        const smallestTimestamp = new Date(Math.min(...res.map((event) => new Date(event.timestamp).getTime())))
+        const smallestTimestamp = new Date(Math.min(...res?.map((event) => new Date(event.timestamp).getTime())))
         moduleStartTime = smallestTimestamp
       } else {
         moduleStartTime = null
@@ -215,20 +215,20 @@ const ModuleActivity = ({ ...props }) => {
   }
 
   const checkIsModuleCompleted = async (id) => {
-    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")]?.map((y: any) =>
       !!y?.error ? undefined : y?.data
     )[0]
-    const isCompleted = (tag || []).filter((t) => t.moduleId === id && t.participants.includes(participant.id))
-    return isCompleted.length > 0 ? true : false
+    const isCompleted = (tag || [])?.filter((t) => t.moduleId === id && t.participants.includes(participant.id))
+    return isCompleted?.length > 0 ? true : false
   }
 
   const createCompletedAttachment = async (id) => {
-    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+    let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")]?.map((y: any) =>
       !!y?.error ? undefined : y?.data
     )[0]
-    let checkIsModule = (tag || []).filter((t) => t.moduleId === id)
-    let checkNotModule = (tag || []).filter((t) => t.moduleId !== id)
-    if (!checkIsModule.length) {
+    let checkIsModule = (tag || [])?.filter((t) => t.moduleId === id)
+    let checkNotModule = (tag || [])?.filter((t) => t.moduleId !== id)
+    if (!checkIsModule?.length) {
       checkNotModule.push({ moduleId: id, participants: participant?.id ?? participant })
     } else {
       checkIsModule.forEach((item) => {
@@ -237,7 +237,7 @@ const ModuleActivity = ({ ...props }) => {
         }
       })
     }
-    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", checkNotModule.concat(checkIsModule))
+    await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", checkNotModule?.concat(checkIsModule))
   }
 
   const addModuleActivityEvent = async (data) => {
@@ -264,7 +264,7 @@ const ModuleActivity = ({ ...props }) => {
           const activityEvents =
             moduleStartTime === null ? [] : await getActivityEvents(participant, id, moduleStartTime)
           if (
-            (activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+            (activityEvents?.length > 0 && fetchedData.spec !== "lamp.module") ||
             (fetchedData.spec === "lamp.module" && (await addModuleActivityEvent(fetchedData)))
           ) {
             arr.push(id)
@@ -273,7 +273,7 @@ const ModuleActivity = ({ ...props }) => {
           console.error("Error fetching data for id:", id, error)
         }
       }
-      if (arr.length === validIds.length) {
+      if (arr?.length === validIds?.length) {
         if (await checkIsModuleCompleted(data.id)) {
           activityEventCreated = true
         } else {
@@ -325,7 +325,7 @@ const ModuleActivity = ({ ...props }) => {
           fetchedData.spec === "lamp.module" && moduleStarted ? await addModuleActivityEvent(fetchedData) : false
         delete fetchedData.settings
         if (
-          (moduleStarted && activityEvents.length > 0 && fetchedData.spec !== "lamp.module") ||
+          (moduleStarted && activityEvents?.length > 0 && fetchedData.spec !== "lamp.module") ||
           (fetchedData.spec === "lamp.module" && eventCreated)
         ) {
           fetchedData["isCompleted"] = true
@@ -335,7 +335,7 @@ const ModuleActivity = ({ ...props }) => {
         } else {
           if (sequential && !sequentialActivityAdded) {
             sequentialActivityAdded = true
-            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents.length === 0) {
+            if (moduleStarted && fetchedData.spec === "lamp.module" && activityEvents?.length === 0) {
               setModuleForNotification(fetchedData)
             }
           } else if (sequential && sequentialActivityAdded) {
@@ -350,7 +350,7 @@ const ModuleActivity = ({ ...props }) => {
         setLoadingModules(false)
       }
     }
-    const filteredArr = arr.filter((item) => item != null)
+    const filteredArr = arr?.filter((item) => item != null)
     delete moduleActivityData.settings
 
     moduleActivityData.subActivities = filteredArr
@@ -367,7 +367,7 @@ const ModuleActivity = ({ ...props }) => {
     setModuleData((prev) => sortModulesByCompletion([...prev, moduleActivityData]))
     setOpenSubModules([moduleActivityData])
     const splitData = localStorage.getItem("parentStringForSurvey")?.split(">")
-    if (!splitData || splitData.length <= 1) setIndexToLoad(indexToLoad + 1)
+    if (!splitData || splitData?.length <= 1) setIndexToLoad(indexToLoad + 1)
     setLoadingModules(false)
   }
 
@@ -375,20 +375,20 @@ const ModuleActivity = ({ ...props }) => {
   useEffect(() => {
     ;(async () => {
       let tag =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")]?.map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0] ?? []
-      setFavorites(openSubModules.filter((activity) => tag?.includes(activity.id)).map((activity) => activity.id))
+      setFavorites(openSubModules?.filter((activity) => tag?.includes(activity.id))?.map((activity) => activity.id))
     })()
   }, [openSubModules])
 
   const updateIsCompleted = (subActivityId, parentString) => {
     const updateRecursive = (activities) => {
-      return activities.map((activity) => {
+      return activities?.map((activity) => {
         if (activity.id === subActivityId && activity.parentString === parentString) {
           return { ...activity, isCompleted: true }
         }
-        if (activity.subActivities && activity.subActivities.length > 0) {
+        if (activity.subActivities && activity.subActivities?.length > 0) {
           const updatedSubActivities = updateRecursive(activity.subActivities)
           return { ...activity, subActivities: updatedSubActivities }
         }
@@ -406,7 +406,7 @@ const ModuleActivity = ({ ...props }) => {
       const lastActiveTab = localStorage.getItem("lastActiveTab").toLowerCase()
       window.location.href = `/#/participant/${participant}/${lastActiveTab}`
     } else {
-      const newArr = openSubModules.slice(0, -1)
+      const newArr = openSubModules?.slice(0, -1)
       setOpenSubModules(newArr)
       setIndexToLoad(indexToLoad - 1)
     }
@@ -432,8 +432,8 @@ const ModuleActivity = ({ ...props }) => {
             type={null}
             showStreak={null}
             participant={participant?.id ?? participant}
-            updateIsCompleted={updateIsCompleted}
-            updateLocalStorage={updateLocalStorage}
+            // updateIsCompleted={updateIsCompleted}
+            // updateLocalStorage={updateLocalStorage}
           />
           {!!moduleForNotification && (
             <Dialog

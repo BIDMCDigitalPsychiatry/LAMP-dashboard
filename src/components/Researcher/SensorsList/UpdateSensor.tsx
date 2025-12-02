@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
-import { Service } from "../../DBService/DBService"
 import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 
@@ -24,6 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
 export interface Sensors {
   id?: string
   study_id?: string
+  study_name?: string
+  name?: string
+  spec?: string
 }
 export default function UpdateSensor({
   studies,
@@ -34,7 +36,7 @@ export default function UpdateSensor({
   profile,
   ...props
 }: {
-  studies?: Array<Object>
+  studies?: any
   sensor?: Sensors
   type?: string
   studyId?: string
@@ -49,24 +51,14 @@ export default function UpdateSensor({
 
   useEffect(() => {
     if (!!profile) {
-      LAMP.Participant.allByStudy(studyId).then((result) => {
-        setParticipantCount(result.length)
-      })
-    }
-    getAllStudies()
-  }, [])
-
-  useEffect(() => {
-    getAllStudies()
-  }, [sensorDialog])
-
-  const getAllStudies = () => {
-    Service.getAll("sensors").then((sensorObj) => {
-      if (sensorObj) {
-        setAllSensors(sensorObj)
+      const study_id = studies && studies[0]?.id
+      if (study_id) {
+        LAMP.Participant.allByStudy(study_id).then((result) => {
+          setParticipantCount(result?.length)
+        })
       }
-    })
-  }
+    }
+  }, [])
 
   const addOrUpdateSensor = (sensor?: any) => {
     setSensorDialog(false)
@@ -103,16 +95,19 @@ export default function UpdateSensor({
             : null
         }
       />
-      <SensorDialog
-        sensor={sensor}
-        onClose={() => setSensorDialog(false)}
-        studies={studies}
-        open={sensorDialog}
-        type="edit"
-        studyId={studyId ?? null}
-        addOrUpdateSensor={addOrUpdateSensor}
-        allSensors={allSensors}
-      />
+      {!!sensorDialog ? (
+        <SensorDialog
+          sensor={sensor}
+          onClose={() => setSensorDialog(false)}
+          studies={studies}
+          open={sensorDialog}
+          type="edit"
+          studyId={studyId ?? null}
+          addOrUpdateSensor={addOrUpdateSensor}
+        />
+      ) : (
+        <></>
+      )}
     </Box>
   )
 }

@@ -291,11 +291,11 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
       setStorageData({ ...storageData, skill: skillRange })
       let skillData = []
       let timeStamp = skillRange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-        event.temporal_slices.map((slice) => {
+        event.temporal_slices?.map((slice) => {
           if (
             slice.level === "skill" &&
             event.timestamp <= parseInt(timeStamp[0]) &&
@@ -310,7 +310,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
 
       let dates = getDates(timeStamp[1], timeStamp[0])
       let selDates = []
-      dates.map((date) => {
+      dates?.map((date) => {
         selDates.push(
           (getDateVal(date).getMonth() + 1).toString().padStart(2, "0") +
             "/" +
@@ -338,7 +338,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
     } else {
       data.push(key)
     }
-    setExpanded(data.length > 0)
+    setExpanded(data?.length > 0)
     setExpandedSkills([...data])
   }
 
@@ -357,7 +357,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                 setSkillRange(event.target.value)
               }}
             >
-              {dateArray.map((dateString) => (
+              {dateArray?.map((dateString) => (
                 <option value={dateString.timestamp}>{dateString.date}</option>
               ))}
             </NativeSelect>
@@ -393,7 +393,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
         </Grid>
       </Grid>
       <TableContainer className={classes.tableOuter}>
-        {data.map((v, kv) => {
+        {data?.map((v, kv) => {
           return (
             <div className={classes.tableDiv}>
               <Accordion
@@ -427,18 +427,18 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                     <Table>
                       <TableHead>
                         {(!!skillData &&
-                          (v?.data || []).filter((each) => !!skillData[each]).length > 0 &&
+                          (v?.data || [])?.filter((each) => !!skillData[each])?.length > 0 &&
                           filterChecked) ||
                         !filterChecked ? (
                           <TableRow>
                             <TableCell className={classes.skillWidth}>Skills</TableCell>
-                            {(selectedDates || []).map((date) => (
+                            {(selectedDates || [])?.map((date) => (
                               <TableCell className={classes.colDate}>{date}</TableCell>
                             ))}
                           </TableRow>
                         ) : (
                           <TableRow>
-                            <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
+                            <TableCell className={classes.skillWidth} colSpan={selectedDates?.length + 1}>
                               {`${t("No records found")}`}
                             </TableCell>
                           </TableRow>
@@ -464,7 +464,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                             >
                               {v.data[0]}
                             </TableCell>
-                            {(selectedDates || []).map((d) => (
+                            {(selectedDates || [])?.map((d) => (
                               <TableCell
                                 className={
                                   classes.colCheck +
@@ -487,7 +487,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                             ))}
                           </TableRow>
                         )}
-                        {v.data.map(
+                        {v.data?.map(
                           (k, key) =>
                             ((!!skillData && !!skillData[k] && filterChecked) || !filterChecked) &&
                             key !== 0 && (
@@ -505,7 +505,7 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, set
                                 }
                               >
                                 <TableCell className={classes.skillWidth}>{k}</TableCell>
-                                {(selectedDates || []).map((d) => (
+                                {(selectedDates || [])?.map((d) => (
                                   <TableCell className={classes.colCheck}>
                                     {!!skillData && skillData[k]?.includes(d) ? (
                                       <Icon className={classes.greentxt}>check</Icon>

@@ -180,11 +180,11 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   useEffect(() => {
     let dateArray = []
     let weekend
-    if (selectedEvents.length > 0) {
-      selectedEvents = selectedEvents.sort((a, b) => {
+    if (selectedEvents?.length > 0) {
+      selectedEvents = selectedEvents?.sort((a, b) => {
         return a.timestamp - b.timestamp
       })
-      let start = new Date(selectedEvents[selectedEvents.length - 1].timestamp)
+      let start = new Date(selectedEvents[selectedEvents?.length - 1].timestamp)
       let i = 0
       while (start >= selectedEvents[0].timestamp) {
         weekend = new Date(start)
@@ -208,7 +208,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       setStorageData(ranges)
       setDBTrange(ranges["dbt"])
     } else {
-      setDBTrange(setTimestamp(new Date(selectedEvents[selectedEvents.length - 1].timestamp)))
+      setDBTrange(setTimestamp(new Date(selectedEvents[selectedEvents?.length - 1].timestamp)))
       setLoaded(true)
     }
   }, [selectedEvents])
@@ -275,9 +275,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let summaryData = []
       setStorageData({ ...storageData, summary: summaryRange })
       let timeStamp = summaryRange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1])) {
-          event.temporal_slices.map((slice) => {
+          event.temporal_slices?.map((slice) => {
             if (!!slice.value) {
               if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
                 dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
@@ -294,7 +294,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           }
         }
       })
-      if (Object.keys(dData).length === 0) {
+      if (Object.keys(dData)?.length === 0) {
         summaryData.push({ action: "", count: 0 })
       } else {
         Object.keys(dData).forEach(function (key) {
@@ -313,14 +313,14 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let emotionData = []
       setStorageData({ ...storageData, emotion: emotionrange })
       let timeStamp = emotionrange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate()
         var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
 
-        event.temporal_slices.map((slice) => {
+        event.temporal_slices?.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "emotion":
@@ -332,9 +332,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         })
       })
       let dates = getDates(timeStamp[1], timeStamp[0])
-      dates.map((d) => {
-        if (emotionData.length === 0) {
-          if (emotionData.filter((eff) => eff.date === d).length === 0) {
+      dates?.map((d) => {
+        if (emotionData?.length === 0) {
+          if (emotionData?.filter((eff) => eff.date === d)?.length === 0) {
             emotionData.push({ value: null, date: d, symbol: "None" })
           }
         }
@@ -351,13 +351,13 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let effectivesData = []
       setStorageData({ ...storageData, effective: effectiverange })
       let timeStamp = effectiverange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate()
         var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
-        event.temporal_slices.map((slice) => {
+        event.temporal_slices?.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "target_effective":
@@ -369,9 +369,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         })
       })
       let dates = getDates(timeStamp[1], timeStamp[0])
-      dates.map((d) => {
-        if (effectivesData.length === 0) {
-          if (effectivesData.filter((eff) => eff.date === d).length === 0) {
+      dates?.map((d) => {
+        if (effectivesData?.length === 0) {
+          if (effectivesData?.filter((eff) => eff.date === d)?.length === 0) {
             effectivesData.push({ value: null, date: d, symbol: "None" })
           }
         }
@@ -388,13 +388,13 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let inEffectiveData = []
       setStorageData({ ...storageData, inEffective: inEffectiverange })
       let timeStamp = inEffectiverange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate()
         var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
-        event.temporal_slices.map((slice) => {
+        event.temporal_slices?.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "target_ineffective":
@@ -420,9 +420,9 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         }
       })
       let dates = getDates(timeStamp[1], timeStamp[0])
-      dates.map((d) => {
-        if (inEffectiveData.length === 0) {
-          if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+      dates?.map((d) => {
+        if (inEffectiveData?.length === 0) {
+          if (inEffectiveData?.filter((eff) => eff.date === d)?.length === 0) {
             inEffectiveData.push({ value: null, date: d, symbol: "None" })
           }
         }
@@ -440,14 +440,14 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let tData = []
       setStorageData({ ...storageData, action: actionrange })
       let timeStamp = actionrange.split("-")
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
 
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
-        event.temporal_slices.map((slice) => {
+        event.temporal_slices?.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             if (
               slice.type !== null &&
@@ -462,7 +462,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           }
         })
       })
-      if (Object.keys(tData).length === 0) {
+      if (Object.keys(tData)?.length === 0) {
         let date = new Date(parseInt(timeStamp[0]))
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
@@ -495,7 +495,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={dbtrange}
                 onChange={(event) => setDBTrange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
@@ -507,7 +507,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={emotionrange}
                 onChange={(event) => setEmotionrange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
@@ -518,7 +518,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={effectiverange}
                 onChange={(event) => setEffectiverange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
@@ -529,7 +529,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={inEffectiverange}
                 onChange={(event) => setInEffectiverange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
@@ -540,7 +540,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={summaryRange}
                 onChange={(event) => setSummaryRange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
@@ -551,7 +551,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 value={actionrange}
                 onChange={(event) => setActionrange(event.target.value)}
               >
-                {dateArray.map((dateString) => (
+                {dateArray?.map((dateString) => (
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>

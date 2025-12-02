@@ -92,11 +92,13 @@ export default function ParticipantListItem({
   handleSelectionChange,
   selectedParticipants,
   researcherId,
+  sensor,
+  event,
   ...props
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(
-    selectedParticipants.filter((d) => d.id === participant.id).length > 0 ? true : false
+    selectedParticipants?.filter((d) => d.id === participant.id)?.length > 0 ? true : false
   )
   const [user, setName] = useState(participant)
   const [openSettings, setOpenSettings] = useState(false)
@@ -115,7 +117,6 @@ export default function ParticipantListItem({
   }, [user])
 
   useEffect(() => {}, [])
-
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" p={1}>
@@ -136,8 +137,8 @@ export default function ParticipantListItem({
             className={classes.participantHeader}
           />
           <CardContent className={classes.participantSub}>
-            <Passive participant={participant} />
-            <Active participant={participant} />
+            <Passive sensor={sensor} />
+            <Active event={event} participant={participant} />
           </CardContent>
         </Box>
         <Box>
@@ -145,7 +146,9 @@ export default function ParticipantListItem({
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} fromParticipant={true} />
             <Link
-              href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`}
+              href={`/#/researcher/${researcherId}/participant/${participant?.id}/study/${
+                participant?.studyId || participant?.study_id
+              }/settings`}
               underline="none"
               className={classes.settingslink}
             >

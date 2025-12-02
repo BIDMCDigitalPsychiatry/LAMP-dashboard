@@ -13,12 +13,13 @@ import zhHK from "javascript-time-ago/locale/zh-Hans-HK"
 import fr from "javascript-time-ago/locale/fr"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
-import { Service } from "../../DBService/DBService"
-import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { Service } from "../../DBService/DBService"
+import { sortData } from "../Dashboard"
+import { getBasicToken } from "../../helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -157,6 +158,7 @@ export default function ParticipantList({
 }) {
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
+  const [allParticipants, setAllParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState([])
@@ -164,6 +166,18 @@ export default function ParticipantList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [filters, setFilters] = useState({
+    studies: [], // study names
+    sort: "createdAt",
+    order: order ? "asc" : "desc",
+    search: "",
+    page: 1,
+    limit: 40,
+  })
+  const [sensors, setSensors] = useState(null)
+  const [events, setEvents] = useState(null)
+  const [participantCount, setParticipantCount] = useState({})
+  const [totalCount, setTotalCount] = useState(0)
 
   const { t } = useTranslation()
 
@@ -172,7 +186,7 @@ export default function ParticipantList({
       setLoading(true)
       getAllStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
 
@@ -183,16 +197,26 @@ export default function ParticipantList({
   }, [])
 
   useEffect(() => {
+    if (studies?.length > 0) {
+      studies.forEach((study) => {
+        LAMP.Study.lookup(study.id, 1).then((sensors) => {
+          setSensors(sensors)
+        })
+        LAMP.Study.lookup(study.id, 2).then((events) => {
+          setEvents(events)
+        })
+      })
+    }
+  }, [studies])
+
+  useEffect(() => {
     if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
+    const userToken: any = getBasicToken()
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      if ((selected || []).length > 0) {
+      if ((selected || [])?.length > 0) {
         searchParticipants()
       } else {
         setParticipants([])
@@ -201,36 +225,32 @@ export default function ParticipantList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected])
 
-  const handleChange = (participant, checked) => {
-    if (checked) {
-      setSelectedParticipants((prevState) => [...prevState, participant])
-    } else {
-      let selected = selectedParticipants.filter((item) => item.id != participant.id)
-      setSelectedParticipants(selected)
-    }
-  }
-
-  const searchParticipants = (searchVal?: string) => {
+  const searchParticipantsForDemo = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0) {
+    const selectedData = selected?.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData?.length > 0) {
       Service.getAll("participants").then((participantData) => {
-        // participantData = (participantData || []).filter((p) => p.is_deleted != true)
-        if (!!searchTxt && searchTxt.trim().length > 0) {
-          participantData = (participantData || []).filter(
+        if (!!searchTxt && searchTxt.trim()?.length > 0) {
+          participantData = (participantData || [])?.filter(
             (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
           )
           setParticipants(sortData(participantData, selectedData, "id"))
         } else {
           setParticipants(sortData(participantData, selectedData, "id"))
         }
+        const allCounts = (participantData || [])?.reduce((acc: Record<string, number>, a: any) => {
+          const key = a.study_id || a.study || "unknown"
+          acc[key] = (acc[key] || 0) + 1
+          return acc
+        }, {} as Record<string, number>)
+
+        setParticipantCount(allCounts)
+        setTotalCount(participants?.length)
         setPaginatedParticipants(
-          sortData(participantData, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+          sortData(participantData, selectedData, "id")?.slice(page * rowCount, page * rowCount + rowCount)
         )
-        setPage(page)
-        setRowCount(rowCount)
         setLoading(false)
       })
     } else {
@@ -240,21 +260,89 @@ export default function ParticipantList({
     setSelectedParticipants([])
   }
 
-  const handleSearchData = (val: string) => {
-    setSearch(val)
-    searchParticipants(val)
+  const searchParticipants = (searchVal?: string) => {
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      searchParticipantsForDemo(searchVal)
+      return
+    } else {
+      fetchParticipants()
+    }
   }
 
-  const handleChangePage = (page: number, rowCount: number) => {
-    setLoading(true)
-    setRowCount(rowCount)
-    setPage(page)
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    setPaginatedParticipants(
-      sortData(participants, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
-    )
-    localStorage.setItem("participants", JSON.stringify({ page: page, rowCount: rowCount }))
-    setLoading(false)
+  const handleSearchData = (val: string) => {
+    setSearch(val)
+    setFilters((prev) => ({ ...prev, search: val, page: 1 }))
+  }
+
+  const handleChangePage = (pageNum, rowCnt) => {
+    setFilters((prev) => ({ ...prev, page: pageNum + 1, limit: rowCnt }))
+    localStorage.setItem("participants", JSON.stringify({ page: pageNum, rowCount: rowCnt }))
+  }
+
+  useEffect(() => {
+    if (!researcherId || !studies?.length) return
+    localStorage.setItem("researcherId", researcherId)
+
+    if (LAMP.Auth?._auth?.serverAddress === "demo.lamp.digital") {
+      searchParticipantsForDemo(search)
+    } else {
+      fetchParticipants()
+    }
+  }, [researcherId, selectedStudies, filters])
+
+  useEffect(() => {
+    if (participants?.length > 0) {
+      const start = page * rowCount
+      const end = start + rowCount
+      setPaginatedParticipants(participants?.slice(start, end))
+    } else {
+      setPaginatedParticipants([])
+    }
+  }, [participants, page, rowCount])
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, order: order ? "asc" : "desc" }))
+  }, [order])
+
+  const handleChange = (participant, checked) => {
+    if (checked) setSelectedParticipants((prev) => [...prev, participant])
+    else setSelectedParticipants((prev) => prev?.filter((p) => p.id !== participant.id))
+  }
+
+  const fetchParticipants = async () => {
+    try {
+      setLoading(true)
+
+      // build body
+      const requestBody = {
+        studies: selectedStudies,
+        sort: filters.order,
+        search: filters.search?.trim(),
+        page: filters.page,
+        limit: filters.limit,
+      }
+
+      const result = await LAMP.Researcher.usersList(researcherId, requestBody)
+      const participantArray = result?.users || []
+      const mapped = participantArray?.map((p) => ({
+        ...p,
+        id: p._id,
+        name: p.userName || p._id,
+        study_name: p.studyName,
+      }))
+
+      setParticipants(mapped)
+
+      setTotalCount(result?.count || 0)
+      setPaginatedParticipants(mapped?.slice(0, rowCount))
+      setParticipantCount(result?.totalUsers || {})
+    } catch (err) {
+      console.error(" Error fetching participants:", err)
+      setPaginatedParticipants([])
+    } finally {
+      setLoading(false)
+    }
+    setSelectedParticipants([])
   }
 
   return (
@@ -274,12 +362,15 @@ export default function ParticipantList({
         mode={mode}
         setOrder={setOrder}
         order={order}
+        loading={loading}
+        participants={participants}
+        participantCount={participantCount}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!participants && participants.length > 0 ? (
+          {!!participants && participants?.length > 0 ? (
             <Grid container spacing={3}>
-              {paginatedParticipants.map((eachParticipant, index) => (
+              {paginatedParticipants?.map((eachParticipant, index) => (
                 <Grid item lg={6} xs={12} key={eachParticipant.id}>
                   <ParticipantListItem
                     participant={eachParticipant}
@@ -289,6 +380,8 @@ export default function ParticipantList({
                     handleSelectionChange={handleChange}
                     selectedParticipants={selectedParticipants}
                     researcherId={researcherId}
+                    sensor={sensors?.participants?.filter((s) => s.id === eachParticipant.id)[0]}
+                    event={events?.participants?.filter((e) => e.id === eachParticipant.id)[0]}
                   />
                 </Grid>
               ))}
@@ -298,6 +391,7 @@ export default function ParticipantList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                totalCount={totalCount}
               />
             </Grid>
           ) : (

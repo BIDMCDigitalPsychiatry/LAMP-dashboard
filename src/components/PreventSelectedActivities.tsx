@@ -188,9 +188,9 @@ const useStyles = makeStyles((theme: Theme) =>
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+      ?.filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      ?.map((x, idx) => {
+        let question = (Array.isArray(activity.settings) ? activity.settings : [])?.filter((y) => y.text === x.item)[0]
         if (!!question && typeof x?.value !== "undefined")
           return ["Yes", "True"].includes(x.value)
             ? 1
@@ -204,27 +204,28 @@ export const strategies = {
           )
         else if (x?.value != null && typeof x.value !== "string" && typeof x.value !== "number") {
           let sum = 0
-          Object.keys(x.value || []).map((val) => {
-            if (!!x.value[val]?.value && x.value[val]?.value?.length > 0) {
-              sum += (x.value[val]?.value || [])
-                .map((elt) => {
+          Object.keys(x.value || [])?.map((val) => {
+            const valueArray = x.value[val]?.value
+            if (!!valueArray && Array.isArray(valueArray) && valueArray?.length > 0) {
+              sum += valueArray
+                ?.map((elt) => {
                   // assure the value can be converted into an integer
                   return !isNaN(Number(elt)) ? Number(elt) : 0
                 })
-                .reduce((sum, current) => sum + current)
+                ?.reduce((sum, current) => sum + current, 0)
             }
           })
           return sum
         } else return Number(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value) || 0
       })
-      .reduce((prev, curr) => prev + curr, 0),
+      ?.reduce((prev, curr) => prev + curr, 0),
   "lamp.trails_b": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices.length - 1]?.type ?? 0,
+  "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices?.length - 1]?.type ?? 0,
   "lamp.jewels_a": (slices, activity, scopedItem) =>
     slices.score == "NaN"
       ? 0
@@ -259,16 +260,16 @@ export const strategies = {
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
   "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
-    let temporalSlices = slices.filter(function (data) {
+    let temporalSlices = slices?.filter(function (data) {
       return !!data && data.type === true
     })
-    return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
+    return temporalSlices?.length > 0 && slices?.length > 0 ? temporalSlices?.length / slices?.length : 0
   },
   "lamp.maze_game": (slices, activity, scopedItem) => {
-    return (slices || []).map((x) => x.duration).reduce((prev, cur) => prev + cur, 0) / slices.length
+    return (slices || [])?.map((x) => x.duration)?.reduce((prev, cur) => prev + cur, 0) / slices?.length
   },
   "lamp.emotion_recognition": (slices, activity, scopedItem) => {
-    return (slices || []).map((x) => (!!x.type ? 1 : 0)).reduce((prev, cur) => prev + cur, 0)
+    return (slices || [])?.map((x) => (!!x.type ? 1 : 0))?.reduce((prev, cur) => prev + cur, 0)
   },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.digit_span": (slices, activity, scopedItem) =>
@@ -279,7 +280,7 @@ export const strategies = {
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.funny_memory": (slices, activity, scopedItem) =>
-    (slices.number_of_correct_pairs_recalled / slices.number_of_total_pairs) * 100,
+    (slices.number_of_correct_force_choice / slices.total_number_of_pairings_listed) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
@@ -293,7 +294,7 @@ export const strategies = {
       ? 100
       : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
-    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
+    slices?.map((x) => parseInt(x.item) || 0)?.reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
 /**
@@ -309,9 +310,9 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
       ? await getSelfHelpAllActivityEvents()
       : await LAMP.ActivityEvent.allByParticipant(participantId)
   return await Promise.all(
-    percentage.concat(
-      activities.map(async (activity) => {
-        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")].map((y: any) =>
+    percentage?.concat(
+      activities?.map(async (activity) => {
+        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")]?.map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0]
         if (!!tag) {
@@ -321,9 +322,9 @@ const getPercentageSettings = async (participantId, activities: ActivityObj[]) =
             activityId: activity.id,
             percentage:
               Math.round(
-                (activityEvents.filter(
+                (activityEvents?.filter(
                   (a) => a.activity === activity.id && a.timestamp >= startTime && a.timestamp <= endTime
-                ).length /
+                )?.length /
                   tag.limit) *
                   100 *
                   100
@@ -414,8 +415,8 @@ export default function PreventSelectedActivities({
   // const [percentages, setPercentages] = React.useState([])
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
 
@@ -440,8 +441,8 @@ export default function PreventSelectedActivities({
   return (
     <React.Fragment>
       {(activities || [])
-        .filter((x) => (selectedActivities || []).includes(x.name))
-        .map((
+        ?.filter((x) => (selectedActivities || []).includes(x.name))
+        ?.map((
           activity // Uncomment if you want to view the Voice Recording Details on Prevent
         ) =>
           activity.spec === "lamp.recording" ||
@@ -476,7 +477,7 @@ export default function PreventSelectedActivities({
                     </Box>
                   </Box>
                   <Box className={classes.preventGraph}>
-                    <Typography variant="h2">{(activityEvents?.[activity.name] || []).length}</Typography>
+                    <Typography variant="h2">{(activityEvents?.[activity.name] || [])?.length}</Typography>
                   </Box>
                   <Typography variant="h6">
                     {`${t("entries")}`} {timeAgo.format(timeSpans[activity.name].timestamp)}
@@ -514,7 +515,7 @@ export default function PreventSelectedActivities({
                         style={{ backgroundColor: "#00000000" }}
                         spec={{
                           data: {
-                            values: activityEvents?.[activity.name]?.map((d) => ({
+                            values: activityEvents?.[activity.name]??.map((d) => ({
                               x: new Date(d.timestamp),
                               y: strategies[activity.spec]
                                 ? strategies[activity.spec](

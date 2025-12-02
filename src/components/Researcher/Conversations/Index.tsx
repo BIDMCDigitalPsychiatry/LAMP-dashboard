@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { getBasicToken } from "../../helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -163,6 +164,16 @@ export default function Conversations({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [filters, setFilters] = useState({
+    studies: [], // study names
+    sort: "createdAt",
+    order: order ? "asc" : "desc",
+    search: "",
+    page: 1,
+    limit: 40,
+  })
+  const [participantCount, setParticipantCount] = useState({})
+  const [totalCount, setTotalCount] = useState(0)
 
   const { t } = useTranslation()
 
@@ -171,7 +182,7 @@ export default function Conversations({
       setLoading(true)
       getAllStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
 
@@ -186,12 +197,19 @@ export default function Conversations({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
+    if (!researcherId || !studies?.length) return
+
+    if (LAMP.Auth?._auth?.serverAddress === "demo.lamp.digital") {
+      searchParticipantsForDemo(search)
+    } else {
+      fetchParticipants()
+    }
+  }, [researcherId, selectedStudies, filters])
+
+  useEffect(() => {
+    const userToken: any = getBasicToken()
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      if ((selected || []).length > 0) {
+      if ((selected || [])?.length > 0) {
         searchParticipants()
       } else {
         setParticipants([])
@@ -200,36 +218,50 @@ export default function Conversations({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected])
 
   const handleChange = (participant, checked) => {
     if (checked) {
       setSelectedParticipants((prevState) => [...prevState, participant])
     } else {
-      let selected = selectedParticipants.filter((item) => item.id != participant.id)
+      let selected = selectedParticipants?.filter((item) => item.id != participant.id)
       setSelectedParticipants(selected)
     }
   }
 
   const searchParticipants = (searchVal?: string) => {
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      searchParticipantsForDemo(searchVal)
+      return
+    } else {
+      fetchParticipants()
+    }
+  }
+
+  const searchParticipantsForDemo = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0) {
+    if (selectedData?.length > 0) {
       Service.getAll("participants").then((participantData) => {
-        // participantData = (participantData || []).filter((p) => p.is_deleted != true)
-        if (!!searchTxt && searchTxt.trim().length > 0) {
-          participantData = (participantData || []).filter(
+        if (!!searchTxt && searchTxt.trim()?.length > 0) {
+          participantData = (participantData || [])?.filter(
             (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
           )
           setParticipants(sortData(participantData, selectedData, "id"))
         } else {
           setParticipants(sortData(participantData, selectedData, "id"))
         }
+        const allCounts = (participantData || [])?.reduce((acc: Record<string, number>, a: any) => {
+          const key = a.study_id || a.study || "unknown"
+          acc[key] = (acc[key] || 0) + 1
+          return acc
+        }, {} as Record<string, number>)
+
+        setParticipantCount(allCounts)
+        setTotalCount(participants?.length)
         setPaginatedParticipants(
-          sortData(participantData, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+          sortData(participantData, selectedData, "id")?.slice(page * rowCount, page * rowCount + rowCount)
         )
-        setPage(page)
-        setRowCount(rowCount)
         setLoading(false)
       })
     } else {
@@ -238,19 +270,51 @@ export default function Conversations({
     }
     setSelectedParticipants([])
   }
+  // const searchParticipants = (searchVal?: string) => {
+  //   let searchTxt = searchVal ?? search
+  //   const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+  //   if (selectedData?.length > 0) {
+  //     // Service.getAll("participants").then((participantData) => {
+  //     //   // participantData = (participantData || []).filter((p) => p.is_deleted != true)
+  //     //   if (!!searchTxt && searchTxt.trim()?.length > 0) {
+  //     //     participantData = (participantData || []).filter(
+  //     //       (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
+  //     //     )
+  //     //     setParticipants(sortData(participantData, selectedData, "id"))
+  //     //   } else {
+  //     //     setParticipants(sortData(participantData, selectedData, "id"))
+  //     //   }
+  //     //   setPaginatedParticipants(
+  //     //     sortData(participantData, selectedData, "id")?.slice(page * rowCount, page * rowCount + rowCount)
+  //     //   )
+  //     //   setPage(page)
+  //     //   setRowCount(rowCount)
+  //     //   setLoading(false)
+  //     // })
+  //     fetchParticipants()
+  //   } else {
+  //     setParticipants([])
+  //     setLoading(false)
+  //   }
+  //   setSelectedParticipants([])
+  // }
 
+  // const handleSearchData = (val: string) => {
+  //   setSearch(val)
+  //   searchParticipants(val)
+  // }
   const handleSearchData = (val: string) => {
     setSearch(val)
-    searchParticipants(val)
+    setFilters((prev) => ({ ...prev, search: val, page: 1 }))
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    const selectedData = selected?.filter((o) => studies.some(({ name }) => o === name))
     setPaginatedParticipants(
-      sortData(participants, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+      sortData(participants, selectedData, "name")?.slice(page * rowCount, page * rowCount + rowCount)
     )
     localStorage.setItem("participants", JSON.stringify({ page: page, rowCount: rowCount }))
     setLoading(false)
@@ -262,6 +326,44 @@ export default function Conversations({
       setEnabled(result.data)
     })
   }, [])
+
+  const fetchParticipants = async () => {
+    try {
+      setLoading(true)
+
+      // build body
+      const requestBody = {
+        studies: selectedStudies,
+        sort: filters.order,
+        search: filters.search?.trim(),
+        page: filters.page,
+        limit: filters.limit,
+      }
+
+      const result = await LAMP.Researcher.usersList(researcherId, requestBody)
+      const participantArray = result?.users || []
+      const mapped = participantArray?.map((p) => ({
+        ...p,
+        id: p._id,
+        name: p.userName || p._id,
+        study_name: p.studyName,
+      }))
+
+      setParticipants(mapped)
+      const total = !!result?.totalUsers
+        ? Object.values(result?.totalUsers)?.reduce((sum, value) => Number(sum) + Number(value), 0)
+        : 0
+      setTotalCount(Number(total))
+      setPaginatedParticipants(mapped?.slice(0, rowCount))
+      setParticipantCount(result?.totalUsers || {})
+    } catch (err) {
+      console.error(" Error fetching participants:", err)
+      setPaginatedParticipants([])
+    } finally {
+      setLoading(false)
+    }
+    setSelectedParticipants([])
+  }
 
   return (
     <React.Fragment>
@@ -286,9 +388,9 @@ export default function Conversations({
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!participants && participants.length > 0 ? (
+          {!!participants && participants?.length > 0 ? (
             <Grid container spacing={3}>
-              {paginatedParticipants.map((eachParticipant, index) => (
+              {paginatedParticipants?.map((eachParticipant, index) => (
                 <Grid item lg={6} xs={12} key={eachParticipant.id}>
                   <ParticipantListItem
                     participant={eachParticipant}
@@ -308,6 +410,7 @@ export default function Conversations({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                totalCount={totalCount}
               />
             </Grid>
           ) : (

@@ -88,9 +88,9 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
       setStorageData({ ...storageData, notes: notesRange })
       let timeStamp = notesRange.split("-")
       let notesData = []
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         if (
-          event.static_data.notes?.trim().length > 0 &&
+          event.static_data.notes?.trim()?.length > 0 &&
           event.timestamp <= parseInt(timeStamp[0]) &&
           event.timestamp >= parseInt(timeStamp[1])
         ) {
@@ -126,16 +126,16 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, setS
                 setNotesRange(event.target.value)
               }}
             >
-              {dateArray.map((dateString) => (
+              {dateArray?.map((dateString) => (
                 <option value={dateString.timestamp}>{dateString.date}</option>
               ))}
             </NativeSelect>
           </Box>
         </Box>
       </div>
-      {(notes || []).length > 0 ? (
+      {(notes || [])?.length > 0 ? (
         <Box className={classes.fullWidth}>
-          {(notes || []).map(
+          {(notes || [])?.map(
             (data) =>
               !!data.note && (
                 <Box className={classes.blueBoxStyle}>

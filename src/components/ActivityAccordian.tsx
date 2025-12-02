@@ -165,14 +165,15 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
   const getStatus = (module) => {
     return module.name === "Other activities"
       ? ""
-      : module.subActivities?.filter((activity) => activity.isCompleted === true).length +
+      : module.subActivities?.filter((activity) => activity.isCompleted === true)?.length +
           "/" +
-          module.subActivities.length
+          module.subActivities?.length
   }
   // Function to calculate the percentage of completed sub-activities
   const getPercentage = (module) => {
     return (
-      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
+      (module.subActivities?.filter((activity) => activity.isCompleted === true)?.length /
+        module.subActivities?.length) *
       100
     )
   }
@@ -185,8 +186,8 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
             className={classes.accordionHeadIcons}
             style={{
               margin: "auto",
-              background: tag.filter((x) => x.id === module?.id)[0]?.photo
-                ? `url(${tag.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
+              background: tag?.filter((x) => x.id === module?.id)[0]?.photo
+                ? `url(${tag?.filter((x) => x.id === module?.id)[0]?.photo}) center center/contain no-repeat`
                 : `url(${InfoIcon}) center center/contain no-repeat`,
             }}
           ></Box>
@@ -260,7 +261,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
   useEffect(() => {
     ;(async () => {
       let tag =
-        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")]?.map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0] ?? []
       setFavoriteIds(tag)
@@ -274,7 +275,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
       const isCurrentlyFavorite = tag.includes(activityId)
       let updatedTag
       if (isCurrentlyFavorite) {
-        updatedTag = tag.filter((id) => id !== activityId)
+        updatedTag = tag?.filter((id) => id !== activityId)
       } else {
         updatedTag = [...tag, activityId]
       }
@@ -287,7 +288,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
   }
   return (
     <div>
-      {data.map((module, index) => (
+      {data?.map((module, index) => (
         <>
           <Accordion expanded={false} key={index} className={classes.accordionMain}>
             {type != "activity" ? (

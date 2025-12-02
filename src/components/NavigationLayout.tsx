@@ -37,9 +37,6 @@ import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
 import { useLocation } from "react-router-dom"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
-import { Position } from "monaco-editor"
-import Notifications from "./Notifications"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -350,7 +347,7 @@ export default function NavigationLayout({
       if (sensorData === null) {
         ;(async () => {
           let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
-          data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+          data = Array.isArray(data) ? (data || [])?.filter((d) => d.data.page === "conversations") : null
           setSensorData(!!data ? data[0] : [])
         })()
       }
@@ -370,15 +367,15 @@ export default function NavigationLayout({
     window.location.href = `/#/participant/${id}/messages`
     await sensorEventUpdate("conversations", id, null)
     let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
-    data = (data || []).filter((d) => d.data.page === "conversations")
+    data = (data || [])?.filter((d) => d.data.page === "conversations")
     setSensorData(data ? data[0] : [])
   }
 
   const onDeleteAccount = async () => {
     await LAMP.Type.setAttachment(id, "me", "lamp.is_deleted", true)
     await LAMP.Credential.list(id).then((cred) => {
-      cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      ;(cred || []).map(async (each) => {
+      cred = cred?.filter((c) => c.hasOwnProperty("origin"))
+      ;(cred || [])?.map(async (each) => {
         await LAMP.Credential.delete(id, each["access_key"])
       })
     })
@@ -396,11 +393,11 @@ export default function NavigationLayout({
       Object.fromEntries(
         (
           await Promise.all(
-            [id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
+            [id || ""]?.map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
           )
         )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
+          ?.filter((x: any) => x[1].message !== "404.object-not-found")
+          ?.map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -409,7 +406,7 @@ export default function NavigationLayout({
     let x = (conversations || {})[id || ""] || []
     return !Array.isArray(x)
       ? 0
-      : x.filter((a) => a.from === "researcher" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
+      : x?.filter((a) => a.from === "researcher" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0))?.length
   }
   const [anchorEl, setAnchorEl] = React.useState(null)
 
@@ -422,15 +419,20 @@ export default function NavigationLayout({
   }
 
   const participantBack = () => {
-    if (researcherId === null) {
-      Service.getAll("researcher").then((researcher) => {
-        setResId(researcher[0]["id"])
-        window.location.href = `/#/researcher/${researcher[0]["id"]}/users`
-        setLoading(false)
-      })
-    } else {
-      window.location.href = `/#/researcher/${researcherId}/users`
-    }
+    // console.log("researcherId", researcherId)
+    // if (researcherId === null) {
+    //   Service.getAll("researcher").then((researcher) => {
+    //     setResId(researcher[0]["id"])
+    //     window.location.href = `/#/researcher/${researcher[0]["id"]}/users`
+    //     setLoading(false)
+    //   })
+    // } else {
+    //   window.location.href = `/#/researcher/${researcherId}/users`
+    // }
+    let researcher = localStorage.getItem("researcherId")
+    setResId(researcher)
+    window.location.href = `/#/researcher/${researcher}/users`
+    setLoading(false)
   }
   const fetchNotifications = async (id: string) => {
     try {
@@ -637,44 +639,6 @@ export default function NavigationLayout({
                         <Icon>comment</Icon>
                       </Badge>
                     </Tooltip>
-                  ) : (
-                    ""
-                  )}
-                </Box>
-              )}
-              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
-                    <>
-                      <Tooltip title={`${t("Notifications")}`}>
-                        <IconButton aria-describedby="notificationPopover" onClick={handleNotificationClick}>
-                          <Icon>notifications</Icon>
-                        </IconButton>
-                      </Tooltip>
-                      <Popover
-                        id="notificationPopover"
-                        classes={{
-                          paper: classes.notificatioOuter,
-                        }}
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={handleClose}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "right",
-                        }}
-                      >
-                        <Notifications
-                          notifications={notifications}
-                          notificationLoader={notificationLoader}
-                          handleClose={handleClose}
-                        />
-                      </Popover>
-                    </>
                   ) : (
                     ""
                   )}

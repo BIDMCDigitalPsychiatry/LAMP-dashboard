@@ -19,6 +19,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Alert } from "@mui/material"
+import { getBasicToken } from "./helper"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -139,7 +140,7 @@ const fetchCoordinators = async (participant) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: getBasicToken(),
       },
       credentials: "include",
     })
@@ -211,14 +212,14 @@ export default function Messages({
       Object.fromEntries(
         (
           await Promise.all(
-            [participant || ""].map(async (x) => [
+            [participant || ""]?.map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
           )
         )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
+          ?.filter((x: any) => x[1].message !== "404.object-not-found")
+          ?.map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -234,7 +235,7 @@ export default function Messages({
 
   const sendMessage = async (msgOpen: boolean) => {
     let msg = (currentMessage || "").trim()
-    if (msg.length === 0 || !participant) return
+    if (msg?.length === 0 || !participant) return
 
     await refreshMessages()
     let all = getMessages()
@@ -257,7 +258,7 @@ export default function Messages({
           // .filter(
           //   // (x) => (x.from = "") //&&  x.from === sender - to be replaced with different senders
           // )
-          .map((x) => (
+          ?.map((x) => (
             <Box
               className={classes.innerMessage}
               style={{
@@ -288,7 +289,7 @@ export default function Messages({
           ))}
 
         <Divider />
-        {(coordinators || []).length == 0 && (
+        {(coordinators || [])?.length == 0 && (
           <Box>
             <Alert severity="warning">{`${t("No Coach or Support staff are available for messaging.")}`}</Alert>
           </Box>

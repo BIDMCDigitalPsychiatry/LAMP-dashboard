@@ -7,6 +7,7 @@ import ActivityRow from "./ActivityRow"
 import DeleteActivity from "../../ActivityList/DeleteActivity"
 import { sortData } from "../../Dashboard"
 import Pagination from "../../../PaginatedElement"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -57,6 +58,7 @@ export default function Activities({
   const [paginatedActivities, setPaginatedActivities] = useState([])
   const [rowCount, setRowCount] = useState(10)
   const [page, setPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
 
   useEffect(() => {
     let params = JSON.parse(localStorage.getItem("profile-activities"))
@@ -65,16 +67,18 @@ export default function Activities({
     onChangeActivities()
   }, [])
 
-  const onChangeActivities = () => {
-    Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
-      let result = sortData(activities, [participant.study_name], "name")
-      setActivities(result)
+  const onChangeActivities = async () => {
+    await LAMP.Activity.allByParticipant(participant.id).then((result) => {
+      // Handle both return types: array or { data, total }
+      const activities = Array.isArray(result) ? result : result.data
+      setActivities(activities)
     })
     setSelectedActivities([])
   }
 
   useEffect(() => {
-    setPaginatedActivities((activities || []).slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedActivities((activities || [])?.slice(page * rowCount, page * rowCount + rowCount))
+    setTotalCount(activities?.length)
   }, [activities])
 
   const handleActivitySelected = (activity, checked) => {
@@ -82,7 +86,7 @@ export default function Activities({
       setSelectedActivities((prevState) => [...prevState, activity])
     } else {
       let selected = selectedActivities
-      selected = selected.filter((item) => item.id != activity.id)
+      selected = selected?.filter((item) => item.id != activity.id)
       setSelectedActivities(selected)
     }
   }
@@ -90,7 +94,7 @@ export default function Activities({
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
     setPage(page)
-    setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedActivities(activities?.slice(page * rowCount, page * rowCount + rowCount))
     localStorage.setItem("profile-activities", JSON.stringify({ page: page, rowCount: rowCount }))
   }
 
@@ -108,10 +112,11 @@ export default function Activities({
             studies={studies}
             studyId={participant.study_id}
             setActivities={onChangeActivities}
+            researcherId={researcherId}
           />
         </Box>
       </Box>
-      {(selectedActivities || []).length > 0 && (
+      {(selectedActivities || [])?.length > 0 && (
         <Box className={classes.optionsMain}>
           <DeleteActivity activities={selectedActivities} setActivities={onChangeActivities} profile={true} />
         </Box>
@@ -119,7 +124,7 @@ export default function Activities({
       <Grid container spacing={0}>
         <Grid item xs={12} sm={12}>
           <Box p={1}>
-            {(activities ?? []).length > 0 ? (
+            {(activities ?? [])?.length > 0 ? (
               <Grid container>
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
@@ -144,7 +149,7 @@ export default function Activities({
             )}
           </Box>
           <Grid container>
-            {(paginatedActivities ?? []).map((item, index) => (
+            {(paginatedActivities ?? [])?.map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <ActivityRow
                   activities={activities}
@@ -166,6 +171,7 @@ export default function Activities({
                 currentRowCount={rowCount}
                 currentPage={page}
                 type={1}
+                totalCount={totalCount}
               />
             )}
           </Grid>

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, lazy, Suspense } from "react"
 import {
   Box,
   Typography,
@@ -16,12 +16,14 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import Journal from "./Journal"
-import PreventDBT from "./PreventDBT"
-import PreventData from "./PreventData"
-import PreventGoalData from "./PreventGoalData"
-import VoiceRecoding from "./VoiceRecoding"
 import { getSelfHelpAllActivityEvents } from "./Participant"
+import { lazyRetry } from "../helper/functions"
+
+const Journal = lazy(lazyRetry(() => import("./Journal")))
+const PreventGoalData = lazy(lazyRetry(() => import("./PreventGoalData")))
+const PreventDBT = lazy(lazyRetry(() => import("./PreventDBT")))
+const VoiceRecoding = lazy(lazyRetry(() => import("./VoiceRecoding")))
+const PreventData = lazy(lazyRetry(() => import("./PreventData")))
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -211,12 +213,12 @@ export default function PreventPage({ activityId, type, participantId, ...props 
       setActivity(data)
       if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
         getSelfHelpAllActivityEvents().then((events) => {
-          setActivityEvents(events.filter((event) => event.activity === activityId))
+          setActivityEvents(events?.filter((event) => event.activity === activityId))
           setLoading(false)
         })
       } else {
         LAMP.ActivityEvent.allByParticipant(participantId).then((events) => {
-          setActivityEvents(events.filter((event) => event.activity === activityId))
+          setActivityEvents(events?.filter((event) => event.activity === activityId))
           setLoading(false)
         })
       }
@@ -225,10 +227,10 @@ export default function PreventPage({ activityId, type, participantId, ...props 
 
   const earliestDate = () =>
     activityEvents
-      .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
-      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
-      .slice(0, 1)
-      .map((x) => (x === 0 ? undefined : new Date(x)))[0]
+      ?.map((x) => (x?.length === 0 ? 0 : x?.slice(0, 1)[0].timestamp))
+      ?.sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
+      ?.slice(0, 1)
+      ?.map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
   return (
     <React.Fragment>
@@ -254,61 +256,71 @@ export default function PreventPage({ activityId, type, participantId, ...props 
       {!!activity && type === "activity" && !!activityEvents && (
         <Box>
           {activity?.spec === "lamp.journal" ? (
-            <Journal selectedEvents={activityEvents} />
+            <Suspense fallback={<div />}>
+              <Journal selectedEvents={activityEvents} />
+            </Suspense>
           ) : activity?.spec === "lamp.goals" || activity?.spec === "lamp.medications" ? (
-            <PreventGoalData
-              selectedEvents={activityEvents}
-              participantId={participantId}
-              activity={activity ?? null}
-            />
+            <Suspense fallback={<div />}>
+              <PreventGoalData
+                selectedEvents={activityEvents}
+                participantId={participantId}
+                activity={activity ?? null}
+              />
+            </Suspense>
           ) : activity?.spec === "lamp.dbt_diary_card" ? (
-            <PreventDBT selectedEvents={activityEvents} />
+            <Suspense fallback={<div />}>
+              <PreventDBT selectedEvents={activityEvents} />
+            </Suspense>
           ) : activity?.spec === "lamp.recording" ? (
-            <VoiceRecoding selectedEvents={activityEvents} />
+            <Suspense fallback={<div />}>
+              <VoiceRecoding selectedEvents={activityEvents} />
+            </Suspense>
           ) : (
-            <PreventData
-              activity={activity}
-              events={activityEvents}
-              graphType={3}
-              earliestDate={earliestDate}
-              enableEditMode={!_patientMode()}
-              onEditAction={
-                (activity, data) => {}
-                //     setSurveyName(activity.name)
-                //     setVisibleActivities([
-                //       {
-                //         ...activity,
-                //         prefillData: [
-                //           data.slice.map(({ item, value }) => ({
-                //             item,
-                //             value,
-                //           })),
-                //         ],
-                //         prefillTimestamp: new Date(
-                //           data.x
-                //         ).getTime() /* post-increment later to avoid double-reporting events! */,
-                //       },
-                //     ])
-                //   }
-              }
-              onCopyAction={
-                (activity, data) => {}
-                //     setSurveyName(activity.name)
-                //     setVisibleActivities([
-                //       {
-                //         ...activity,
-                //         prefillData: [
-                //           data.slice.map(({ item, value }) => ({
-                //             item,
-                //             value,
-                //           })),
-                //         ],
-                //       },
-                //     ])
-                //   }
-              }
-              onDeleteAction={(activity, data) => {}} //hideEvent(new Date(data.x).getTime(), activity.id)}
-            />
+            <Suspense fallback={<div />}>
+              <PreventData
+                activity={activity}
+                events={activityEvents}
+                graphType={3}
+                earliestDate={earliestDate}
+                enableEditMode={!_patientMode()}
+                onEditAction={
+                  (activity, data) => {}
+                  //     setSurveyName(activity.name)
+                  //     setVisibleActivities([
+                  //       {
+                  //         ...activity,
+                  //         prefillData: [
+                  //           data?.slice?.map(({ item, value }) => ({
+                  //             item,
+                  //             value,
+                  //           })),
+                  //         ],
+                  //         prefillTimestamp: new Date(
+                  //           data.x
+                  //         ).getTime() /* post-increment later to avoid double-reporting events! */,
+                  //       },
+                  //     ])
+                  //   }
+                }
+                onCopyAction={
+                  (activity, data) => {}
+                  //     setSurveyName(activity.name)
+                  //     setVisibleActivities([
+                  //       {
+                  //         ...activity,
+                  //         prefillData: [
+                  //           data?.slice?.map(({ item, value }) => ({
+                  //             item,
+                  //             value,
+                  //           })),
+                  //         ],
+                  //       },
+                  //     ])
+                  //   }
+                }
+                onDeleteAction={(activity, data) => {}} //hideEvent(new Date(data.x).getTime(), activity.id)}
+              />
+            </Suspense>
           )}
         </Box>
       )}

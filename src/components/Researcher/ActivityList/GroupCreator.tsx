@@ -42,16 +42,29 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed)
   return result
 }
-function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
-  const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x?.id === selected)[0] ?? null : null)
+export function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
+  const [_selected, setSelected] = useState(
+    !!selected ? activities?.filter((x) => x?.id === selected)[0] ?? null : null
+  )
   const [anchorEl, setAnchorEl] = useState<Element>()
   const [search, setSearch] = useState("")
   const [filteredActivities, setFilteredActivities] = useState(activities ?? [])
 
   const { t } = useTranslation()
+
   useEffect(() => {
-    if (_selected !== selected && _selected !== null) onSave && onSave(_selected.id)
-  }, [_selected])
+    if (_selected?.id !== selected && _selected !== null) onSave && onSave(_selected.id)
+  }, [_selected, selected])
+
+  useEffect(() => {
+    setFilteredActivities(activities ?? [])
+    if (selected) {
+      const matched = (activities ?? []).find((a) => a?.id === selected) ?? null
+      setSelected(matched)
+    } else {
+      setSelected(null)
+    }
+  }, [activities, selected])
 
   useEffect(() => {
     filterActivities(search)
@@ -61,8 +74,8 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   }
   const filterActivities = (searchVal: string) => {
     const searchTxt = searchVal.trim().toLowerCase()
-    if (searchTxt.length > 0) {
-      const filtered = activities.filter((activity) => activity.name?.toLowerCase()?.includes(searchTxt))
+    if (searchTxt?.length > 0) {
+      const filtered = activities?.filter((activity) => activity.name?.toLowerCase()?.includes(searchTxt))
       setFilteredActivities(filtered)
     } else {
       setFilteredActivities(activities)
@@ -78,7 +91,12 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
               "Drag the handle on the left to change the order in which this Activity appears in the group."
             )}`}
           >
-            <ButtonGroup style={{ background: "#fff", marginBottom: 8 }}>
+            <ButtonGroup
+              style={{
+                background: "#fff",
+                marginBottom: 8,
+              }}
+            >
               <Button disabled variant="outlined" color={_selected?.name ? "primary" : "secondary"}>
                 <Icon>drag_indicator</Icon>
               </Button>
@@ -100,7 +118,11 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
             </ButtonGroup>
           </Tooltip>
           <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(undefined)}>
-            <div style={{ padding: "8px" }}>
+            <div
+              style={{
+                padding: "8px",
+              }}
+            >
               <TextField
                 placeholder="Search..."
                 variant="outlined"
@@ -115,11 +137,13 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
                     </InputAdornment>
                   ),
                 }}
-                style={{ marginBottom: 10 }}
+                style={{
+                  marginBottom: 10,
+                }}
               />
             </div>
-            {!!filteredActivities && filteredActivities.length > 0 ? (
-              filteredActivities.map((activity) => (
+            {!!filteredActivities && filteredActivities?.length > 0 ? (
+              filteredActivities?.map((activity) => (
                 <MenuItem
                   key={activity.id}
                   onClick={() => {
@@ -149,6 +173,7 @@ export default function GroupCreator({
   study,
   type,
   id,
+  setAllActivities,
   ...props
 }: {
   activities?: any[]
@@ -159,37 +184,21 @@ export default function GroupCreator({
   study?: string
   type?: string
   id?: string
+  setAllActivities?: Function
 }) {
   const classes = useStyles()
   const [items, setItems] = useState(!!value ? value.settings.activities ?? value.settings : [])
-
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
       ? type == "lamp.group"
-        ? activities.filter(
-            (x) =>
-              x.spec !== "lamp.group" &&
-              x.spec !== "lamp.module" &&
-              x.spec !== "lamp.zoom_meeting" &&
-              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-              availableActivitySpecs.includes(x.spec)
+        ? activities?.filter(
+            (x) => x.spec !== "lamp.group" && x.spec !== "lamp.module" && availableActivitySpecs.includes(x.spec)
           )
         : !!id
-        ? activities.filter(
-            (x) =>
-              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-              availableActivitySpecs.includes(x.spec) &&
-              !!id &&
-              x.id != id
-          )
-        : activities.filter(
-            (x) =>
-              (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-              availableActivitySpecs.includes(x.spec)
-          )
+        ? activities?.filter((x) => availableActivitySpecs.includes(x.spec) && !!id && x.id != id)
+        : activities?.filter((x) => availableActivitySpecs.includes(x.spec))
       : []
   )
-
   const { t } = useTranslation()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
@@ -223,30 +232,44 @@ export default function GroupCreator({
     setData(data)
   }, [items])
 
+  // Update studyActivities when activities prop changes (e.g., from batch loading)
+  useEffect(() => {
+    if (activities && activities?.length > 0) {
+      const studyId = data.studyID || study || value?.study_id
+      if (studyId) {
+        setStudyActivities(
+          type == "lamp.group" || type == "lamp.module"
+            ? activities?.filter((x) => x.spec !== "lamp.group" && availableActivitySpecs.includes(x.spec))
+            : !!id
+            ? activities?.filter((x) => availableActivitySpecs.includes(x.spec) && x.id != id)
+            : activities?.filter((x) => availableActivitySpecs.includes(x.spec))
+        )
+      } else {
+        setStudyActivities([])
+      }
+    }
+  }, [activities, data.studyID, study, value?.study_id, type, id])
+
   const handleChange = (details) => {
     if (!!details.studyId) {
       setStudyActivities(
         type == "lamp.group"
-          ? activities.filter(
+          ? activities?.filter(
               (x) =>
                 x.spec !== "lamp.group" &&
                 x.spec !== "lamp.module" &&
-                x.spec !== "lamp.zoom_meeting" &&
-                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
+                // (!!study ? x.study_id === study : x.study_id === details.studyId) &&
                 availableActivitySpecs.includes(x.spec)
             )
           : !!id
-          ? activities.filter(
+          ? activities?.filter(
               (x) =>
-                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
-                availableActivitySpecs.includes(x.spec) &&
-                !!id &&
-                x.id != id
+                // (!!study ? x.study_id === study : x.study_id === details.studyId) &&
+                availableActivitySpecs.includes(x.spec) && !!id && x.id != id
             )
-          : activities.filter(
-              (x) =>
-                (!!study ? x.study_id === study : x.study_id === details.studyId) &&
-                availableActivitySpecs.includes(x.spec)
+          : activities?.filter((x) =>
+              // (!!study ? x.study_id === study : x.study_id === details.studyId) &&
+              availableActivitySpecs.includes(x.spec)
             )
       )
     }
@@ -273,44 +296,13 @@ export default function GroupCreator({
   const validate = () => {
     return !(
       !onSave ||
-      (items || []).length === 0 ||
-      (items || []).filter((i) => i === null).length > 0 ||
+      (items || [])?.length === 0 ||
+      (items || [])?.filter((i) => i === null)?.length > 0 ||
       !data.name ||
       !data.studyID ||
-      !data.name.trim().length
+      !data.name.trim()?.length
     )
   }
-
-  const [sequentialOrdering, setSequentialOrdering] = useState(data.settings?.sequential_ordering ?? false)
-  const [hideOnCompletion, setHideOnCompletion] = useState(data.settings?.hide_on_completion ?? false)
-  // const [initializeOpened, setInitializeOpened] = useState(data.settings?.initialize_opened ?? false)
-  const [hideSubActivities, setHideSubActivities] = useState(data.settings?.hide_sub_activities ?? false)
-  const [trackProgress, setTrackProgress] = useState(data.settings?.track_progress ?? false)
-
-  useEffect(() => {
-    data.settings.track_progress = trackProgress
-    setData({ ...data, settings: data.settings })
-  }, [trackProgress])
-
-  useEffect(() => {
-    data.settings.sequential_ordering = sequentialOrdering
-    setData({ ...data, settings: data.settings })
-  }, [sequentialOrdering])
-
-  useEffect(() => {
-    data.settings.hide_sub_activities = hideSubActivities
-    setData({ ...data, settings: data.settings })
-  }, [hideSubActivities])
-
-  useEffect(() => {
-    data.settings.hide_on_completion = hideOnCompletion
-    setData({ ...data, settings: data.settings })
-  }, [hideOnCompletion])
-
-  // useEffect(() => {
-  //   data.settings.initialize_opened = initializeOpened
-  //   setData({ ...data, settings: data.settings })
-  // }, [initializeOpened])
 
   const handleTabChange = (tab) => {
     setData({ ...data, category: tab })
@@ -329,6 +321,8 @@ export default function GroupCreator({
             onChange={handleChange}
             onTabChange={handleTabChange}
             image={null}
+            setAllActivities={setAllActivities}
+            activities={activities}
           />
 
           <Box width={1}>
@@ -342,7 +336,7 @@ export default function GroupCreator({
               <Droppable droppableId="list">
                 {(provided) => (
                   <Box ref={provided.innerRef} {...provided.droppableProps}>
-                    {(items || []).map((x, idx) => (
+                    {(items || [])?.map((x, idx) => (
                       <ActivitySelector
                         index={idx}
                         key={`${idx}.${x}`}
@@ -369,63 +363,12 @@ export default function GroupCreator({
                 )}
               </Droppable>
             </DragDropContext>
-            {type !== "lamp.group" && (
-              <FormControlLabel
-                value="sequential_ordering"
-                control={
-                  <Switch
-                    color="primary"
-                    onChange={(evt) => setSequentialOrdering(evt.target.checked)}
-                    checked={data.settings?.sequential_ordering}
-                  />
-                }
-                label="Sequential Ordering"
-                labelPlacement="end"
-              />
-            )}
-            {/* {type !== "lamp.group" && (
-              <FormControlLabel
-                value="initialize_opened"
-                control={
-                  <Switch
-                    color="primary"
-                    checked={data.settings?.initialize_opened}
-                    onChange={(evt) => setInitializeOpened(evt.target.checked)}
-                  />
-                }
-                label="Initialize Opened"
-                labelPlacement="end"
-              />
-            )} */}
-            <FormControlLabel
-              value="hide_sub_activities"
-              control={
-                <Switch
-                  color="primary"
-                  checked={data.settings?.hide_sub_activities}
-                  onChange={(evt) => setHideSubActivities(evt.target.checked)}
-                />
-              }
-              label="Hide Sub Activities"
-              labelPlacement="end"
-            />
-            <FormControlLabel
-              value="track_progress"
-              control={
-                <Switch
-                  color="primary"
-                  checked={data.settings?.track_progress}
-                  onChange={(evt) => setTrackProgress(evt.target.checked)}
-                />
-              }
-              label="Track Activity Progress"
-              labelPlacement="end"
-            />
+
             <ButtonGroup>
               <Button
                 variant="contained"
                 color="primary"
-                disabled={!data.studyID || studyActivities.length === 0}
+                disabled={!data.studyID || studyActivities?.length === 0}
                 onClick={() => setItems((items) => [...items, null])}
               >
                 <Icon>add_circle</Icon>
@@ -435,7 +378,7 @@ export default function GroupCreator({
                 size="small"
                 color="primary"
                 onClick={() => setItems((items) => [...items, null])}
-                disabled={!data.studyID || studyActivities.length === 0}
+                disabled={!data.studyID || studyActivities?.length === 0}
               >
                 {`${t("Add Activity")}`}
               </Button>

@@ -1,9 +1,10 @@
-import React from "react"
-import DataPortalHome from "./DataPortalHome"
+import React, { lazy, Suspense } from "react"
 import SignIn from "./SignIn"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { makeStyles, Container } from "@material-ui/core"
+import { lazyRetry } from "../../helper/functions"
+const DataPortalHome = lazy(lazyRetry(() => import("./DataPortalHome")))
 
 const useStyles = makeStyles((theme) => ({
   portal: {
@@ -32,12 +33,16 @@ export default function DataPortal({ onLogout, standalone = false, ...props }) {
     return standalone ? (
       <Container className={classes.standaloneContainer}>
         <DndProvider backend={HTML5Backend}>
-          <DataPortalHome className={classes.portal} token={token} onLogout={onLogout} />
+          <Suspense fallback={<div />}>
+            <DataPortalHome className={classes.portal} token={token} onLogout={onLogout} />
+          </Suspense>
         </DndProvider>
       </Container>
     ) : (
       <DndProvider backend={HTML5Backend}>
-        <DataPortalHome className={classes.portal} token={token} onLogout={onLogout} />
+        <Suspense fallback={<div />}>
+          <DataPortalHome className={classes.portal} token={token} onLogout={onLogout} />
+        </Suspense>
       </DndProvider>
     )
   } else {

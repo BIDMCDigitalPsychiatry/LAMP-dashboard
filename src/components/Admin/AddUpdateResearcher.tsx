@@ -94,12 +94,12 @@ export default function AddUpdateResearcher({
   const [isError, setIsError] = useState(false)
 
   const addResearcher = async () => {
-    let duplicates = researchers.filter((x) =>
+    let duplicates = researchers?.filter((x) =>
       !!researcher
         ? x.name?.toLowerCase() === name?.trim().toLowerCase() && x.id !== researcher?.id
         : x.name?.toLowerCase() === name?.trim().toLowerCase()
     )
-    if (duplicates.length > 0) {
+    if (duplicates?.length > 0) {
       enqueueSnackbar(`${t("Investigator with same name already exist.")}`, {
         variant: "error",
       })
@@ -143,7 +143,7 @@ export default function AddUpdateResearcher({
     } else if (value.includes("<script>")) {
       setIsError(true)
       setNameError("<script> tags not allowed in input. Please remove")
-    } else if (value.length > 50) {
+    } else if (value?.length > 50) {
       setIsError(true)
       setNameError("Maximum 50 characters allowed.")
     } else {

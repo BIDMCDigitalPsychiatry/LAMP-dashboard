@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
@@ -30,6 +30,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
     showFeed: { marginTop: "10px" },
+    exportingText: {
+      background: "#078637",
+      color: "#fff",
+      padding: "5px 16px",
+      borderRadius: "16px",
+      marginLeft: "15px",
+      fontSize: "12px",
+    },
   })
 )
 export default function Header({
@@ -43,6 +51,8 @@ export default function Header({
   setActivities,
   setOrder,
   order,
+  activityByStudy,
+  setSelectedActivities,
   ...props
 }) {
   const classes = useStyles()
@@ -51,6 +61,29 @@ export default function Header({
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
   }
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const check = () => {
+      const present = !!localStorage.getItem("exportInProgress")
+      setLoading(present)
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "exportInProgress") check()
+    }
+    const onExportRemoved = () => {
+      setSelectedActivities([])
+      setLoading(false)
+    }
+    window.addEventListener("storage", onStorage)
+    window.addEventListener("exportInProgressRemoved", onExportRemoved)
+    const intervalId = window.setInterval(check, 1000)
+    return () => {
+      window.removeEventListener("storage", onStorage)
+      window.removeEventListener("exportInProgressRemoved", onExportRemoved)
+      clearInterval(intervalId)
+    }
+  }, [])
 
   return (
     <Box>
@@ -81,13 +114,15 @@ export default function Header({
           showFilterStudies={showFilterStudies}
           selectedStudies={selectedStudies}
           setSelectedStudies={setSelectedStudies}
+          filterData={activityByStudy}
         />
       </Box>
-      {(selectedActivities || []).length > 0 && (
+      {((selectedActivities || [])?.length > 0 || loading) && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <ExportActivity activities={selectedActivities} />
             <DeleteActivity activities={selectedActivities} setActivities={setActivities} />
+            {loading && <span className={classes.exportingText}>Exporting...</span>}
           </Box>
         </Box>
       )}

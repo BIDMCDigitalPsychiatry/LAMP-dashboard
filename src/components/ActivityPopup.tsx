@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import {
   Typography,
   Icon,
@@ -14,10 +14,6 @@ import {
   createStyles,
   DialogProps,
   Link,
-  Fab,
-  Tooltip,
-  Button,
-  DialogContentText,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -25,15 +21,9 @@ import InfoIcon from "../icons/Info.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
-import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
+import BreatheIcon from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
-import VideoMeeting from "../icons/Video.svg"
-import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
-import NotificationPage from "./NotificationPage"
-import ResponsiveDialog from "./ResponsiveDialog"
-import LAMP from "lamp-core"
-import { isMobile } from "react-device-detect"
-import { useSnackbar } from "notistack"
+import JournalIcon from "../icons/Goal.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,8 +54,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     closeButton: {
       position: "absolute",
-      right: 0,
-      top: 0,
+      right: theme.spacing(1),
+      top: theme.spacing(1),
       color: theme.palette.grey[500],
     },
     dialogueStyle: {
@@ -159,30 +149,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     dialogtitle: { padding: 0 },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400, minWidth: 325 },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-    },
-    headerTitleIcon: {
-      background: "none",
-      boxShadow: "none",
-      width: 36,
-      height: 36,
-      color: "#666",
-      marginLeft: 8,
-      "& .material-icons": {
-        fontSize: "2rem",
-      },
-      "&:hover": {
-        background: "#fff",
-      },
-      "&.active": {
-        color: "#e3b303",
-      },
-    },
-    dFlex: {
-      display: "Flex",
-      alignItems: "center",
     },
   })
 )
@@ -202,12 +171,6 @@ export default function ActivityPopup({
   type,
   participant,
   showStreak,
-  onClose,
-  setFavorites,
-  savedActivities,
-  updateIsCompleted,
-  tab,
-  updateLocalStorage,
   ...props
 }: {
   activity: any
@@ -216,106 +179,10 @@ export default function ActivityPopup({
   type: string
   participant: any
   showStreak: Function
-  onClose?: Function
-  setFavorites?: any
-  savedActivities?: any
-  updateIsCompleted: Function
-  updateLocalStorage: Function
-  tab?: any
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [moduleActivity, setModuleActivity] = useState("")
-  const [open, setOpen] = useState(false)
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
-  const [showPopup, setShowPopUp] = useState(false)
 
-  const { enqueueSnackbar } = useSnackbar()
-
-  useEffect(() => {
-    if (!!activity) {
-      const activityFromModule = localStorage.getItem("activityFromModule")
-      setModuleActivity(activityFromModule)
-    }
-  }, [activity])
-
-  useEffect(() => {
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0] ?? []
-      setFavoriteIds(tag)
-    })()
-  }, [])
-
-  const handleFavoriteClick = async (activityId) => {
-    try {
-      const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
-      let tag: string[] = !!result.error ? [] : result.data ?? []
-      const isCurrentlyFavorite = tag.includes(activityId)
-      let updatedTag
-      if (isCurrentlyFavorite) {
-        updatedTag = tag.filter((id) => id !== activityId)
-      } else {
-        updatedTag = [...tag, activityId]
-      }
-      await LAMP.Type.setAttachment(participant?.id, "me", "lamp.dashboard.favorite_activities", updatedTag)
-      setFavoriteIds(updatedTag)
-    } catch (error) {
-      console.error("Failed to toggle favorite:", error)
-    }
-  }
-
-  const handleCloseActivityPopup = (activity) => {
-    if (activity?.spec === "lamp.group" && tab === "favorite") {
-      ;(async () => {
-        let tag =
-          [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-            !!y?.error ? undefined : y?.data
-          )[0] ?? []
-        setFavorites(savedActivities.filter((activity) => tag.includes(activity.id)))
-      })()
-    }
-  }
-
-  const handleTeamsLink = (link) => {
-    const webUrl = link
-    const teamsLink = link.replace("https://", "msteams://")
-    const win = isMobile ? window.open(teamsLink, "_self") : window.open(webUrl, "_blank")
-    setTimeout(() => {
-      if (win) {
-        win.focus()
-      } else {
-        window.location.href = webUrl
-      }
-    }, 1500)
-  }
-
-  const openMeetingLink = (meetingActivity, evt) => {
-    const now = new Date().getTime()
-    LAMP.ActivityEvent.create(participant.id ?? participant, {
-      timestamp: new Date().getTime(),
-      activity: meetingActivity.id,
-      static_data: {},
-    })
-    // updateIsCompleted(meetingActivity?.id, localStorage.getItem("parentString"))
-    // onClose(evt, "backdropClick")
-    if (meetingActivity?.settings?.zoom_link.indexOf("teams") !== -1) {
-      handleTeamsLink(meetingActivity?.settings?.zoom_link)
-    } else {
-      const win = isMobile
-        ? window.open(meetingActivity?.settings?.zoom_link, "_self")
-        : window.open(meetingActivity?.settings?.zoom_link, "_blank")
-      setTimeout(() => {
-        const elapsed = new Date().getTime() - now
-        if (elapsed < 2000) {
-          window.open(meetingActivity?.settings?.zoom_link, "_blank")
-        }
-      }, 1500)
-    }
-    window.location.reload()
-  }
   return (
     <React.Fragment>
       <Dialog
@@ -333,9 +200,7 @@ export default function ActivityPopup({
           <IconButton
             aria-label="close"
             className={classes.closeButton}
-            onClick={(evt) => {
-              onClose(evt, "backdropClick"), handleCloseActivityPopup(activity)
-            }}
+            onClick={(evt) => props.onClose(evt, "backdropClick")}
           >
             <Icon>close</Icon>
           </IconButton>
@@ -364,37 +229,19 @@ export default function ActivityPopup({
                   ? `url(${JournalIcon}) center center/contain no-repeat`
                   : activity?.spec === "lamp.scratch_image"
                   ? `url(${ScratchCard}) center center/contain no-repeat`
-                  : activity?.spec === "lamp.zoom_meeting"
-                  ? `url(${VideoMeeting}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>
             <Typography variant="body2" align="left">
               {`${t(type)}`}
             </Typography>
-            <Typography variant="h2" className={classes.dFlex}>
+            <Typography variant="h2">
               <ReactMarkdown
                 children={t(activity?.name ?? null)}
                 skipHtml={false}
                 remarkPlugins={[gfm, emoji]}
                 components={{ link: LinkRenderer }}
               />
-              {activity?.spec === "lamp.group" && (
-                <Tooltip
-                  title={
-                    favoriteIds.includes(activity.id)
-                      ? "Tap to remove from Favorite Activities"
-                      : "Tap to add to Favorite Activities"
-                  }
-                >
-                  <Fab
-                    className={`${classes.headerTitleIcon} ${favoriteIds.includes(activity.id) ? "active" : ""}`}
-                    onClick={() => handleFavoriteClick(activity.id)}
-                  >
-                    <Icon>star_rounded</Icon>
-                  </Fab>
-                </Tooltip>
-              )}
             </Typography>
           </div>
         </DialogTitle>
@@ -431,31 +278,7 @@ export default function ActivityPopup({
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
-              href={
-                moduleActivity || activity?.spec === "lamp.zoom_meeting"
-                  ? "javascript:void(0)"
-                  : `/#/participant/${participant?.id ?? participant}/activity/${activity?.id}?mode=dashboard`
-              }
-              onClick={(evt) => {
-                const isEmptyGroupActivity =
-                  Array.isArray(activity?.settings?.activities) && activity?.settings?.activities?.length === 0
-                if (isEmptyGroupActivity) {
-                  evt.preventDefault()
-                  setShowPopUp(true)
-                  return
-                }
-                updateLocalStorage()
-                if (activity?.spec == "lamp.zoom_meeting") {
-                  openMeetingLink(activity, evt)
-                  setShowPopUp(false)
-                } else {
-                  setTimeout(() => {
-                    setOpen(true)
-                    setShowPopUp(false)
-                    onClose(evt, "escapeKeyDown")
-                  }, 100)
-                }
-              }}
+              href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
               underline="none"
               className={classnames(
                 classes.btngreen,
@@ -469,54 +292,9 @@ export default function ActivityPopup({
                   : classes.btnPrevent
               )}
             >
-              {activity?.spec === "lamp.survey"
-                ? `${t("Start survey")}`
-                : activity?.spec === "lamp.zoom_meeting"
-                ? `${t("Launch meeting")}`
-                : `${t("Begin")}`}
+              {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
             </Link>
           </Box>
-        </DialogActions>
-      </Dialog>
-      <ResponsiveDialog
-        open={!!open}
-        animate
-        fullScreen
-        onClose={() => {
-          setOpen(false)
-        }}
-      >
-        <NotificationPage
-          participant={participant?.id ?? participant}
-          activityId={activity?.id}
-          mode={"dashboard"}
-          tab={"activity"}
-        />
-      </ResponsiveDialog>
-      <Dialog
-        open={!!showPopup}
-        onClose={() => {
-          setShowPopUp(false)
-        }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{`${t("Activity Group")}`}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t("There are currently no activities under this activity group. Please contact your researcher.")}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setShowPopUp(false)
-            }}
-            color="primary"
-            autoFocus
-          >
-            {`${t("Ok")}`}
-          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

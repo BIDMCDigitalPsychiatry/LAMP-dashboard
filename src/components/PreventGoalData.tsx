@@ -64,7 +64,7 @@ export default function GoalEntries({ ...props }) {
     Service.getUserDataByKey("activitytags", [props.activity.id], "id").then((tags) => {
       setTag(tags[0])
     })
-    ;(props.selectedEvents || []).map((event) => {
+    ;(props.selectedEvents || [])?.map((event) => {
       const date = new Date(event.timestamp)
       days.push(date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear())
     })

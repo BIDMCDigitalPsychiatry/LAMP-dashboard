@@ -55,7 +55,7 @@ export default function Repeat({ ...props }) {
         >
           <MenuItem value={null}>Select</MenuItem>
 
-          {(props?.options || []).map((option) => (
+          {(props?.options || [])?.map((option) => (
             <MenuItem value={option.value}>{option.text}</MenuItem>
           ))}
         </Select>

@@ -14,7 +14,7 @@ export const useAccounts = ({ accounts: Accounts = [], onDelete, onAdd }): any =
   const [accounts, setAccounts] = React.useState(Accounts)
 
   const addAccount = React.useCallback(
-    (account, index = accounts.length) => {
+    (account, index = accounts?.length) => {
       setAccounts((prev) => {
         var next = [...prev]
         next.splice(index, 0, account)
@@ -27,7 +27,7 @@ export const useAccounts = ({ accounts: Accounts = [], onDelete, onAdd }): any =
 
   const deleteAccount = React.useCallback(
     (id) => {
-      setAccounts((prev) => [...prev].filter((a) => a.id !== id))
+      setAccounts((prev) => [...prev]?.filter((a) => a.id !== id))
       onDelete && onDelete(id)
     },
     [setAccounts, onDelete]
@@ -133,11 +133,11 @@ function parseAnchor(value) {
     return defaultAnchor
   }
   const parts = value.split(" ")
-  if (parts.length > 2) {
+  if (parts?.length > 2) {
     throw new Error('LinkTo anchor format is "<x> <y>"')
   }
   const [x, y] = parts
-  return Object.assign(
+  return Object?.assign(
     {},
     defaultAnchor,
     x ? parseAnchorText(x) || { x: parseAnchorPercent(x) } : {},
@@ -201,7 +201,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
 ) {
   const classes = useStyles({ diameter, avatarWidth })
 
-  const children = React.Children.toArray(childrenProp).filter((child) => {
+  const children = React.Children.toArray(childrenProp)?.filter((child) => {
     /*if (isFragment(child)) {
       console.error(
         [
@@ -223,12 +223,12 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
 
   return (
     <Box className={clsx(classes.root, className)} ref={handleSetRef} {...other}>
-      {children.map((c: any, i) => (
+      {children?.map((c: any, i) => (
         <OnCircle
           key={i}
           diameter={diameter}
           index={i}
-          count={children.length - 1}
+          count={children?.length - 1}
           root={root}
           avatarWidth={avatarWidth}
           parent={parent}
@@ -239,7 +239,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
             ref: (el) => (i === 0 ? setRoot(el) : undefined),
             className: clsx(classes.avatar, c?.props.className),
             style: {
-              zIndex: children.length - i,
+              zIndex: children?.length - i,
               ...c.props.style,
             },
           })}
@@ -324,7 +324,7 @@ export default function AvatarCircleGroup({
   return (
     <>
       <AvatarMesh diameter={diameter} avatarWidth={avatarWidth} lines={lines} classes={classes}>
-        {accounts.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
+        {accounts?.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
           <Tooltip key={id} title={tooltip || ""}>
             <ButtonBase style={{ borderRadius: avatarWidth / 2 }} onClick={onClick}>
               <Avatar

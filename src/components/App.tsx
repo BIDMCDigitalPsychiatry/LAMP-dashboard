@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, colors, Backdrop, CircularProgress } from "@material-ui/core"
+import {
+  CssBaseline,
+  Button,
+  ThemeProvider,
+  colors,
+  Backdrop,
+  CircularProgress,
+  useMediaQuery,
+} from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
-import { createTheme } from "@material-ui/core/styles"
+import { createTheme, useTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
@@ -29,6 +37,8 @@ import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
+import { clearLocalStorageItems } from "./helper"
+// import Home from "./HomeIntermediate"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -62,7 +72,7 @@ function ErrorFallback({ error }) {
         </code>
         <br />
         <code style={{ color: "#fff" }}>
-          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
+          {trace?.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
         </code> */}
         <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
         <br />
@@ -87,7 +97,7 @@ export const changeCase = (text) => {
   if (!!text) {
     let result = text.replace(/([A-Z])/g, " $1")
     result = text.replace(/_/g, " ")
-    result = result.charAt(0).toUpperCase() + result.slice(1)
+    result = result.charAt(0).toUpperCase() + result?.slice(1)
     return result
   }
   return ""
@@ -97,6 +107,8 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
   const location: any = useLocation()
+
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   useEffect(() => {
     const isLoginPage = location.pathname === "/"
@@ -109,10 +121,10 @@ function AppRouter({ setConfirmSession, ...props }) {
     } catch (error) {
       console.log(error)
     }
-    const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+    //  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
     const hasRoleFlag = localStorage.getItem("isParticipant")
 
-    if (userToken && !hasRoleFlag) {
+    if (!hasRoleFlag) {
       const firstPath = window.location.hash
       const participantRegex = /^#\/participant\/[^\/]+\/assess$/
 
@@ -122,11 +134,7 @@ function AppRouter({ setConfirmSession, ...props }) {
         localStorage.setItem("isParticipant", "false")
       }
     }
-    if (
-      LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
-      location?.pathname === "/" &&
-      !userToken?.accessToken
-    ) {
+    if (LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" && location?.pathname === "/" && !state.identity) {
       reset()
     }
   }, [location?.pathname])
@@ -168,6 +176,9 @@ function AppRouter({ setConfirmSession, ...props }) {
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
   const [loading, setLoading] = useState(false)
   const [participantSelected, setParticipantSelected] = useState(false)
+  const [checked, setChecked] = useState(false)
+  const [redirectPath, setRedirectPath] = useState(null)
+
   useEffect(() => {
     setParticipantSelected(false)
     if (localStorage.getItem("demo_mode") === "try_it") {
@@ -176,10 +187,10 @@ function AppRouter({ setConfirmSession, ...props }) {
       LAMP.initializeDemoDB(self_help_db)
     }
     let query = window.location.hash.split("?")
-    if (!!query && query.length > 1) {
+    if (!!query && query?.length > 1) {
       setLoading(true)
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
-      if (typeof src === "string" && src.length > 0) {
+      if (typeof src === "string" && src?.length > 0) {
         enqueueSnackbar(`${t("You're using the src server to log into mindLAMP.", { src: src })}`, { variant: "info" })
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
@@ -199,24 +210,24 @@ function AppRouter({ setConfirmSession, ...props }) {
           id: userName,
           password: password,
           serverAddress:
-            x.length > 2 && typeof x[2] !== "undefined"
-              ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+            x?.length > 2 && typeof x[2] !== "undefined"
+              ? x[2] + (x?.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
               : "api.lamp.digital",
         })
         if (userName && password) {
           try {
-            const res = await LAMP.Credential.login(userName, password)
-            sessionStorage.setItem(
-              "tokenInfo",
-              JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-            )
+            // const res = await LAMP.Credential.login(userName, password)
+            // sessionStorage.setItem(
+            //   "tokenInfo",
+            //   JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
+            // )
             setAuthenticated(true)
             reset({
               id: x[0],
               password: x[1],
               serverAddress:
-                x.length > 2 && typeof x[2] !== "undefined"
-                  ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+                x?.length > 2 && typeof x[2] !== "undefined"
+                  ? x[2] + (x?.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
                   : "api.lamp.digital",
             }).then((x) => {
               window.location.href = query[0]
@@ -238,18 +249,29 @@ function AppRouter({ setConfirmSession, ...props }) {
       refreshPage()
       setLoading(false)
     }
+
     document.addEventListener("visibilitychange", function logData() {
       if (document.visibilityState === "hidden") {
         sensorEventUpdate(null, (LAMP.Auth._me as any)?.id, null)
       } else {
-        let hrefloc = window.location.href.split("/")[window.location.href.split("/").length - 1]
-        hrefloc.split("?").length > 1
+        let hrefloc = window.location.href.split("/")[window.location.href.split("/")?.length - 1]
+        hrefloc.split("?")?.length > 1
           ? sensorEventUpdate(state.activeTab, (LAMP.Auth._me as any)?.id, hrefloc.split("?")[0])
           : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any)?.id, null)
       }
     })
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
+
+  useEffect(() => {
+    const isLoggedIn = !!state.identity
+
+    if (!isLoggedIn) {
+      // if (!supportsSidebar) setRedirectPath("/home")
+      setRedirectPath("/#")
+    }
+    setChecked(true)
+  }, [supportsSidebar, state.identity])
 
   const refreshPage = () => {
     LAMP.Auth.refresh_identity().then((x) => {
@@ -268,7 +290,7 @@ function AppRouter({ setConfirmSession, ...props }) {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (res?.data) {
         let checked = false
-        Object.keys(res.data).map((key) => {
+        Object.keys(res.data)?.map((key) => {
           if (res.data[key].hasOwnProperty((LAMP.Auth._auth as any).id)) {
             const id = Object.keys(res.data[key])[0]
             checked = true
@@ -361,12 +383,16 @@ function AppRouter({ setConfirmSession, ...props }) {
 
   const logout = async () => {
     const token = sessionStorage.getItem("tokenInfo")
-    try {
-      await LAMP.Credential.logout(token)
-    } catch (err) {
-      console.error("Logout failed:", err)
-    } finally {
+    if (LAMP.Auth?._auth?.serverAddress === "demo.lamp.digital") {
       await reset()
+    } else {
+      try {
+        await LAMP.Credential.logout(token)
+      } catch (err) {
+        console.error("Logout failed:", err)
+      } finally {
+        await reset()
+      }
     }
   }
 
@@ -422,6 +448,8 @@ function AppRouter({ setConfirmSession, ...props }) {
       sessionStorage.removeItem("tokenInfo")
       localStorage.removeItem("isParticipant")
       localStorage.removeItem("isLoginPage")
+      clearLocalStorageItems()
+      sessionStorage.clear()
       window.location.href = "/#/"
     }
   }
@@ -747,7 +775,7 @@ function AppRouter({ setConfirmSession, ...props }) {
 
           <Route
             exact
-            path="/researcher/:rid/participant/:id/settings"
+            path="/researcher/:rid/participant/:id/study/:studyId/settings"
             render={(props) =>
               !state.identity ? (
                 <React.Fragment>
@@ -823,8 +851,10 @@ function AppRouter({ setConfirmSession, ...props }) {
           <Route
             exact
             path="/"
-            render={(props) =>
-              !(window.location.hash.split("?").length > 1 && !state.identity) ? (
+            render={(props) => {
+              if (!checked) return null
+              // if (redirectPath === "/home") return <Redirect to={redirectPath} />
+              return !(window.location.hash.split("?")?.length > 1 && !state.identity) ? (
                 !state.identity ? (
                   <React.Fragment>
                     <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
@@ -862,8 +892,19 @@ function AppRouter({ setConfirmSession, ...props }) {
               ) : (
                 <React.Fragment />
               )
-            }
+            }}
           />
+
+          {/* <Route
+            exact
+            path="/home"
+            render={(props) => (
+              <React.Fragment>
+                <PageTitle>mindLAMP</PageTitle>
+                <Home />
+              </React.Fragment>
+            )}
+          /> */}
 
           {/* Route authenticated routes. */}
           <Route
@@ -1040,7 +1081,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             exact
             path="/participant/:id/:tab"
             render={(props) =>
-              !state.identity || !getParticipant(props.match.params.id) ? (
+              !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
                   <Login
@@ -1051,6 +1092,10 @@ function AppRouter({ setConfirmSession, ...props }) {
                     setConfirmSession={setConfirmSession}
                   />
                 </React.Fragment>
+              ) : !getParticipant(props.match.params.id) ? (
+                <Backdrop open>
+                  <CircularProgress />
+                </Backdrop>
               ) : (
                 <React.Fragment>
                   <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>

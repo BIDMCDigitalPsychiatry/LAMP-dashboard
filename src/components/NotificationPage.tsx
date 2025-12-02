@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, lazy, Suspense } from "react"
 import {
   makeStyles,
   Box,
@@ -16,16 +16,17 @@ import {
   Button,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Streak from "./Streak"
-import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
-import GroupActivity from "./GroupActivity"
+
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
 import VisualPopup from "./VisualPopup"
-import ModuleActivity from "./ModuleActivity"
-import ResponsiveDialog from "./ResponsiveDialog"
+import { lazyRetry } from "../helper/functions"
+const Streak = lazy(lazyRetry(() => import("./Streak")))
+const GroupActivity = lazy(lazyRetry(() => import("./GroupActivity")))
+const EmbeddedActivity = lazy(lazyRetry(() => import("./EmbeddedActivity")))
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -121,7 +122,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [tag, setTag] = useState(null)
   const [visualPopup, setVisualPopup] = useState(null)
   const [staticData, setStaticData] = useState(0)
-  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
 
   useEffect(() => {
     if (!!activityId) {
@@ -130,20 +130,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   }, [activityId])
 
   useEffect(() => {
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0] ?? []
-      setFavoriteActivities(tag)
-    })()
-  }, [])
-
-  useEffect(() => {
-    setLoading(true)
     setResponse(false)
+    const sessionValue = sessionStorage.getItem("LAMP.Auth")
     ;(async () => {
-      if (!!favoriteActivities && !!id && !!LAMP.Auth) {
+      if (!!id && !!LAMP.Auth) {
         LAMP.Activity.view(id)
           .then((data: any) => {
             if (!!data) {
@@ -158,8 +148,13 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
                 setLoading(false)
               })
             } else {
-              setOpenNotFound(true)
-              setLoading(false)
+              if (!sessionValue) {
+                setOpenNotFound(false)
+                window.location.href = "/#/"
+              } else {
+                setOpenNotFound(true)
+                setLoading(false)
+              }
             }
           })
           .catch((e) => {
@@ -172,31 +167,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           })
       }
     })()
-  }, [id, favoriteActivities])
-  const [moduleActivity, setModuleActivity] = useState("")
-  const [open, setOpen] = useState(false)
+  }, [id])
 
-  const [module, setModule] = useState("")
   const returnResult = () => {
-    setStreak(0)
-    const activityFromModule = localStorage.getItem("activityFromModule")
-    const moduleId = localStorage.getItem("moduleId")
-    setModule(activityFromModule)
+    const lastActiveTab = localStorage.getItem("lastActiveTab")?.toLocaleLowerCase()
     if (mode === null) setResponse(true)
-    else if (mode === "responseActivity") {
-      const surveyId = localStorage.getItem("SurveyId")
-      if (surveyId) {
-        window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
-        localStorage.removeItem("SurveyId")
-      } else {
-        window.location.href = `/#/participant/${participant}/assess `
-      }
-    } else if (!!activityFromModule && !!tab) {
-      setModuleActivity(activityFromModule)
-      setOpen(true)
-    } else if (moduleId && !!tab) {
-      window.location.href = `/#/participant/${participant?.id ?? participant}/module/${moduleId}`
-      localStorage.removeItem("moduleId")
+    else if (!!lastActiveTab) {
+      window.location.href = `/#/participant/${participant}/${lastActiveTab}`
+      localStorage.removeItem("lastActiveTab")
     } else if (tab === null || typeof tab === "undefined")
       window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) {
@@ -218,7 +196,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const showStreak = (participant, activity) => {
     setLoading(true)
     setVisualPopup(null)
-    setStreakActivity(tag?.streak ?? null)
+    // setStreakActivity(tag?.streak ?? null)
+    setStreakActivity({ ...tag?.streak, activity })
     if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
       getEvents(participant, activity.id).then((streak) => {
         setStreak(streak)
@@ -229,7 +208,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     }
   }
 
-  const showVisualPopup = (activity) => {
+  const showVisualPopup = (activity, data) => {
     Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
       const tag = tags[0]
       if (
@@ -240,7 +219,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       ) {
         setVisualPopup(tag?.visualSettings)
       } else {
-        showStreak(participant, activity)
+        if (!!tag?.streak?.streak || typeof tag?.streak !== "undefined") {
+          if (!!data?.response?.data?.streak) setStreak(data?.response?.data?.streak)
+          else returnResult()
+        } else returnResult()
       }
     })
   }
@@ -272,56 +254,63 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       {!response &&
         !loading &&
         (activity?.spec === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            onComplete={(data) => {
-              showStreak(participant, activity)
-            }}
-            noBack={false}
-            tab={tab}
-          />
+          <Suspense fallback={<div />}>
+            <GroupActivity
+              activity={activity}
+              participant={participant}
+              onComplete={(data) => {
+                if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+                  if (!!data?.response?.data?.streak) setStreak(data?.response?.data?.streak)
+                  else returnResult()
+                } else returnResult()
+              }}
+              noBack={false}
+              tab={tab}
+            />
+          </Suspense>
         ) : (
-          <EmbeddedActivity
-            name={activity?.name}
-            activity={activity}
-            participant={participant}
-            noBack={false}
-            tab={tab}
-            favoriteActivities={favoriteActivities}
-            onComplete={(data) => {
-              console.log(mode, data)
-              setStaticData(data?.static_data ?? {})
-              if (data === null) {
-                if (mode === null) window.location.href = "/#/"
-                else history.back()
-              } else if (data?.clickBack === true) {
-                if (!!data && !!data?.timestamp) {
-                  showVisualPopup(activity)
-                } else {
+          <Suspense fallback={<div />}>
+            <EmbeddedActivity
+              name={activity?.name}
+              activity={activity}
+              participant={participant}
+              noBack={false}
+              tab={tab}
+              onComplete={(data) => {
+                setStaticData(data?.static_data ?? {})
+                if (data === null) {
                   if (mode === null) window.location.href = "/#/"
                   else history.back()
+                } else if (data?.clickBack === true) {
+                  if (!!data && !!data?.timestamp) {
+                    showVisualPopup(activity, data)
+                  } else {
+                    if (mode === null) window.location.href = "/#/"
+                    else history.back()
+                  }
+                } else if (!!data && !!data?.timestamp) {
+                  showVisualPopup(activity, data)
                 }
-              } else if (!!data && !!data?.timestamp) {
-                showVisualPopup(activity)
-              }
-            }}
-          />
+              }}
+            />
+          </Suspense>
         ))}
-      <Streak
-        open={openComplete}
-        onClose={() => {
-          setOpenComplete(false)
-          returnResult()
-          setLoading(false)
-        }}
-        popupClose={() => {
-          setOpenComplete(false)
-          setLoading(true)
-        }}
-        streak={streak}
-        activity={streakActivity}
-      />
+      <Suspense fallback={<div />}>
+        <Streak
+          open={openComplete}
+          onClose={() => {
+            setOpenComplete(false)
+            returnResult()
+            setLoading(false)
+          }}
+          popupClose={() => {
+            setOpenComplete(false)
+            setLoading(true)
+          }}
+          streak={streak}
+          activity={{ ...activity, ...streakActivity?.activity }}
+        />
+      </Suspense>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -354,19 +343,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
-      <ResponsiveDialog
-        open={!!open}
-        transient={module != "" ? true : false}
-        animate
-        fullScreen
-        onClose={() => {
-          setOpen(false)
-          setId(localStorage.getItem("SurveyId") ?? "")
-          localStorage.removeItem("activityFromModule")
-        }}
-      >
-        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
-      </ResponsiveDialog>
     </div>
   )
 }

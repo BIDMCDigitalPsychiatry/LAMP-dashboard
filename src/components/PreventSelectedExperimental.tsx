@@ -55,7 +55,7 @@ export default function PreventSelectedExperimental({
 
   return (
     <React.Fragment>
-      {(selectedExperimental || []).map((experimentalKey) => {
+      {(selectedExperimental || [])?.map((experimentalKey) => {
         let visualizationKey = experimentalKey
         if (!visualizationKey.startsWith("lamp.dashboard.experimental.")) {
           visualizationKey = "lamp.dashboard.experimental." + visualizationKey

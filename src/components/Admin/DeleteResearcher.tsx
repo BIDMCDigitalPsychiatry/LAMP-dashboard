@@ -38,8 +38,8 @@ export default function DeleteResearcher({
     if (status === "Yes") {
       if (((await LAMP.Researcher.delete(researcher.id)) as any).error === undefined) {
         LAMP.Credential.list(researcher.id).then((cred) => {
-          cred = cred.filter((c) => c.hasOwnProperty("origin"))
-          cred.map((each) => {
+          cred = cred?.filter((c) => c.hasOwnProperty("origin"))
+          cred?.map((each) => {
             LAMP.Credential.delete(researcher.id, each["access_key"])
           })
         })

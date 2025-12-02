@@ -52,7 +52,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   }
 
   useEffect(() => {
-    if ((category || []).length === 1 && category[0] === defaultTab) setCustomize(false)
+    if ((category || [])?.length === 1 && category[0] === defaultTab) setCustomize(false)
     else setCustomize(true)
     onChange(category)
   }, [category])
@@ -109,16 +109,16 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
             input={<OutlinedInput />}
             MenuProps={MenuProps}
             className={classes.menuitemsul}
-            renderValue={(selected) => (category || []).map((c) => tabs[c]).join(", ")}
+            renderValue={(selected) => (category || [])?.map((c) => tabs[c]).join(", ")}
           >
-            {Object.keys(tabs).map((key) => (
+            {Object.keys(tabs)?.map((key) => (
               <MenuItem key={key} value={key}>
                 <Checkbox checked={(category || []).indexOf(key) > -1} />
                 <ListItemText primary={tabs[key]} />
               </MenuItem>
             ))}
           </Select>
-          {(category || []).length === 0 && (
+          {(category || [])?.length === 0 && (
             <Typography variant="caption">
               {`${t("This Activity will only appear in the Feed tab if a schedule is configured.")}`}
             </Typography>

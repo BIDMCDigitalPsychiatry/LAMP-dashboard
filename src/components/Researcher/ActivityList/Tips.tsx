@@ -161,8 +161,8 @@ export default function Tips({
   )
 
   const toBinary = (string) => {
-    const codeUnits = new Uint16Array(string.length)
-    for (let i = 0; i < codeUnits.length; i++) {
+    const codeUnits = new Uint16Array(string?.length)
+    for (let i = 0; i < codeUnits?.length; i++) {
       codeUnits[i] = string.charCodeAt(i)
     }
   }
@@ -181,7 +181,7 @@ export default function Tips({
     name: value?.name ?? "",
     spec: value?.spec ?? "lamp.tips",
     schedule: value?.schedule ?? [],
-    description: "",
+    description: details?.description ?? "",
     streak: details?.streak ?? null,
     settings: value?.settings ?? [],
     studyID: !!value ? value.study_id : study,
@@ -211,32 +211,37 @@ export default function Tips({
     setNewTipText("")
     ;(async () => {
       if (category && category !== "add_new") {
-        if (categoryArray.length > 0) {
+        if (categoryArray?.length > 0) {
           let existsData = categoryArray.find((o) => o.id === category)
-          if (Object.keys(existsData).length > 0) {
+          if (Object.keys(existsData)?.length > 0) {
             if (existsData.id) {
               let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.activity_details")
               if (iconsData.hasOwnProperty("data")) {
                 setCategoryImage(iconsData.data.icon)
+                existsData.description = iconsData.data.description || ""
               }
             }
             if (!value) {
               let settingsData = await LAMP.Activity.view(existsData.id)
               if (settingsData) {
-                settingsData.settings = settingsData.settings.reduce((ds, d) => {
+                settingsData.settings = settingsData.settings?.reduce((ds, d) => {
                   let newD = d
                   if (d.image === "") {
-                    newD = Object.assign({}, d, { image: defaultBase64 })
+                    newD = Object?.assign({}, d, { image: defaultBase64 })
                   }
-                  return ds.concat(newD)
+                  return ds?.concat(newD)
                 }, [])
-                existsData.settings = settingsData.settings.concat(defaultSettingsArray)
+                existsData.settings = settingsData.settings?.concat(defaultSettingsArray)
               } else {
                 existsData.settings = defaultSettingsArray
               }
             }
             setTipsDataArray(existsData.settings)
-            setData({ ...data, settings: existsData.settings })
+            setData({
+              ...data,
+              settings: existsData.settings,
+              description: value ? value.description : existsData.description || "",
+            })
           }
         }
       } else {
@@ -255,14 +260,14 @@ export default function Tips({
       setLoading(true)
       if (studyId) {
         Service.getDataByKey("activities", [studyId], "study_id").then((activitiesObject) => {
-          let tipActivities = activitiesObject.filter((x) => x.spec === "lamp.tips")
+          let tipActivities = activitiesObject?.filter((x) => x.spec === "lamp.tips")
           setCategoryArray(tipActivities)
         })
       }
       if (!!value) {
         let activitiesData = JSON.parse(JSON.stringify(value))
         setCategory(activitiesData.id)
-        if (Object.keys(activitiesData.settings).length > 0) {
+        if (Object.keys(activitiesData.settings)?.length > 0) {
           setTipsDataArray(activitiesData.settings)
         }
         let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
@@ -357,12 +362,12 @@ export default function Tips({
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
       (typeof text !== "undefined" && text?.trim() !== "")
     ) {
-      duplicates = categoryArray.filter((x) =>
+      duplicates = categoryArray?.filter((x) =>
         !!value
           ? x.name?.toLowerCase() === text?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       )
-      if (duplicates.length > 0) {
+      if (duplicates?.length > 0) {
         enqueueSnackbar(`${t("Activity with same name already exist.")}`, { variant: "error" })
         return false
       }
@@ -370,9 +375,9 @@ export default function Tips({
     let settingsObj = data?.settings?.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
-        newD = Object.assign({}, d, { image: "" })
+        newD = Object?.assign({}, d, { image: "" })
       }
-      return ds.concat(newD)
+      return ds?.concat(newD)
     }, [])
     setLoading(true)
     category === "add_new" || duplicate
@@ -382,6 +387,7 @@ export default function Tips({
             name: duplicate ? text : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            description: data?.description || "",
             streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
@@ -397,6 +403,7 @@ export default function Tips({
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
+            description: data.description,
             streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
@@ -414,9 +421,9 @@ export default function Tips({
     let settingsObj = data?.settings?.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
-        newD = Object.assign({}, d, { image: "" })
+        newD = Object?.assign({}, d, { image: "" })
       }
-      return ds.concat(newD)
+      return ds?.concat(newD)
     }, [])
     let dataObj =
       category === "add_new" || duplicate
@@ -425,6 +432,7 @@ export default function Tips({
             name: duplicate ? text : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            description: data.description,
             streak: data.streak,
             showFeed: showFeed,
             schedule: value?.schedule ?? [],
@@ -438,6 +446,7 @@ export default function Tips({
             spec: "lamp.tips",
             icon: categoryImage,
             streak: data.streak,
+            description: data.description,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -457,7 +466,7 @@ export default function Tips({
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
       (typeof text !== "undefined" && text?.trim() !== "")
     ) {
-      duplicates = categoryArray.filter((x) => {
+      duplicates = categoryArray?.filter((x) => {
         if (!!value) {
           // EDIT MODE
           const isSameName = x.name?.toLowerCase() === text?.trim().toLowerCase()
@@ -469,7 +478,7 @@ export default function Tips({
         }
       })
 
-      if (duplicates.length > 0) {
+      if (duplicates?.length > 0) {
         enqueueSnackbar(`${t("Activity with same name already exist.")}`, { variant: "error" })
         return true
       }
@@ -479,7 +488,7 @@ export default function Tips({
   }
   const validate = () => {
     let validationData = false
-    if (Object.keys(data.settings).length > 0) {
+    if (Object.keys(data.settings)?.length > 0) {
       validationData = data.settings.some((item) => {
         let sizeInBytes = 0
         let type = ""
@@ -489,7 +498,7 @@ export default function Tips({
           let img = new Image()
           img.src = base64Img
           type = base64Img?.split(";")[0]?.split("/")[1]
-          let stringLength = base64Img?.length - ("data:image/" + type + ";base64,").length
+          let stringLength = base64Img?.length - ("data:image/" + type + ";base64,")?.length
           sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
           if ((type !== "" && !imageTypes.includes(type)) || sizeInBytes > 4194304) {
             setIsImagError(true)
@@ -513,7 +522,7 @@ export default function Tips({
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
       (typeof text !== "undefined" && text?.trim() !== "")
     ) {
-      duplicates = categoryArray.filter((x) => {
+      duplicates = categoryArray?.filter((x) => {
         return !!value
           ? x.name?.toLowerCase() === text?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
@@ -529,10 +538,10 @@ export default function Tips({
         category === "" ||
         (category == "add_new" && (newTipText === null || newTipText === "")) ||
         validationData ||
-        (data.settings && data.settings.length === 0)
+        (data.settings && data.settings?.length === 0)
       )
       // ||
-      // duplicates.length > 0
+      // duplicates?.length > 0
     )
       ? setIsError(true)
       : setIsError(false)
@@ -546,11 +555,11 @@ export default function Tips({
         category === null ||
         category === "" ||
         (category == "add_new" && (newTipText === null || newTipText === "")) ||
-        (data.settings && data.settings.length === 0) ||
+        (data.settings && data.settings?.length === 0) ||
         validationData
       )
       // ||
-      // duplicates.length > 0
+      // duplicates?.length > 0
     )
   }
 
@@ -628,7 +637,7 @@ export default function Tips({
                     variant="filled"
                     disabled={!!value || !!study ? true : false}
                   >
-                    {studies.map((option) => (
+                    {studies?.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {t(option.name)}
                       </MenuItem>
@@ -679,7 +688,7 @@ export default function Tips({
                         <MenuItem value="add_new" key="add_new">
                           {`${t("Add New")}`}
                         </MenuItem>
-                        {categoryArray.map((x, idx) => (
+                        {categoryArray?.map((x, idx) => (
                           <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
                         ))}
                       </TextField>
@@ -707,6 +716,18 @@ export default function Tips({
                     </Grid>
                   </>
                 )}
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    label={`${t("Activity Description")}`}
+                    variant="filled"
+                    rows={2}
+                    value={data.description || ""}
+                    onChange={(event) => setData({ ...data, description: event.target.value })}
+                    inputProps={{ maxLength: 2500 }}
+                  />
+                </Grid>
                 {/* {!!value ? (
                   <Grid container>
                     <Grid item xs sm={6} md={4} lg={3}>
@@ -771,7 +792,7 @@ export default function Tips({
 
           <ActivityStreak onChange={handleStreakChange} value={details?.streak} />
 
-          {data.settings && data.settings.length === 0 && (
+          {data.settings && data.settings?.length === 0 && (
             <Grid container spacing={2}>
               <Grid item xs sm={12}>
                 <Alert severity="error">{`${t("Atleast one tip details required")}`}</Alert>

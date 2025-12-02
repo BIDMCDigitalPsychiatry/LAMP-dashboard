@@ -119,13 +119,10 @@ export function CredentialEditor({
   const _qrLink = () =>
     window.location.href.split("#")[0] +
     "#/?a=" +
-    btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
+    btoa([credID, password, LAMP.Auth._auth.serverAddress]?.filter((x) => !!x).join(":"))
   const roles =
     userType == "researcher" && !fromParticipant
-      ? [
-          { value: "investigator", label: "Investigator" },
-          { value: "message_coordinator", label: "Message Coordinator" },
-        ]
+      ? [{ value: "investigator", label: "Investigator" }]
       : title === "User Administrator"
       ? [
           { value: "edit", label: "User Administrator" },
@@ -173,7 +170,7 @@ export function CredentialEditor({
   }
   // validating name input field
   const validateNameField = (value) => {
-    if (value.length > 50) {
+    if (value?.length > 50) {
       setFormErrors((prev) => ({
         ...prev,
         nameError: "Maximum 50 characters allowed.",
@@ -199,9 +196,9 @@ export function CredentialEditor({
       confirmPassword?.length > 0
     ) {
       if (
-        formErrors.nameError.length === 0 &&
-        formErrors.emailError.length === 0 &&
-        formErrors.passwordError.length === 0
+        formErrors.nameError?.length === 0 &&
+        formErrors.emailError?.length === 0 &&
+        formErrors.passwordError?.length === 0
       ) {
         return false
       }
@@ -243,7 +240,7 @@ export function CredentialEditor({
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
-          error={formErrors.nameError.length > 0}
+          error={formErrors.nameError?.length > 0}
           fullWidth
           label={`${t("Name")}`}
           type="text"
@@ -309,11 +306,11 @@ export function CredentialEditor({
               ],
             }}
           >
-            {roles.length > 0 &&
+            {roles?.length > 0 &&
               ((typeof userType === "undefined" && title == "Administrator") ||
                 (!!permissions && !!title && !fromParticipant) ||
                 (userType == "researcher" && !fromParticipant)) &&
-              roles.map((option) => (
+              roles?.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -323,7 +320,7 @@ export function CredentialEditor({
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
-          error={formErrors.emailError.length > 0}
+          error={formErrors.emailError?.length > 0}
           fullWidth
           label={`${t("Email Address")}`}
           type="email"
@@ -344,7 +341,7 @@ export function CredentialEditor({
             label={`${t("Password")}`}
             type="password"
             variant="outlined"
-            error={!accepted || formErrors.passwordError.length > 0 ? true : false}
+            error={!accepted || formErrors.passwordError?.length > 0 ? true : false}
             helperText={
               !showSaveTick()
                 ? "On the right of the box, press the check mark in the circle to save changes."
@@ -415,7 +412,7 @@ export function CredentialEditor({
           />
         </Box>
       )}
-      {showLink && password.length > 0 && (
+      {showLink && password?.length > 0 && (
         <Grid item>
           <TextField
             fullWidth
@@ -510,11 +507,11 @@ export const CredentialManager: React.FunctionComponent<{
 
   useEffect(() => {
     LAMP.Type.parent(id)
-      .then((x) => Object.keys(x?.data || []).length === 0)
+      .then((x) => Object.keys(x?.data || [])?.length === 0)
       .then((x) => setShouldSyncWithChildren(x))
     id = !!type ? null : id
     LAMP.Credential.list(id).then((cred) => {
-      cred = cred.filter((c) => c.hasOwnProperty("origin"))
+      cred = cred?.filter((c) => c.hasOwnProperty("origin"))
       LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
         setPermissions(!!res.data ? res.data : [])
         setCredentials(cred, res.data)
@@ -526,11 +523,11 @@ export const CredentialManager: React.FunctionComponent<{
   const setCredentials = (cred, permissions) => {
     if (type === "User Administrator") {
       let selectedCred = cred
-      selectedCred.map((credent, index) => {
-        let selected = permissions.filter(
+      selectedCred?.map((credent, index) => {
+        let selected = permissions?.filter(
           (d) => Object.keys(d)[0] === credent["access_key"] && d[credent["access_key"]] !== "admin"
         )
-        if (selected.length === 0) delete selectedCred[index]
+        if (selected?.length === 0) delete selectedCred[index]
       })
       setAllCreds(selectedCred)
     } else {
@@ -544,7 +541,7 @@ export const CredentialManager: React.FunctionComponent<{
       ;(async () => {
         let ext = ((await LAMP.Type.getAttachment(id, `${prefix}.external`)) as any).data
         let int = ((await LAMP.Type.getAttachment(id, `${prefix}`)) as any).data
-        setAllRoles(Object.assign(ext ?? {}, int ?? {}))
+        setAllRoles(Object?.assign(ext ?? {}, int ?? {}))
         setExt(Object.keys(ext ?? {}))
         setInt(Object.keys(int ?? {}))
       })()
@@ -573,7 +570,7 @@ export const CredentialManager: React.FunctionComponent<{
       let newData = {}
       let dataPermissions = permissions
       let found = false
-      Object.keys(permissions).map((key) => {
+      Object.keys(permissions)?.map((key) => {
         if (!found) {
           const accKey = data.emailAddress !== "" ? data.emailAddress : data.credential.access_key
           if (permissions[key].hasOwnProperty(accKey)) {
@@ -611,7 +608,7 @@ export const CredentialManager: React.FunctionComponent<{
     if (result === 1) {
       id = !!type ? null : id
       LAMP.Credential.list(id).then((cred) => {
-        cred = cred.filter((c) => c.hasOwnProperty("origin"))
+        cred = cred?.filter((c) => c.hasOwnProperty("origin"))
         setCredentials(cred, permissions)
       })
       setRoles()
@@ -636,7 +633,7 @@ export const CredentialManager: React.FunctionComponent<{
       enqueueSnackbar(`${t("Credential management failed.")}`, { variant: "error" })
     }
     LAMP.Credential.list(id).then((cred) => {
-      cred = cred.filter((c) => c.hasOwnProperty("origin"))
+      cred = cred?.filter((c) => c.hasOwnProperty("origin"))
       setCredentials(cred, permissions)
     })
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
@@ -652,7 +649,7 @@ export const CredentialManager: React.FunctionComponent<{
             {`${t("Manage Credentials")}`}
           </Typography>
         </Grid>
-        {allCreds.map((x, idx) => (
+        {allCreds?.map((x, idx) => (
           <Grid item key={idx}>
             <Tooltip
               title={

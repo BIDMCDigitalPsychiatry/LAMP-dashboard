@@ -95,9 +95,9 @@ export default function PreventNoSkills({
       setStorageData({ ...storageData, reasons: reasonsRange })
       let timeStamp = reasonsRange.split("-")
       let reasonData = []
-      selectedEvents.map((event) => {
+      selectedEvents?.map((event) => {
         if (
-          event.static_data.reason?.trim().length > 0 &&
+          event.static_data.reason?.trim()?.length > 0 &&
           event.timestamp <= parseInt(timeStamp[0]) &&
           event.timestamp >= parseInt(timeStamp[1])
         ) {
@@ -134,16 +134,16 @@ export default function PreventNoSkills({
                 setReasonsRange(event.target.value)
               }}
             >
-              {dateArray.map((dateString) => (
+              {dateArray?.map((dateString) => (
                 <option value={dateString.timestamp}>{dateString.date}</option>
               ))}
             </NativeSelect>
           </Box>
         </Box>
       </div>
-      {!!reasons && (reasons || []).length > 0 ? (
+      {!!reasons && (reasons || [])?.length > 0 ? (
         <Box className={classes.fullWidth}>
-          {(reasons || []).map(
+          {(reasons || [])?.map(
             (data) =>
               !!data.reason && (
                 <Box className={classes.blueBoxStyle}>

@@ -56,12 +56,12 @@ export default function SymbolDigitResponses({ activityData, ...props }) {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [rowCount, setRowCount] = useState(10)
-  const [paginated, setPaginated] = useState(activityData.slice(page * rowCount, page * rowCount + rowCount))
+  const [paginated, setPaginated] = useState(activityData?.slice(page * rowCount, page * rowCount + rowCount))
 
   const handleChangePage = (page: number, rowCount: number) => {
     setPage(page)
     setRowCount(rowCount)
-    setPaginated(activityData.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginated(activityData?.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -78,8 +78,8 @@ export default function SymbolDigitResponses({ activityData, ...props }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {activityData.length > 0 ? (
-            paginated.map((event) => (
+          {activityData?.length > 0 ? (
+            paginated?.map((event) => (
               <TableRow>
                 <TableCell>{getDateStringValue(event?.timestamp)}</TableCell>
                 <TableCell>{event?.static_data?.number_of_symbols}</TableCell>

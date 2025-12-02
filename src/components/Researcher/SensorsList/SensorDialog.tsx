@@ -12,7 +12,6 @@ import {
   CircularProgress,
   makeStyles,
   createStyles,
-  withStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -63,6 +62,7 @@ const useStyles = makeStyles((theme) =>
 )
 
 export interface Sensors {
+  study_name?: any
   id?: string
   study_id?: string
   name?: string
@@ -74,7 +74,6 @@ export default function SensorDialog({
   studyId,
   type,
   addOrUpdateSensor,
-  allSensors,
   ...props
 }: {
   sensor?: Sensors
@@ -82,7 +81,6 @@ export default function SensorDialog({
   studyId?: string
   type?: string
   addOrUpdateSensor?: Function
-  allSensors?: Array<any>
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState(sensor ? sensor.study_id : studyId ?? "")
@@ -96,17 +94,38 @@ export default function SensorDialog({
   const [duplicateCnt, setDuplicateCnt] = useState(0)
   const [oldSensorName, setOldSensorName] = useState(sensor ? sensor.name : "")
   const [allSensorData, setAllSensorData] = useState([])
+  const hash = window.location.hash
+  const match = hash.match(/\/study\/([^/]+)/)
+  const study_Id = match ? match[1] : null
 
   useEffect(() => {
-    LAMP.SensorSpec.all().then((res) => {
-      setSensorSpecs(res)
-      setSensorSpec(sensor ? sensor.spec : null)
-    })
-  }, [])
+    if (!!props.open) {
+      LAMP.SensorSpec.all().then((res) => {
+        setSensorSpecs(res)
+        setSensorSpec(sensor ? sensor.spec : null)
+      })
+      if (sensor) setOldSensorName(sensor.name)
+    }
+  }, [props.open])
+
+  const sensorDataByStudy = async () => {
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      Service.getAll("sensors").then((sensorObj: any) => {
+        setAllSensorData(sensorObj)
+      })
+    } else {
+      const sensors = await LAMP.Sensor.allByStudy(selectedStudy)
+      sensors?.map((sensor: any) => {
+        sensor.study_id = selectedStudy
+        return sensor
+      })
+      setAllSensorData(sensors)
+    }
+  }
 
   useEffect(() => {
-    setAllSensorData(allSensors)
-  }, [allSensors])
+    if (selectedStudy && !!props.open) sensorDataByStudy()
+  }, [selectedStudy])
 
   useEffect(() => {
     if (type === "add") {
@@ -115,7 +134,7 @@ export default function SensorDialog({
       setSensorName("")
       setSensorSpec("")
     } else {
-      setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
+      setSelectedStudy(study_Id ? study_Id : sensor ? sensor.study_id : "")
       setSelectedSensor(sensor ?? null)
       setSensorName(sensor ? sensor.name : "")
       setSensorSpec(sensor ? sensor.spec : null)
@@ -127,19 +146,19 @@ export default function SensorDialog({
     if (!(typeof sensorName === "undefined" || (typeof sensorName !== "undefined" && sensorName?.trim() === ""))) {
       if (allSensorData) {
         selectedSensor
-          ? (duplicateCount = allSensorData.filter((sensorData) => {
+          ? (duplicateCount = allSensorData?.filter((sensorData) => {
               if (sensorData.name !== oldSensorName) {
                 return (
                   sensorData.study_id === selectedStudy &&
                   sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
                 )
               }
-            }).length)
-          : (duplicateCount = allSensorData.filter(
+            })?.length)
+          : (duplicateCount = allSensorData?.filter(
               (sensorData) =>
                 sensorData.study_id === selectedStudy &&
                 sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
-            ).length)
+            )?.length)
       }
       setDuplicateCnt(duplicateCount)
     }
@@ -148,12 +167,12 @@ export default function SensorDialog({
   useEffect(() => {
     let duplicateCount = 0
     if (!(typeof sensorName === "undefined" || (typeof sensorName !== "undefined" && sensorName?.trim() === ""))) {
-      if (allSensors) {
-        duplicateCount = allSensors.filter(
+      if (allSensorData) {
+        duplicateCount = allSensorData?.filter(
           (sensorData) =>
             sensorData.study_id === selectedStudy &&
             sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
-        ).length
+        )?.length
       }
       setDuplicateCnt(duplicateCount)
     }
@@ -181,12 +200,13 @@ export default function SensorDialog({
       spec: sensorSpec,
     })
       .then((res) => {
-        Service.updateMultipleKeys(
-          "sensors",
-          { sensors: [{ id: selectedSensor.id, name: sensorName.trim(), spec: sensorSpec }] },
-          ["name", "spec"],
-          "id"
-        )
+        if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital")
+          Service.updateMultipleKeys(
+            "sensors",
+            { sensors: [{ id: selectedSensor.id, name: sensorName.trim(), spec: sensorSpec }] },
+            ["name", "spec"],
+            "id"
+          )
         enqueueSnackbar(`${t("Successfully updated a sensor.")}`, {
           variant: "success",
         })
@@ -209,31 +229,35 @@ export default function SensorDialog({
     })
       .then((res) => {
         let result = JSON.parse(JSON.stringify(res))
-        Service.getData("studies", selectedStudy).then((studiesObject) => {
-          let sensorObj = {
-            id: result.data,
-            name: sensorName.trim(),
-            spec: sensorSpec,
-            study_id: selectedStudy,
-            study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
-          }
-          Service.addData("sensors", [sensorObj])
-          Service.updateMultipleKeys(
-            "studies",
-            {
-              studies: [
-                { id: studiesObject.id, sensor_count: studiesObject.sensor_count ? studiesObject.sensor_count + 1 : 1 },
-              ],
-            },
-            ["sensor_count"],
-            "id"
-          )
-          enqueueSnackbar(`${t("Successfully created a sensor.")}`, {
-            variant: "success",
+        if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital")
+          Service.getData("studies", selectedStudy).then((studiesObject) => {
+            let sensorObj = {
+              id: result.data,
+              name: sensorName.trim(),
+              spec: sensorSpec,
+              study_id: selectedStudy,
+              study_name: studies?.filter((study) => study.id === selectedStudy)[0]?.name,
+            }
+            Service.addData("sensors", [sensorObj])
+            Service.updateMultipleKeys(
+              "studies",
+              {
+                studies: [
+                  {
+                    id: studiesObject.id,
+                    sensor_count: studiesObject.sensor_count ? studiesObject.sensor_count + 1 : 1,
+                  },
+                ],
+              },
+              ["sensor_count"],
+              "id"
+            )
           })
-          setLoading(false)
-          addOrUpdateSensor()
+        enqueueSnackbar(`${t("Successfully created a sensor.")}`, {
+          variant: "success",
         })
+        setLoading(false)
+        setTimeout(() => addOrUpdateSensor(), 100)
       })
       .catch((e) => {
         enqueueSnackbar(`${t("An error occured while creating the sensor.")}`, {
@@ -271,7 +295,7 @@ export default function SensorDialog({
             }
             variant="filled"
           >
-            {(studies || []).map((option) => (
+            {(studies || [])?.map((option) => (
               <MenuItem key={option.id} value={option.id} data-selected-study-name={t(option.name)}>
                 {t(option.name)}
               </MenuItem>
@@ -317,7 +341,7 @@ export default function SensorDialog({
             variant="filled"
           >
             {!!sensorSpecs &&
-              sensorSpecs.map((option) => (
+              sensorSpecs?.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {t(option.id.replace("lamp.", ""))}
                 </MenuItem>

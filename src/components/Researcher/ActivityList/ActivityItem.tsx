@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Box,
   Typography,
@@ -51,8 +51,14 @@ export default function ActivityItem({
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(
-    selectedActivities.filter((d) => d.id === activity.id).length > 0 ? true : false
+    selectedActivities?.filter((d) => d.id === activity.id)?.length > 0 ? true : false
   )
+
+  useEffect(() => {
+    if (selectedActivities?.length > 0)
+      setChecked(selectedActivities?.filter((d) => d.id === activity.id)?.length > 0 ? true : false)
+    else setChecked(false)
+  }, [selectedActivities])
 
   const handleChange = (activity, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)

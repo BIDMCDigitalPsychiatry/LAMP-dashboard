@@ -348,7 +348,7 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
               }}
               className={classes.thumbMain}
             >
-              {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
+              {(favorites || [])?.filter((f) => f?.id == activity?.id)?.length > 0 && (
                 <Icon className={classes.favstar}>star_rounded</Icon>
               )}
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -395,8 +395,6 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
                           ? `url(${JournalIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.scratch_image"
                           ? `url(${ScratchCard}) center center/contain no-repeat`
-                          : activity?.spec === "lamp.zoom_meeting"
-                          ? `url(${VideoMeeting}) center center/contain no-repeat`
                           : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
                     ></Box>
@@ -430,10 +428,10 @@ export default function ActivityListForModule({ ...props }) {
     // Fetch favorite activities for the participant
     ;(async () => {
       const tag: string[] =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")]?.map((y: any) =>
           !!y?.error ? undefined : y?.data
         )[0] ?? []
-      setFavoriteIds(module.subActivities.filter((activity) => tag?.includes(activity.id)))
+      setFavoriteIds(module.subActivities?.filter((activity) => tag?.includes(activity.id)))
     })()
   }, [module])
 
@@ -441,14 +439,15 @@ export default function ActivityListForModule({ ...props }) {
   const getStatus = (module) => {
     return module?.name === "Other activities"
       ? ""
-      : module?.subActivities?.filter((activity) => activity.isCompleted === true).length +
+      : module?.subActivities?.filter((activity) => activity.isCompleted === true)?.length +
           "/" +
-          module?.subActivities.length
+          module?.subActivities?.length
   }
   // Function to calculate the percentage of completed sub-activities
   const getPercentage = (module) => {
     return (
-      (module.subActivities?.filter((activity) => activity.isCompleted === true).length / module.subActivities.length) *
+      (module.subActivities?.filter((activity) => activity.isCompleted === true)?.length /
+        module.subActivities?.length) *
       100
     )
   }
@@ -460,7 +459,7 @@ export default function ActivityListForModule({ ...props }) {
       const isCurrentlyFavorite = tag.includes(activityId)
       let updatedTag
       if (isCurrentlyFavorite) {
-        updatedTag = tag.filter((id) => id !== activityId)
+        updatedTag = tag?.filter((id) => id !== activityId)
       } else {
         updatedTag = [...tag, activityId]
       }
@@ -494,7 +493,7 @@ export default function ActivityListForModule({ ...props }) {
                     <Typography variant="h6">{module.name}</Typography>
                     <Fab
                       className={`${classes.headerTitleIcon} ${
-                        (favorites || []).filter((f) => f == module?.id).length > 0 ? "active" : ""
+                        (favorites || [])?.filter((f) => f == module?.id)?.length > 0 ? "active" : ""
                       }`}
                       onClick={(e) => {
                         e.stopPropagation()

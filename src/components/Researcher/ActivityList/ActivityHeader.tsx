@@ -18,8 +18,10 @@ import ActivityTab from "./ActivityTab"
 import ActivityStreak from "./ActivityStreak"
 import ActivityImage from "./ActivityImage"
 import BranchingSettings from "./BranchingSettings"
+import LAMP from "lamp-core"
+import { getActivitiesByStudyWithDeduplication } from "../../../helper/functions"
 
-function compress(file, width, height) {
+export function compress(file, width, height) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -57,6 +59,8 @@ export default function ActivityHeader({
   onChange,
   image,
   onTabChange,
+  setAllActivities,
+  activities,
   ...props
 }) {
   const { t } = useTranslation()
@@ -73,7 +77,6 @@ export default function ActivityHeader({
   const [branchingSettings, setBranchingSettings] = useState(
     details?.branchingSettings ? details?.branchingSettings : null
   )
-
   useEffect(() => {
     onChange({
       text,
@@ -85,11 +88,11 @@ export default function ActivityHeader({
       visualSettings,
       branchingSettings,
     })
-  }, [text, description, photo, studyId, streak, showFeed, visualSettings, branchingSettings])
+  }, [text, description, photo, studyId, streak, showFeed, visualSettings, branchingSettings, activities])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
-      compress(acceptedFiles[0], 64, 64).then(setPhoto)
+      compress(acceptedFiles[0], 300, 300).then(setPhoto)
     }, []),
     onDropRejected: useCallback((rejectedFiles) => {
       if (rejectedFiles[0].size / 1024 / 1024 > 5) {
@@ -141,8 +144,19 @@ export default function ActivityHeader({
               select
               label={`${t("Group")}`}
               value={studyId}
-              onChange={(e) => {
+              onChange={async (e) => {
+                const selectedStudyId = e.target.value
                 setStudyId(e.target.value)
+                if (selectedStudyId && selectedStudyId.trim() !== "") {
+                  const activities = await getActivitiesByStudyWithDeduplication(selectedStudyId)
+                  activities?.map((activities: any) => {
+                    activities.study_id = activities.studyId
+                    return activities
+                  })
+                  setAllActivities(activities)
+                } else {
+                  setAllActivities([])
+                }
               }}
               helperText={
                 typeof studyId == "undefined" || studyId === null || studyId === ""
@@ -152,7 +166,7 @@ export default function ActivityHeader({
               variant="filled"
               disabled={!!value ? true : false}
             >
-              {(studies || []).map((option) => (
+              {(studies || [])?.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {t(option.name)}
                 </MenuItem>
@@ -199,9 +213,7 @@ export default function ActivityHeader({
           label={`${t("Show activity in the participant feed?")}`}
         />
       </Grid>
-      {!["lamp.zoom_meeting"].includes(activitySpecId) && (
-        <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
-      )}
+      <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
       <Divider />
       {[
         "lamp.jewels_a",
@@ -218,13 +230,6 @@ export default function ActivityHeader({
         />
       )}
       <Divider />
-      {activitySpecId === "lamp.survey" && (
-        <BranchingSettings
-          studyId={studyId}
-          branching_settings={branchingSettings}
-          onChange={(val) => setBranchingSettings(val)}
-        />
-      )}
     </Grid>
   )
 }

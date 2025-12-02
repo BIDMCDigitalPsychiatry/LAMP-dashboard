@@ -9,16 +9,23 @@ import { useSnackbar } from "notistack"
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
   "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
+  btoa([credID, password, LAMP.Auth._auth.serverAddress]?.filter((x) => !!x).join(":"))
 
 export default function NewPatientDetail({ id, ...props }: { id: string }) {
   const { t } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
   const [shown, setShown] = React.useState(false)
+  const [participantId, setparticipantId] = React.useState(id)
 
   useEffect(() => {
     setShown(true)
+    setShown(false)
+    setparticipantId(id)
   }, [id])
+
+  useEffect(() => {
+    setShown(true)
+  }, [participantId])
 
   return (
     <React.Fragment>
