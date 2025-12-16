@@ -108,7 +108,7 @@ export default function AddUser({
         } else {
           newParticipant["id"] = idData
         }
-        if (!!((await LAMP.Credential.create(id, `${id}@digitalpsych.org`, id, "Temporary Login")) as any).error) {
+        if (!!((await LAMP.Credential.create(id, `${id}@digitalpsych.org`, id, "Temporary Login", id)) as any).error) {
           enqueueSnackbar(`${t("Could not create credential for id.", { id: id })}`, { variant: "error" })
         } else {
           newParticipant.study_id = selectedStudy

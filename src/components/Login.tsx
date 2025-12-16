@@ -233,7 +233,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       })
     }
 
-    if (res.authType === "participant") {
+    if (res?.authType === "participant") {
       await localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
       await LAMP.SensorEvent.create(res.identity.id, {
         timestamp: Date.now(),
@@ -246,7 +246,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       } as any).then((res) => console.dir(res))
       await LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
     }
-    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+    if (res?.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
       let studiesSelected =
         localStorage.getItem("studies_" + res.identity.id) !== null
           ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
