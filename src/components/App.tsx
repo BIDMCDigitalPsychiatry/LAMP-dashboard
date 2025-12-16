@@ -228,7 +228,6 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [])
 
   const refreshPage = () => {
-    console.log("Top of refresh page")
     LAMP.Auth.refresh_identity().then(
       () => {
         getAdminType()
