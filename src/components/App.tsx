@@ -8,7 +8,6 @@ import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
-import Login from "./Login"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -30,6 +29,9 @@ import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
+import { LinkAccount } from "../LinkAccount"
+import { buildLampServerRequestUrl } from "../utilities"
+import LoginWorkflow from "./LoginWorkflow"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -99,7 +101,6 @@ function AppRouter({ setConfirmSession, ...props }) {
   const search = useLocation().search
   const location: any = useLocation()
   const { setIsLoggedIn, isLoggedIn } = useAuthContext()
-
   useEffect(() => {
     const isLoginPage = location.pathname === "/"
     localStorage.setItem("isLoginPage", JSON.stringify(isLoginPage))
@@ -227,8 +228,25 @@ function AppRouter({ setConfirmSession, ...props }) {
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 
-  const refreshPage = () => {
-    LAMP.Auth.refresh_identity().then(
+  const refreshPage = async () => {
+    // If there is a finishLoginToken in the query string, finish loggin in by
+    // passing the token to the server
+    const currentSearch = new URLSearchParams(window.location.search)
+    const loginToken = currentSearch.get("finishLoginToken")
+    if (loginToken) {
+      const serverAddress = localStorage.getItem("lastServerSelected")
+      await LAMP.Auth.set_server(serverAddress)
+      await fetch(buildLampServerRequestUrl(serverAddress, `/login/one-time-token/${loginToken}`), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+    }
+
+    // Get the information associated with the currently logged in user if there is one
+    await LAMP.Auth.refresh_identity().then(
       () => {
         getAdminType()
         setState((state) => ({
@@ -244,6 +262,11 @@ function AppRouter({ setConfirmSession, ...props }) {
         setIsLoggedIn && setIsLoggedIn(false)
       }
     )
+
+    // If there was a login token, clear it only after refreshing the identity
+    if (loginToken) {
+      window.location.search = ""
+    }
   }
 
   const getAdminType = async () => {
@@ -348,6 +371,7 @@ function AppRouter({ setConfirmSession, ...props }) {
       console.error("Logout failed:", err)
     } finally {
       await reset()
+      window.location.replace("/#/")
     }
   }
 
@@ -384,7 +408,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     setIsLoggedIn && setIsLoggedIn(false)
     localStorage.removeItem("isParticipant")
     localStorage.removeItem("isLoginPage")
-    window.location.href = "/#/"
   }
 
   const setIdentity = async (identity: any) => {
@@ -519,14 +542,39 @@ function AppRouter({ setConfirmSession, ...props }) {
         <Switch>
           <Route
             exact
+            path="/link-social"
+            render={(props) => {
+              return !state.identity ? (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
+                  <LoginWorkflow
+                    setIdentity={async (identity) => !!identity && (await reset(identity))}
+                    onComplete={() => {
+                      props.history.replace("/")
+                    }}
+                    state={state}
+                    setAuthenticated={setAuthenticated}
+                    setConfirmSession={setConfirmSession}
+                  />
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <PageTitle>mindLAMP | Setup Account</PageTitle>
+                  <LinkAccount></LinkAccount>
+                </React.Fragment>
+              )
+            }}
+          />
+          <Route
+            exact
             path="/participant/:id/messages"
             render={(props) =>
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => {
                       props.history.replace("/")
                     }}
@@ -579,9 +627,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -614,9 +662,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -642,9 +690,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -670,9 +718,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -707,9 +755,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -745,9 +793,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -782,9 +830,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -821,9 +869,9 @@ function AppRouter({ setConfirmSession, ...props }) {
                 !state.identity ? (
                   <React.Fragment>
                     <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                    <Login
+                    <LoginWorkflow
                       setIdentity={async (identity) => !!identity && (await reset(identity))}
-                      lastDomain={state.lastDomain}
+                      state={state}
                       onComplete={() => props.history.replace("/")}
                       setAuthenticated={setAuthenticated}
                       setConfirmSession={setConfirmSession}
@@ -866,9 +914,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity || state.authType !== "admin" ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -917,9 +965,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -984,9 +1032,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity || (state.authType !== "admin" && state.authType !== "researcher") ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/data_portal")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -1036,9 +1084,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity || !getParticipant(props.match.params.id) ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -1084,9 +1132,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
@@ -1114,9 +1162,9 @@ function AppRouter({ setConfirmSession, ...props }) {
               !state.identity ? (
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
+                  <LoginWorkflow
                     setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
+                    state={state}
                     onComplete={() => props.history.replace("/")}
                     setAuthenticated={setAuthenticated}
                     setConfirmSession={setConfirmSession}
