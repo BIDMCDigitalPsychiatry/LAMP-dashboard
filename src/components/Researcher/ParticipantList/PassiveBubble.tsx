@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Chip, Tooltip, makeStyles } from "@material-ui/core"
 import { getTimeAgo } from "./Index"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
-import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {

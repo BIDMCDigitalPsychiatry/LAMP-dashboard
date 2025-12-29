@@ -31,7 +31,6 @@ import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
-import { clearLocalStorageItems } from "./helper"
 
 type SuggestedUrlOption = {
   label: string
@@ -74,7 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
+export default function Login({ setIdentity, lastDomain, onComplete, setAuthenticated, setConfirmSession, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [showPassword, setShowPassword] = useState(false)
@@ -87,7 +86,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
-  const userTokenKey = "tokenInfo"
+
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
@@ -164,25 +163,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  // const generateTokens = async (args: { id: string; password: string }) => {
-  //   setLoginClick(false)
-  //   const userName = args?.id?.trim()
-  //   const password = args?.password?.trim()
-
-  //   if (userName && password) {
-  //     try {
-  //       // const res = await LAMP.Credential.login(userName, password)
-  //       // sessionStorage.setItem(
-  //       //   userTokenKey,
-  //       //   JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-  //       // )
-  //       props?.setAuthenticated(true)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-  // }
-
   const checkMAxAttempts = () => {
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (attempts >= MAX_ATTEMPTS) {
@@ -256,9 +236,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         })()
         setLoginClick(false)
         onComplete()
+        setAuthenticated(true)
       })
       .catch((err) => {
-        // console.warn("error with auth request", err)
+        console.warn("error with auth request", err)
         enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
           variant: "error",
         })
@@ -486,7 +467,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                         localStorage.setItem("demo_mode", "try_it")
                         setTryitMenu(event.currentTarget)
                       }}
-                      // setTryitMenu(event.currentTarget)}
                     >
                       {`${t("Try it")}`}
                     </Link>
@@ -500,13 +480,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                     >
                       {`${t("Self Help")}`}
                     </Link>
-                    {/* <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                  >
-                    {`${t("Research studies using mindLAMP")}`}
-                  </Link> */}
+
                     <Menu
                       keepMounted
                       open={Boolean(tryitMenu)}

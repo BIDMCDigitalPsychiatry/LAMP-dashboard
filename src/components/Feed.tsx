@@ -29,7 +29,6 @@ import LAMP from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
-import { getDate } from "./Researcher/ActivityList/ScheduleRow"
 import { Service } from "./DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -416,32 +415,14 @@ export default function Feed({
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
-  const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
   const [currentFeed, setCurrentFeed] = useState([])
-  const triweekly = [1, 3, 5]
-  const biweekly = [2, 4]
-  const daily = [0, 1, 2, 3, 4, 5, 6]
   const [events, setEvents] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [tag, setTag] = useState(null)
   const { t } = useTranslation()
   const [showFeed, setShowFeed] = useState(false)
-
-  // useEffect(() => {
-  //   ;(async () => {
-  //     const showFeed = await LAMP.Type.getAttachment(participant.id, "lamp.show_feed").then((res: any) =>
-  //       res.error === undefined && typeof res.data != "undefined" ? res.data : true
-  //     )
-  //     setShowFeed(showFeed)
-  //     // if (showFeed !== false) {
-  //     //   getFeedByDate(new Date())
-  //     // } else {
-  //     //   setLoading(false)
-  //     // }
-  //   })()
-  // }, [])
 
   const getFeedByDate = (date: Date) => {
     FetchModuleCompletionAPI(date)
@@ -457,7 +438,6 @@ export default function Feed({
         participant.id,
         "lamp.dashboard.welcome_dismissed"
       ).then((res: any) => (res.error === undefined && typeof res.data != "undefined" ? res.data : true))
-      console.log("showFeed", showFeed)
       setShowFeed(showFeed)
       if (showFeed !== false) {
         getFeedByDate(new Date())
@@ -477,14 +457,7 @@ export default function Feed({
       LAMP.Activity.feedDetails(participant?.id, formattedDate).then((res: any) => {
         const payload = (res && res.data) || res || {}
         const items = Array.isArray(payload) ? payload : payload.items || []
-        // const now = Date.now()
-        // console.log("now",now)
-        // const updated = (items as any[]).map((it: any) => {
-        //   const startMs = interpretAsLocalWallTime(it.timestamp)
-        //   const endMs = interpretAsLocalWallTime(it.endTime)
-        //   const isClickable = Number.isFinite(startMs) && Number.isFinite(endMs) && now >= startMs && now < endMs
-        //   return { ...it, clickable: isClickable }
-        // })
+
         // // Multi-day highlighting (month/week) provided by API
         const distinctDays = Array.isArray(payload.distinctDays) ? payload.distinctDays : []
         if (distinctDays?.length) setSelectedDays(distinctDays)
@@ -493,7 +466,6 @@ export default function Feed({
       })
     } catch (e) {
       console.error("Failed to fetch leaderboard", e)
-      // setData(null)
     }
   }
 

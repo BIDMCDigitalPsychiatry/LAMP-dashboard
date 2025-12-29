@@ -15,17 +15,9 @@ import {
   Box,
   Tooltip,
   IconButton,
-  TextField,
 } from "@material-ui/core"
-import {
-  tagged_entities,
-  ajaxRequest,
-  formatGraphName,
-  tags_object,
-  generate_participant_tag_info,
-} from "./DataPortalShared"
+import { tagged_entities, ajaxRequest, formatGraphName, generate_participant_tag_info } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
-
 import { useDrop } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
@@ -115,7 +107,6 @@ export default function QueryBuilder(props) {
 
   const [participantTagInfo, setParticipantTagInfo] = React.useState({})
   const [sharedTagsUpdateList, setSharedTagsUpdateList] = React.useState([])
-
   const [availableSharedTags, setSharedTags] = React.useState([])
   const [sharedTagsLoading, setSharedTagsLoadingStatus] = React.useState(false)
   const [selectedSharedTags, setSelectedSharedTags] = React.useState([])
@@ -126,7 +117,7 @@ export default function QueryBuilder(props) {
   const [tagsLoading, setTagLoadingStatus] = React.useState(false)
   const [tagObject, setTagObject] = React.useState({})
   const [checkedCategories, setCheckedCategories] = React.useState([])
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+
   //when the list of available tags change,
   //we update a tag variable to display info
   React.useEffect(() => {

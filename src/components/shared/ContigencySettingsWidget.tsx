@@ -22,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
 const SurveyContingency = (props) => {
   const classes = useStyles()
   const { t } = useTranslation()
-
   const { value } = props
   const [isChecked, setIsChecked] = useState(false)
   const [selectedOption, setSelectedOption] = useState("")

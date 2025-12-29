@@ -402,7 +402,7 @@ export default function ImportActivity({ ...props }) {
   }, [])
 
   // eslint-disable-next-line
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: "application/json,.json",
     maxSize: 25 * 1024 * 1024 /* 5MB */,

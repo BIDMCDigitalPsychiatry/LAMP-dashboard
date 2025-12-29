@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react"
 import { Box, Typography, Grid, makeStyles, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import AddSensor from "../../SensorsList/AddSensor"
-import { Service } from "../../../DBService/DBService"
 import SensorRow from "./SensorRow"
 import DeleteSensor from "../../SensorsList/DeleteSensor"
-import { sortData } from "../../Dashboard"
 import Pagination from "../../../PaginatedElement"
 import LAMP from "lamp-core"
 
@@ -54,10 +52,6 @@ export default function Sensors({ participant, studies, ...props }: { participan
   }, [])
 
   const onChangeSensors = async () => {
-    // Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
-    //   let result = sortData(sensors, [participant.study_name], "name")
-    //   setSensors(result)
-    // })
     await LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
       setSensors(sensors)
     })

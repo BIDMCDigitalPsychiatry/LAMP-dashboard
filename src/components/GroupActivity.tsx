@@ -2,12 +2,12 @@
 import React, { useEffect, useState, lazy, Suspense } from "react"
 import { makeStyles, Box, Backdrop, CircularProgress } from "@material-ui/core"
 import LAMP from "lamp-core"
-
 import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
-import { lazyRetry } from "../helper/functions"
+import { getActivityWithDeduplication, lazyRetry } from "../helper/functions"
+import { getImage } from "./Participant"
 
 const EmbeddedActivity = lazy(lazyRetry(() => import("./EmbeddedActivity")))
 
@@ -40,7 +40,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   const [groupActivities, setGroupActivities] = useState([])
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [loading, setLoading] = useState(true)
-  const { t } = useTranslation()
   const [index, setIndex] = useState(-1)
   const [data, setResponse] = useState(null)
   const [groupActivitySettings, setGroupActivitySettings] = useState({
@@ -52,23 +51,88 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   })
 
   useEffect(() => {
+    let groupActivity = activity
     if (index === 0) {
       sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
     }
     if ((groupActivities || [])?.length > 0 && index <= (groupActivities || [])?.length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
-      LAMP.Activity.view(actId).then((activity) => {
-        Service.getUserDataByKey("activitytags", [activity?.id], "id").then((data) => {
-          const tag = data[0]
-          const dataActivity =
-            activity.spec === "lamp.survey"
-              ? spliceActivity({ raw: activity, tag })
-              : spliceCTActivity({ raw: activity, tag })
-          setCurrentActivity(dataActivity)
-          setLoading(false)
-        })
-      })
+
+      // Check cache first for instant loading (from prefetch)
+      const cacheKey = `activity_data_${actId}`
+      let useCache = false
+      try {
+        const cached = sessionStorage.getItem(cacheKey)
+        if (cached) {
+          const parsed = JSON.parse(cached)
+          const cacheAge = Date.now() - (parsed.timestamp || 0)
+          // Use cache if less than 2 minutes old
+          if (cacheAge < 2 * 60 * 1000 && parsed.data && parsed.tag) {
+            const cachedActivity = parsed.data
+            const cachedTag = parsed.tag
+            // Show cached data immediately - instant navigation!
+            const dataActivity =
+              cachedActivity.spec === "lamp.survey"
+                ? spliceActivity({ raw: cachedActivity, tag: cachedTag, mainactivity: groupActivity })
+                : spliceCTActivity({ raw: cachedActivity, tag: cachedTag, mainactivity: groupActivity })
+            setCurrentActivity(dataActivity)
+            setLoading(false)
+            useCache = true
+            // Continue fetching fresh data in background (non-blocking)
+          }
+        }
+      } catch (e) {
+        // If cache read fails, continue with normal fetch
+      }
+
+      // If not using cache, fetch fresh data immediately (don't wait for prefetch)
+      // The first activity should display as soon as possible while other activities prefetch in background
+      if (!useCache) {
+        // Use getActivityWithDeduplication to benefit from caching (localStorage + in-memory)
+        // This prevents duplicate API calls when the same activity is opened from ActivityBox and NotificationPage
+        getActivityWithDeduplication(actId)
+          .then((activityData) => {
+            // Use activity.spec instead of data.spec since data might be null
+            if (!activityData || !activityData.spec) {
+              setLoading(false)
+              return
+            }
+            // Fetch image in parallel (optimized)
+            return Promise.all([
+              Promise.resolve(activityData),
+              getImage(actId, activityData.spec).catch(() => undefined),
+            ])
+          })
+          .then((result) => {
+            if (result) {
+              const [activityData, tag] = result
+              // Cache for next time
+              try {
+                sessionStorage.setItem(
+                  cacheKey,
+                  JSON.stringify({
+                    data: activityData,
+                    tag,
+                    timestamp: Date.now(),
+                  })
+                )
+              } catch (e) {
+                // Ignore cache write errors
+              }
+              const dataActivity =
+                activityData.spec === "lamp.survey"
+                  ? spliceActivity({ raw: activityData, tag, mainactivity: groupActivity })
+                  : spliceCTActivity({ raw: activityData, tag, mainactivity: groupActivity })
+              setCurrentActivity(dataActivity)
+              setLoading(false)
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to fetch activity:", error)
+            setLoading(false)
+          })
+      }
     }
   }, [index])
 
@@ -95,7 +159,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
 
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
-      setLoading(true)
       iterateActivity()
     }
   }, [data])
@@ -127,6 +190,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
           )}
           <Suspense fallback={<div />}>
             <EmbeddedActivity
+              isFromGroupActivity={true}
               name={currentActivity?.name}
               activity={currentActivity}
               participant={participant}

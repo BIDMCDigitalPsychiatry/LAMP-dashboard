@@ -71,8 +71,7 @@ export default function PreventData({
         >
           {graphType === 1 ? (
             <div />
-          ) : /*<RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />*/
-          graphType === 2 ? (
+          ) : graphType === 2 ? (
             <Sparkline
               minWidth={250}
               minHeight={450}

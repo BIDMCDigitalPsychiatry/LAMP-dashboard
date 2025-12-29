@@ -55,7 +55,16 @@ const demoActivities = {
   "lamp.digit_span": "digitspan",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
+export default function EmbeddedActivity({
+  participant,
+  activity,
+  name,
+  onComplete,
+  noBack,
+  tab,
+  isFromGroupActivity = false,
+  ...props
+}) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -72,12 +81,42 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    setCurrentActivity(activity)
+    localStorage.removeItem("lastUrl")
+    const updatedActivity = activity
+    setCurrentActivity(updatedActivity)
     setSaved(true)
     setEmbeddedActivity("")
     setSettings(null)
     setActivityTimestamp(0)
     setIframe(null)
+
+    // Preload HTML immediately when activity changes (don't wait for user interaction)
+    if (updatedActivity?.id && updatedActivity?.spec) {
+      const activityName = demoActivities[updatedActivity.spec]
+      if (activityName) {
+        const cacheKey = `activity-html-${activityName}`
+        // Check cache first for instant loading
+        try {
+          const cached = localStorage.getItem(cacheKey)
+          if (cached) {
+            // Preload cached HTML immediately - show activity right away
+            setEmbeddedActivity(cached)
+            setLoading(false)
+            // Continue fetching fresh HTML in background (non-blocking)
+            setTimeout(() => {
+              // Prefetch fresh HTML asynchronously
+              import("./NotificationPage")
+                .then(({ fetchActivityHTML }) => fetchActivityHTML(activityName))
+                .catch(() => {
+                  // Silently fail, cached version is already shown
+                })
+            }, 100)
+          }
+        } catch (e) {
+          // Continue with normal load
+        }
+      }
+    }
   }, [activity])
 
   useEffect(() => {
@@ -161,6 +200,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     try {
       if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
         if (!!activityTimestamp && (activityTimestamp ?? 0) !== timestamp) {
+          // Only show loader if not from group activity (group handles its own final loader for streak popup)
+          if (!isFromGroupActivity) {
+            setLoading(true)
+          }
           setTimestamp(activityTimestamp)
           sensorEventUpdate(
             tab?.toLowerCase() ?? null,
@@ -168,19 +211,41 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             currentActivity.id,
             activityTimestamp
           )
-          setCurrentActivity(null)
-          LAMP.ActivityEvent.create(participant?.id ?? participant, data)
-            .catch((e) => {
+          // For group activities: fire-and-forget API call, proceed immediately to next activity
+          // For individual activities: wait for API call to complete (needed for streak popup)
+          if (isFromGroupActivity) {
+            // Fire and forget - don't wait for API response
+            LAMP.ActivityEvent.create(participant?.id ?? participant, data).catch((e) => {
               enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
                 variant: "error",
               })
             })
-            .then((x) => {
-              localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
-              setSaved(true)
-              onComplete({ ...data, response: x })
-              setLoading(false)
-            })
+            // Proceed immediately without waiting
+            setCurrentActivity(null)
+            localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
+            setSaved(true)
+            onComplete({ ...data })
+          } else {
+            // Individual activity - wait for API response (needed for streak popup)
+            ;(async () => {
+              LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+                .catch((e) => {
+                  enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                    variant: "error",
+                  })
+                })
+                .then((x) => {
+                  setCurrentActivity(null)
+                  localStorage.setItem(
+                    "first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id,
+                    "true"
+                  )
+                  setSaved(true)
+                  onComplete({ ...data, response: x })
+                  setLoading(false)
+                })
+            })()
+          }
         } else {
           onComplete(null)
           setLoading(false)
@@ -224,11 +289,40 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setLoading(false)
     }
   }
+  // const loadFallBack = async () => {
+  //   if (!!demoActivities[currentActivity.spec]) {
+  //     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+  //     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+  //     return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
+  //   } else {
+  //     return "about:blank"
+  //   }
+  // }
+
   const loadFallBack = async () => {
     if (!!demoActivities[currentActivity.spec]) {
-      let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
-      activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
+      const activityName = demoActivities[currentActivity.spec]
+      const cacheKey = `activity-html-${activityName}`
+
+      // Use shared fetch function from NotificationPage to prevent duplicate fetches
+      // This ensures we use the same cache and promise deduplication
+      // The fetchActivityHTML function already handles cache checking and deduplication
+      try {
+        const { fetchActivityHTML } = await import("./NotificationPage")
+        return await fetchActivityHTML(activityName)
+      } catch (e) {
+        console.error("Failed to load activity HTML:", e)
+        // Try to return cached HTML even if expired as fallback
+        try {
+          const expiredCache = localStorage.getItem(cacheKey)
+          if (expiredCache) {
+            return expiredCache
+          }
+        } catch (cacheError) {
+          // Ignore cache read errors
+        }
+        throw e
+      }
     } else {
       return "about:blank"
     }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { TextField, makeStyles, createStyles, Theme, Grid, Divider, Typography, MenuItem } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import LAMP from "lamp-core"
 import { getActivitiesByStudyWithDeduplication } from "../../../helper/functions"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

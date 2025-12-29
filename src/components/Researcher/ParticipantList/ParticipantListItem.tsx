@@ -116,7 +116,9 @@ export default function ParticipantListItem({
     setName(user)
   }, [user])
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    setChecked(selectedParticipants?.filter((d) => d.id === participant.id)?.length > 0 ? true : false)
+  }, [selectedParticipants])
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" p={1}>

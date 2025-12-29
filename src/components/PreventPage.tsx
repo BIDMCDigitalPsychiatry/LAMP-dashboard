@@ -283,42 +283,9 @@ export default function PreventPage({ activityId, type, participantId, ...props 
                 graphType={3}
                 earliestDate={earliestDate}
                 enableEditMode={!_patientMode()}
-                onEditAction={
-                  (activity, data) => {}
-                  //     setSurveyName(activity.name)
-                  //     setVisibleActivities([
-                  //       {
-                  //         ...activity,
-                  //         prefillData: [
-                  //           data?.slice?.map(({ item, value }) => ({
-                  //             item,
-                  //             value,
-                  //           })),
-                  //         ],
-                  //         prefillTimestamp: new Date(
-                  //           data.x
-                  //         ).getTime() /* post-increment later to avoid double-reporting events! */,
-                  //       },
-                  //     ])
-                  //   }
-                }
-                onCopyAction={
-                  (activity, data) => {}
-                  //     setSurveyName(activity.name)
-                  //     setVisibleActivities([
-                  //       {
-                  //         ...activity,
-                  //         prefillData: [
-                  //           data?.slice?.map(({ item, value }) => ({
-                  //             item,
-                  //             value,
-                  //           })),
-                  //         ],
-                  //       },
-                  //     ])
-                  //   }
-                }
-                onDeleteAction={(activity, data) => {}} //hideEvent(new Date(data.x).getTime(), activity.id)}
+                onEditAction={() => {}}
+                onCopyAction={() => {}}
+                onDeleteAction={() => {}} //hideEvent(new Date(data.x).getTime(), activity.id)}
               />
             </Suspense>
           )}

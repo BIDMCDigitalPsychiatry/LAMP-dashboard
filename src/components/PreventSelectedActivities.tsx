@@ -24,10 +24,8 @@ import hi from "javascript-time-ago/locale/hi"
 import fr from "javascript-time-ago/locale/fr"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
-import { VegaLite } from "react-vega"
-import { getSelfHelpAllActivityEvents } from "./Participant"
+
 TimeAgo.addLocale(en)
-const timeAgo = new TimeAgo("en-US")
 
 const localeMap = {
   "en-US": en,
@@ -188,8 +186,8 @@ const useStyles = makeStyles((theme: Theme) =>
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     (slices ?? [])
-      ?.filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      ?.map((x, idx) => {
+      ?.filter((idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      ?.map((x) => {
         let question = (Array.isArray(activity.settings) ? activity.settings : [])?.filter((y) => y.text === x.item)[0]
         if (!!question && typeof x?.value !== "undefined")
           return ["Yes", "True"].includes(x.value)
@@ -219,169 +217,89 @@ export const strategies = {
         } else return Number(typeof x.value === "string" ? x.value.replace(/\"/g, "") : x.value) || 0
       })
       ?.reduce((prev, curr) => prev + curr, 0),
-  "lamp.trails_b": (slices, activity, scopedItem) =>
+  "lamp.trails_b": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spin_wheel": (slices, activity, scopedItem) => slices[slices?.length - 1]?.type ?? 0,
-  "lamp.jewels_a": (slices, activity, scopedItem) =>
+  "lamp.spin_wheel": (slices) => slices[slices?.length - 1]?.type ?? 0,
+  "lamp.jewels_a": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) =>
+  "lamp.jewels_b": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.symbol_digit_substitution": (slices, activity, scopedItem) =>
+  "lamp.symbol_digit_substitution": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.fragmented_letters": (slices, activity, scopedItem) =>
-    parseInt(slices.best_correct_fragmentation.split("%")[0]),
-  "lamp.spatial_span": (slices, activity, scopedItem) =>
+  "lamp.fragmented_letters": (slices) => parseInt(slices.best_correct_fragmentation.split("%")[0]),
+  "lamp.spatial_span": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.dcog": (slices, activity, scopedItem) =>
+  "lamp.dcog": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
-  "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
+  "lamp.balloon_risk": (slices) => parseInt(slices.points ?? 0).toFixed(1) || 0,
+  "lamp.pop_the_bubbles": (slices) => {
     let temporalSlices = slices?.filter(function (data) {
       return !!data && data.type === true
     })
     return temporalSlices?.length > 0 && slices?.length > 0 ? temporalSlices?.length / slices?.length : 0
   },
-  "lamp.maze_game": (slices, activity, scopedItem) => {
+  "lamp.maze_game": (slices) => {
     return (slices || [])?.map((x) => x.duration)?.reduce((prev, cur) => prev + cur, 0) / slices?.length
   },
-  "lamp.emotion_recognition": (slices, activity, scopedItem) => {
+  "lamp.emotion_recognition": (slices) => {
     return (slices || [])?.map((x) => (!!x.type ? 1 : 0))?.reduce((prev, cur) => prev + cur, 0)
   },
-  "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
-  "lamp.digit_span": (slices, activity, scopedItem) =>
+  "lamp.cats_and_dogs": (slices) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.digit_span": (slices) =>
     slices.score == "NaN"
       ? 0
       : (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100
       ? 100
       : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
-  "lamp.funny_memory": (slices, activity, scopedItem) =>
+  "lamp.memory_game": (slices) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.funny_memory": (slices) =>
     (slices.number_of_correct_force_choice / slices.total_number_of_pairings_listed) * 100,
-  "lamp.scratch_image": (slices, activity, scopedItem) =>
+  "lamp.scratch_image": (slices) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
-  "lamp.breathe": (slices, activity, scopedItem) =>
+  "lamp.breathe": (slices) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
-  "lamp.tips": (slices, activity, scopedItem) =>
+  "lamp.tips": (slices) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
-  __default__: (slices, activity, scopedItem) =>
+  __default__: (slices) =>
     slices?.map((x) => parseInt(x.item) || 0)?.reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
 /**
- * Get percentage value for particular survey activity for the seletced participant.
- * @param participantId
+ * Get percentage value for particular survey activity.
+ *
  * @param activities
  * @returns
  */
-const getPercentageSettings = async (participantId, activities: ActivityObj[]) => {
-  let percentage = []
-  let activityEvents =
-    LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
-      ? await getSelfHelpAllActivityEvents()
-      : await LAMP.ActivityEvent.allByParticipant(participantId)
-  return await Promise.all(
-    percentage?.concat(
-      activities?.map(async (activity) => {
-        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.percentage_settings")]?.map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0]
-        if (!!tag) {
-          const startTime = getStartTime(tag)
-          const endTime = getEndTime(startTime, tag)
-          return {
-            activityId: activity.id,
-            percentage:
-              Math.round(
-                (activityEvents?.filter(
-                  (a) => a.activity === activity.id && a.timestamp >= startTime && a.timestamp <= endTime
-                )?.length /
-                  tag.limit) *
-                  100 *
-                  100
-              ) / 100,
-          }
-        }
-      })
-    )
-  )
-}
-
-const getStartTime = (tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
-  let startTime = tag.startDate
-  let diff = 1
-  let diffDate = new Date(tag.startDate)
-  switch (tag.unit) {
-    case "weeks":
-      diff = (new Date().getTime() - diffDate.getTime()) / (7 * tag.timeframe * 24 * 60 * 60 * 1000)
-      diffDate = new Date(tag.startDate + 7 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
-      break
-    case "months":
-      diff = (new Date().getTime() - diffDate.getTime()) / (30 * tag.timeframe * 24 * 60 * 60 * 1000)
-      diffDate = new Date(tag.startDate + 30 * Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
-      diffDate.setDate(new Date(tag.startDate).getDate())
-      break
-    case "days":
-      diff = (new Date().getTime() - diffDate.getTime()) / (24 * tag.timeframe * 60 * 60 * 1000)
-      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 24 * 60 * 60 * 1000)
-      break
-    case "hours":
-      diff = (new Date().getTime() - diffDate.getTime()) / (tag.timeframe * 60 * 60 * 1000)
-      diffDate = new Date(tag.startDate + Math.floor(diff) * tag.timeframe * 60 * 60 * 1000)
-      break
-  }
-  startTime = diffDate.getTime()
-  return startTime
-}
-const getEndTime = (startTime: number, tag: { limit: number; unit: string; timeframe: number; startDate: number }) => {
-  let endTime = startTime
-  switch (tag.unit) {
-    case "weeks":
-      endTime = startTime + 7 * tag.timeframe * 24 * 60 * 60 * 1000
-      break
-    case "months":
-      const d = new Date(startTime)
-      d.setMonth(d.getMonth() + tag.timeframe)
-      endTime = d.getTime()
-      break
-    case "days":
-      endTime = startTime + tag.timeframe * 24 * 60 * 60 * 1000
-      break
-    case "hours":
-      endTime = startTime + tag.timeframe * 60 * 60 * 1000
-      break
-  }
-  return endTime
-}
 
 export default function PreventSelectedActivities({
   participant,
@@ -419,19 +337,6 @@ export default function PreventSelectedActivities({
     const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
-
-  /**
-   * Enable the survey percentage settings by uncommenting the below section
-   */
-  // React.useEffect(() => {
-  //   ;(async () => {
-  //     const percentages = await getPercentageSettings(
-  //       participant.id,
-  //       activities.filter((activity) => activity.spec === "lamp.survey")
-  //     )
-  //     setPercentages(percentages)
-  //   })()
-  // }, [activities])
 
   useEffect(() => {
     TimeAgo.addLocale(localeMap[getSelectedLanguage()])
@@ -500,85 +405,8 @@ export default function PreventSelectedActivities({
                       skipHtml={false}
                       remarkPlugins={[gfm, emoji]}
                     />
-                    {/* Uncomment below lines to show the survey percentage value
-                    {activity.spec === "lamp.survey" && !!percentages && (
-                      <Typography variant="h5">
-                        {(percentages || []).filter((p) => p?.activityId === activity.id)[0]?.percentage ?? 0}%
-                        completed
-                      </Typography>
-                    )} */}
                   </Typography>
-                  <Box className={classes.maxw300}>
-                    {/* {!!activityEvents?.[activity.name] && (
-                      <VegaLite
-                        actions={false}
-                        style={{ backgroundColor: "#00000000" }}
-                        spec={{
-                          data: {
-                            values: activityEvents?.[activity.name]??.map((d) => ({
-                              x: new Date(d.timestamp),
-                              y: strategies[activity.spec]
-                                ? strategies[activity.spec](
-                                    activity.spec === "lamp.survey" ||
-                                      activity.spec === "lamp.pop_the_bubbles" ||
-                                      activity.spec === "lamp.maze_game" ||
-                                      activity.spec === "lamp.emotion_recognition"
-                                      ? d?.temporal_slices.filter((t) => t.type != "manual_exit") ??
-                                          d["temporal_slices"].filter((t) => t.type != "manual_exit")
-                                      : activity.spec === "lamp.scratch_image" ||
-                                        activity.spec === "lamp.breathe" ||
-                                        activity.spec === "lamp.tips"
-                                      ? d
-                                      : d.static_data,
-                                    activity,
-                                    undefined
-                                  )
-                                : 0,
-                            })),
-                          },
-                          width: 300,
-                          height: 70,
-                          background: "#00000000",
-                          config: {
-                            view: { stroke: "transparent" },
-                            title: {
-                              color: "rgba(0, 0, 0, 0.75)",
-                              fontSize: 25,
-                              font: "Inter",
-                              fontWeight: 600,
-                              align: "left",
-                              anchor: "start",
-                            },
-                            legend: {
-                              title: null,
-                              orient: "bottom",
-                              columns: 2,
-                              labelColor: "rgba(0, 0, 0, 0.75)",
-                              labelFont: "Inter",
-                              labelFontSize: 14,
-                              labelFontWeight: 600,
-                              symbolStrokeWidth: 12,
-                              symbolSize: 150,
-                              symbolType: "circle",
-                              offset: 0,
-                            },
-                            axisX: {
-                              disable: true,
-                            },
-                            axisY: {
-                              disable: true,
-                            },
-                          },
-                          mark: { type: "line", interpolate: "cardinal", tension: 0.8, color: "#3C5DDD" },
-                          encoding: {
-                            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
-                            y: { field: "y", type: "quantitative" },
-                            strokeWidth: { value: 2 },
-                          },
-                        }}
-                      />
-                    )} */}
-                  </Box>
+                  <Box className={classes.maxw300}></Box>
                   <Typography variant="h6">
                     {activity?.name && timeAgo.format(timeSpans[activity?.name]?.timestamp)}
                   </Typography>

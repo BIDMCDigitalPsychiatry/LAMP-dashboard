@@ -29,12 +29,8 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const [query, setQuery] = React.useState("")
   const [result, setResult] = React.useState("")
   const [focusBuilder, toggleFocus] = React.useState(false)
-
-  const [treeCollapsed, setTreeCollapsed] = React.useState(false)
-
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
   const { t } = useTranslation()
-
   const [isGUIEditor, toggleEditorStyle] = useLocalStorage("_editor_style", true)
   const [GUIQuery, setGUIQuery] = React.useState({
     target: "",

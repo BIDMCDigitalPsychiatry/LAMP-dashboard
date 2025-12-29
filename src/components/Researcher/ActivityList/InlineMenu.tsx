@@ -20,9 +20,7 @@ export default function InlineMenu({ customTimes, onChange, startDate, startTime
   const [items, setItems] = useState(customTimes ?? [])
   const [open, setOpen] = useState<Element>()
   const [current, setCurrent] = useState("")
-
   const { t } = useTranslation()
-
   const getStartDateTime = () => {
     try {
       const datePart = startDate ? new Date(getDate(startDate)) : new Date()
@@ -41,8 +39,6 @@ export default function InlineMenu({ customTimes, onChange, startDate, startTime
       return new Date()
     }
   }
-
-  const startDateTime = getStartDateTime()
 
   return (
     <React.Fragment>
@@ -104,28 +100,8 @@ export default function InlineMenu({ customTimes, onChange, startDate, startTime
                     <IconButton
                       edge="end"
                       aria-label="add"
-                      // onClick={() => {
-                      //   if (current?.length > 0) setItems((x) => [...x, current])
-                      // }}
                       onClick={() => {
                         if (!current) return
-                        // const newTime = getDate(current)
-
-                        // // Combine with startDate for comparison
-                        // const checkTime = new Date(
-                        //   startDateTime.getFullYear(),
-                        //   startDateTime.getMonth(),
-                        //   startDateTime.getDate(),
-                        //   newTime.getHours(),
-                        //   newTime.getMinutes(),
-                        //   0
-                        // )
-
-                        // if (checkTime < startDateTime) {
-                        //   alert(t("Custom time cannot be earlier than the start time."))
-                        //   return
-                        // }
-
                         setItems((x) => [...x, current])
                       }}
                       onMouseDown={(event) => event.preventDefault()}

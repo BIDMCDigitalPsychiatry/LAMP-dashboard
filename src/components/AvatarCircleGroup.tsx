@@ -202,14 +202,6 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
   const classes = useStyles({ diameter, avatarWidth })
 
   const children = React.Children.toArray(childrenProp)?.filter((child) => {
-    /*if (isFragment(child)) {
-      console.error(
-        [
-          "Material-UI: the AvatarMesh component doesn't accept a Fragment as a child.",
-          "Consider providing an array instead.",
-        ].join("\n")
-      )
-    }*/
     return React.isValidElement(child)
   })
 
@@ -266,59 +258,12 @@ export default function AvatarCircleGroup({
   lines = true,
   accounts: Accounts = [],
   onAdd: OnAdd = undefined,
-  onRemove = undefined,
-  onResetPassword = undefined,
+
   classes = undefined,
 }: AvatarCircleGroupProps) {
   // eslint-disable-next-line
   const [anchor, handleOpen, handleClose] = useMenu()
-  /*const onAdd = React.useCallback(
-    account => {
-      OnAdd && OnAdd(account);
-      handleClose();
-    },
-    [OnAdd, handleClose]
-  );
 
-  const onDelete = React.useCallback(
-    id => {
-      onRemove && onRemove(id);
-      handleClose();
-    },
-    [onRemove, handleClose]
-  );
-
-  var [accounts, addAccount, deleteAccount] = useAccounts({
-    accounts: Accounts, // Set initial accounts
-    onDelete, // Callback fired on account delete
-    onAdd // Callback fired on account add
-  });
-
-  const handleChangePassword = () => {
-    onResetPassword && onResetPassword(anchor.id);
-    handleClose();
-  };
-
-  const handleDelete = React.useCallback(() => deleteAccount(anchor.id), [
-    anchor.id,
-    deleteAccount
-  ]);
-
-  const id = Math.max(...[-1, ...accounts.map(a => a.id)]) + 1;
-  const handleAdd = React.useCallback(
-    (index = undefined) => addAccount(createTestAccount(id), index),
-    [addAccount, id]
-  );
-
-  const handleClick = React.useCallback(
-    ({ id, onClick }) => event => {
-      id > 0 &&
-        handleOpen(id, event);
-      onClick &&
-        onClick({ id, accounts, addAccount, deleteAccount, handleAdd });
-    },
-    [handleOpen, addAccount, deleteAccount, handleAdd, accounts]
-  );*/
   let accounts = Accounts
 
   return (

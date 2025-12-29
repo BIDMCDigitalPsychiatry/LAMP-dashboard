@@ -96,7 +96,6 @@ export default function StudiesList({
   const [newStudy, setNewStudy] = useState(null)
   const [loading, setLoading] = useState(true)
   const [enabledMessagingStudyIds, setEnabledMessagingStudyIds] = useState([])
-  const { enqueueSnackbar } = useSnackbar()
 
   useInterval(
     () => {
@@ -124,7 +123,6 @@ export default function StudiesList({
   }, [studies])
   const searchFilterStudies = async () => {
     if (!!search && search !== "") {
-      // let studiesList: any = await Service.getAll("studies")
       const newStudies = studies?.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
       setAllStudies(newStudies)
     } else {
@@ -158,45 +156,6 @@ export default function StudiesList({
   const handleSearchData = (val) => {
     setSearch(val)
   }
-  const handleMessageIconClick = () => {
-    //ASK Saritha Chechi what is its logic
-  }
-
-  // const handleEnableMessaging = (studyId, event) => {
-  //   const isChecked = event.target.checked
-  //   setEnabledMessagingStudyIds((prevIds) =>
-  //     isChecked ? [...prevIds, studyId] : prevIds.filter((id) => id !== studyId)
-  //   )
-  // }
-  const handleEnableMessaging = async (studyId, event) => {
-    const isChecked = event.target.checked
-    // Update local state if needed
-    setEnabledMessagingStudyIds((prevIds) =>
-      isChecked ? [...prevIds, studyId] : prevIds?.filter((id) => id !== studyId)
-    )
-
-    // Prepare update payload
-    const studyUpdate = {
-      id: studyId,
-      isMessageEnabled: isChecked,
-    }
-
-    try {
-      // Call your API or service
-      await Service.updateValue("studies", { studies: [studyUpdate] }, "isMessageEnabled", "id")
-
-      enqueueSnackbar(`${t("Messaging setting updated")}`, {
-        variant: "success",
-      })
-    } catch (err) {
-      enqueueSnackbar(
-        `${t("Failed to update messaging setting: errorMessage", {
-          errorMessage: err.message,
-        })}`,
-        { variant: "error" }
-      )
-    }
-  }
 
   return (
     <React.Fragment>
@@ -225,28 +184,6 @@ export default function StudiesList({
                         researcherId={researcherId}
                       />
                     </Box>
-                    {/* <Box className={classes.checkMsgContainer}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={enabledMessagingStudyIds?.includes(study.id)}
-                            onChange={(e) => handleEnableMessaging(study.id, e)}
-                          />
-                        }
-                        label=""
-                      />
-                      <Fab
-                        size="small"
-                        color="primary"
-                        disabled={study.id > 1 ? true : false}
-                        classes={{ root: classes.btnWhite, disabled: classes.disabledButton }}
-                        onClick={() => {
-                          handleMessageIconClick()
-                        }}
-                      >
-                        <Icon>chat_bubble_outline</Icon>
-                      </Fab>
-                    </Box> */}
 
                     <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
                   </Box>

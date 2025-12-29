@@ -15,8 +15,6 @@ import {
   Backdrop,
   CircularProgress,
   makeStyles,
-  FormControlLabel,
-  Checkbox,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -174,10 +172,6 @@ export default function StudyCreator({
   const handleEnter = () => {
     setStudyName("")
   }
-  const handleEnableMessaging = (event) => {
-    const isChecked = event.target.checked
-    setIsMessagingEnabled(isChecked)
-  }
 
   return (
     <Dialog
@@ -227,12 +221,6 @@ export default function StudyCreator({
         />
       </DialogContent>
       <DialogActions>
-        {/* <Box className={classes.enableMessaging}>
-          <FormControlLabel
-            control={<Checkbox checked={isMessagingEnabled} onChange={handleEnableMessaging} />}
-            label="Enable Messaging"
-          />
-        </Box> */}
         <Box textAlign="right" width={1} mt={3} mb={3} mx={3}>
           <Button
             color="primary"

@@ -425,41 +425,8 @@ export default function ScheduleRow({
                 <>
                   <IconButton
                     className={classes.btnIcon}
-                    // onClick={() => {
-                    //   if (validate()) {
-                    //     const duplicate = existingSchedules.some(
-                    //       (item, i) => i !== index && item.start_date === data.start_date && item.time === data.time
-                    //     )
-
-                    //     if (duplicate) {
-                    //       alert(t("You already have an activity scheduled at this date and time."))
-                    //       return
-                    //     }
-                    //     updateActivitySchedule(data, index, "edit")
-                    //     setEdit(false)
-                    //     setShowNotificationInput(false)
-                    //   }
-                    // }}
                     onClick={() => {
                       if (!validate()) return
-
-                      // const now = new Date()
-                      // const startDate = data.start_date ? new Date(getDate(data.start_date)) : now
-                      // const selectedTime = data.time ? new Date(getDate(data.time)) : now
-
-                      // const combined = new Date(
-                      //   startDate.getFullYear(),
-                      //   startDate.getMonth(),
-                      //   startDate.getDate(),
-                      //   selectedTime.getHours(),
-                      //   selectedTime.getMinutes(),
-                      //   0
-                      // )
-
-                      // if (combined < now) {
-                      //   alert(t("You cannot select a past date or time."))
-                      //   return
-                      // }
 
                       const duplicate = existingSchedules.some(
                         (item, i) => i !== index && item.start_date === data.start_date && item.time === data.time
@@ -489,11 +456,6 @@ export default function ScheduleRow({
                       }
                       setShowNotificationInput(false)
                     }}
-                    // onClick={() => {
-                    //   setEdit(false)
-                    //   setShowNotificationInput(false)
-                    //   setData(scheduleRow) //To make the state value to its initial value other wise updated state value is showing
-                    // }}
                   >
                     <Icon>close</Icon>
                   </IconButton>
@@ -564,19 +526,6 @@ export default function ScheduleRow({
           </TableCell>
         </TableRow>
       )}
-      {/* <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
-        <ReminderSettings
-          isEdit={isEdit}
-          reminderSettings={data.reminderSettings}
-          repeat_interval={data?.repeat_interval}
-          onUpdate={(settings) => {
-            setData({
-              ...data,
-              reminderSettings: settings,
-            })
-          }}
-        />
-      </TableRow> */}
     </>
   )
 }

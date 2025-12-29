@@ -56,37 +56,6 @@ export default function DeleteActivity({
     }
   }, [])
 
-  // const confirmAction = async (status) => {
-  //   if (status === "Yes") {
-  //     let activityIds = activities?.map((a) => {
-  //       return a.id
-  //     })
-  //     for (let activity of activities) {
-  //       let tag
-  //       if (activity.spec === "lamp.survey") {
-  //         tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
-  //       } else {
-  //         tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
-  //       }
-  //       if (activity.spec === "lamp.module" || activity.spec === "lamp.group") {
-  //         let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")]?.map((y: any) =>
-  //           !!y?.error ? undefined : y?.data
-  //         )[0]
-  //         let hidden = (tag || []).filter((t) => t.moduleId !== activity.id)
-  //         await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
-  //       }
-  //       await LAMP.Activity.delete(activity.id)
-  //       if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital")
-  //         Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
-  //     }
-  //     if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") Service.delete("activities", activityIds)
-  //     setActivities()
-  //     enqueueSnackbar(`${t("Successfully deleted the selected Activities.")}`, {
-  //       variant: "success",
-  //     })
-  //   }
-  //   setConfirmationDialog(0)
-  // }
   const confirmAction = async (status) => {
     if (status === "Yes") {
       let activityIds = activities?.map((a) => {

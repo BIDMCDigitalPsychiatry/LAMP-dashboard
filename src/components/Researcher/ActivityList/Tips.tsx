@@ -728,50 +728,6 @@ export default function Tips({
                     inputProps={{ maxLength: 2500 }}
                   />
                 </Grid>
-                {/* {!!value ? (
-                  <Grid container>
-                    <Grid item xs sm={6} md={4} lg={3}>
-                      <Box mt={2}>
-                        <Checkbox
-                          onChange={(event) => {
-                            setIsDuplicate(event.target.checked)
-                            setDuplicateTipText("")
-                          }}
-                          color="primary"
-                          inputProps={{ "aria-label": "secondary checkbox" }}
-                        />{" "}
-                        {`${t("Duplicate")}`}
-                      </Box>
-                    </Grid>
-                    <Grid item xs sm={6} md={8} lg={9}>
-                      {isDuplicate ? (
-                        <Box mb={3} pr={1}>
-                          <TextField
-                            fullWidth
-                            error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
-                            variant="filled"
-                            label={`${t("Tip")}`}
-                            className="Tips"
-                            value={duplicateTipText}
-                            onChange={(event) => {
-                              setDuplicateTipText(event.target.value)
-                              validate()
-                            }}
-                            helperText={
-                              isDuplicate && (duplicateTipText === null || duplicateTipText === "")
-                                ? `${t("Please add new tip.")}`
-                                : ""
-                            }
-                          />
-                        </Box>
-                      ) : (
-                        ""
-                      )}
-                    </Grid>
-                  </Grid>
-                ) : (
-                  ""
-                )} */}
               </Grid>
               <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
             </Grid>

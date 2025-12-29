@@ -27,7 +27,6 @@ export default function Manage({ participant, activities, showStreak, ...props }
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { t } = useTranslation()
   useEffect(() => {
     // Filter Manage activities and load associated tags once
     setLoading(true)

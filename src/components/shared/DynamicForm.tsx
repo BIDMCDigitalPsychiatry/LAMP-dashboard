@@ -49,11 +49,6 @@ function DescriptionFieldTemplate(props: DescriptionFieldProps) {
   return <small id={id}>{description}</small>
 }
 
-function AutoCompleteTemplate(props: DescriptionFieldProps) {
-  const { description, id } = props
-  return <small id={id}>{description}</small>
-}
-
 //TextWidget: AutocompleteTextWidget,
 const widgets: RegistryWidgetsType = {
   FileWidget: CustomFileWidget,

@@ -3,116 +3,7 @@ import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
 import AutoSuggest from "../../shared/AutoSuggest"
-
-function geFeedBackSettings() {
-  return {
-    feedback_text: {
-      type: "string",
-      title: i18n.t("Feedback Text"),
-      maxLength: 500,
-      "ui:widget": "textarea",
-      "ui:options": {
-        rows: 3,
-      },
-      description: i18n.t("This text will be shown to the participant after the input."),
-    },
-  }
-}
-
-function geProConsSettings() {
-  return {
-    pros: {
-      type: "string",
-      title: i18n.t("Pros"),
-      maxLength: 500,
-    },
-    cons: {
-      type: "string",
-      title: i18n.t("Cons"),
-      maxLength: 500,
-    },
-  }
-}
-
-function getContingencySettings() {
-  const enumIds = localStorage.getItem("enumIds")
-  const enumNames = localStorage.getItem("enumNames")
-
-  if (!enumIds || JSON.parse(enumIds)?.length === 0) return {}
-
-  return {
-    contigencySettings: {
-      type: "object",
-      title: "Contigency Settings",
-      required: ["enable_contigency"],
-      properties: {
-        enable_contigency: {
-          type: "boolean",
-          title: "Enable Contigency",
-          default: false,
-        },
-      },
-      dependencies: {
-        enable_contigency: {
-          oneOf: [
-            {
-              properties: {
-                enable_contigency: { const: true },
-                contigency_type: {
-                  type: "string",
-                  enum: ["activity", "question"],
-                  enumNames: [i18n.t("Activity"), i18n.t("Question")],
-                  default: "activity",
-                },
-              },
-              required: ["contigency_type"],
-            },
-            {
-              properties: {
-                enable_contigency: { const: false },
-              },
-            },
-          ],
-        },
-        contigency_type: {
-          allOf: [
-            {
-              if: {
-                properties: { contigency_type: { const: "activity" } },
-              },
-              then: {
-                properties: {
-                  activity: {
-                    type: "string",
-                    title: "Select an activity",
-                    enum: enumIds ? JSON.parse(enumIds) : [],
-                    enumNames: enumNames ? JSON.parse(enumNames) : [],
-                  },
-                },
-                required: ["activity"],
-              },
-            },
-            {
-              if: {
-                properties: { contigency_type: { const: "question" } },
-              },
-              then: {
-                properties: {
-                  question_index: {
-                    type: "number",
-                    title: "Question number",
-                    minimum: 1,
-                  },
-                },
-                required: ["question_index"],
-              },
-            },
-          ],
-        },
-      },
-    },
-  }
-}
+import { clearActivityCache } from "../../ActivityBox"
 export const SchemaList = () => {
   return {
     "lamp.spin_wheel": {
@@ -1778,6 +1669,7 @@ export async function saveTipActivity(x) {
       description: x.description,
     })
   }
+  clearActivityCache()
   return result
 }
 
@@ -1790,6 +1682,7 @@ export async function saveCTestActivity(x) {
     visualSettings: x?.visualSettings,
     showFeed: x.showFeed,
   })
+  clearActivityCache()
   return newItem
 }
 
@@ -1797,6 +1690,7 @@ export async function saveSurveyActivity(x) {
   const { raw, tag } = unspliceActivity(x)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
+  clearActivityCache()
   return newItem
 }
 
@@ -1835,6 +1729,7 @@ export async function getDefaultTab(spec) {
 export const updateSchedule = async (activity) => {
   await LAMP.Activity.update(activity.id, { schedule: activity.schedule })
   Service.update("activities", { activities: [{ schedule: activity.schedule, id: activity.id }] }, "schedule", "id")
+  clearActivityCache()
 }
 // Commit an update to an Activity object (ONLY DESCRIPTIONS).
 export async function updateActivityData(x, isDuplicated, selectedActivity) {
@@ -1850,16 +1745,10 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         visualSettings: x?.visualSettings,
         showFeed: x?.showFeed,
       })
+      clearActivityCache()
       return result
     } else {
       if (selectedActivity?.study_id !== x.studyID) {
-        // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
-        // await LAMP.Activity.delete(x.id)
-        // result = (await LAMP.Activity.create(x.studyID, x)) as any
-        // await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
-        //   description: x?.description ?? "",
-        //   photo: x?.photo ?? "",
-        // })
       } else {
         result = (await LAMP.Activity.update(x.id, x)) as any
         await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
@@ -1869,6 +1758,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
           visualSettings: x?.visualSettings,
           showFeed: x?.showFeed,
         })
+        clearActivityCache()
         return result
       }
     }
@@ -1881,6 +1771,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         streak: x.streak,
         showFeed: x?.showFeed,
       })
+      clearActivityCache()
       return result
     } else {
       result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
@@ -1891,6 +1782,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         streak: x.streak,
         showFeed: x?.showFeed,
       })
+      clearActivityCache()
       return result
     }
   } else if (x.spec === "lamp.survey") {
@@ -1898,10 +1790,12 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
     if (isDuplicated) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.survey_description", tag)
+      clearActivityCache()
       return result
     } else {
       result = (await LAMP.Activity.update(selectedActivity?.id, raw)) as any
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.survey_description", tag)
+      clearActivityCache()
       return result
     }
   } else if (x.spec === "lamp.tips") {
@@ -1920,6 +1814,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         category: x.category,
       }
       result = await saveTipActivity(tipObj)
+      // saveTipActivity already calls clearActivityCache()
       return result
     } else {
       result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
@@ -1930,6 +1825,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         showFeed: x?.showFeed,
         description: x.description,
       })
+      clearActivityCache()
       return result
     }
   }

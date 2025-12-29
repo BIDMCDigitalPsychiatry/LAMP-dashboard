@@ -6,7 +6,6 @@ import {
   MenuItem,
   Typography,
   Dialog,
-  InputBase,
   DialogProps,
   Backdrop,
   CircularProgress,

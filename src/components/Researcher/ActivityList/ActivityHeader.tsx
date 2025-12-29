@@ -17,8 +17,6 @@ import { useDropzone } from "react-dropzone"
 import ActivityTab from "./ActivityTab"
 import ActivityStreak from "./ActivityStreak"
 import ActivityImage from "./ActivityImage"
-import BranchingSettings from "./BranchingSettings"
-import LAMP from "lamp-core"
 import { getActivitiesByStudyWithDeduplication } from "../../../helper/functions"
 
 export function compress(file, width, height) {
@@ -90,7 +88,7 @@ export default function ActivityHeader({
     })
   }, [text, description, photo, studyId, streak, showFeed, visualSettings, branchingSettings, activities])
 
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 300, 300).then(setPhoto)
     }, []),

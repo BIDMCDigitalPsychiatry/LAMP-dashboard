@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-
 // Local Imports
 import LAMP from "lamp-core"
 

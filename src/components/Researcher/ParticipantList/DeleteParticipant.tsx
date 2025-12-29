@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function DeleteParticipant({ participants, setParticipants, ...props }) {
+export default function DeleteParticipant({ participants, setParticipants, setSelectedParticipants, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -55,8 +55,11 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
         variant: "success",
       })
     }
+
+    setSelectedParticipants([])
     setConfirmationDialog(0)
   }
+
   return (
     <span>
       <Fab

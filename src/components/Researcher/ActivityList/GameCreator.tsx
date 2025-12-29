@@ -62,7 +62,6 @@ export default function GameCreator({
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const [loading, setLoading] = React.useState(false)
   const [schemaListObj, setSchemaListObj] = React.useState({})
   const { t } = useTranslation()
   const breatheFileLimit = 10
@@ -562,7 +561,7 @@ export default function GameCreator({
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={false}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Container className={classes.containerWidth}>

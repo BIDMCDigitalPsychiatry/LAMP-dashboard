@@ -14,7 +14,7 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
+import LAMP from "lamp-core"
 import BreatheIcon from "../icons/Breathe.svg"
 import JournalIcon from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -26,6 +26,44 @@ import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { LinkRenderer } from "./ActivityPopup"
 import { getSelfHelpActivityEvents } from "./Participant"
+
+export const clearActivityCache = () => {
+  try {
+    // Clear sessionStorage caches
+    const sessionKeysToRemove: string[] = []
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i)
+      if (
+        key &&
+        (key.startsWith("activitybox_cache_") ||
+          key.startsWith("activities_cache_") ||
+          key.startsWith("activity_data_"))
+      ) {
+        sessionKeysToRemove.push(key)
+      }
+    }
+    sessionKeysToRemove.forEach((key) => sessionStorage.removeItem(key))
+
+    // Clear localStorage caches for activity data
+    const localStorageKeysToRemove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && (key.startsWith("activity-view-") || key.startsWith("activity-attachment-"))) {
+        localStorageKeysToRemove.push(key)
+      }
+    }
+    localStorageKeysToRemove.forEach((key) => localStorage.removeItem(key))
+
+    const totalCleared = sessionKeysToRemove.length + localStorageKeysToRemove.length
+    if (totalCleared > 0) {
+      console.log(
+        `Cleared activity cache: ${sessionKeysToRemove.length} sessionStorage entries, ${localStorageKeysToRemove.length} localStorage entries`
+      )
+    }
+  } catch (e) {
+    console.warn("Failed to clear activity cache:", e)
+  }
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -213,98 +251,400 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [open, setOpen] = useState(false)
   const [questionCount, setQuestionCount] = React.useState(0)
   const [message, setMessage] = useState("")
-  const [activitiesList, setActivityList] = useState<any>({})
+  // Helper function to get cache key (must be defined before getInitialState)
+  const getCacheKey = (participantId: string, tabType: string) => {
+    return `activitybox_cache_${participantId}_${tabType.toLowerCase()}`
+  }
+
+  // Helper function to check if we have valid data (must be defined before getInitialState)
+  const hasValidData = (data?: any) => {
+    const checkData = data
+    return (
+      checkData &&
+      typeof checkData === "object" &&
+      Object.keys(checkData).length > 0 &&
+      (checkData?.modules?.length > 0 || checkData?.otherActivities?.length > 0)
+    )
+  }
+
+  // Initialize state - check cache immediately on mount to prevent blank screens
+  // This is CRITICAL because components unmount/remount when switching tabs (unmountOnExit)
+  // Also critical when exiting activities/groups - cache ensures instant loading
+  const getInitialState = () => {
+    if (!participant?.id) {
+      return { activitiesList: {}, favorites: [], hasCache: false }
+    }
+    const tab = type.toLowerCase() === "portal" ? "prevent" : String(type || "").toLowerCase()
+    const cacheKey = getCacheKey(participant.id, tab)
+    try {
+      const cachedData = sessionStorage.getItem(cacheKey)
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData)
+        const cacheTimestamp = parsed.timestamp || 0
+        const cacheAge = Date.now() - cacheTimestamp
+        if (cacheAge < 5 * 60 * 1000 && hasValidData(parsed.data)) {
+          return {
+            activitiesList: parsed.data,
+            favorites: parsed.favorites || [],
+            hasCache: true,
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore cache errors on initial load
+    }
+    return { activitiesList: {}, favorites: [], hasCache: false }
+  }
+
+  const initialState = getInitialState()
+  const [activitiesList, setActivityList] = useState<any>(initialState.activitiesList)
   const [loadingModules, setLoadingModules] = useState(true)
+  const fetchedKeyRef = useRef<string | null>(null)
+  const fetchingRef = useRef<boolean>(false)
 
   const { t } = useTranslation()
-
   const handleClickOpen = (y: any, isAuto = false) => {
+    let totalQuestions = 0
     LAMP.Activity.view(y.id).then(async (data) => {
+      if (y.spec === "lamp.survey") totalQuestions = data.settings?.filter((q) => q.type !== "matrix")?.length
+
       setActivity(data)
       setOpen(true)
       y.spec === "lamp.dbt_diary_card"
         ? setQuestionCount(7)
         : y.spec === "lamp.survey"
-        ? setQuestionCount(data.settings?.length ?? 0)
+        ? setQuestionCount(totalQuestions ?? 0)
         : setQuestionCount(0)
     })
   }
 
+  // Non-demo: fetch at most once per participant+type key with pagination
   useEffect(() => {
     if (!participant?.id) return
-    const fetchData = async () => {
-      try {
-        const batchSize = 50
-        const tab = String(type || "").toLowerCase()
+    if (LAMP.Auth?._auth?.serverAddress === "demo.lamp.digital") return
 
-        const firstBatchResponse: any = await (LAMP.Activity.listActivities as any)(
-          participant.id,
-          tab,
-          null,
-          batchSize,
-          0
-        )
-        if (!firstBatchResponse || !firstBatchResponse.data) {
+    const key = `${participant.id}|${String(type || "").toLowerCase()}`
+    const tab = type.toLowerCase() === "portal" ? "prevent" : String(type || "").toLowerCase()
+    const cacheKey = getCacheKey(participant.id, tab)
+
+    // CRITICAL: Check sessionStorage cache FIRST and set state IMMEDIATELY
+    // This must happen synchronously before any async operations to prevent blank screens
+    let cacheUsed = false
+    let cachedDataToUse = null
+    try {
+      const cachedData = sessionStorage.getItem(cacheKey)
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData)
+        const cacheTimestamp = parsed.timestamp || 0
+        const cacheAge = Date.now() - cacheTimestamp
+        // Use cache if less than 5 minutes old and has valid data
+        if (cacheAge < 5 * 60 * 1000 && hasValidData(parsed.data)) {
+          cachedDataToUse = parsed.data
+          // Set state IMMEDIATELY from cache - don't wait for anything
+          setActivityList(parsed.data)
           setLoadingModules(false)
-          return
+          fetchedKeyRef.current = key
+          cacheUsed = true
+        } else {
+          // Cache expired, remove it
+          sessionStorage.removeItem(cacheKey)
         }
-        // Extract data and total from response
-        let firstBatchData: any = firstBatchResponse.data ?? {}
-        let total = firstBatchResponse.total || 0
-        setLoadingModules(false)
-        setActivityList(firstBatchData)
-        const totalBatches = Math.ceil(total / batchSize)
-        // If there's only one batch, we're done
-        if (totalBatches <= 1) {
-          return
-        }
-        // Create array of promises for remaining batches (batch 2 onwards)
-        const remainingBatches = Array.from({ length: totalBatches - 1 }, (_, i) => {
-          const offset = (i + 1) * batchSize
-          return (LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, offset)
-        })
-        const remainingResults: any[] = await Promise.all(remainingBatches)
-        const mergedData = remainingResults?.reduce((acc: any, result: any) => {
-          if (!result || !result.data) return acc
-          const data = result.data
-          return {
-            otherActivities: [...(acc.otherActivities || []), ...(data.otherActivities || [])],
-          }
-        }, firstBatchData)
-        // Remove duplicates from each array based on activity id
-        const removeDuplicates = (activities: any[]): any[] => {
-          if (!Array.isArray(activities)) return []
-          const uniqueMap = new Map<string, any>()
-          activities.forEach((activity: any) => {
-            if (activity && activity.id) {
-              // Keep the first occurrence of each activity
-              if (!uniqueMap.has(activity.id)) {
-                uniqueMap.set(activity.id, activity)
-              }
-            }
-          })
-          return Array.from(uniqueMap.values())
-        }
-
-        const deduplicatedData = {
-          otherActivities: removeDuplicates(mergedData.otherActivities || []),
-        }
-        setActivityList(deduplicatedData)
-      } catch (err) {
-        setLoadingModules(false)
-        console.log("Error fetching activities:", err)
-      } finally {
-        setLoadingModules(false)
+      }
+    } catch (e) {
+      // If cache read fails, continue with normal fetch
+      console.warn("Failed to read ActivityBox cache:", e)
+      try {
+        sessionStorage.removeItem(cacheKey)
+      } catch (e2) {
+        // Ignore removal errors
       }
     }
-    if (LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital") {
-      fetchData()
+
+    // Check if we already have valid data in state for THIS key
+    // Important: Only check hasData if the key matches (don't use data from different tab)
+    const hasData = fetchedKeyRef.current === key && hasValidData()
+
+    // If cache was used, fetch fresh data in background and return early
+    if (cacheUsed && cachedDataToUse) {
+      // Background refresh - fetch fresh data without blocking UI
+      ;(async () => {
+        try {
+          const tab = type.toLowerCase() === "portal" ? "prevent" : String(type || "").toLowerCase()
+          const batchSize = 50
+
+          const firstBatchResponse: any = await (async () => {
+            const response = await (LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, 0)
+            if (!response || response.error || !response.data) {
+              return null
+            }
+            return response
+          })()
+
+          if (!firstBatchResponse) return
+
+          const firstBatchData = firstBatchResponse.data ?? {}
+          const total = firstBatchResponse.total || 0
+
+          // If only one batch, cache it and update state
+          if (total <= batchSize) {
+            try {
+              sessionStorage.setItem(
+                cacheKey,
+                JSON.stringify({
+                  data: firstBatchData,
+                  favorites: firstBatchData?.favouriteActivities ?? [],
+                  timestamp: Date.now(),
+                })
+              )
+              setActivityList(firstBatchData)
+            } catch (e) {
+              // Ignore cache errors
+            }
+            return
+          }
+
+          // Fetch remaining batches
+          const remainingBatchPromises = Array.from({ length: Math.ceil(total / batchSize) - 1 }, (_, i) =>
+            (LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, (i + 1) * batchSize)
+          )
+
+          const remainingResults: any[] = await Promise.all(remainingBatchPromises)
+
+          // Merge and dedupe
+          const merged = remainingResults.reduce(
+            (acc, curr) => {
+              const d = curr?.data || {}
+              return {
+                modules: [...(acc.modules || []), ...(d.modules || [])],
+                favouriteActivities: [...(acc.favouriteActivities || []), ...(d.favouriteActivities || [])],
+                otherActivities: [...(acc.otherActivities || []), ...(d.otherActivities || [])],
+              }
+            },
+            { ...firstBatchData }
+          )
+
+          const dedupe = (arr: any[] = []) => {
+            const map = new Map()
+            arr.forEach((a) => {
+              if (a?.id && !map.has(a.id)) map.set(a.id, a)
+            })
+            return Array.from(map.values())
+          }
+
+          const deduped = {
+            modules: dedupe(merged.modules),
+            favouriteActivities: dedupe(merged.favouriteActivities),
+            otherActivities: dedupe(merged.otherActivities),
+          }
+
+          // Update cache and state with fresh data
+          try {
+            sessionStorage.setItem(
+              cacheKey,
+              JSON.stringify({
+                data: deduped,
+                favorites: deduped.favouriteActivities ?? [],
+                timestamp: Date.now(),
+              })
+            )
+            setActivityList(deduped)
+          } catch (e) {
+            // Ignore cache errors
+          }
+        } catch (err) {
+          // Silently fail - cached data is already shown
+          console.warn("Background refresh failed:", err)
+        }
+      })()
+      return // Exit early - cached data is already shown
     }
-  }, [participant?.id, type, savedActivities])
+
+    // If we're already fetching the same key, skip (prevent duplicate calls during same mount)
+    if (fetchedKeyRef.current === key && fetchingRef.current) return
+
+    // If we already fetched this key AND have valid data, skip
+    if (fetchedKeyRef.current === key && hasData) return
+
+    // If cache was used, fetch fresh data in background without blocking UI
+    // This ensures data is up-to-date while showing cached data immediately
+    if (cacheUsed) {
+      return // Exit early - cached data is already shown, background refresh will happen
+    }
+    // If no cache and no data, show loading indicator immediately
+    // This ensures users see feedback when data is being fetched from API
+    if (!cacheUsed && !hasData) {
+      setLoadingModules(true)
+    }
+
+    // If key changed (switching tabs), reset and fetch
+    if (fetchedKeyRef.current !== null && fetchedKeyRef.current !== key) {
+      fetchingRef.current = false
+      // Only clear activitiesList if we don't have cache for the new tab
+      // This prevents showing wrong data when switching tabs
+      if (!cacheUsed) {
+        setActivityList({})
+        setLoadingModules(true)
+      }
+    }
+
+    // If we previously fetched this key but lost data, reset and refetch
+    if (fetchedKeyRef.current === key && !hasData) {
+      fetchingRef.current = false
+      fetchedKeyRef.current = null
+      setLoadingModules(true)
+    }
+
+    fetchingRef.current = true
+    let isActive = true
+
+    // --- Timeout wrapper (prevents silent hangs)
+    const withTimeout = (promise: Promise<any>, ms = 10000) => {
+      return new Promise((resolve, reject) => {
+        const id = setTimeout(() => reject(new Error("timeout")), ms)
+        promise.then(
+          (res) => {
+            clearTimeout(id)
+            resolve(res)
+          },
+          (err) => {
+            clearTimeout(id)
+            reject(err)
+          }
+        )
+      })
+    }
+
+    // --- Helper to normalize SDK errors (many SDKs resolve instead of reject)
+    const ensureSuccess = (response: any) => {
+      if (!response || response.error || !response.data) {
+        throw new Error("network-error")
+      }
+      return response
+    }
+
+    ;(async () => {
+      try {
+        const tab = type.toLowerCase() === "portal" ? "prevent" : String(type || "").toLowerCase()
+        const batchSize = 50
+
+        setLoadingModules(true)
+        // --------------------
+        // 1. Fetch first batch with timeout + validation
+        // --------------------
+        const firstBatchResponse: any = ensureSuccess(
+          await withTimeout((LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, 0))
+        )
+
+        if (!isActive) return
+
+        const firstBatchData = firstBatchResponse.data ?? {}
+        const total = firstBatchResponse.total || 0
+
+        // Update UI immediately with first batch
+        setLoadingModules(false)
+        setActivityList(firstBatchData)
+        fetchedKeyRef.current = key
+
+        // CRITICAL: Cache first batch IMMEDIATELY for faster remounts
+        // This ensures data is available when component remounts on tab switch
+        try {
+          sessionStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              data: firstBatchData,
+              favorites: firstBatchData?.favouriteActivities ?? [],
+              timestamp: Date.now(),
+            })
+          )
+        } catch (e) {
+          console.warn("Failed to cache first batch:", e)
+        }
+
+        const totalBatches = Math.ceil(total / batchSize)
+        if (totalBatches <= 1) {
+          fetchingRef.current = false
+          return
+        }
+
+        // --------------------
+        // 2. Fetch remaining batches in parallel
+        // --------------------
+
+        const remainingBatchPromises = Array.from({ length: totalBatches - 1 }, (_, i) =>
+          withTimeout(
+            (LAMP.Activity.listActivities as any)(participant.id, tab, null, batchSize, (i + 1) * batchSize)
+          ).then(ensureSuccess)
+        )
+
+        const remainingResults: any[] = await Promise.all(remainingBatchPromises)
+
+        if (!isActive) return
+
+        // --------------------
+        // 3. Merge + dedupe
+        // --------------------
+        const merged = remainingResults.reduce(
+          (acc, curr) => {
+            const d = curr.data
+            return {
+              otherActivities: [...(acc.otherActivities || []), ...(d.otherActivities || [])],
+            }
+          },
+          { ...firstBatchData }
+        )
+
+        const dedupe = (arr: any[] = []) => {
+          const map = new Map()
+          arr.forEach((a) => {
+            if (a?.id && !map.has(a.id)) map.set(a.id, a)
+          })
+          return Array.from(map.values())
+        }
+
+        const deduped = {
+          otherActivities: dedupe(merged.otherActivities),
+        }
+
+        setActivityList(deduped)
+        // Cache in sessionStorage for persistence across remounts
+        try {
+          sessionStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              data: deduped,
+              timestamp: Date.now(),
+            })
+          )
+        } catch (e) {
+          // If cache write fails, continue normally
+          console.warn("Failed to cache ActivityBox data:", e)
+        }
+      } catch (err) {
+        console.error("Error fetching activities:", err)
+
+        setLoadingModules(false)
+
+        // Reset refs on error to allow retry
+        // Only reset if this was the current key (don't reset if key changed during fetch)
+        const currentKey = `${participant.id}|${String(type || "").toLowerCase()}`
+        if (fetchedKeyRef.current === currentKey) {
+          fetchedKeyRef.current = null
+        }
+        fetchingRef.current = false
+      } finally {
+        fetchingRef.current = false
+      }
+    })()
+
+    return () => {
+      isActive = false
+      // Reset fetching flag on unmount to allow fresh fetch on remount
+      fetchingRef.current = false
+    }
+  }, [participant?.id, type])
 
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
-    localStorage.removeItem("parentStringForSurvey")
     for (let i = localStorage?.length - 1; i >= 0; i--) {
       const key = localStorage.key(i)
       if (key.startsWith("activity-survey-")) {

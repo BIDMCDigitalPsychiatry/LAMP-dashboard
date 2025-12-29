@@ -17,8 +17,6 @@ import {
   makeStyles,
   Theme,
   createStyles,
-  Switch,
-  FormControlLabel,
   InputAdornment,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"

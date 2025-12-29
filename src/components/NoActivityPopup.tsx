@@ -1,25 +1,9 @@
-// import React from "react"
-// import {
-//   Dialog,
-//   DialogProps,
-//   DialogContent,
-//   makeStyles,
-//   Theme,
-//   createStyles,
-//   DialogActions,
-//   Box,
-//   Fab,
-//   Grid,
-// } from "@material-ui/core"
-// import { useTranslation } from "react-i18next"
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     score: {
-      //   border: "#aedbff solid 1px",
       color: "#2b2c2cff",
       padding: "4px 12px",
-      //   borderRadius: 15,
+
       marginTop: 3,
     },
   })
@@ -65,19 +49,13 @@ export default function ConfirmationDialog({
       <DialogTitle id="alert-dialog-title">{`${t("  ")}`}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          {/* {`${t(confirmationMsg)}`} */}
           <Grid container direction="row" justifyContent="space-between" alignItems="center">
             <span className={classes.score}>{`${t(confirmationMsg)}`}</span>
           </Grid>
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={onClose}
-          color="primary"
-          autoFocus
-          //   className={classes.btnBlue}
-        >
+        <Button onClick={onClose} color="primary" autoFocus>
           {`${t("ok")}`}
         </Button>
       </DialogActions>

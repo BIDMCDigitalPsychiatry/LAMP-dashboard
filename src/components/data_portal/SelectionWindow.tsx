@@ -1,17 +1,6 @@
 import React, { useState } from "react"
-import {
-  Backdrop,
-  Card,
-  Box,
-  Typography,
-  Button,
-  makeStyles,
-  IconButton,
-  Tooltip,
-  CircularProgress,
-} from "@material-ui/core"
+import { Backdrop, Card, Box, Button, makeStyles, IconButton, Tooltip, CircularProgress } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
-import { useTranslation } from "react-i18next"
 import DisplayItem from "./DisplayItem"
 
 const useStyles = makeStyles((theme) => ({

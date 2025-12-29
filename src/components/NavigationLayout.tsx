@@ -271,7 +271,6 @@ export default function NavigationLayout({
   activeTab,
   sameLineTitle,
   changeResearcherType,
-  // participant,
   ...props
 }: {
   title?: string
@@ -284,7 +283,6 @@ export default function NavigationLayout({
   activeTab?: string
   sameLineTitle?: boolean
   changeResearcherType?: Function
-  // participant?: Participant
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -419,16 +417,6 @@ export default function NavigationLayout({
   }
 
   const participantBack = () => {
-    // console.log("researcherId", researcherId)
-    // if (researcherId === null) {
-    //   Service.getAll("researcher").then((researcher) => {
-    //     setResId(researcher[0]["id"])
-    //     window.location.href = `/#/researcher/${researcher[0]["id"]}/users`
-    //     setLoading(false)
-    //   })
-    // } else {
-    //   window.location.href = `/#/researcher/${researcherId}/users`
-    // }
     let researcher = localStorage.getItem("researcherId")
     setResId(researcher)
     window.location.href = `/#/researcher/${researcher}/users`
@@ -451,10 +439,7 @@ export default function NavigationLayout({
       setNotificationLoader(false)
     }
   }
-  const handleNotificationClick = (event) => {
-    handleClick(event)
-    if (id) fetchNotifications(id)
-  }
+
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
@@ -562,18 +547,6 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-
-              {/**Commenting for now
-               {(authType === "researcher" || authType === "admin") &&
-                title !== "Administrator" &&
-                title !== "User Administrator" &&
-                title !== "Practice Lead" &&
-                !title.startsWith("User") &&
-                !!changeResearcherType && (
-                  <Box>
-                    <ModeToggleButton changeResearcherType={changeResearcherType} />
-                  </Box>
-                )} */}
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
@@ -623,8 +596,6 @@ export default function NavigationLayout({
               )}
               <Box flexGrow={1} />
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                // participant?.isMessagingEnabled && (
-                // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
                 <Box className={classes.headerRight}>
                   {hideNotifications.indexOf(activeTab) < 0 ? (
                     <Tooltip title={`${t("Messages")}`}>

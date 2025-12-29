@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Fab, Icon, Typography, Box, makeStyles, Theme, createStyles, Badge } from "@material-ui/core"
 // Local Imports
 import { sensorEventUpdate } from "../../BottomMenu"
-import { Service } from "../../DBService/DBService"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "../../useInterval"
@@ -116,9 +115,6 @@ export default function ParticipantListItem({
   )
 
   useEffect(() => {
-    // Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-    //   setName(data[0]?.name ?? participant.id ?? "")
-    // })
     LAMP.Participant.view(participant?.id).then((data: any) => {
       setName(data?.userName ?? participant?.id ?? "")
     })

@@ -27,12 +27,43 @@ import LAMP, {
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
+import locale_lang from "../locale_map.json"
 import { lazyRetry } from "../helper/functions"
 
 const Learn = lazy(lazyRetry(() => import("./Learn")))
 const Survey = lazy(lazyRetry(() => import("./Survey")))
 const Manage = lazy(lazyRetry(() => import("./Manage")))
 const Prevent = lazy(lazyRetry(() => import("./Prevent")))
+
+// Prefetch commonly used chunks in background for better performance
+if (typeof window !== "undefined") {
+  const prefetchCommonChunks = () => {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(
+        () => {
+          // Prefetch chunks that are likely to be needed
+          import(/* webpackChunkName: "Learn" */ "./Learn").catch(() => {})
+          import(/* webpackChunkName: "Survey" */ "./Survey").catch(() => {})
+        },
+        { timeout: 3000 }
+      )
+    } else {
+      setTimeout(() => {
+        import(/* webpackChunkName: "Learn" */ "./Learn").catch(() => {})
+        import(/* webpackChunkName: "Survey" */ "./Survey").catch(() => {})
+      }, 2000)
+    }
+  }
+
+  // Prefetch after initial render
+  if (typeof requestAnimationFrame !== "undefined") {
+    requestAnimationFrame(() => {
+      setTimeout(prefetchCommonChunks, 1000)
+    })
+  } else {
+    setTimeout(prefetchCommonChunks, 1000)
+  }
+}
 
 export async function getImage(activityId: string, spec: string) {
   return [
@@ -56,23 +87,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _hideCareTeam() {
-  return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
-}
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
-async function getShowWelcome(participant: ParticipantObj): Promise<boolean> {
-  if (!_patientMode()) return false
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.welcome_dismissed")) as any
-  return !!_hidden.error ? true : !(_hidden.data as boolean)
-}
+
 async function setShowWelcome(participant: ParticipantObj): Promise<void> {
   await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.welcome_dismissed", true)
-}
-
-async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
-  if (_hideCareTeam()) return true
 }
 
 async function addHiddenEvent(
@@ -92,11 +112,6 @@ async function addHiddenEvent(
   )) as any
   if (!!_setEvents.error) return undefined
   return new_events
-}
-// Refresh hidden events list.
-async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
 export async function getSelfHelpActivityEvents(activityId: string, from: number, to: number) {
@@ -224,18 +239,122 @@ export default function Participant({
   const [allEmpty, setAllEmpty] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [allActivitiesLoaded, setAllActivitiesLoaded] = useState(false)
+  // Cache key for activities to avoid refetching on remount
+  const activitiesCacheKey = `activities_cache_${participant?.id}`
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
 
+  const getSelectedLanguage = () => {
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
+  }
+
+  function _hideCareTeam() {
+    return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
+  }
+
+  async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
+    if (_hideCareTeam()) return true
+  }
+
   useEffect(() => {
-    loadData()
+    // Clear cache if participant changed
+    const previousCacheKey = sessionStorage.getItem("current_participant_cache_key")
+    if (previousCacheKey && previousCacheKey !== activitiesCacheKey) {
+      try {
+        sessionStorage.removeItem(previousCacheKey)
+      } catch (e) {
+        // Ignore cache clear errors
+      }
+    }
+    sessionStorage.setItem("current_participant_cache_key", activitiesCacheKey)
+
+    if (allEmpty) {
+      _setTab("feed")
+      localStorage.setItem("lastActiveTab", "Home")
+    }
+
+    if (!!LAMP.Auth) {
+      loadData()
+      LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
+        .then((y: any) => {
+          const fav = !!y?.error ? [] : y?.data ?? []
+          const cleanTag = fav.filter(Boolean)
+          localStorage.setItem("favoritesId", JSON.stringify(cleanTag))
+        })
+        .catch((err) => {
+          console.error("Failed to load favorites:", err)
+        })
+    } else {
+      window.location.href = "/#/"
+    }
+    let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+      ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+      : getSelectedLanguage()
+      ? getSelectedLanguage()
+      : "en-US"
+    i18n.changeLanguage(language)
+    // getHiddenEvents(participant).then(setHiddenEvents)
+    tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
   const loadData = async () => {
+    // Check if we already have activities data (from cache or previous load)
+    if (allactivities && allactivities.length > 0) {
+      setLoading(false)
+      setAllActivitiesLoaded(true)
+      if (tab !== undefined && tab !== null) {
+        setActivities(allactivities)
+      }
+      return
+    }
+
+    // Check sessionStorage cache to avoid refetching on remount
+    // This is CRITICAL for instant loading when exiting activities/groups
+    try {
+      const cachedData = sessionStorage.getItem(activitiesCacheKey)
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData)
+        const cacheTimestamp = parsed.timestamp || 0
+        const cacheAge = Date.now() - cacheTimestamp
+        // Use cache if less than 5 minutes old
+        if (
+          cacheAge < 5 * 60 * 1000 &&
+          parsed.activities &&
+          Array.isArray(parsed.activities) &&
+          parsed.activities.length > 0
+        ) {
+          // Set data IMMEDIATELY - don't wait for anything
+          setAllActivities(parsed.activities)
+          setAllActivitiesLoaded(true)
+          setLoading(false) // Hide loading backdrop immediately
+          if (tab !== undefined && tab !== null) {
+            setActivities(parsed.activities)
+          }
+          setLoaded(true)
+          // Return early - data is shown, fresh data will load in background if needed
+          return
+        } else {
+          // Cache expired, remove it
+          sessionStorage.removeItem(activitiesCacheKey)
+        }
+      }
+    } catch (e) {
+      // If cache read fails, continue with normal fetch
+      console.warn("Failed to read activities cache:", e)
+      try {
+        sessionStorage.removeItem(activitiesCacheKey)
+      } catch (e2) {
+        // Ignore removal errors
+      }
+    }
+
     if (!loaded) {
       setLoaded(true)
       const batchSize = 50
+
       try {
         // First, fetch the first batch to get the total count
         const firstBatchResponse: any = await (LAMP.Activity.allByParticipant as any)(
@@ -258,18 +377,18 @@ export default function Participant({
         if (firstBatchResponse && firstBatchResponse.data && Array.isArray(firstBatchResponse.data)) {
           // Standard format: { data: Activity[], total: number }
           firstBatchData = firstBatchResponse.data
-          total = typeof firstBatchResponse?.total === "number" ? firstBatchResponse?.total : firstBatchData?.length
+          total = typeof firstBatchResponse?.total === "number" ? firstBatchResponse?.total : firstBatchData.length
         } else if (Array.isArray(firstBatchResponse)) {
           // Fallback: if result is directly an array
           firstBatchData = firstBatchResponse
-          total = firstBatchResponse?.length
+          total = firstBatchResponse.length
         } else {
           console.error("Unexpected response structure:", firstBatchResponse)
           setLoading(false)
           return
         }
 
-        if (firstBatchData?.length === 0) {
+        if (firstBatchData.length === 0) {
           setLoading(false)
           return
         }
@@ -340,6 +459,20 @@ export default function Participant({
 
         setAllActivities(uniqueActivitiesData)
         setAllActivitiesLoaded(true)
+
+        // Cache activities in sessionStorage to avoid refetching on remount
+        try {
+          sessionStorage.setItem(
+            activitiesCacheKey,
+            JSON.stringify({
+              activities: uniqueActivitiesData,
+              timestamp: Date.now(),
+            })
+          )
+        } catch (e) {
+          // If cache write fails, continue normally
+          console.warn("Failed to cache activities:", e)
+        }
 
         if (tab !== undefined || tab !== null) {
           setActivities(uniqueActivitiesData)

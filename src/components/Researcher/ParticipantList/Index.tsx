@@ -158,7 +158,6 @@ export default function ParticipantList({
 }) {
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
-  const [allParticipants, setAllParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState([])
@@ -358,6 +357,7 @@ export default function ParticipantList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
+        setSelectedParticipants={setSelectedParticipants}
         setData={getAllStudies}
         mode={mode}
         setOrder={setOrder}

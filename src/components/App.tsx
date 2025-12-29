@@ -35,10 +35,7 @@ import TwoFA from "./TwoFA"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
-import Notifications from "./Notifications"
-import ModuleActivity from "./ModuleActivity"
 import { clearLocalStorageItems } from "./helper"
-// import Home from "./HomeIntermediate"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -67,18 +64,9 @@ function ErrorFallback({ error }) {
       }}
     >
       <pre>
-        {/* <code style={{ fontSize: "16px" }}>
-          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
-        </code>
-        <br />
-        <code style={{ color: "#fff" }}>
-          {trace?.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code> */}
         <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
         <br />
-        {/* <code>
-          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code> */}
+
         <br />
         <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
           {`${t("Back to page.")}`}
@@ -121,7 +109,7 @@ function AppRouter({ setConfirmSession, ...props }) {
     } catch (error) {
       console.log(error)
     }
-    //  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+
     const hasRoleFlag = localStorage.getItem("isParticipant")
 
     if (!hasRoleFlag) {
@@ -216,11 +204,6 @@ function AppRouter({ setConfirmSession, ...props }) {
         })
         if (userName && password) {
           try {
-            // const res = await LAMP.Credential.login(userName, password)
-            // sessionStorage.setItem(
-            //   "tokenInfo",
-            //   JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-            // )
             setAuthenticated(true)
             reset({
               id: x[0],
@@ -267,7 +250,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     const isLoggedIn = !!state.identity
 
     if (!isLoggedIn) {
-      // if (!supportsSidebar) setRedirectPath("/home")
       setRedirectPath("/#")
     }
     setChecked(true)
@@ -503,13 +485,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     }))
   }
 
-  const setServerAddress = (address) => {
-    setState((state) => ({
-      ...state,
-      lastDomain: true,
-    }))
-  }
-
   const promptInstall = () => {
     if (deferredPrompt === null) return
     deferredPrompt.prompt()
@@ -582,31 +557,7 @@ function AppRouter({ setConfirmSession, ...props }) {
               )
             }
           />
-          {/* <Route
-            exact
-            path="/participant/:id/notifications"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
-                    onComplete={() => {
-                      props.history.replace("/")
-                    }}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Notifications")}`}</PageTitle>
-                  <Notifications participant={getParticipant(props.match.params.id)?.id ?? null} from ="app"/>
-                </React.Fragment>
-              )
-            }
-          /> */}
+
           <Route
             exact
             path="/2fa"
@@ -636,34 +587,6 @@ function AppRouter({ setConfirmSession, ...props }) {
                         ? props.history.replace("/researcher")
                         : props.history.replace("/researcher/me/users")
                     }}
-                  />
-                </React.Fragment>
-              )
-            }
-          />
-
-          <Route
-            exact
-            path="/participant/:id/module/:moduleId"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                  <Login
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <ModuleActivity
-                    participant={props.match.params.id}
-                    moduleId={props.match.params.moduleId}
-                    fromTab={true}
-                    tab={state.activeTab}
                   />
                 </React.Fragment>
               )
@@ -853,7 +776,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/"
             render={(props) => {
               if (!checked) return null
-              // if (redirectPath === "/home") return <Redirect to={redirectPath} />
+
               return !(window.location.hash.split("?")?.length > 1 && !state.identity) ? (
                 !state.identity ? (
                   <React.Fragment>
@@ -894,17 +817,6 @@ function AppRouter({ setConfirmSession, ...props }) {
               )
             }}
           />
-
-          {/* <Route
-            exact
-            path="/home"
-            render={(props) => (
-              <React.Fragment>
-                <PageTitle>mindLAMP</PageTitle>
-                <Home />
-              </React.Fragment>
-            )}
-          /> */}
 
           {/* Route authenticated routes. */}
           <Route
@@ -1103,15 +1015,9 @@ function AppRouter({ setConfirmSession, ...props }) {
                     authType={state.authType}
                     id={props.match.params.id}
                     title={`User ${getParticipant(props.match.params.id).id}`}
-                    // name={
-                    //   getParticipant(props.match.params.id)?.alias ||
-                    //   getParticipant(props.match.params.id)?.name ||
-                    //   getParticipant(props.match.params.id)?.id
-                    // }
                     goBack={props.history.goBack}
                     onLogout={() => logout()}
                     activeTab={state.activeTab ?? "assess"}
-                    // participant={getParticipant(props.match.params.id)}
                   >
                     <Participant
                       participant={getParticipant(props.match.params.id)}
@@ -1195,26 +1101,6 @@ function AppRouter({ setConfirmSession, ...props }) {
 }
 
 export default function App({ ...props }) {
-  // const INACTIVITY_LIMIT = 30 * 60 * 1000 // 5 minutes
-  // let inactivityTimer: ReturnType<typeof setTimeout> | null = null
-
-  // const resetInactivityTimer = () => {
-  //   clearTimeout(inactivityTimer)
-  //   inactivityTimer = setTimeout(() => {
-  //     localStorage.getItem("isParticipant") === "false"
-  //     if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
-  //       alert("Your session has expired. Please login again to continue.")
-  //       window.location.href = "/#/"
-  //       localStorage.removeItem("isParticipant")
-  //       localStorage.removeItem("tokenInfo")
-  //     }
-  //   }, INACTIVITY_LIMIT)
-  // }
-  // const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart"]
-  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
-
-  // resetInactivityTimer()
-
   const [confirmSession, setConfirmSession] = useState(false)
 
   const onMouseMove = () => {
@@ -1344,18 +1230,6 @@ export default function App({ ...props }) {
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
-        {/* <span
-          style={{
-            position: "fixed",
-            bottom: 16,
-            left: 16,
-            fontSize: "8",
-            zIndex: -1,
-            opacity: 0.1,
-          }}
-        >
-          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
-        </span> */}
       </ThemeProvider>
     </ErrorBoundary>
   )

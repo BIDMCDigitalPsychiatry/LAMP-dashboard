@@ -270,39 +270,7 @@ export default function Conversations({
     }
     setSelectedParticipants([])
   }
-  // const searchParticipants = (searchVal?: string) => {
-  //   let searchTxt = searchVal ?? search
-  //   const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-  //   if (selectedData?.length > 0) {
-  //     // Service.getAll("participants").then((participantData) => {
-  //     //   // participantData = (participantData || []).filter((p) => p.is_deleted != true)
-  //     //   if (!!searchTxt && searchTxt.trim()?.length > 0) {
-  //     //     participantData = (participantData || []).filter(
-  //     //       (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
-  //     //     )
-  //     //     setParticipants(sortData(participantData, selectedData, "id"))
-  //     //   } else {
-  //     //     setParticipants(sortData(participantData, selectedData, "id"))
-  //     //   }
-  //     //   setPaginatedParticipants(
-  //     //     sortData(participantData, selectedData, "id")?.slice(page * rowCount, page * rowCount + rowCount)
-  //     //   )
-  //     //   setPage(page)
-  //     //   setRowCount(rowCount)
-  //     //   setLoading(false)
-  //     // })
-  //     fetchParticipants()
-  //   } else {
-  //     setParticipants([])
-  //     setLoading(false)
-  //   }
-  //   setSelectedParticipants([])
-  // }
 
-  // const handleSearchData = (val: string) => {
-  //   setSearch(val)
-  //   searchParticipants(val)
-  // }
   const handleSearchData = (val: string) => {
     setSearch(val)
     setFilters((prev) => ({ ...prev, search: val, page: 1 }))

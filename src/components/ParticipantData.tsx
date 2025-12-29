@@ -143,66 +143,6 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
-  const { t } = useTranslation()
-  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
-  return [
-    [
-      {
-        label: `${t("Alone")}`,
-        value: gps_events?.filter((x) => x.data.context.social === "alone")?.length,
-      },
-      {
-        label: `${t("Friends")}`,
-        value: gps_events?.filter((x) => x.data.context.social === "friends")?.length,
-      },
-      {
-        label: `${t("Family")}`,
-        value: gps_events?.filter((x) => x.data.context.social === "family")?.length,
-      },
-      {
-        label: `${t("Peers")}`,
-        value: gps_events?.filter((x) => x.data.context.social === "peers")?.length,
-      },
-      {
-        label: `${t("Crowd")}`,
-        value: gps_events?.filter((x) => x.data.context.social === "crowd")?.length,
-      },
-    ],
-    [
-      {
-        label: `${t("Home")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
-          ?.length,
-      },
-      {
-        label: `${t("School")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "school")?.length,
-      },
-      {
-        label: `${t("Work")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "work")?.length,
-      },
-      {
-        label: `${t("Hospital")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "hospital")?.length,
-      },
-      {
-        label: `${t("Outside")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "outside")?.length,
-      },
-      {
-        label: `${t("Shopping")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "shopping")?.length,
-      },
-      {
-        label: `${t("Transit")}`,
-        value: gps_events?.filter((x) => x.data.context.environment === "transit")?.length,
-      },
-    ],
-  ]
-}
-
 export default function ParticipantData({
   participant,
   hiddenEvents,
@@ -392,7 +332,6 @@ export default function ParticipantData({
               {`${t("Environmental Context")}`}
             </Typography>
             <Divider />
-            {/* <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} /> */}
           </Card>
         )}
         {((selectedSensors || []).includes("Step Count") || !!printView) && (

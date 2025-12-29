@@ -1,7 +1,6 @@
 import React from "react"
 import {
   Box,
-  Typography,
   Card,
   CardHeader,
   CardActions,
@@ -21,13 +20,11 @@ import {
   generate_activity_dict,
   ts_to_UTC_String,
   stringify_obj_values,
-  generate_participant_tag_info,
 } from "./DataPortalShared"
 import { useDrag } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
 import { generate_ids, queryDictionary } from "./DataPortalShared"
-
 import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
 import { useTranslation } from "react-i18next"

@@ -170,25 +170,6 @@ export default function Messages({
     true
   )
 
-  const duration = (date: Date) => {
-    var delta = Math.abs(date.getTime() - new Date().getTime()) / 1000
-
-    var days = Math.floor(delta / 86400)
-    delta -= days * 86400
-    if (days > 0) return days + (days > 1 ? " " + `${t("days")}` : `${t("day")}`)
-
-    var hours = Math.floor(delta / 3600) % 24
-    if (hours > 0) return hours + (hours > 1 ? " hrs" : "hr")
-
-    delta -= hours * 3600
-    var minutes = Math.floor(delta / 60) % 60
-    if (minutes > 0) return minutes + (minutes > 1 ? " mins" : "min")
-
-    delta -= minutes * 60
-    var seconds = Math.floor(delta % 60)
-    return seconds + (seconds > 1 ? "sec" : "secs")
-  }
-
   const refreshMessages = async () => {
     setConversations(
       Object.fromEntries(

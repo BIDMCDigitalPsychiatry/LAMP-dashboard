@@ -8,7 +8,6 @@ import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
-import { set } from "date-fns"
 import { getBasicToken } from "../../helper"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -228,15 +227,6 @@ export default function SensorsList({
     searchFilterSensors(val)
   }
 
-  // const handleChangePage = (page: number, rowCount: number) => {
-  //   setLoading(true)
-  //   setRowCount(rowCount)
-  //   setPage(page)
-  //   localStorage.setItem("sensors", JSON.stringify({ page: page, rowCount: rowCount }))
-  //   const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-  //   setPaginatedSensors(sortData(sensors, selectedData, "name")?.slice(page * rowCount, page * rowCount + rowCount))
-  //   setLoading(false)
-  // }
   const handleChangePage = (page: number, rowCount: number) => {
     setFilters((prev) => ({ ...prev, page: page + 1, limit: rowCount }))
     localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))

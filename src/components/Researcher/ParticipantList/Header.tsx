@@ -58,6 +58,7 @@ export default function Header({
   studies,
   researcherId,
   selectedParticipants,
+  setSelectedParticipants,
   searchData,
   setSelectedStudies,
   selectedStudies,
@@ -123,7 +124,11 @@ export default function Header({
             sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
           >
             <ToggleFeed participants={selectedParticipants} setParticipants={setParticipants} />
-            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
+            <DeleteParticipant
+              participants={selectedParticipants}
+              setParticipants={setParticipants}
+              setSelectedParticipants={setSelectedParticipants}
+            />
           </Box>
         </Box>
       )}

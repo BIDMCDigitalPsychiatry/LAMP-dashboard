@@ -1,7 +1,6 @@
 import React from "react"
 import { makeStyles, createStyles, Grid, Theme, Box, Paper, InputBase, IconButton, Button } from "@material-ui/core"
 import { ReactComponent as LogoMindLamp } from "../icons/LogoMindlamp.svg"
-import { ReactComponent as LogoSafeGuard } from "../icons/LogoSafeGuard.svg"
 import { ReactComponent as LogoArmyLevelUp } from "../icons/LogoArmyLevelUp.svg"
 import { useHistory } from "react-router-dom"
 const useStyles = makeStyles((theme: Theme) =>
@@ -76,7 +75,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Home() {
   const classes = useStyles()
   const [url, setUrl] = React.useState("")
-  const history = useHistory()
 
   return (
     <>

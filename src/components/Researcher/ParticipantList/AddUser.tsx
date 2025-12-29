@@ -113,11 +113,6 @@ export default function AddUser({
         } else {
           newParticipant.study_id = selectedStudy
           newParticipant.study_name = studies?.filter((study) => study.id === selectedStudy)[0]?.name
-          // Service.addData("participants", [newParticipant])
-          // Service.updateCount("studies", selectedStudy, "participant_count")
-          // Service.getData("studies", selectedStudy).then((studiesObject) => {
-          // handleNewStudy(studiesObject)
-          // })
           setNewId(newParticipant.id)
         }
         ids = [...ids, id]

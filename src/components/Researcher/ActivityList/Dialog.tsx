@@ -126,26 +126,6 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
-function RatioButton({ checked, onChange, title, value, unable, smallSpace, color, ...props }) {
-  const classes = useStyles()
-
-  return (
-    <Box display="flex" mx={3}>
-      <div
-        onClick={() => !unable && onChange(value)}
-        className={unable ? classes.unableContainer : checked ? classes.checkedContainer : classes.uncheckContainer}
-        style={{
-          marginRight: smallSpace ? 10 : 10,
-          backgroundColor: checked ? (color ? color : "#2F9D7E") : "transparent",
-        }}
-      />
-      <Typography className={unable ? classes.unableCheck : checked ? classes.titleChecked : classes.titleUncheck}>
-        {title}
-      </Typography>
-    </Box>
-  )
-}
-
 export function TargetDialog({ onClose, dialogOpen, ...props }) {
   const classes = useStyles()
   const [measure, setMeasure] = React.useState("Times")
