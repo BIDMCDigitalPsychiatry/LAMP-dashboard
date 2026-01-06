@@ -4,7 +4,9 @@ import SelectServer from "./SelectServer"
 import Login from "./Login"
 
 export default function LoginWorkflow({ setIdentity, state, onComplete, setAuthenticated, setConfirmSession }) {
-  const [isServerAddressSelected, setIsServerAddressSelected] = useState(!!LAMP.Auth._auth.serverAddress)
+  const [isServerAddressSelected, setIsServerAddressSelected] = useState(
+    !!LAMP.Auth._auth.serverAddress || !!localStorage.getItem("lastServerSelected")
+  )
   const [srcLocked, setSrcLocked] = useState(false)
   return (
     <React.Fragment>
@@ -16,6 +18,10 @@ export default function LoginWorkflow({ setIdentity, state, onComplete, setAuthe
           setAuthenticated={setAuthenticated}
           setConfirmSession={setConfirmSession}
           srcLocked={srcLocked}
+          clearServer={() => {
+            LAMP.Auth.clear_server()
+            setIsServerAddressSelected(false)
+          }}
         />
       ) : (
         <SelectServer

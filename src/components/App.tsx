@@ -29,9 +29,7 @@ import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
-import { LinkAccount } from "../LinkAccount"
-import { buildLampServerRequestUrl } from "../utilities"
-import LoginWorkflow from "./LoginWorkflow"
+import AuthenticatedRoute from "./AuthenticatedRoute"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -236,13 +234,8 @@ function AppRouter({ setConfirmSession, ...props }) {
     if (loginToken) {
       const serverAddress = localStorage.getItem("lastServerSelected")
       await LAMP.Auth.set_server(serverAddress)
-      await fetch(buildLampServerRequestUrl(serverAddress, `/login/one-time-token/${loginToken}`), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
+      await LAMP.Credential.finishOAuth(loginToken)
+      window.history.replaceState(null, "", window.location.pathname)
     }
 
     // Get the information associated with the currently logged in user if there is one
@@ -259,14 +252,12 @@ function AppRouter({ setConfirmSession, ...props }) {
         setIsLoggedIn && setIsLoggedIn(true)
       },
       () => {
+        if (!!LAMP.Auth._auth?.serverAddress) {
+          setState({ ...state, identity: LAMP.Auth._auth })
+        }
         setIsLoggedIn && setIsLoggedIn(false)
       }
     )
-
-    // If there was a login token, clear it only after refreshing the identity
-    if (loginToken) {
-      window.location.search = ""
-    }
   }
 
   const getAdminType = async () => {
@@ -542,47 +533,18 @@ function AppRouter({ setConfirmSession, ...props }) {
         <Switch>
           <Route
             exact
-            path="/link-social"
-            render={(props) => {
-              return !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    onComplete={() => {
-                      props.history.replace("/")
-                    }}
-                    state={state}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | Setup Account</PageTitle>
-                  <LinkAccount></LinkAccount>
-                </React.Fragment>
-              )
-            }}
-          />
-          <Route
-            exact
             path="/participant/:id/messages"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => {
-                      props.history.replace("/")
-                    }}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
                   <Messages
@@ -592,8 +554,8 @@ function AppRouter({ setConfirmSession, ...props }) {
                     participant={getParticipant(props.match.params.id)?.id ?? null}
                   />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
           {/* <Route
             exact
@@ -623,54 +585,52 @@ function AppRouter({ setConfirmSession, ...props }) {
           <Route
             exact
             path="/2fa"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : state.authType === "participant" ? (
-                <Redirect to="/participant/me/assess" />
-              ) : (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {state.authType === "participant" ? (
+                  <Redirect to="/participant/me/assess" />
+                ) : (
+                  <React.Fragment>
+                    <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
+                    <TwoFA
+                      onLogout={() => logout()}
+                      onComplete={() => {
+                        localStorage.setItem("verified", JSON.stringify({ value: true }))
 
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              )
-            }
+                        state.authType === "admin"
+                          ? props.history.replace("/researcher")
+                          : props.history.replace("/researcher/me/users")
+                      }}
+                    />
+                  </React.Fragment>
+                )}
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/participant/:id/module/:moduleId"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <ModuleActivity
                     participant={props.match.params.id}
@@ -679,26 +639,24 @@ function AppRouter({ setConfirmSession, ...props }) {
                     tab={state.activeTab}
                   />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/participant/:id/activity/:activityId"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <NotificationPage
                     participant={props.match.params.id}
@@ -707,237 +665,133 @@ function AppRouter({ setConfirmSession, ...props }) {
                     tab={state.activeTab}
                   />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/researcher/:rid/activity/import"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              // TODO: Removed a 2FA check based on the assumption that 2fa is broken
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <ImportActivity />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
           <Route
             exact
             path="/researcher/:rid/activity/add/:type"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              // TODO: Removed some 2FA based on the assumption that 2FA is broken
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <Activity type={props.match.params.type} researcherId={props.match.params.rid} />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/researcher/:rid/participant/:id/settings"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              // TODO: Removed some 2FA based on the assumption that 2FA is broken
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <PatientProfile researcherId={props.match.params.rid} participantId={props.match.params.id} />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
           <Route
             exact
             path="/researcher/:rid/activity/:id"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              // TODO: Removed some 2FA based on the assumption that 2FA is broken
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                onComplete={() => {
+                  props.history.replace("/")
+                }}
+                state={state}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
                 <React.Fragment>
                   <Activity id={props.match.params.id} researcherId={props.match.params.rid} />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
           {/* Route index => login or home (which redirects based on user type). */}
           <Route
             exact
             path="/"
-            render={(props) =>
-              !(window.location.hash.split("?").length > 1 && !state.identity) ? (
-                !state.identity ? (
-                  <React.Fragment>
-                    <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                    <LoginWorkflow
-                      setIdentity={async (identity) => !!identity && (await reset(identity))}
-                      state={state}
-                      onComplete={() => props.history.replace("/")}
-                      setAuthenticated={setAuthenticated}
-                      setConfirmSession={setConfirmSession}
-                    />
-                  </React.Fragment>
-                ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                    typeof state.auth?.serverAddress === "undefined") &&
-                  JSON.parse(localStorage.getItem("verified"))?.value === false &&
-                  state.authType !== "participant" ? (
-                  <React.Fragment>
-                    <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                    <TwoFA
-                      onLogout={() => logout()}
-                      onComplete={() => {
-                        localStorage.setItem("verified", JSON.stringify({ value: true }))
-                        state.authType === "admin"
-                          ? props.history.replace("/researcher")
-                          : props.history.replace("/researcher/me/users")
-                      }}
-                    />
-                  </React.Fragment>
-                ) : state.authType === "admin" ? (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {state.authType === "admin" ? (
                   <Redirect to="/researcher" />
                 ) : state.authType === "researcher" ? (
                   <Redirect to="/researcher/me/users" />
                 ) : (
                   <Redirect to="/participant/me/assess" />
-                )
-              ) : (
-                <React.Fragment />
-              )
-            }
+                )}
+              </AuthenticatedRoute>
+            )}
           />
 
           {/* Route authenticated routes. */}
           <Route
             exact
             path="/researcher"
-            render={(props) =>
-              !state.identity || state.authType !== "admin" ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {/* TODO: Show login if user is not an admin */}
                 <React.Fragment>
                   <PageTitle>{`${t("Administrator")}`}</PageTitle>
                   <NavigationLayout
@@ -955,107 +809,73 @@ function AppRouter({ setConfirmSession, ...props }) {
                     <Root {...props} updateStore={updateStore} adminType={state.adminType} />
                   </NavigationLayout>
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
           <Route
             exact
             path="/researcher/:id/:tab"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : !getResearcher(props.match.params.id) ? (
-                <React.Fragment />
-              ) : (
-                <React.Fragment>
-                  <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
-                  <NavigationLayout
-                    authType={state.authType}
-                    id={props.match.params.id}
-                    title={`${getResearcher(props.match.params.id).name}`}
-                    goBack={props.history.goBack}
-                    onLogout={() => logout()}
-                    activeTab="Researcher"
-                    sameLineTitle={true}
-                    changeResearcherType={changeResearcherType}
-                  >
-                    <Researcher
-                      researcher={getResearcher(props.match.params.id)}
-                      onParticipantSelect={(id) => {
-                        ;(async () => {
-                          setParticipantSelected(true)
-                          await Service.deleteUserDB()
-                          setState((state) => ({
-                            ...state,
-                            activeTab: 3,
-                          }))
-                          props.history.push(`/participant/${id}/portal`)
-                        })()
-                      }}
-                      mode={"researcher"} // Defaulting to researcher mode for now {state.researcherType}
-                      tab={props.match.params.tab}
-                    />
-                  </NavigationLayout>
-                </React.Fragment>
-              )
-            }
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {/* TODO: Only viewable to the correct people */}
+                {!isLoggedIn || !getResearcher(props.match.params.id) ? (
+                  <React.Fragment />
+                ) : (
+                  <React.Fragment>
+                    <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
+                    <NavigationLayout
+                      authType={state.authType}
+                      id={props.match.params.id}
+                      title={`${getResearcher(props.match.params.id).name}`}
+                      goBack={props.history.goBack}
+                      onLogout={() => logout()}
+                      activeTab="Researcher"
+                      sameLineTitle={true}
+                      changeResearcherType={changeResearcherType}
+                    >
+                      <Researcher
+                        researcher={getResearcher(props.match.params.id)}
+                        onParticipantSelect={(id) => {
+                          ;(async () => {
+                            setParticipantSelected(true)
+                            await Service.deleteUserDB()
+                            setState((state) => ({
+                              ...state,
+                              activeTab: 3,
+                            }))
+                            props.history.push(`/participant/${id}/portal`)
+                          })()
+                        }}
+                        mode={"researcher"} // Defaulting to researcher mode for now {state.researcherType}
+                        tab={props.match.params.tab}
+                      />
+                    </NavigationLayout>
+                  </React.Fragment>
+                )}
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/data_portal"
-            render={(props) =>
-              !state.identity || (state.authType !== "admin" && state.authType !== "researcher") ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/data_portal")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (serverAddressFro2FA.includes(state.auth?.serverAddress) ||
-                  typeof state.auth?.serverAddress === "undefined") &&
-                JSON.parse(localStorage.getItem("verified"))?.value === false ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("2FA")}`}</PageTitle>
-                  <TwoFA
-                    onLogout={() => logout()}
-                    onComplete={() => {
-                      localStorage.setItem("verified", JSON.stringify({ value: true }))
-                      state.authType === "admin"
-                        ? props.history.replace("/researcher")
-                        : props.history.replace("/researcher/me/users")
-                    }}
-                  />
-                </React.Fragment>
-              ) : (
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/data_portal")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {/* TODO: Researcher and admin only */}
                 <React.Fragment>
                   <PageTitle>Data Portal</PageTitle>
                   <DataPortal
@@ -1073,116 +893,115 @@ function AppRouter({ setConfirmSession, ...props }) {
                     onLogout={() => logout()}
                   />
                 </React.Fragment>
-              )
-            }
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/participant/:id/:tab"
-            render={(props) =>
-              !state.identity || !getParticipant(props.match.params.id) ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
-                  <NavigationLayout
-                    authType={state.authType}
-                    id={props.match.params.id}
-                    title={`User ${getParticipant(props.match.params.id).id}`}
-                    // name={
-                    //   getParticipant(props.match.params.id)?.alias ||
-                    //   getParticipant(props.match.params.id)?.name ||
-                    //   getParticipant(props.match.params.id)?.id
-                    // }
-                    goBack={props.history.goBack}
-                    onLogout={() => logout()}
-                    activeTab={state.activeTab ?? "assess"}
-                    // participant={getParticipant(props.match.params.id)}
-                  >
-                    <Participant
-                      participant={getParticipant(props.match.params.id)}
-                      activeTab={activeTab}
-                      tabValue={props.match.params.tab ?? "assess"}
-                      surveyDone={state.surveyDone}
-                      submitSurvey={submitSurvey}
-                      setShowDemoMessage={(val) => {
-                        setShowDemoMessage(val)
-                      }}
-                    />
-                  </NavigationLayout>
-                </React.Fragment>
-              )
-            }
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {/* TODO: Removed login from here, needs a better loading page */}
+                {!isLoggedIn || !getParticipant(props.match.params.id) ? (
+                  <React.Fragment />
+                ) : (
+                  <React.Fragment>
+                    <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
+                    <NavigationLayout
+                      authType={state.authType}
+                      id={props.match.params.id}
+                      title={`User ${getParticipant(props.match.params.id).id}`}
+                      // name={
+                      //   getParticipant(props.match.params.id)?.alias ||
+                      //   getParticipant(props.match.params.id)?.name ||
+                      //   getParticipant(props.match.params.id)?.id
+                      // }
+                      goBack={props.history.goBack}
+                      onLogout={() => logout()}
+                      activeTab={state.activeTab ?? "assess"}
+                      // participant={getParticipant(props.match.params.id)}
+                    >
+                      <Participant
+                        participant={getParticipant(props.match.params.id)}
+                        activeTab={activeTab}
+                        tabValue={props.match.params.tab ?? "assess"}
+                        surveyDone={state.surveyDone}
+                        submitSurvey={submitSurvey}
+                        setShowDemoMessage={(val) => {
+                          setShowDemoMessage(val)
+                        }}
+                      />
+                    </NavigationLayout>
+                  </React.Fragment>
+                )}
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/participant/:id/portal/activity/:activityId"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : !getParticipant(props.match.params.id) ? (
-                <React.Fragment />
-              ) : (
-                <React.Fragment>
-                  <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
-                  <PreventPage
-                    type="activity"
-                    activityId={props.match.params.activityId}
-                    participantId={props.match.params.id}
-                  />
-                </React.Fragment>
-              )
-            }
+            render={(props) => (
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {/* TODO: Verify that this is fine without the additional isLoggedin check */}
+                {!getParticipant(props.match.params.id) ? (
+                  <React.Fragment />
+                ) : (
+                  <React.Fragment>
+                    <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
+                    <PreventPage
+                      type="activity"
+                      activityId={props.match.params.activityId}
+                      participantId={props.match.params.id}
+                    />
+                  </React.Fragment>
+                )}
+              </AuthenticatedRoute>
+            )}
           />
 
           <Route
             exact
             path="/participant/:id/portal/sensor/:spec"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <LoginWorkflow
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    state={state}
-                    onComplete={() => props.history.replace("/")}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : !getParticipant(props.match.params.id) ? (
-                <React.Fragment />
-              ) : (
-                <React.Fragment>
-                  <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
-                  <PreventPage
-                    type="sensor"
-                    activityId={props.match.params.spec}
-                    participantId={props.match.params.id}
-                  />
-                </React.Fragment>
-              )
-            }
+            render={(props) => (
+              // TODO: Check that extra identity check is not needed...
+              <AuthenticatedRoute
+                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                state={state}
+                onComplete={() => props.history.replace("/")}
+                setAuthenticated={setAuthenticated}
+                setConfirmSession={setConfirmSession}
+                reset={reset}
+              >
+                {!getParticipant(props.match.params.id) ? (
+                  <React.Fragment />
+                ) : (
+                  <React.Fragment>
+                    <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
+                    <PreventPage
+                      type="sensor"
+                      activityId={props.match.params.spec}
+                      participantId={props.match.params.id}
+                    />
+                  </React.Fragment>
+                )}
+              </AuthenticatedRoute>
+            )}
           />
         </Switch>
       )}
@@ -1356,5 +1175,13 @@ export default function App({ ...props }) {
         </span> */}
       </ThemeProvider>
     </ErrorBoundary>
+  )
+}
+
+function ResearcherTabPage({ ...props }) {
+  return (
+    <React.Fragment>
+      <p>Research Tab Page...</p>
+    </React.Fragment>
   )
 }

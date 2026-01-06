@@ -24,6 +24,7 @@ export function AuthContextProvider({ ...props }) {
     authorizationHeader: authorizationHeader,
     isLoggedIn: isLoggedIn,
     setIsLoggedIn: (newvalue: boolean) => {
+      console.log("Is logged in = ", newvalue)
       setIsLoggedIn(newvalue)
     },
   }

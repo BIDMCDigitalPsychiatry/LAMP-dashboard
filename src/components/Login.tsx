@@ -1,6 +1,19 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Fab, Box, TextField, Menu, MenuItem, Icon, IconButton, InputAdornment, Grid, Link } from "@material-ui/core"
+import {
+  Fab,
+  Box,
+  TextField,
+  Menu,
+  MenuItem,
+  Icon,
+  IconButton,
+  InputAdornment,
+  Grid,
+  Link,
+  Typography,
+  Button,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
@@ -15,7 +28,7 @@ import { clearLocalStorageItems } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
 
-export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
+export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, clearServer, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ id: undefined, password: undefined })
   const [showPassword, setShowPassword] = useState(false)
@@ -214,6 +227,18 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     <>
       <LoginFrame>
         <Grid item className={classes.loginInner}>
+          <Box marginY={2} bgcolor="primary" padding={2} className={classes.textfieldStyle}>
+            <Grid container direction="row" wrap="nowrap">
+              <Box>
+                <IconButton style={{ background: "#7599FF", color: "White" }} onClick={() => clearServer()}>
+                  <Icon>arrow_back</Icon>
+                </IconButton>
+              </Box>
+              <Box sx={{ flexGrow: "1" }} alignContent={"center"}>
+                <Typography align="center">{LAMP.Auth._auth.serverAddress}</Typography>
+              </Box>
+            </Grid>
+          </Box>
           <form onSubmit={(e) => handleLogin(e)}>
             <Box>
               {isLockedOut && (
