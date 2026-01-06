@@ -536,7 +536,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/participant/:id/messages"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -587,7 +587,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/2fa"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -622,7 +622,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/participant/:id/module/:moduleId"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -648,7 +648,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/participant/:id/activity/:activityId"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -675,7 +675,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             render={(props) => (
               // TODO: Removed a 2FA check based on the assumption that 2fa is broken
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -696,7 +696,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             render={(props) => (
               // TODO: Removed some 2FA based on the assumption that 2FA is broken
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -718,7 +718,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             render={(props) => (
               // TODO: Removed some 2FA based on the assumption that 2FA is broken
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -739,7 +739,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             render={(props) => (
               // TODO: Removed some 2FA based on the assumption that 2FA is broken
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 onComplete={() => {
                   props.history.replace("/")
                 }}
@@ -902,7 +902,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/participant/:id/:tab"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 state={state}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -951,7 +951,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             path="/participant/:id/portal/activity/:activityId"
             render={(props) => (
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 state={state}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
@@ -981,7 +981,7 @@ function AppRouter({ setConfirmSession, ...props }) {
             render={(props) => (
               // TODO: Check that extra identity check is not needed...
               <AuthenticatedRoute
-                identityState={[identity, async (identity) => !!identity && (await reset(identity))]}
+                identityState={[state.identity, async (identity) => !!identity && (await reset(identity))]}
                 state={state}
                 onComplete={() => props.history.replace("/")}
                 setAuthenticated={setAuthenticated}
