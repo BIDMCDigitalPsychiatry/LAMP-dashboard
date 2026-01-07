@@ -23,6 +23,10 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { color: "#5680f9", background: "#fff" },
       "& span.MuiIcon-root": { fontSize: 20, marginRight: 3 },
     },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
+    },
   })
 )
 
@@ -31,6 +35,7 @@ export default function ExportActivity({ activities, ...props }) {
   const { t } = useTranslation()
   const classes = useStyles()
   const downloadActivities = async (activities) => {
+    localStorage.setItem("exportInProgress", "true")
     let data = []
     for (let x of activities) {
       delete x["study_id"]
@@ -58,6 +63,8 @@ export default function ExportActivity({ activities, ...props }) {
       } else data.push({ ...x, tableData: undefined })
     }
     _saveFile(data)
+    localStorage.removeItem("exportInProgress")
+    window.dispatchEvent(new Event("exportInProgressRemoved"))
     enqueueSnackbar(`${t("The selected Activities were successfully exported.")}`, {
       variant: "info",
     })
@@ -72,13 +79,15 @@ export default function ExportActivity({ activities, ...props }) {
     )
 
   return (
-    <Fab
-      variant="extended"
-      size="small"
-      classes={{ root: classes.btnText }}
-      onClick={() => downloadActivities(activities)}
-    >
-      <Icon>drive_folder_upload</Icon> {`${t("Export")}`}
-    </Fab>
+    <>
+      <Fab
+        variant="extended"
+        size="small"
+        classes={{ root: classes.btnText }}
+        onClick={() => downloadActivities(activities)}
+      >
+        <Icon>drive_folder_upload</Icon> {`${t("Export")}`}
+      </Fab>
+    </>
   )
 }

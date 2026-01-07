@@ -41,7 +41,7 @@ export default function SensorListItem({
   ...props
 }: {
   sensor?: Sensors
-  studies?: Array<Object>
+  studies?: any
   handleSelectionChange: Function
   selectedSensors?: any
   setSensors?: Function
@@ -50,7 +50,7 @@ export default function SensorListItem({
 
   const classes = useStyles()
   const [checked, setChecked] = React.useState(
-    selectedSensors.filter((d) => d.id === sensor.id).length > 0 ? true : false
+    selectedSensors?.filter((d) => d.id === sensor.id)?.length > 0 ? true : false
   )
 
   const handleChange = (sensor, event) => {

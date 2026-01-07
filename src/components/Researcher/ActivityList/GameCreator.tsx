@@ -23,7 +23,6 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,6 +47,7 @@ export default function GameCreator({
   details,
   studies,
   study,
+  setAllActivities,
   ...props
 }: {
   activities?: any
@@ -58,10 +58,10 @@ export default function GameCreator({
   details?: any
   studies?: any
   study?: string
+  setAllActivities?: Function
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const [loading, setLoading] = React.useState(false)
   const [schemaListObj, setSchemaListObj] = React.useState({})
   const { t } = useTranslation()
   const breatheFileLimit = 10
@@ -72,7 +72,7 @@ export default function GameCreator({
 
   useEffect(() => {
     if (
-      Object.keys(schemaListObj).length > 0 &&
+      Object.keys(schemaListObj)?.length > 0 &&
       !(
         (value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
         Object.keys(schemaListObj).includes(activitySpecId)
@@ -107,24 +107,22 @@ export default function GameCreator({
 
   useEffect(() => {
     const studyID = localStorage.getItem("studyId")
-    if (studyID != data.studyID) {
+    if (studyID != data.studyID && activities?.length > 0) {
       updateActivities()
     }
     validate()
-  }, [data])
+  }, [data, activities])
 
   const updateActivities = () => {
     if (!!data.studyID) {
       localStorage.setItem("studyId", data.studyID)
       let enumActivityIds = []
       let enumActivityNames = []
-      Service.getAll("activities").then((activities) => {
-        enumActivityIds = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.id)
-        enumActivityNames = (activities || []).filter((d) => d.study_id == data.studyID).map((d) => d.name)
-        localStorage.setItem("enumIds", JSON.stringify(enumActivityIds))
-        localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
-        setSchemaListObj(SchemaList())
-      })
+      enumActivityIds = (activities || [])?.filter((d) => d.study_id == data.studyID)?.map((d) => d.id)
+      enumActivityNames = (activities || [])?.filter((d) => d.study_id == data.studyID)?.map((d) => d.name)
+      localStorage.setItem("enumIds", JSON.stringify(enumActivityIds))
+      localStorage.setItem("enumNames", JSON.stringify(enumActivityNames))
+      setSchemaListObj(SchemaList())
     } else {
       setSchemaListObj(SchemaList())
     }
@@ -132,19 +130,19 @@ export default function GameCreator({
 
   const validateQuestions = (questions) => {
     let status = 0
-    if (!!questions && questions.length > 0) {
+    if (!!questions && questions?.length > 0) {
       let optionsArray = []
       {
-        ;(questions || []).map((x, idx) => {
+        ;(questions || [])?.map((x, idx) => {
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
           questions[idx].type === "rating"
             ? !Array.isArray(questions[idx].options) ||
               questions[idx].options === null ||
-              (!!questions[idx].options && questions[idx].options.length === 0)
+              (!!questions[idx].options && questions[idx].options?.length === 0)
               ? optionsArray.push(1)
-              : (questions[idx].options || []).filter(
+              : (questions[idx].options || [])?.filter(
                   (i) =>
                     (!!i &&
                       (((questions[idx].type === "slider" || questions[idx].type === "rating") && i?.value >= 0) ||
@@ -153,16 +151,16 @@ export default function GameCreator({
                             i?.value === "0" ||
                             (i?.value !== 0 &&
                               i?.value !== "0" &&
-                              ((i?.value || "").toString() || "")?.trim().length > 0))))) ||
+                              ((i?.value || "").toString() || "")?.trim()?.length > 0))))) ||
                     i === ""
-                ).length === (questions[idx].options || []).length
+                )?.length === (questions[idx].options || [])?.length
               ? optionsArray.push(0)
               : optionsArray.push(1)
             : optionsArray.push(0)
         })
       }
-      ;(questions || []).map((x, idx) => {
-        ;(questions[idx].options || []).map((i) => {
+      ;(questions || [])?.map((x, idx) => {
+        ;(questions[idx].options || [])?.map((i) => {
           if (!!value?.id && !!i?.contigencySettings?.activity && i?.contigencySettings?.activity === value?.id) {
             optionsArray.push(1)
             enqueueSnackbar(
@@ -174,7 +172,7 @@ export default function GameCreator({
           }
           if (
             !!i?.contigencySettings?.question_index &&
-            i?.contigencySettings?.question_index > (questions || []).length + 1
+            i?.contigencySettings?.question_index > (questions || [])?.length + 1
           ) {
             optionsArray.push(1)
             enqueueSnackbar(`${t("The specified question number does not exist.")}`, {
@@ -183,7 +181,7 @@ export default function GameCreator({
           }
         })
       })
-      if (optionsArray.filter((val) => val !== 0).length > 0) {
+      if (optionsArray?.filter((val) => val !== 0)?.length > 0) {
         status = 1
         return false
       } else {
@@ -191,12 +189,12 @@ export default function GameCreator({
       }
     }
     if (
-      questions.length === 0 ||
-      questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length !== questions.length
+      questions?.length === 0 ||
+      questions?.filter((val) => !!val.text && val.text?.trim()?.length !== 0)?.length !== questions?.length
     ) {
       return false
     } else if (
-      questions.filter((q) => ["list", "multiselect", "slider", "rating", "time"].includes(q.type)).length > 0 &&
+      questions?.filter((q) => ["list", "multiselect", "slider", "rating", "time"].includes(q.type))?.length > 0 &&
       status === 1
     ) {
       return false
@@ -207,25 +205,25 @@ export default function GameCreator({
   const validate = () => {
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
-      duplicates = activities.filter(
+      duplicates = activities?.filter(
         (x) =>
           (!!value
-            ? x.name?.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
-            : x.name?.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
+            ? x?.name?.toLowerCase() === data?.name?.trim().toLowerCase() && x?.id !== value?.id
+            : x?.name?.toLowerCase() === data?.name?.trim().toLowerCase()) && data.studyID === x.study_id
       )
-      if (duplicates.length > 0) {
+      if (duplicates?.length > 0) {
         enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
       }
     }
     if (value?.spec === "lamp.survey" || activitySpecId === "lamp.survey") {
-      const status = Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
+      const status = Object.keys(data.settings)?.length > 0 ? validateQuestions(data.settings) : false
       return (
         status &&
         !(
           typeof data.studyID == "undefined" ||
           data.studyID === null ||
           data.studyID === "" ||
-          duplicates.length > 0 ||
+          duplicates?.length > 0 ||
           typeof data.name === "undefined" ||
           (typeof data.name !== "undefined" && data.name?.trim() === "")
         )
@@ -253,7 +251,7 @@ export default function GameCreator({
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
-        duplicates.length > 0 ||
+        duplicates?.length > 0 ||
         data.settings?.threshold > 90 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
@@ -266,7 +264,7 @@ export default function GameCreator({
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
-        duplicates.length > 0 ||
+        duplicates?.length > 0 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -279,8 +277,6 @@ export default function GameCreator({
       return validateDBT(duplicates)
     } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       return validateBreathe(duplicates)
-    } else if ((value?.spec && ["lamp.zoom_meeting"].includes(value.spec)) || activitySpecId === "lamp.zoom_meeting") {
-      return validateZoomMeeting(duplicates)
     } else if (
       (value?.spec && ["lamp.symbol_digit_substitution"].includes(value.spec)) ||
       activitySpecId === "lamp.symbol_digit_substitution"
@@ -301,40 +297,27 @@ export default function GameCreator({
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
-        duplicates.length > 0 ||
+        duplicates?.length > 0 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "") ||
         typeof data.settings === "undefined" ||
-        Object.keys(data?.settings || {}).length === 0 ||
+        Object.keys(data?.settings || {})?.length === 0 ||
         (typeof data.settings !== "undefined" &&
-          Object.keys(data?.settings || {}).length > 0 &&
-          (data?.settings || []).length > 50) ||
-        (data?.settings || {}).filter((d) => !!d.emotionText).length !== Object.keys(data?.settings || {}).length ||
-        (data?.settings || {}).filter((d) => !!d.image).length !== Object.keys(data?.settings || {}).length
+          Object.keys(data?.settings || {})?.length > 0 &&
+          (data?.settings || [])?.length > 50) ||
+        (data?.settings || {})?.filter((d) => !!d.emotionText)?.length !== Object.keys(data?.settings || {})?.length ||
+        (data?.settings || {})?.filter((d) => !!d.image)?.length !== Object.keys(data?.settings || {})?.length
       )
     } else {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
-        duplicates.length > 0 ||
+        duplicates?.length > 0 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
-  }
-
-  const validateZoomMeeting = (duplicates) => {
-    return !(
-      typeof data.studyID == "undefined" ||
-      data.studyID === null ||
-      data.studyID === "" ||
-      duplicates.length > 0 ||
-      typeof data.settings?.zoom_link === "undefined" ||
-      data.settings?.zoom_link === "" ||
-      typeof data.name === "undefined" ||
-      (typeof data.name !== "undefined" && data.name?.trim() === "")
-    )
   }
 
   const validateRecording = (duplicates) => {
@@ -342,7 +325,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       typeof data.settings?.record_label === "undefined" ||
       typeof data.settings?.rerecord_label === "undefined" ||
       data.settings?.record_label === "" ||
@@ -357,7 +340,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       data.settings?.count_of_symbols > 10 ||
       data.settings?.count_of_symbols < 4 ||
       data.settings?.duration > 300 ||
@@ -372,7 +355,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       data.settings?.bubble_count === 0 ||
       data.settings?.bubble_count === "" ||
       data.settings?.bubble_speed === 0 ||
@@ -383,8 +366,8 @@ export default function GameCreator({
       data.settings?.bubble_duration === "" ||
       typeof data.settings?.bubble_duration === "undefined" ||
       typeof data.settings?.intertrial_duration === "undefined" ||
-      data.settings?.bubble_count.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
-      data.settings?.bubble_speed.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+      data.settings?.bubble_count?.filter((d) => typeof d === "undefined" || d === null)?.length > 0 ||
+      data.settings?.bubble_speed?.filter((d) => typeof d === "undefined" || d === null)?.length > 0 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )
@@ -395,7 +378,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       data.settings?.balloon_count === 0 ||
       data.settings?.balloon_count === "" ||
       data.settings?.breakpoint_mean === 0 ||
@@ -415,7 +398,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       data.settings?.beginner_seconds > 300 ||
       data.settings?.beginner_seconds === 0 ||
       data.settings?.beginner_seconds === "" ||
@@ -459,7 +442,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       typeof data.settings?.value === "undefined" ||
       (typeof data.settings?.value !== "undefined" && data.settings?.value < 0) ||
       typeof data.settings?.unit === "undefined" ||
@@ -472,7 +455,7 @@ export default function GameCreator({
   const validateDBT = (duplicates) => {
     let validateEffective = false
     if (data.settings && data.settings?.targetEffective !== undefined) {
-      if (data.settings?.targetEffective.length > 0) {
+      if (data.settings?.targetEffective?.length > 0) {
         validateEffective = data.settings?.targetEffective.some((item) => {
           return (
             item.target === "" ||
@@ -491,7 +474,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "") ||
       validateEffective
@@ -504,7 +487,7 @@ export default function GameCreator({
       typeof data.studyID == "undefined" ||
       data.studyID === null ||
       data.studyID === "" ||
-      duplicates.length > 0 ||
+      duplicates?.length > 0 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "") ||
       fileMB > breatheFileLimit
@@ -538,7 +521,7 @@ export default function GameCreator({
     let b64Settings = settingsData ? settingsData.audio : ""
     let totalSizeMB = 0
     if (b64Settings) {
-      let stringLength = b64Settings.length - "data:audio/mpeg;base64,".length
+      let stringLength = b64Settings?.length - "data:audio/mpeg;base64,"?.length
       let sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
       totalSizeMB = sizeInBytes / Math.pow(1024, 2)
     }
@@ -547,7 +530,7 @@ export default function GameCreator({
 
   const updateSettings = (settingsData) => {
     if (data?.spec === "lamp.survey") {
-      ;(settingsData?.settings || []).map((x, idx) => {
+      ;(settingsData?.settings || [])?.map((x, idx) => {
         if (
           !(
             x.type === "time" ||
@@ -563,8 +546,8 @@ export default function GameCreator({
           delete settingsData.settings[idx]["options"]
         }
         if (x.type === "time") {
-          if (!!settingsData.settings[idx]["options"] && settingsData.settings[idx]["options"].length > 1) {
-            settingsData.settings[idx]["options"].map((i, indx) => {
+          if (!!settingsData.settings[idx]["options"] && settingsData.settings[idx]["options"]?.length > 1) {
+            settingsData.settings[idx]["options"]?.map((i, indx) => {
               if (indx > 0) {
                 settingsData.settings[idx]["options"].splice(indx, 1)
               }
@@ -578,7 +561,7 @@ export default function GameCreator({
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={false}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Container className={classes.containerWidth}>
@@ -602,6 +585,8 @@ export default function GameCreator({
               ? BreatheIcon
               : null
           }
+          setAllActivities={setAllActivities}
+          activities={activities}
         />
         {validateAudioSize() > breatheFileLimit && (
           <Box my={2} p={2} border={1} borderColor="#0000001f" className={classes.errorcustom}>

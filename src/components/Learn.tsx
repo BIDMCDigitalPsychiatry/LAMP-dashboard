@@ -39,27 +39,34 @@ export default function Learn({
   const [tag, setTag] = useState([])
 
   useEffect(() => {
-    let gActivities = activities.filter(
-      (x: any) =>
-        (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
-        (!!x?.category && x?.category.includes("learn"))
-    )
-    setSavedActivities(gActivities)
-    if (gActivities.length > 0) {
-      Service.getAllTags("activitytags").then((data) => {
-        setTag(
-          (data || []).filter(
-            (x: any) =>
-              (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
-              (!!x?.category && x?.category.includes("learn"))
+    // Filter Learn activities and load associated tags once
+    const refreshTags = () => {
+      let gActivities = activities?.filter(
+        (x: any) =>
+          (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
+          (!!x?.category && x?.category.includes("learn"))
+      )
+      setSavedActivities(gActivities)
+      if (gActivities?.length > 0) {
+        Service.getAllTags("activitytags").then((data) => {
+          setTag(
+            (data || [])?.filter(
+              (x: any) =>
+                (x.spec === "lamp.tips" && (typeof x?.category === "undefined" || x?.category === null)) ||
+                (!!x?.category && x?.category.includes("learn"))
+            )
           )
-        )
+          setLoading(false)
+        })
+      } else {
         setLoading(false)
-      })
-    } else {
-      setLoading(false)
+      }
     }
+    refreshTags()
+    window.addEventListener("activityTagsUpdated", refreshTags)
+    return () => window.removeEventListener("activityTagsUpdated", refreshTags)
   }, [])
+
   return (
     <Container className={classes.thumbContainer}>
       <Backdrop className={classes.backdrop} open={loading}>

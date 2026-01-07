@@ -164,7 +164,6 @@ export default function AddActivity({
     "lamp.voice_survey": `${t("Speech Recording")}`,
     "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
     "lamp.digit_span": `${t("Digit Span")}`,
-    "lamp.zoom_meeting": `${t("Virtual Meeting")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -182,17 +181,17 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
-      let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
-      let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
+      let availableSpecs = allSpecs?.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
+      let otherSpecs = allSpecs?.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
-      if (otherSpecs.length > 0) {
-        await otherSpecs.map(async (x: any, index: number) => {
+      if (otherSpecs?.length > 0) {
+        await otherSpecs?.map(async (x: any, index: number) => {
           if (!!x.id) {
             await getActivitySpec(x.id).then((spec) => {
               if (!!spec) availableSpecs.push(spec)
             })
           }
-          if (index === otherSpecs.length - 1) {
+          if (index === otherSpecs?.length - 1) {
             setActivitySpecs(availableSpecs)
             setLoading(false)
           }
@@ -249,14 +248,14 @@ export default function AddActivity({
               </Grid>
             </Grid>
           </MenuItem>
-          {activitySpecs.filter((x) => ["lamp.group", "lamp.survey", "lamp.module"].includes(x.id)).length > 0 && (
+          {activitySpecs?.filter((x) => ["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))?.length > 0 && (
             <React.Fragment>
               <MenuItem disabled divider>
                 <b>{`${t("Create a new...")}`}</b>
               </MenuItem>
               {activitySpecs
-                .filter((x) => ["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))
-                .map((x) => (
+                ?.filter((x) => ["lamp.group", "lamp.survey"].includes(x.id))
+                ?.map((x) => (
                   <Link
                     href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
                     underline="none"
@@ -268,13 +267,13 @@ export default function AddActivity({
                 ))}
             </React.Fragment>
           )}
-          {activitySpecs.filter((x) => !["lamp.group", "lamp.survey", "lamp.module"].includes(x.id)).length > 0 && [
+          {activitySpecs?.filter((x) => !["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))?.length > 0 && [
             <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{`${t("Smartphone Cognitive Tests")}`}</b>
             </MenuItem>,
             ...activitySpecs
-              .filter((x) => !["lamp.group", "lamp.survey", "lamp.module"].includes(x.id))
-              .map((x) => (
+              ?.filter((x) => !["lamp.group", "lamp.survey", "lamp.module", "lamp.zoom_meeting"].includes(x.id))
+              ?.map((x) => (
                 <Link
                   href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
                   underline="none"

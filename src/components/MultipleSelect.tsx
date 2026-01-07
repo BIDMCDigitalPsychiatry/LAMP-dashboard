@@ -41,12 +41,12 @@ export default function MultipleSelect({ ...props }) {
   const { t } = useTranslation()
   const [items, setItems] = React.useState([])
   useEffect(() => {
-    if (props.items.length > 0) setItems(props.items)
+    if (props.items?.length > 0) setItems(props.items)
   }, [])
 
   return (
     <Box className={classes.filterChips}>
-      {(items || []).map((item) => (
+      {(items || [])?.map((item) => (
         <Tooltip
           key={item}
           style={{ margin: 4 }}
@@ -64,7 +64,7 @@ export default function MultipleSelect({ ...props }) {
             color={(props.selected || []).indexOf(item) >= 0 ? "primary" : undefined}
             onClick={
               (props.selected || []).indexOf(item) >= 0
-                ? () => props.onChange((props.selected || []).filter((x) => x !== item))
+                ? () => props.onChange((props.selected || [])?.filter((x) => x !== item))
                 : () => props.onChange(!!props.singleSelect ? [item] : [...(props.selected || []), item])
             }
           />

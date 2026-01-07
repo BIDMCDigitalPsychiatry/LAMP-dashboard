@@ -28,20 +28,20 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function DeleteParticipant({ participants, setParticipants, ...props }) {
+export default function DeleteParticipant({ participants, setParticipants, setSelectedParticipants, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
   let deleteParticipants = async (status) => {
     if (status === "Yes") {
-      const participantIds = participants.map((p) => {
+      const participantIds = participants?.map((p) => {
         return p.id
       })
       for (let participant of participants) {
         await LAMP.Credential.list(participant.id).then((cred) => {
-          cred = cred.filter((c) => c.hasOwnProperty("origin"))
-          cred.map(async (each) => {
+          cred = cred?.filter((c) => c.hasOwnProperty("origin"))
+          cred?.map(async (each) => {
             await LAMP.Credential.delete(participant.id, each["access_key"])
           })
         })
@@ -55,8 +55,11 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
         variant: "success",
       })
     }
+
+    setSelectedParticipants([])
     setConfirmationDialog(0)
   }
+
   return (
     <span>
       <Fab

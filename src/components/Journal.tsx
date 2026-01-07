@@ -105,18 +105,18 @@ function getWeekDates() {
 const getJournals = async (journals: any) => {
   let weekdays = getWeekDates()
   let weekData = journals
-    .filter(
+    ?.filter(
       (journal: any) =>
         new Date(journal.timestamp).getMonth() === new Date().getMonth() &&
         weekdays.indexOf(new Date(journal.timestamp).getDate()) > -1
     )
-    .map((journal) => journal)
+    ?.map((journal) => journal)
   let monthData = journals
-    .filter((journal: any) => new Date(journal.timestamp).getMonth() === new Date().getMonth())
-    .map((journal) => journal)
+    ?.filter((journal: any) => new Date(journal.timestamp).getMonth() === new Date().getMonth())
+    ?.map((journal) => journal)
   let others = journals
-    .filter((journal: any) => new Date(journal.timestamp).getMonth() !== new Date().getMonth())
-    .map((journal) => journal)
+    ?.filter((journal: any) => new Date(journal.timestamp).getMonth() !== new Date().getMonth())
+    ?.map((journal) => journal)
 
   let data = {
     "This week": weekData,
@@ -156,25 +156,25 @@ export default function Journals({ selectedEvents, ...props }) {
   useEffect(() => {
     setJournals(selectedEvents)
     getJournals(selectedEvents).then(setAllJournals)
-    setSelectedDates(selectedEvents.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
+    setSelectedDates(selectedEvents?.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
   }, [])
 
   useEffect(() => {
     if (allJournals !== null) {
       let textData = []
-      Object.keys(allJournals).map((each) => {
-        if (allJournals[each].length > 0 && text.length === 0) {
-          allJournals[each].map((journal, index) => {
+      Object.keys(allJournals)?.map((each) => {
+        if (allJournals[each]?.length > 0 && text?.length === 0) {
+          allJournals[each]?.map((journal, index) => {
             setOpen({ ...open, [index]: false })
             let jText =
-              journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+              journal.static_data.text.substring(0, 80)?.length === journal.static_data.text?.length
                 ? journal.static_data.text
                 : journal.static_data.text
                     .substring(0, 80)
                     .substr(
                       0,
                       Math.min(
-                        journal.static_data.text.substring(0, 80).length,
+                        journal.static_data.text.substring(0, 80)?.length,
                         journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                       )
                     ) + "..."
@@ -190,14 +190,14 @@ export default function Journals({ selectedEvents, ...props }) {
     if (journal !== null) {
       let jText = !!open[index]
         ? journal.static_data.text
-        : journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+        : journal.static_data.text.substring(0, 80)?.length === journal.static_data.text?.length
         ? journal.static_data.text
         : journal.static_data.text
             .substring(0, 80)
             .substr(
               0,
               Math.min(
-                journal.static_data.text.substring(0, 80).length,
+                journal.static_data.text.substring(0, 80)?.length,
                 journal.static_data.text.substring(0, 80).lastIndexOf(" ")
               )
             ) + "..."
@@ -226,16 +226,16 @@ export default function Journals({ selectedEvents, ...props }) {
                 <Box fontWeight="fontWeightBold" className={classes.journalday}>
                   This date
                 </Box>
-                {journals.filter(
+                {journals?.filter(
                   (journal) => new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
-                ).length > 0 ? (
+                )?.length > 0 ? (
                   <Box>
                     {journals
-                      .filter(
+                      ?.filter(
                         (journal) =>
                           new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
                       )
-                      .map((journal, index) => (
+                      ?.map((journal, index) => (
                         <Box boxShadow={0}>
                           <Grid item>
                             <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
@@ -243,14 +243,14 @@ export default function Journals({ selectedEvents, ...props }) {
                                 {getDateString(new Date(journal.timestamp))}
                               </Typography>
                               <Typography variant="body2" component="p">
-                                {journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+                                {journal.static_data.text.substring(0, 80)?.length === journal.static_data.text?.length
                                   ? journal.static_data.text
                                   : journal.static_data.text
                                       .substring(0, 80)
                                       .substr(
                                         0,
                                         Math.min(
-                                          journal.static_data.text.substring(0, 80).length,
+                                          journal.static_data.text.substring(0, 80)?.length,
                                           journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                                         )
                                       ) + "..."}
@@ -274,14 +274,14 @@ export default function Journals({ selectedEvents, ...props }) {
             <div>
               {!!allJournals &&
                 allJournals !== null &&
-                Object.keys(allJournals).map((each) => (
+                Object.keys(allJournals)?.map((each) => (
                   <Container>
-                    {allJournals[each].length > 0 && (
+                    {allJournals[each]?.length > 0 && (
                       <Container className={classes.journalHistory}>
                         <Box fontWeight="fontWeightBold" className={classes.journalday}>
                           {each}
                         </Box>
-                        {allJournals[each].map((journal, index) => (
+                        {allJournals[each]?.map((journal, index) => (
                           <Box boxShadow={0}>
                             <Grid item>
                               <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>

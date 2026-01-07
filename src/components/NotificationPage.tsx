@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, lazy, Suspense } from "react"
 import {
   makeStyles,
   Box,
@@ -16,16 +16,16 @@ import {
   Button,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Streak from "./Streak"
-import EmbeddedActivity from "./EmbeddedActivity"
-import { getEvents } from "./Participant"
+import { getEvents, getImage } from "./Participant"
 import { useTranslation } from "react-i18next"
-import GroupActivity from "./GroupActivity"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
 import VisualPopup from "./VisualPopup"
-import ModuleActivity from "./ModuleActivity"
-import ResponsiveDialog from "./ResponsiveDialog"
+import { getActivityWithDeduplication, lazyRetry } from "../helper/functions"
+const Streak = lazy(lazyRetry(() => import("./Streak")))
+const GroupActivity = lazy(lazyRetry(() => import("./GroupActivity")))
+const EmbeddedActivity = lazy(lazyRetry(() => import("./EmbeddedActivity")))
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -107,6 +107,213 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const demoActivities = {
+  "lamp.spatial_span": "boxgame",
+  "lamp.cats_and_dogs": "catsndogs",
+  "Dot Touch": "dottouch",
+  "lamp.jewels_a": "jewelspro",
+  "lamp.jewels_b": "jewelspro",
+  "lamp.fragmented_letters": "fragmentationofletters",
+  "lamp.dbt_diary_card": "dbtdiarycard",
+  "lamp.balloon_risk": "balloonrisk",
+  "lamp.pop_the_bubbles": "popthebubbles",
+  "lamp.journal": "journal",
+  "lamp.breathe": "breathe",
+  "lamp.recording": "voicerecording",
+  "lamp.survey": "survey",
+  "lamp.scratch_image": "scratchimage",
+  "lamp.tips": "tips",
+  "lamp.goals": "goals",
+  "lamp.medications": "medicationtracker",
+  "lamp.memory_game": "memorygame",
+  "lamp.spin_wheel": "spin_wheel",
+  "lamp.maze_game": "maze_game",
+  "lamp.emotion_recognition": "emotion_recognition",
+  "lamp.symbol_digit_substitution": "symbol_digit_substitution",
+  "lamp.gyroscope": "gyroscope",
+  "lamp.dcog": "d-cog",
+  "lamp.funny_memory": "funnymemory",
+  "lamp.trails_b": "dottouch",
+  "lamp.voice_survey": "speechrecording",
+  "lamp.digit_span": "digitspan",
+}
+
+// In-memory cache for activity HTML fetch promises to prevent duplicate concurrent requests
+const activityHTMLFetchCache = new Map<string, Promise<string>>()
+
+// Shared function to fetch activity HTML with deduplication
+// Returns cached HTML if available, or fetches and caches it
+// Uses promise caching to prevent duplicate concurrent requests
+export const fetchActivityHTML = async (activityName: string): Promise<string> => {
+  const cacheKey = `activity-html-${activityName}`
+  const cacheTimestampKey = `activity-html-${activityName}-timestamp`
+  const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
+
+  // Check if already cached and valid
+  try {
+    const cachedHTML = localStorage.getItem(cacheKey)
+    const cachedTimestamp = localStorage.getItem(cacheTimestampKey)
+
+    if (cachedHTML && cachedTimestamp) {
+      const cacheAge = Date.now() - parseInt(cachedTimestamp, 10)
+      if (cacheAge < CACHE_DURATION) {
+        // Already cached and valid, return immediately
+        return cachedHTML
+      } else {
+        // Cache expired, remove it
+        localStorage.removeItem(cacheKey)
+        localStorage.removeItem(cacheTimestampKey)
+      }
+    }
+  } catch (e) {
+    // Continue to fetch if cache check fails
+    console.warn("Cache read failed:", e)
+  }
+
+  // Check if a fetch is already in progress for this activity
+  if (activityHTMLFetchCache.has(activityName)) {
+    return activityHTMLFetchCache.get(activityName)!
+  }
+
+  // Create fetch promise
+  let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+  activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+  // activityURL += "dist/out"
+  const fetchPromise = fetch(`${activityURL}/${activityName}.html.b64`)
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch activity: ${response.status}`)
+      }
+      const base64Text = await response.text()
+      const html = atob(base64Text)
+
+      // Cache the result
+      try {
+        localStorage.setItem(cacheKey, html)
+        localStorage.setItem(cacheTimestampKey, Date.now().toString())
+      } catch (e) {
+        // If localStorage is full, try to clear old cache entries
+        console.warn("Cache write failed, clearing old entries:", e)
+        try {
+          // Clear expired cache entries
+          Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith("activity-html-") && key.endsWith("-timestamp")) {
+              const timestamp = parseInt(localStorage.getItem(key) || "0", 10)
+              if (Date.now() - timestamp > CACHE_DURATION) {
+                const activityKey = key.replace("-timestamp", "")
+                localStorage.removeItem(activityKey)
+                localStorage.removeItem(key)
+              }
+            }
+          })
+          // Retry caching
+          localStorage.setItem(cacheKey, html)
+          localStorage.setItem(cacheTimestampKey, Date.now().toString())
+        } catch (e2) {
+          console.warn("Could not cache activity HTML:", e2)
+        }
+      }
+
+      return html
+    })
+    .finally(() => {
+      // Remove from cache after fetch completes (success or failure)
+      activityHTMLFetchCache.delete(activityName)
+    })
+
+  // Store the promise in cache
+  activityHTMLFetchCache.set(activityName, fetchPromise)
+
+  return fetchPromise
+}
+
+// Prefetch activity HTML to cache it before EmbeddedActivity needs it
+// Now uses shared fetchActivityHTML function to prevent duplicate requests
+const prefetchActivityHTML = async (activity: any): Promise<void> => {
+  try {
+    if (!activity || !activity.spec) return
+
+    const activityName = demoActivities[activity.spec]
+    if (!activityName) return
+
+    // Use shared fetch function which handles caching and deduplication
+    await fetchActivityHTML(activityName)
+  } catch (e) {
+    // Silently fail - EmbeddedActivity will handle the fetch
+  }
+}
+
+// Prefetch all activities in a group for instant navigation
+const prefetchAllGroupActivities = async (groupData: any) => {
+  let activitiesList: string[] = []
+  if (Array.isArray(groupData.settings)) {
+    activitiesList = groupData.settings
+  } else {
+    activitiesList = groupData.settings?.activities || []
+  }
+
+  if (activitiesList.length === 0) return
+
+  // Prefetch all activities in parallel (don't block UI)
+  const prefetchPromises = activitiesList.map((actId: string) => {
+    return getActivityWithDeduplication(actId)
+      .then((activityData: any) => {
+        if (!activityData || !activityData.spec) {
+          return null
+        }
+        // Fetch image in parallel
+        return Promise.all([Promise.resolve(activityData), getImage(actId, activityData.spec).catch(() => undefined)])
+      })
+      .then((result: any) => {
+        if (result) {
+          const [activityData, tag] = result
+          // Cache each activity for instant loading
+          const cacheKey = `activity_data_${actId}`
+          try {
+            sessionStorage.setItem(
+              cacheKey,
+              JSON.stringify({
+                data: activityData,
+                tag,
+                timestamp: Date.now(),
+              })
+            )
+          } catch (e) {
+            // Ignore cache write errors
+          }
+
+          // Also prefetch activity HTML if it's a demo activity
+          const activityName = demoActivities[activityData.spec]
+          if (activityName) {
+            const htmlCacheKey = `activity-html-${activityName}`
+            // Check if HTML is already cached
+            try {
+              const cachedHtml = localStorage.getItem(htmlCacheKey)
+              if (!cachedHtml) {
+                // Prefetch HTML in background (non-blocking)
+                fetchActivityHTML(activityName).catch(() => {
+                  // Silently fail, will load when needed
+                })
+              }
+            } catch (e) {
+              // Ignore
+            }
+          }
+        }
+        return result
+      })
+      .catch(() => {
+        // Silently fail for individual activities - prefetch is optional
+        return null
+      })
+  })
+
+  // Don't wait for all to complete - let them run in background
+  Promise.all(prefetchPromises).catch(() => {
+    // Silently fail - prefetch is optional
+  })
+}
+
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
@@ -121,7 +328,15 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [tag, setTag] = useState(null)
   const [visualPopup, setVisualPopup] = useState(null)
   const [staticData, setStaticData] = useState(0)
-  const [favoriteActivities, setFavoriteActivities] = useState<null | string[]>(null)
+  const [activityTag, setActivityTag] = useState<any>(null)
+
+  // Prefetch chunks immediately on mount to reduce loading delay
+  useEffect(() => {
+    // Prefetch commonly used chunks right away
+    import("./EmbeddedActivity").catch(() => {})
+    import("./Streak").catch(() => {})
+    import("./GroupActivity").catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!!activityId) {
@@ -130,36 +345,115 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   }, [activityId])
 
   useEffect(() => {
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0] ?? []
-      setFavoriteActivities(tag)
-    })()
-  }, [])
-
-  useEffect(() => {
+    // Fetch the activity, splice by tags, and prepare UI; handles not-found and session cases
     setLoading(true)
     setResponse(false)
+    const sessionValue = sessionStorage.getItem("LAMP.Auth")
     ;(async () => {
-      if (!!favoriteActivities && !!id && !!LAMP.Auth) {
-        LAMP.Activity.view(id)
+      if (!!id && !!LAMP.Auth) {
+        // Check cache first for instant loading
+        const cacheKey = `activity_data_${id}`
+        let cachedData = null
+        let cachedTag = null
+        let useCache = false
+
+        try {
+          const cached = sessionStorage.getItem(cacheKey)
+          if (cached) {
+            const parsed = JSON.parse(cached)
+            const cacheAge = Date.now() - (parsed.timestamp || 0)
+            // Use cache if less than 2 minutes old
+            if (cacheAge < 2 * 60 * 1000 && parsed.data) {
+              cachedData = parsed.data
+              cachedTag = parsed.tag
+              useCache = true
+              // Show cached data immediately for instant UI
+              setActivityTag(cachedTag)
+              const processedData =
+                cachedData.spec === "lamp.survey"
+                  ? spliceActivity({ raw: cachedData, tag: cachedTag })
+                  : spliceCTActivity({ raw: cachedData, tag: cachedTag })
+              setActivity(processedData)
+              setLoading(false) // Show UI immediately with cached data
+            }
+          }
+        } catch (e) {
+          // If cache read fails, continue with normal fetch
+        }
+
+        // Start prefetching chunks immediately (don't wait for API calls)
+        const chunkPrefetchPromise = import("./EmbeddedActivity").catch(() => {})
+        const groupPrefetchPromise = import("./GroupActivity").catch(() => {})
+        const streakPrefetchPromise = import("./Streak").catch(() => {})
+        Promise.all([chunkPrefetchPromise, groupPrefetchPromise, streakPrefetchPromise]).catch(() => {})
+
+        // Fetch activity data and image in parallel (optimized)
+        const activityPromise = getActivityWithDeduplication(id)
+
+        // Start image fetch immediately (we'll get spec from activity data)
+        // But also try common attachment names in parallel for faster loading
+        const commonImagePromises = [
+          getImage(id, "lamp.survey").catch(() => undefined),
+          getImage(id, "lamp.dashboard.activity_details").catch(() => undefined),
+        ]
+
+        activityPromise
           .then((data: any) => {
+            if (!data) {
+              throw new Error("No activity data")
+            }
+
+            // Prefetch activity HTML immediately (don't wait)
+            prefetchActivityHTML(data).catch(() => {})
+
+            // Get the correct image based on spec
+            const imagePromise = data.spec ? getImage(id, data.spec) : Promise.resolve(undefined)
+
+            // Wait for image (use cached common images if available)
+            return Promise.all([Promise.resolve(data), imagePromise])
+          })
+          .then(([data, tag]: [any, any]) => {
             if (!!data) {
-              Service.getUserDataByKey("activitytags", [id], "id").then((tags) => {
-                setTag(tags[0])
-                const tag = tags[0]
-                data =
+              data.spec === "lamp.group" && localStorage.setItem("groupactivityid", id)
+
+              // If this is an activity group, prefetch all activities immediately
+              if (data.spec === "lamp.group") {
+                prefetchAllGroupActivities(data)
+              }
+
+              // Only update if we didn't use cache, or if fresh data is different
+              if (!useCache || cachedData?.id !== data.id) {
+                // Cache the result for next time
+                try {
+                  sessionStorage.setItem(
+                    cacheKey,
+                    JSON.stringify({
+                      data,
+                      tag,
+                      timestamp: Date.now(),
+                    })
+                  )
+                } catch (e) {
+                  // Ignore cache write errors
+                }
+
+                setActivityTag(tag)
+                const processedData =
                   data.spec === "lamp.survey"
                     ? spliceActivity({ raw: data, tag })
                     : spliceCTActivity({ raw: data, tag })
-                setActivity(data)
+                setActivity(processedData)
                 setLoading(false)
-              })
+              }
+              // If we used cache, data is already set, just refresh in background silently
             } else {
-              setOpenNotFound(true)
-              setLoading(false)
+              if (!sessionValue) {
+                setOpenNotFound(false)
+                window.location.href = "/#/"
+              } else {
+                setOpenNotFound(true)
+                setLoading(false)
+              }
             }
           })
           .catch((e) => {
@@ -172,31 +466,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           })
       }
     })()
-  }, [id, favoriteActivities])
-  const [moduleActivity, setModuleActivity] = useState("")
-  const [open, setOpen] = useState(false)
+  }, [id])
 
-  const [module, setModule] = useState("")
   const returnResult = () => {
-    setStreak(0)
-    const activityFromModule = localStorage.getItem("activityFromModule")
-    const moduleId = localStorage.getItem("moduleId")
-    setModule(activityFromModule)
+    const lastActiveTab = localStorage.getItem("lastActiveTab")?.toLocaleLowerCase()
     if (mode === null) setResponse(true)
-    else if (mode === "responseActivity") {
-      const surveyId = localStorage.getItem("SurveyId")
-      if (surveyId) {
-        window.location.href = `/#/participant/${participant}/activity/${surveyId}?mode=dashboard`
-        localStorage.removeItem("SurveyId")
-      } else {
-        window.location.href = `/#/participant/${participant}/assess `
-      }
-    } else if (!!activityFromModule && !!tab) {
-      setModuleActivity(activityFromModule)
-      setOpen(true)
-    } else if (moduleId && !!tab) {
-      window.location.href = `/#/participant/${participant?.id ?? participant}/module/${moduleId}`
-      localStorage.removeItem("moduleId")
+    else if (!!lastActiveTab) {
+      window.location.href = `/#/participant/${participant}/${lastActiveTab}`
+      localStorage.removeItem("lastActiveTab")
     } else if (tab === null || typeof tab === "undefined")
       window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) {
@@ -218,8 +495,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const showStreak = (participant, activity) => {
     setLoading(true)
     setVisualPopup(null)
-    setStreakActivity(tag?.streak ?? null)
-    if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+    // setStreakActivity(activityTag?.streak ?? null)
+    setStreakActivity({ ...activityTag?.streak, activity })
+    if (
+      !!activityTag?.streak?.streak ||
+      typeof activityTag?.streak === "undefined" ||
+      !!activityTag?.streak?.streakType ||
+      typeof activityTag?.streakType !== "undefined"
+    ) {
       getEvents(participant, activity.id).then((streak) => {
         setStreak(streak)
       })
@@ -229,20 +512,42 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
     }
   }
 
-  const showVisualPopup = (activity) => {
-    Service.getUserDataByKey("activitytags", [activity?.id], "id").then((tags) => {
-      const tag = tags[0]
-      if (
-        typeof tag?.visualSettings !== "undefined" &&
-        tag?.visualSettings != null &&
-        tag?.visualSettings?.image !== "" &&
-        !!tag?.visualSettings?.checked
-      ) {
-        setVisualPopup(tag?.visualSettings)
-      } else {
-        showStreak(participant, activity)
-      }
-    })
+  const showVisualPopup = (activity, data) => {
+    const isactivityGroupSubmit = localStorage.getItem("fromGroupSurvey") === "true"
+    if (!isactivityGroupSubmit) {
+      getImage(activity?.id, activity?.spec)
+        .then((tag) => {
+          if (
+            typeof tag?.visualSettings !== "undefined" &&
+            tag?.visualSettings != null &&
+            tag?.visualSettings?.image !== "" &&
+            !!tag?.visualSettings?.checked
+          ) {
+            setVisualPopup(tag?.visualSettings)
+          } else {
+            if (
+              !!tag?.streak?.streak ||
+              typeof tag?.streak !== "undefined" ||
+              !!tag?.streak?.streakType ||
+              typeof tag?.streakType !== "undefined"
+            ) {
+              if (!!data?.response?.data?.streak) {
+                setStreak(data?.response?.data?.streak)
+              } else {
+                returnResult()
+              }
+            } else {
+              returnResult()
+            }
+          }
+        })
+        .catch(() => {
+          // If attachment doesn't exist, just return result
+          returnResult()
+        })
+    } else {
+      returnResult()
+    }
   }
 
   return (
@@ -272,56 +577,63 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       {!response &&
         !loading &&
         (activity?.spec === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            onComplete={(data) => {
-              showStreak(participant, activity)
-            }}
-            noBack={false}
-            tab={tab}
-          />
+          <Suspense fallback={<div />}>
+            <GroupActivity
+              activity={activity}
+              participant={participant}
+              onComplete={(data) => {
+                if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+                  if (!!data?.response?.data?.streak) setStreak(data?.response?.data?.streak)
+                  else returnResult()
+                } else returnResult()
+              }}
+              noBack={false}
+              tab={tab}
+            />
+          </Suspense>
         ) : (
-          <EmbeddedActivity
-            name={activity?.name}
-            activity={activity}
-            participant={participant}
-            noBack={false}
-            tab={tab}
-            favoriteActivities={favoriteActivities}
-            onComplete={(data) => {
-              console.log(mode, data)
-              setStaticData(data?.static_data ?? {})
-              if (data === null) {
-                if (mode === null) window.location.href = "/#/"
-                else history.back()
-              } else if (data?.clickBack === true) {
-                if (!!data && !!data?.timestamp) {
-                  showVisualPopup(activity)
-                } else {
+          <Suspense fallback={<div />}>
+            <EmbeddedActivity
+              name={activity?.name}
+              activity={activity}
+              participant={participant}
+              noBack={false}
+              tab={tab}
+              onComplete={(data) => {
+                setStaticData(data?.static_data ?? {})
+                if (data === null) {
                   if (mode === null) window.location.href = "/#/"
                   else history.back()
+                } else if (data?.clickBack === true) {
+                  if (!!data && !!data?.timestamp) {
+                    showVisualPopup(activity, data)
+                  } else {
+                    if (mode === null) window.location.href = "/#/"
+                    else history.back()
+                  }
+                } else if (!!data && !!data?.timestamp) {
+                  showVisualPopup(activity, data)
                 }
-              } else if (!!data && !!data?.timestamp) {
-                showVisualPopup(activity)
-              }
-            }}
-          />
+              }}
+            />
+          </Suspense>
         ))}
-      <Streak
-        open={openComplete}
-        onClose={() => {
-          setOpenComplete(false)
-          returnResult()
-          setLoading(false)
-        }}
-        popupClose={() => {
-          setOpenComplete(false)
-          setLoading(true)
-        }}
-        streak={streak}
-        activity={streakActivity}
-      />
+      <Suspense fallback={<div />}>
+        <Streak
+          open={openComplete}
+          onClose={() => {
+            setOpenComplete(false)
+            returnResult()
+            setLoading(false)
+          }}
+          popupClose={() => {
+            setOpenComplete(false)
+            setLoading(true)
+          }}
+          streak={streak}
+          activity={{ ...activity, ...streakActivity?.activity }}
+        />
+      </Suspense>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -354,19 +666,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         data={staticData}
         showStreak={() => showStreak(participant, activity)}
       />
-      <ResponsiveDialog
-        open={!!open}
-        transient={module != "" ? true : false}
-        animate
-        fullScreen
-        onClose={() => {
-          setOpen(false)
-          setId(localStorage.getItem("SurveyId") ?? "")
-          localStorage.removeItem("activityFromModule")
-        }}
-      >
-        <ModuleActivity type="activity" moduleId={moduleActivity} participant={participant} />
-      </ResponsiveDialog>
     </div>
   )
 }

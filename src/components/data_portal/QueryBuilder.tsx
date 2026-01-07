@@ -15,20 +15,13 @@ import {
   Box,
   Tooltip,
   IconButton,
-  TextField,
 } from "@material-ui/core"
-import {
-  tagged_entities,
-  ajaxRequest,
-  formatGraphName,
-  tags_object,
-  generate_participant_tag_info,
-} from "./DataPortalShared"
+import { tagged_entities, ajaxRequest, formatGraphName, generate_participant_tag_info } from "./DataPortalShared"
 import { useTranslation } from "react-i18next"
-
 import { useDrop } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
+import { getBasicToken } from "../helper"
 
 const useStyles = makeStyles((theme) => ({
   loadingBackdrop: {
@@ -108,13 +101,12 @@ export default function QueryBuilder(props) {
   const [analyzeShared, setAnalyzeShared] = React.useState(
     !!(
       currentQuery.id_string &&
-      currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant"
+      currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase() !== "participant"
     )
   )
 
   const [participantTagInfo, setParticipantTagInfo] = React.useState({})
   const [sharedTagsUpdateList, setSharedTagsUpdateList] = React.useState([])
-
   const [availableSharedTags, setSharedTags] = React.useState([])
   const [sharedTagsLoading, setSharedTagsLoadingStatus] = React.useState(false)
   const [selectedSharedTags, setSelectedSharedTags] = React.useState([])
@@ -125,15 +117,15 @@ export default function QueryBuilder(props) {
   const [tagsLoading, setTagLoadingStatus] = React.useState(false)
   const [tagObject, setTagObject] = React.useState({})
   const [checkedCategories, setCheckedCategories] = React.useState([])
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+
   //when the list of available tags change,
   //we update a tag variable to display info
   React.useEffect(() => {
-    if (availableTags.length) {
+    if (availableTags?.length) {
       let tagObjectProcessor = {}
       availableTags.forEach(function (value) {
-        let name = value.slice(value.lastIndexOf(".") + 1)
-        let category = value.slice(0, value.lastIndexOf(".") + 1)
+        let name = value?.slice(value.lastIndexOf(".") + 1)
+        let category = value?.slice(0, value.lastIndexOf(".") + 1)
         if (!tagObjectProcessor[category]) tagObjectProcessor[category] = [[name.replace(/_/g, " "), value]]
         else tagObjectProcessor[category].push([name.replace(/_/g, " "), value])
       })
@@ -145,7 +137,7 @@ export default function QueryBuilder(props) {
     setAnalyzeShared(
       !!(
         currentQuery.id_string &&
-        currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant"
+        currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase() !== "participant"
       )
     )
   }, [currentQuery])
@@ -172,12 +164,12 @@ export default function QueryBuilder(props) {
     setLoadingStatuses(false)
     if (props.focusMe && typeof props.focusMe === "function") props.focusMe()
     props.setQueryResult("")
-    if (currentQuery.target.length !== 0) {
+    if (currentQuery.target?.length !== 0) {
       let testQuery = `$LAMP.Tag.list('${currentQuery.target}')`
       let tagSending = {
         method: "POST",
         url: `https://${props.token.server}/`,
-        headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+        headers: [["Authorization", getBasicToken()]],
         data: testQuery,
         callback: function (res) {
           setTags(JSON.parse(res))
@@ -186,14 +178,14 @@ export default function QueryBuilder(props) {
       }
       ajaxRequest(tagSending)
 
-      if (currentQuery.id_string[currentQuery.id_string.length - 2] !== "Participant") {
+      if (currentQuery.id_string[currentQuery.id_string?.length - 2] !== "Participant") {
         let sharedQuery = `($LAMP.Tag.get('${currentQuery.target}','lamp.dashboard.${currentQuery.id_string[
-          currentQuery.id_string.length - 2
+          currentQuery.id_string?.length - 2
         ].toLowerCase()}_tags'))`
         let sharedSending = {
           method: "POST",
           url: `https://${props.token.server}/`,
-          headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+          headers: [["Authorization", getBasicToken()]],
           data: sharedQuery,
           callback: function (res) {
             let tagList = JSON.parse(res)
@@ -212,11 +204,11 @@ export default function QueryBuilder(props) {
   const DisplayTags = (props) => {
     const { t } = useTranslation()
 
-    if (!props.tagObject || !Object.keys(props.tagObject).length) {
+    if (!props.tagObject || !Object.keys(props.tagObject)?.length) {
       return (
         <Typography>
           {`${t("No tags are available for this")}`}
-          {props.currentQuery.id_string[props.currentQuery.id_string.length - 2].toLowerCase()}
+          {props.currentQuery.id_string[props.currentQuery.id_string?.length - 2].toLowerCase()}
         </Typography>
       )
     }
@@ -230,7 +222,7 @@ export default function QueryBuilder(props) {
       let sending = {
         method: "POST",
         url: `https://${props.token.server}/`,
-        headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+        headers: [["Authorization", getBasicToken()]],
         data: tagQuery,
         callback: function (res) {
           props.setLoadingGraphs(false)
@@ -241,17 +233,17 @@ export default function QueryBuilder(props) {
     }
 
     function returnSortedTagObject(array) {
-      let res = array.slice()
-      res.sort((a, b) => formatGraphName(a[0]).localeCompare(formatGraphName(b[0])))
+      let res = array?.slice()
+      res?.sort((a, b) => formatGraphName(a[0]).localeCompare(formatGraphName(b[0])))
       return res
     }
     return (
       <Box className={classes.categoryBox}>
-        {Object.keys(props.tagObject).map((category) => (
+        {Object.keys(props.tagObject)?.map((category) => (
           <React.Fragment key={category}>
             <Typography>{category}</Typography>
             <Box className={classes.tagsBox}>
-              {returnSortedTagObject(props.tagObject[category]).map((array) => {
+              {returnSortedTagObject(props.tagObject[category])?.map((array) => {
                 //let's format the names
                 let printedName = formatGraphName(array[0])
                 return (
@@ -280,14 +272,14 @@ export default function QueryBuilder(props) {
     if (
       !props.availableSharedTags ||
       !Array.isArray(props.availableSharedTags) ||
-      props.availableSharedTags.length === 0
+      props.availableSharedTags?.length === 0
     ) {
       return (
         <Typography>
-          {`${t("There are no shared tags set for this")}`} {currentQuery.id_string[currentQuery.id_string.length - 2]}.
-          {`${t(" To display data on tags shared between participants, set")}`} "lamp.dashboard.
-          {currentQuery.id_string[currentQuery.id_string.length - 2].slice(0, 1).toLowerCase() +
-            currentQuery.id_string[currentQuery.id_string.length - 2].slice(1)}
+          {`${t("There are no shared tags set for this")}`} {currentQuery.id_string[currentQuery.id_string?.length - 2]}
+          .{`${t(" To display data on tags shared between participants, set")}`} "lamp.dashboard.
+          {currentQuery.id_string[currentQuery.id_string?.length - 2]?.slice(0, 1).toLowerCase() +
+            currentQuery.id_string[currentQuery.id_string?.length - 2]?.slice(1)}
           _tags"{" "}
           {`${t(
             "to an array of strings, where each string is a tag you would like to see. Please contact your study administrator for more info."
@@ -299,23 +291,23 @@ export default function QueryBuilder(props) {
     const addTag = (name) => {
       if (props.selectedSharedTags.indexOf(name) === -1) {
         props.setLoadingGraphs(true)
-        props.setSelectedSharedTags(props.selectedSharedTags.concat([name]))
+        props.setSelectedSharedTags(props.selectedSharedTags?.concat([name]))
       }
     }
     const removeTag = (name) => {
       let index = props.selectedSharedTags.indexOf(name)
       if (index !== -1) {
-        props.setSelectedSharedTags(props.selectedSharedTags.filter((elem) => elem !== name))
+        props.setSelectedSharedTags(props.selectedSharedTags?.filter((elem) => elem !== name))
       }
     }
 
     React.useEffect(() => {
-      if (props.selectedSharedTags.length === 0) {
+      if (props.selectedSharedTags?.length === 0) {
         props.setQueryResult("")
         return
       }
 
-      if (!Array.isArray(props.queryResult) && props.selectedSharedTags.length > 0) {
+      if (!Array.isArray(props.queryResult) && props.selectedSharedTags?.length > 0) {
         props.setQueryResult([])
       }
       //if we have an array already
@@ -326,39 +318,39 @@ export default function QueryBuilder(props) {
         //get the difference between our desired array
         //and our current array
         let currentTags, removingTags, addingTags
-        if (props.queryResult.length) currentTags = props.queryResult.map((elem) => elem["tag"])
+        if (props.queryResult?.length) currentTags = props.queryResult?.map((elem) => elem["tag"])
         else currentTags = []
 
-        if (currentTags.length)
-          removingTags = currentTags.reduce(
-            (acc, tag) => (props.selectedSharedTags.indexOf(tag) === -1 ? acc.concat(tag) : acc),
+        if (currentTags?.length)
+          removingTags = currentTags?.reduce(
+            (acc, tag) => (props.selectedSharedTags.indexOf(tag) === -1 ? acc?.concat(tag) : acc),
             []
           )
         else removingTags = []
 
-        if (currentTags.length)
-          addingTags = props.selectedSharedTags.reduce(
-            (acc, tag) => (currentTags.indexOf(tag) === -1 ? acc.concat(tag) : acc),
+        if (currentTags?.length)
+          addingTags = props.selectedSharedTags?.reduce(
+            (acc, tag) => (currentTags.indexOf(tag) === -1 ? acc?.concat(tag) : acc),
             []
           )
         else addingTags = props.selectedSharedTags
 
-        if (removingTags.length) {
+        if (removingTags?.length) {
           removingTags.forEach((targetTag) => {
-            props.setQueryResult(props.queryResult.filter((obj) => obj["tag"] !== targetTag))
+            props.setQueryResult(props.queryResult?.filter((obj) => obj["tag"] !== targetTag))
           })
         }
 
-        if (addingTags.length) {
+        if (addingTags?.length) {
           //if the tag is not in our array of results
           //we query the db and find values for the tags
           let tagQuery
 
           //if study
           //TODO: find a more elegant way to do determine study vs researcher. probably w/ parent?
-          if (currentQuery.id_string[currentQuery.id_string.length - 2] === "Study") {
+          if (currentQuery.id_string[currentQuery.id_string?.length - 2] === "Study") {
             tagQuery = `(
-								$res := $LAMP.Participant.list('${props.currentQuery.id_string[props.currentQuery.id_string.length - 1]}').id;
+								$res := $LAMP.Participant.list('${props.currentQuery.id_string[props.currentQuery.id_string?.length - 1]}').id;
 								$tagList := ${JSON.stringify(addingTags)};
 								$array := $map($tagList,function($targetTag){
 																	$map($res, function($id){{'result': $LAMP.Tag.get($id,$targetTag),
@@ -369,7 +361,7 @@ export default function QueryBuilder(props) {
           } else {
             //if researcher
             tagQuery = `(
-								$studies := $LAMP.Study.list('${props.currentQuery.id_string[props.currentQuery.id_string.length - 1]}').id;
+								$studies := $LAMP.Study.list('${props.currentQuery.id_string[props.currentQuery.id_string?.length - 1]}').id;
 								$res := $map($studies, function($i){$LAMP.Participant.list($i)}).id;
 								$tagList := ${JSON.stringify(addingTags)};
 								$final := $map($tagList,function($targetTag){
@@ -384,7 +376,7 @@ export default function QueryBuilder(props) {
           let sending = {
             method: "POST",
             url: `https://${props.token.server}/`,
-            headers: [["Authorization", `Bearer ${userToken.accessToken}`]],
+            headers: [["Authorization", getBasicToken()]],
             data: tagQuery,
             callback: function (res) {
               //as we are no longer loading data, we set this to false
@@ -398,8 +390,8 @@ export default function QueryBuilder(props) {
 
               // if we queried multiple things, jsonata returns an array of arrays
               // we reduce this here
-              if (tagsToAdd.length && Array.isArray(tagsToAdd[0]))
-                tagsToAdd = tagsToAdd.reduce((acc, tagList) => acc.concat(tagList), [])
+              if (tagsToAdd?.length && Array.isArray(tagsToAdd[0]))
+                tagsToAdd = tagsToAdd?.reduce((acc, tagList) => acc?.concat(tagList), [])
               if (!Array.isArray(props.queryResult)) {
                 props.setQueryResult(tagsToAdd)
               } else {
@@ -419,15 +411,15 @@ export default function QueryBuilder(props) {
     }
 
     const checkAllTags = () => {
-      if (selectedSharedTags.length < props.availableSharedTags.length) {
+      if (selectedSharedTags?.length < props.availableSharedTags?.length) {
         props.setLoadingGraphs(true)
         props.setSelectedSharedTags(props.availableSharedTags)
       }
     }
 
     function returnSortedTags(array) {
-      let res = array.slice()
-      res.sort((a, b) => formatGraphName(a).localeCompare(formatGraphName(b)))
+      let res = array?.slice()
+      res?.sort((a, b) => formatGraphName(a).localeCompare(formatGraphName(b)))
       return res
     }
 
@@ -437,7 +429,7 @@ export default function QueryBuilder(props) {
         <Button onClick={uncheckAllTags}>{`${t("Deselect all shared tags")}`}</Button>
         <br />
         <Box className={classes.tagsBox}>
-          {returnSortedTags(props.availableSharedTags).map((name) => {
+          {returnSortedTags(props.availableSharedTags)?.map((name) => {
             //let's format the names
             let printedName = formatGraphName(name)
             return (
@@ -473,11 +465,11 @@ export default function QueryBuilder(props) {
       style={{ position: "relative", border: isOver ? "1 px solid green" : "white" }}
     >
       <Backdrop className={classes.loadingBackdrop} open={tagsLoading || sharedTagsLoading || props.loadingGraphs} />
-      {currentQuery.target.length > 0 ? (
+      {currentQuery.target?.length > 0 ? (
         <Card variant="outlined" style={{ margin: "0% 5%" }}>
           <CardHeader
             title={`${
-              currentQuery.id_string.length > 1 ? `${currentQuery.id_string[currentQuery.id_string.length - 2]}:` : ""
+              currentQuery.id_string?.length > 1 ? `${currentQuery.id_string[currentQuery.id_string?.length - 2]}:` : ""
             }
               ${currentQuery.name ? `${currentQuery.name} - (ID:${currentQuery.target})` : currentQuery.target}`}
             classes={{ title: classes.cardHeader }}
@@ -495,7 +487,7 @@ export default function QueryBuilder(props) {
                     setParticipantTagInfo({})
                     setSharedTagsUpdateList(Array.isArray(availableSharedTags) ? availableSharedTags : [])
                     setParticipantTagInfo(
-                      await generate_participant_tag_info(currentQuery.id_string[currentQuery.id_string.length - 1])
+                      await generate_participant_tag_info(currentQuery.id_string[currentQuery.id_string?.length - 1])
                     )
                   }}
                   handleResult={async () => {
@@ -510,7 +502,7 @@ export default function QueryBuilder(props) {
                         {`${t("All Participant Tags")}`}
                         <br />
                         {`${t("This is a list of all tags present on at least one participant in this")}`}
-                        {" " + currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase()}. <br />
+                        {" " + currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase()}. <br />
                         {`${t(
                           "Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then press the 'Set Tags' button."
                         )}`}
@@ -532,14 +524,14 @@ export default function QueryBuilder(props) {
                         </Button>
                       </Box>
                       <Box className={classes.tagsBox}>
-                        {Object.keys(participantTagInfo).length
+                        {Object.keys(participantTagInfo)?.length
                           ? Object.keys(participantTagInfo)
-                              .sort((a, b) => a.localeCompare(b))
-                              .map((tag) => {
+                              ?.sort((a, b) => a.localeCompare(b))
+                              ?.map((tag) => {
                                 return (
                                   <Tooltip
                                     key={tag}
-                                    title={`${participantTagInfo[tag].length} ${t("participants have this tag")}`}
+                                    title={`${participantTagInfo[tag]?.length} ${t("participants have this tag")}`}
                                   >
                                     <Card className={classes.tagCard}>
                                       <CardHeader
@@ -547,9 +539,11 @@ export default function QueryBuilder(props) {
                                           //toggle the clicked tag in the pending update list
                                           let index = sharedTagsUpdateList.indexOf(tag)
                                           if (index !== -1) {
-                                            setSharedTagsUpdateList(sharedTagsUpdateList.filter((elem) => elem !== tag))
+                                            setSharedTagsUpdateList(
+                                              sharedTagsUpdateList?.filter((elem) => elem !== tag)
+                                            )
                                           } else {
-                                            setSharedTagsUpdateList(sharedTagsUpdateList.concat([tag]))
+                                            setSharedTagsUpdateList(sharedTagsUpdateList?.concat([tag]))
                                           }
                                         }}
                                         classes={{ title: classes.tagCardHeader }}
@@ -574,7 +568,7 @@ export default function QueryBuilder(props) {
               )
             }
           />
-          {currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant" && (
+          {currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase() !== "participant" && (
             <FormGroup>
               <FormControlLabel
                 control={
@@ -583,16 +577,16 @@ export default function QueryBuilder(props) {
                 label={
                   analyzeShared
                     ? `${t("Analyze Participant Data")}`
-                    : `${t("Analyze")} ${currentQuery.id_string[currentQuery.id_string.length - 2]} ${t("Data")}`
+                    : `${t("Analyze")} ${currentQuery.id_string[currentQuery.id_string?.length - 2]} ${t("Data")}`
                 }
               />
             </FormGroup>
           )}
 
           {!sharedTagsLoading &&
-            tagged_entities.includes(currentQuery.id_string[currentQuery.id_string.length - 2]) &&
+            tagged_entities.includes(currentQuery.id_string[currentQuery.id_string?.length - 2]) &&
             analyzeShared &&
-            currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant" && (
+            currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase() !== "participant" && (
               <DisplaySharedData
                 style={{ flex: "1", minWidth: "80%" }}
                 currentQuery={currentQuery}
@@ -606,9 +600,9 @@ export default function QueryBuilder(props) {
               />
             )}
           {!tagsLoading &&
-            tagged_entities.includes(currentQuery.id_string[currentQuery.id_string.length - 2]) &&
+            tagged_entities.includes(currentQuery.id_string[currentQuery.id_string?.length - 2]) &&
             (!analyzeShared ||
-              currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() === "participant") && (
+              currentQuery.id_string[currentQuery.id_string?.length - 2].toLowerCase() === "participant") && (
               <DisplayTags
                 style={{ flex: "1", minWidth: "80%" }}
                 currentQuery={currentQuery}

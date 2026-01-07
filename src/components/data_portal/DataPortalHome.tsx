@@ -21,6 +21,7 @@ import Editor from "./Editor"
 import jsonata from "jsonata"
 import { useDrop } from "react-dnd"
 import { useTranslation } from "react-i18next"
+import { getBasicToken } from "../helper"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -28,12 +29,8 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const [query, setQuery] = React.useState("")
   const [result, setResult] = React.useState("")
   const [focusBuilder, toggleFocus] = React.useState(false)
-
-  const [treeCollapsed, setTreeCollapsed] = React.useState(false)
-
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
   const { t } = useTranslation()
-
   const [isGUIEditor, toggleEditorStyle] = useLocalStorage("_editor_style", true)
   const [GUIQuery, setGUIQuery] = React.useState({
     target: "",
@@ -48,7 +45,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
       let res = await fetch(`https://${token.server}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${userToken.accessToken}`,
+          Authorization: getBasicToken(),
         },
         credentials: "include",
         body: query,

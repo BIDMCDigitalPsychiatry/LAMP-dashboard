@@ -36,9 +36,11 @@ export default function UpdateActivity({
 
   useEffect(() => {
     if (!!profile) {
-      LAMP.Participant.allByStudy(activity.study_id).then((result) => {
-        setParticipantCount(result.length)
-      })
+      if (activity?.studyId) {
+        LAMP.Participant.allByStudy(activity.studyId).then((result) => {
+          setParticipantCount(result?.length)
+        })
+      }
     }
   }, [])
 

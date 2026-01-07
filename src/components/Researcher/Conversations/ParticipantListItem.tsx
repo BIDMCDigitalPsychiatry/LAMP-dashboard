@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Fab, Icon, Typography, Box, makeStyles, Theme, createStyles, Badge } from "@material-ui/core"
 // Local Imports
 import { sensorEventUpdate } from "../../BottomMenu"
-import { Service } from "../../DBService/DBService"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "../../useInterval"
@@ -116,8 +115,8 @@ export default function ParticipantListItem({
   )
 
   useEffect(() => {
-    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      setName(data[0]?.name ?? participant.id ?? "")
+    LAMP.Participant.view(participant?.id).then((data: any) => {
+      setName(data?.userName ?? participant?.id ?? "")
     })
     refresh()
   }, [participant])
@@ -130,7 +129,7 @@ export default function ParticipantListItem({
     if (sensorData === null) {
       ;(async () => {
         let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
-        data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+        data = Array.isArray(data) ? (data || [])?.filter((d) => d.data.page === "conversations") : null
         setSensorData(!!data ? data[0] : [])
       })()
     }
@@ -141,14 +140,14 @@ export default function ParticipantListItem({
       Object.fromEntries(
         (
           await Promise.all(
-            [participant.id || ""].map(async (x) => [
+            [participant.id || ""]?.map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
           )
         )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
+          ?.filter((x: any) => x[1].message !== "404.object-not-found")
+          ?.map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -161,7 +160,7 @@ export default function ParticipantListItem({
     let x = (conversations || {})[participant.id || ""] || []
     return !Array.isArray(x)
       ? 0
-      : x.filter((a) => a.from === "participant" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
+      : x?.filter((a) => a.from === "participant" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0))?.length
   }
 
   const updateAnalytics = async () => {
@@ -178,7 +177,7 @@ export default function ParticipantListItem({
     setMsgCount(0)
     await sensorEventUpdate("conversations", researcherId, null)
     let data = await LAMP.SensorEvent.allByResearcher(researcherId, "lamp.analytics")
-    data = (data || []).filter((d) => d.data.page === "conversations")
+    data = (data || [])?.filter((d) => d.data.page === "conversations")
     setSensorData(data ? data[0] : [])
   }
 

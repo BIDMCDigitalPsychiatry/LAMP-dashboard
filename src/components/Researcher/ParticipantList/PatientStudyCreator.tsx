@@ -95,8 +95,8 @@ export default function PatientStudyCreator({
   useEffect(() => {
     let duplicateCount = 0
     if (!(typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === ""))) {
-      duplicateCount = studies.filter((study) => study.name?.trim().toLowerCase() === studyName?.trim().toLowerCase())
-        .length
+      duplicateCount = studies?.filter((study) => study.name?.trim().toLowerCase() === studyName?.trim().toLowerCase())
+        ?.length
     }
     setDuplicateCnt(duplicateCount)
   }, [studyName])
@@ -140,7 +140,7 @@ export default function PatientStudyCreator({
           if (duplicateStudyName) {
             Service.getDataByKey("activities", [duplicateStudyName], "study_id").then((activityData) => {
               let newActivities = activityData
-              newActivities.map((activity) => {
+              newActivities?.map((activity) => {
                 ;(async () => {
                   activity.studyID = studyId
                   let result = await updateActivityData(activity, true, null)
@@ -156,7 +156,7 @@ export default function PatientStudyCreator({
             })
             Service.getDataByKey("sensors", [duplicateStudyName], "study_id").then((SensorData) => {
               let newSensors = SensorData
-              newSensors.map((sensor) => {
+              newSensors?.map((sensor) => {
                 ;(async () => {
                   sensor.studyID = studyId
                   await LAMP.Sensor.create(studyId, sensor).then((res) => {
@@ -222,19 +222,19 @@ export default function PatientStudyCreator({
             id: studyData.data,
             name: studyName,
             participant_count: 0,
-            activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
-            sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
+            activity_count: studyAllData?.length > 0 ? studyAllData[0].activity_count : 0,
+            sensor_count: studyAllData?.length > 0 ? studyAllData[0].sensor_count : 0,
           }
           Service.addData("studies", [newStudyData])
           fetchResult(authId, "activity" + newUriStudyID, "researcher").then((result) => {
-            let filteredActivities = (result?.activities || []).filter(
+            let filteredActivities = (result?.activities || [])?.filter(
               (eachActivities) => eachActivities.study_id === newStudyId
             )
             saveStudyData(filteredActivities, "activities")
           })
 
           fetchResult(authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
-            let filteredSensors = (resultData?.sensors || []).filter((eachSensors) => {
+            let filteredSensors = (resultData?.sensors || [])?.filter((eachSensors) => {
               return eachSensors.study_id === newStudyId
             })
             saveStudyData(filteredSensors, "sensors")
@@ -242,11 +242,11 @@ export default function PatientStudyCreator({
           let updatedNewStudy = newStudyData
           if (createPatient) {
             fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
-              if (results.studies[0].participants.length > 0) {
-                let filteredParticipants = results.studies[0].participants.filter(
+              if (results.studies[0].participants?.length > 0) {
+                let filteredParticipants = results.studies[0].participants?.filter(
                   (eachParticipant) => eachParticipant.study_id === newStudyId
                 )
-                if (filteredParticipants.length > 0) {
+                if (filteredParticipants?.length > 0) {
                   filteredParticipants[0].name = studyName
                   saveStudyData(filteredParticipants, "participants").then((d) => {
                     updateStudyLocalStorage(authId, studyName)
@@ -271,11 +271,11 @@ export default function PatientStudyCreator({
         }
         if (createPatient) {
           fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
-            if (results.studies[0].participants.length > 0) {
-              let filteredParticipants = results.studies[0].participants.filter(
+            if (results.studies[0].participants?.length > 0) {
+              let filteredParticipants = results.studies[0].participants?.filter(
                 (eachParticipant) => eachParticipant.study_id === newStudyId
               )
-              if (filteredParticipants.length > 0) {
+              if (filteredParticipants?.length > 0) {
                 filteredParticipants[0].name = studyName
                 saveStudyData(filteredParticipants, "participants").then((d) => {
                   updateStudyLocalStorage(authId, studyName)
@@ -375,7 +375,7 @@ export default function PatientStudyCreator({
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {(studies || []).map((study) => (
+              {(studies || [])?.map((study) => (
                 <MenuItem key={study.id} value={study.id}>
                   {study.name}
                 </MenuItem>

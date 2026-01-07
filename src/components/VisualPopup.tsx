@@ -74,6 +74,7 @@ export default function VisualPopup({
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const normalizedScore = Number.isFinite(Number(data?.score)) ? Number(data?.score) : 0
 
   return (
     <Dialog
@@ -99,7 +100,7 @@ export default function VisualPopup({
         </Box>
         {!!data?.score && (
           <Grid container direction="row" justifyContent="space-between" alignItems="center">
-            <span className={classes.score}>{`Score: ${data?.score}`}</span>
+            <span className={classes.score}>{`Score: ${normalizedScore}`}</span>
             <span className={classes.maxscore}>{`Maximum score: ${data?.max_score ?? 100}`}</span>
           </Grid>
         )}

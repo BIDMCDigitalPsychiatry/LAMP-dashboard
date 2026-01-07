@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react"
+import React, { lazy, Suspense, useEffect, useState } from "react"
 import { Backdrop, CircularProgress, AppBar, Toolbar, Icon, Box, Divider, Typography, Link } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import GroupCreator from "./GroupCreator"
-import Tips from "./Tips"
-import GameCreator from "./GameCreator"
 import {
   saveTipActivity,
   saveSurveyActivity,
   saveCTestActivity,
-  addActivity,
   spliceActivity,
   updateActivityData,
+  addActivity,
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
-import { Service } from "../../DBService/DBService"
 import { SchemaList } from "./ActivityMethods"
-
+import { Service } from "../../DBService/DBService"
+import { getActivityWithDeduplication, lazyRetry } from "../../../helper/functions"
+const GroupCreator = lazy(lazyRetry(() => import("./GroupCreator")))
+const Tips = lazy(lazyRetry(() => import("./Tips")))
+const GameCreator = lazy(lazyRetry(() => import("./GameCreator")))
 export const games = [
   "lamp.jewels_a",
   "lamp.jewels_b",
@@ -70,10 +70,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export const addHideSubactivities = async (settings, id) => {
-  let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")].map((y: any) =>
+  let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.hide_activities")]?.map((y: any) =>
     !!y?.error ? undefined : y?.data
   )[0]
-  let hidden = (tag || []).filter((t) => t.moduleId !== id)
+  let hidden = (tag || [])?.filter((t) => t.moduleId !== id)
   if (!!settings.hide_sub_activities) {
     hidden.push({ moduleId: id, activities: settings?.activities })
     await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.hide_activities", hidden)
@@ -83,8 +83,8 @@ export const addHideSubactivities = async (settings, id) => {
 }
 
 const toBinary = (string) => {
-  const codeUnits = new Uint16Array(string.length)
-  for (let i = 0; i < codeUnits.length; i++) {
+  const codeUnits = new Uint16Array(string?.length)
+  for (let i = 0; i < codeUnits?.length; i++) {
     codeUnits[i] = string.charCodeAt(i)
   }
 }
@@ -110,9 +110,96 @@ export default function Activity({
   const { t } = useTranslation()
   const classes = useStyles()
 
-  useEffect(() => {
-    setLoading(true)
-    Service.getAll("studies").then((studies) => {
+  const getAllStudies = async () => {
+    await LAMP.Study.allByResearcher(researcherId).then((studies) => {
+      setStudies(studies)
+    })
+  }
+
+  const getAllActivities = async () => {
+    if (!!id) {
+      await getActivityWithDeduplication(id).then(async (data: any) => {
+        setActivity({
+          ...data,
+          study_id: data.studyId,
+        })
+        // Only fetch activities if studyId is valid
+        if (data.studyId) {
+          const batchSize = 50
+
+          // 1. Fetch first batch (50 items) to show initial data quickly
+          const firstBatchResponse: any = await (LAMP.Activity.allByStudy as any)(
+            data.studyId,
+            undefined,
+            false,
+            batchSize,
+            0
+          )
+          // Normalize first batch response
+          let firstBatchData: any[] = []
+          let total = 0
+
+          if (Array.isArray(firstBatchResponse)) {
+            firstBatchData = firstBatchResponse
+            total = firstBatchResponse?.length
+          } else if (firstBatchResponse && typeof firstBatchResponse === "object" && "data" in firstBatchResponse) {
+            firstBatchData = firstBatchResponse.data || []
+            total = firstBatchResponse.total || firstBatchData?.length
+          }
+
+          // Map and set first batch immediately
+          const mappedFirstBatch = firstBatchData?.map((activity: any) => ({
+            ...activity,
+            study_id: activity.studyId || data.studyId,
+          }))
+          setAllActivities(mappedFirstBatch)
+
+          // If there are more batches, fetch and append them
+          if (total > batchSize) {
+            const totalBatches = Math.ceil(total / batchSize)
+
+            // Fetch remaining batches in parallel
+            const remainingBatchPromises = Array.from({ length: totalBatches - 1 }, (_, i) =>
+              (LAMP.Activity.allByStudy as any)(data.studyId, undefined, false, batchSize, (i + 1) * batchSize)
+            )
+
+            const remainingResults: any[] = await Promise.all(remainingBatchPromises)
+
+            // Normalize and merge remaining batches
+            const allRemainingBatches: any[] = []
+            remainingResults.forEach((result) => {
+              if (Array.isArray(result)) {
+                allRemainingBatches.push(...result)
+              } else if (result && typeof result === "object" && "data" in result) {
+                allRemainingBatches.push(...(result.data || []))
+              }
+            })
+
+            // Map remaining batches
+            const mappedRemaining = allRemainingBatches?.map((activity: any) => ({
+              ...activity,
+              study_id: activity.studyId || data.studyId,
+            }))
+
+            // Dedupe and append to existing activities
+            const existingIds = new Set(mappedFirstBatch?.map((a: any) => a.id))
+            const newActivities = mappedRemaining?.filter((a: any) => !existingIds.has(a.id))
+
+            // Append batch-wise results
+            setAllActivities((prev: any[]) => [...(prev || []), ...newActivities])
+          }
+        } else {
+          setAllActivities([])
+        }
+      })
+    } else {
+      setAllActivities([])
+      setLoading(false)
+    }
+  }
+
+  const initializeActivitiesForDemo = async () => {
+    Service.getAll("studies").then((studies: any[]) => {
       setStudies(studies)
       Service.getAll("activities").then((activities) => {
         setAllActivities(activities)
@@ -123,6 +210,16 @@ export default function Activity({
         } else setLoading(false)
       })
     })
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") initializeActivitiesForDemo()
+    else {
+      getAllStudies()
+
+      getAllActivities()
+    }
   }, [])
 
   useEffect(() => {
@@ -138,7 +235,7 @@ export default function Activity({
           setSubActivities(activity.settings?.activities)
         }
         if (activity.spec === "lamp.survey") {
-          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")]?.map((y: any) =>
             !!y?.error ? undefined : y?.data
           )[0]
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
@@ -148,11 +245,11 @@ export default function Activity({
           activity.settings = activity?.settings?.reduce((ds, d) => {
             let newD = d
             if (d.image === "") {
-              newD = Object.assign({}, d, { image: defaultBase64 })
+              newD = Object?.assign({}, d, { image: defaultBase64 })
             }
-            return ds.concat(newD)
+            return ds?.concat(newD)
           }, [])
-          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")]?.map((y: any) =>
             !!y?.error ? undefined : y?.data
           )[0]
           setActivity(activity)
@@ -161,7 +258,7 @@ export default function Activity({
           if (activity.spec === "lamp.breathe" && activity.settings?.audio === null) {
             delete activity.settings?.audio
           }
-          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")]?.map((y: any) =>
             !!y?.error ? undefined : y?.data
           )[0]
           setDetails(tag ?? [])
@@ -186,7 +283,7 @@ export default function Activity({
       })
     } else {
       x["id"] = newItem["data"]
-      updateDb(x)
+      if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") updateDb(x)
       if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"])
       setLoading(false)
       enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
@@ -198,10 +295,10 @@ export default function Activity({
 
   const checkAndSetCompleted = async (settings, id) => {
     if (subActivities != settings.activities) {
-      let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")].map((y: any) =>
+      let tag = [await LAMP.Type.getAttachment(null, "lamp.dashboard.completed")]?.map((y: any) =>
         !!y?.error ? undefined : y?.data
       )[0]
-      let newSet = (tag || []).filter((t) => t.moduleId !== id)
+      let newSet = (tag || [])?.filter((t) => t.moduleId !== id)
       await LAMP.Type.setAttachment(null, "me", "lamp.dashboard.completed", newSet)
     }
   }
@@ -224,7 +321,7 @@ export default function Activity({
         x["id"] = result.data
         if (x.spec === "lamp.module" || x.spec === "lamp.group") addHideSubactivities(x.settings, x["id"])
 
-        addActivity(x, studies)
+        if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") addActivity(x, studies)
         enqueueSnackbar(`${t("Successfully duplicated the Activity under a new name.")}`, {
           variant: "success",
         })
@@ -234,7 +331,7 @@ export default function Activity({
         if (x.spec === "lamp.module") checkAndSetCompleted(x.settings, x.id)
 
         x["study_id"] = x.studyID
-        x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+        x["study_name"] = studies?.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]
         Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
         enqueueSnackbar(`${t("Successfully updated the Activity.")}`, {
@@ -273,41 +370,49 @@ export default function Activity({
           {(!!type && (type === "group" || type === "module")) ||
           activity?.spec === "lamp.group" ||
           activity?.spec === "lamp.module" ? (
-            <GroupCreator
-              activities={allActivities}
-              value={activity ?? null}
-              onSave={!!type ? saveActivity : updateActivity}
-              studies={studies}
-              study={activity?.study_id ?? null}
-              details={details ?? null}
-              type={activity?.spec ?? "lamp." + type}
-              id={id}
-            />
+            <Suspense fallback={<div />}>
+              <GroupCreator
+                activities={allActivities}
+                value={activity ?? null}
+                onSave={!!type ? saveActivity : updateActivity}
+                studies={studies}
+                study={activity?.study_id ?? null}
+                details={details ?? null}
+                type={activity?.spec ?? "lamp." + type}
+                id={id}
+                setAllActivities={setAllActivities}
+              />
+            </Suspense>
           ) : (!!type && type === "tips") || activity?.spec === "lamp.tips" ? (
-            <Tips
-              value={activity}
-              details={details ?? null}
-              onSave={activity && activity?.id ? updateActivity : saveActivity}
-              studies={studies}
-              allActivities={allActivities}
-              study={activity?.study_id ?? null}
-            />
+            <Suspense fallback={<div />}>
+              <Tips
+                value={activity}
+                details={details ?? null}
+                onSave={activity && activity?.id ? updateActivity : saveActivity}
+                studies={studies}
+                allActivities={allActivities}
+                study={activity?.study_id ?? null}
+              />
+            </Suspense>
           ) : (
-            <GameCreator
-              activities={allActivities}
-              value={activity ?? null}
-              details={details ?? null}
-              onSave={!!type ? saveActivity : updateActivity}
-              studies={studies}
-              activitySpecId={
-                !!type
-                  ? Object.keys(SchemaList()).includes("lamp." + type)
-                    ? "lamp." + type
-                    : type
-                  : activity.spec ?? activity.spec
-              }
-              study={activity?.study_id ?? null}
-            />
+            <Suspense fallback={<div />}>
+              <GameCreator
+                activities={allActivities}
+                value={activity ?? null}
+                details={details ?? null}
+                onSave={!!type ? saveActivity : updateActivity}
+                studies={studies}
+                activitySpecId={
+                  !!type
+                    ? Object.keys(SchemaList()).includes("lamp." + type)
+                      ? "lamp." + type
+                      : type
+                    : activity.spec ?? activity.spec
+                }
+                study={activity?.study_id ?? null}
+                setAllActivities={setAllActivities}
+              />
+            </Suspense>
           )}
         </Box>
       )}

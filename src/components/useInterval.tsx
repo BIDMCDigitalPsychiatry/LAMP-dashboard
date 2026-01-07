@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 export default function useInterval(callback, delay, now) {
   const savedCallback = useRef<any>()
   useEffect(() => {

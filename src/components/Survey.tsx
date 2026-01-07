@@ -49,36 +49,41 @@ export default function Survey({ participant, activities, showStreak, ...props }
 
   useEffect(() => {
     setLoading(true)
-    let gActivities = (activities || []).filter(
-      (x) =>
-        ((games.includes(x.spec) ||
-          x.spec === "lamp.group" ||
-          x.spec === "lamp.dbt_diary_card" ||
-          x.spec === "lamp.recording" ||
-          x.spec === "lamp.survey") &&
-          (typeof x?.category === "undefined" || x?.category === null)) ||
-        (!!x?.category && x?.category.includes("assess"))
-    )
-    setSavedActivities(gActivities)
-    if (gActivities.length > 0) {
-      Service.getAllTags("activitytags").then((data) => {
-        setTag(
-          (data || []).filter(
-            (x) =>
-              ((games.includes(x.spec) ||
-                x.spec === "lamp.group" ||
-                x.spec === "lamp.dbt_diary_card" ||
-                x.spec === "lamp.recording" ||
-                x.spec === "lamp.survey") &&
-                (typeof x?.category === "undefined" || x?.category === null)) ||
-              (!!x?.category && x?.category.includes("assess"))
+    const refreshTags = () => {
+      let gActivities = (activities || [])?.filter(
+        (x) =>
+          ((games.includes(x.spec) ||
+            x.spec === "lamp.group" ||
+            x.spec === "lamp.dbt_diary_card" ||
+            x.spec === "lamp.recording" ||
+            x.spec === "lamp.survey") &&
+            (typeof x?.category === "undefined" || x?.category === null)) ||
+          (!!x?.category && x?.category.includes("assess"))
+      )
+      setSavedActivities(gActivities)
+      if (gActivities?.length > 0) {
+        Service.getAllTags("activitytags").then((data) => {
+          setTag(
+            (data || [])?.filter(
+              (x) =>
+                ((games.includes(x.spec) ||
+                  x.spec === "lamp.group" ||
+                  x.spec === "lamp.dbt_diary_card" ||
+                  x.spec === "lamp.recording" ||
+                  x.spec === "lamp.survey") &&
+                  (typeof x?.category === "undefined" || x?.category === null)) ||
+                (!!x?.category && x?.category.includes("assess"))
+            )
           )
-        )
+          setLoading(false)
+        })
+      } else {
         setLoading(false)
-      })
-    } else {
-      setLoading(false)
+      }
     }
+    refreshTags()
+    window.addEventListener("activityTagsUpdated", refreshTags)
+    return () => window.removeEventListener("activityTagsUpdated", refreshTags)
   }, [])
 
   return (

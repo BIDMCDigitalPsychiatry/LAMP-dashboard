@@ -193,20 +193,20 @@ async function getActivityEvents(
     ? await getSelfHelpAllActivityEvents(from, to)
     : await LAMP.ActivityEvent.allByParticipant(participant.id, null, from, to, null, true)
   )
-    .map((x) => ({
+    ?.map((x) => ({
       ...x,
       activity: _activities.find((y) => x.activity === y.id),
     }))
-    .filter((x) => (!!x.activity ? !_hidden?.includes(`${x.timestamp}/${x.activity.id}`) : true))
-    .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
-    .map((x) => ({
+    ?.filter((x) => (!!x.activity ? !_hidden?.includes(`${x.timestamp}/${x.activity.id}`) : true))
+    ?.sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
+    ?.map((x) => ({
       ...x,
       activity: (x.activity || { name: "" }).name || x.static_data?.survey_name,
     }))
-    .groupBy("activity") as any
+    ?.groupBy("activity") as any
   let customEvents = _activities
-    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
-    .map((x) =>
+    ?.filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
+    ?.map((x) =>
       x?.settings?.map((y, idx) =>
         original?.[y.activity]
           ?.map((z) => ({
@@ -216,15 +216,15 @@ async function getActivityEvents(
             activity: x.name,
             slices: z.temporal_slices.find((a) => a.item === y.question),
           }))
-          .filter((y) => y.slices !== undefined)
+          ?.filter((y) => y.slices !== undefined)
       )
     )
-    .filter((x) => x !== undefined)
-    .flat(2)
-    .groupBy("activity")
-  let customGroups = Object.entries(customEvents).map(([k, x]) => [
+    ?.filter((x) => x !== undefined)
+    ?.flat(2)
+    ?.groupBy("activity")
+  let customGroups = Object.entries(customEvents)?.map(([k, x]) => [
     k,
-    Object.values(x.groupBy("timestamp")).map((z: any) => ({
+    Object.values(x?.groupBy("timestamp"))?.map((z: any) => ({
       timestamp: z?.[0].timestamp,
       duration: z?.[0].duration,
       activity: z?.[0].activity,
@@ -233,21 +233,21 @@ async function getActivityEvents(
         z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
           length:
             z
-              .map((a) => a.idx)
-              .sort()
-              .slice(-1)[0] + 1,
+              ?.map((a) => a.idx)
+              ?.sort()
+              ?.slice(-1)[0] + 1,
         })
-      ).map((a) => (a === undefined ? {} : a)),
+      )?.map((a) => (a === undefined ? {} : a)),
     })),
   ])
   return Object.fromEntries([...Object.entries(original), ...customGroups])
 }
 
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
-  return Object.assign(
+  return Object?.assign(
     {},
-    ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
-      [k]: v.length,
+    ...Object.entries(activity_events || {})?.map(([k, v]: [string, any[]]) => ({
+      [k]: v?.length,
     }))
   )
 }
@@ -272,11 +272,11 @@ async function getSelected(participant: ParticipantObj, type) {
     Object.fromEntries(
       (
         await Promise.all(
-          [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
+          [participant.id || ""]?.map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
         )
       )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
+        ?.filter((x: any) => x[1].message !== "404.object-not-found")
+        ?.map((x: any) => [x[0], x[1].data])
     )[participant.id || ""] ?? []
   )
 }
@@ -333,11 +333,11 @@ export default function Prevent({
   const [endDate, setEndDate] = React.useState<number>(endTime)
 
   const setTabActivities = () => {
-    let gActivities = allActivities.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
+    let gActivities = allActivities?.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
     setSavedActivities(gActivities)
-    if (gActivities.length > 0) {
+    if (gActivities?.length > 0) {
       Service.getAllTags("activitytags").then((data) => {
-        setTag((data || []).filter((x: any) => !!x?.category && x?.category.includes("prevent")))
+        setTag((data || [])?.filter((x: any) => !!x?.category && x?.category.includes("prevent")))
       })
     }
     setLoading(false)
@@ -385,10 +385,10 @@ export default function Prevent({
     getVisualizations(participant).then((data) => {
       setVisualizations(data)
       let visualizationCount = Object.keys(data)
-        .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-        .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-      setVisualCounts(Object.assign({}, visualizationCount))
-      setCortex(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+        ?.map((x) => x.replace("lamp.dashboard.experimental.", ""))
+        ?.reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+      setVisualCounts(Object?.assign({}, visualizationCount))
+      setCortex(Object.keys(data)?.map((x) => x.replace("lamp.dashboard.experimental.", "")))
     })
   }
 
@@ -399,35 +399,35 @@ export default function Prevent({
       setActivities([])
       setTimeSpans([])
       setSelectedActivities([])
-      if (Object.keys(activityEvents).length !== 0) {
+      if (Object.keys(activityEvents)?.length !== 0) {
         let timeSpans = Object.fromEntries(
-          Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
+          Object.entries(activityEvents || {})?.map((x) => [x[0], x[1][x[1]?.length - 1]])
         )
         let activityEventCount = getActivityEventCount(activityEvents)
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
-        activities = activities.filter(
+        activities = activities?.filter(
           (activity) =>
             activityEventCount[activity.name] > 0 &&
             activity.spec !== "lamp.group" &&
             activity.spec !== "lamp.tips" &&
             activity.spec !== "lamp.module" &&
-            activity.spec !== "lamp.zoom_meeting"
+            activity.spec !== "lamp.fragmented_letters"
         )
         setActivities(activities)
-        setSelectedActivities(activities.map((activity) => activity.name))
+        setSelectedActivities(activities?.map((activity) => activity.name))
       }
     })
   }
 
   const earliestDate = () =>
     (activities || [])
-      .filter((x) => (selectedActivities || []).includes(x.name))
-      .map((x) => (activityEvents || {})[x.name] || [])
-      .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
-      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
-      .slice(0, 1)
-      .map((x) => (x === 0 ? undefined : new Date(x)))[0]
+      ?.filter((x) => (selectedActivities || []).includes(x.name))
+      ?.map((x) => (activityEvents || {})[x.name] || [])
+      ?.map((x) => (x?.length === 0 ? 0 : x?.slice(0, 1)[0].timestamp))
+      ?.sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
+      ?.slice(0, 1)
+      ?.map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -439,8 +439,8 @@ export default function Prevent({
   }
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
 
@@ -584,7 +584,7 @@ export default function Prevent({
               {dialogueType === 0 && (
                 <MultipleSelect
                   selected={selectedActivities}
-                  items={(activities || []).map((x) => x.name)}
+                  items={(activities || [])?.map((x) => x.name)}
                   showZeroBadges={false}
                   badges={activityCounts}
                   onChange={(x) => {

@@ -38,7 +38,7 @@ class DBService {
             let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
             let cursor = await store.openCursor()
             while (cursor) {
-              ;(newVal[tablespace] || []).map((data) => {
+              ;(newVal[tablespace] || [])?.map((data) => {
                 if (cursor.value[conditionKey] === data[conditionKey]) {
                   let value = cursor.value
                   value[key] = data[key]
@@ -65,7 +65,7 @@ class DBService {
             let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
             let cursor = await store.openCursor()
             while (cursor) {
-              ;(newVal[tablespace] || []).map((data) => {
+              ;(newVal[tablespace] || [])?.map((data) => {
                 if (cursor.key === data[conditionKey]) {
                   let value = cursor.value
                   value[key] = data[key]
@@ -91,7 +91,7 @@ class DBService {
             let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
             let cursor = await store.openCursor()
             while (cursor) {
-              ;(newVal[tablespace] || []).map((data) => {
+              ;(newVal[tablespace] || [])?.map((data) => {
                 if (cursor.key === data[conditionKey]) {
                   let value = cursor.value
                   keys.forEach(function (eachKey) {
@@ -203,7 +203,7 @@ class DBService {
     return userDbPromise
       .then(async (db) => {
         try {
-          return (await db.transaction([tablespace], "readonly").objectStore(tablespace).getAll()).filter(
+          return (await db.transaction([tablespace], "readonly").objectStore(tablespace).getAll())?.filter(
             (event) => event.activity === key
           )
         } catch (error) {
@@ -220,7 +220,7 @@ class DBService {
       .then((db) => {
         try {
           let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
-          data.map((d) => {
+          data?.map((d) => {
             store.put(d)
           })
         } catch (error) {
@@ -236,7 +236,7 @@ class DBService {
     return userDbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
-        data.map((d) => {
+        data?.map((d) => {
           store.put(d)
         })
       })
@@ -355,7 +355,7 @@ class DBService {
             let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
             let cursor = await store.openCursor()
             while (cursor) {
-              ;(newVal[tablespace] || []).map((data) => {
+              ;(newVal[tablespace] || [])?.map((data) => {
                 let value = cursor.value
                 keys.forEach(function (eachKey) {
                   value[eachKey] = data[eachKey]
@@ -379,7 +379,7 @@ class DBService {
       .then((db) => {
         try {
           const stores = [...db.objectStoreNames]
-          stores.map((store) => {
+          stores?.map((store) => {
             db.transaction([store], "readwrite").objectStore(store).clear()
           })
         } catch (error) {
@@ -396,7 +396,7 @@ class DBService {
       .then((db) => {
         try {
           const stores = [...db.objectStoreNames]
-          stores.map((store) => {
+          stores?.map((store) => {
             db.transaction([store], "readwrite").objectStore(store).clear()
           })
         } catch (error) {

@@ -16,12 +16,29 @@ import { KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import { getDate, dateInUTCformat, manyDates } from "./ScheduleRow"
 
-export default function InlineMenu({ customTimes, onChange, ...props }) {
+export default function InlineMenu({ customTimes, onChange, startDate, startTime, ...props }) {
   const [items, setItems] = useState(customTimes ?? [])
   const [open, setOpen] = useState<Element>()
   const [current, setCurrent] = useState("")
-
   const { t } = useTranslation()
+  const getStartDateTime = () => {
+    try {
+      const datePart = startDate ? new Date(getDate(startDate)) : new Date()
+      const timePart = startTime ? new Date(getDate(startTime)) : new Date()
+      // Combine both for comparison
+      const combined = new Date(
+        datePart.getFullYear(),
+        datePart.getMonth(),
+        datePart.getDate(),
+        timePart.getHours(),
+        timePart.getMinutes(),
+        0
+      )
+      return combined
+    } catch {
+      return new Date()
+    }
+  }
 
   return (
     <React.Fragment>
@@ -51,7 +68,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                 <IconButton
                   edge="end"
                   aria-label="remove"
-                  onClick={() => setItems((x) => x.slice(0, idx).concat(x.slice(idx + 1)))}
+                  onClick={() => setItems((x) => x?.slice(0, idx)?.concat(x?.slice(idx + 1)))}
                 >
                   <Icon fontSize="small">delete_forever</Icon>
                 </IconButton>
@@ -62,6 +79,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
         <Divider />
         <MenuItem>
           <KeyboardTimePicker
+            autoOk
             label="Custom time"
             placeholder="08:00 AM"
             mask="__:__ _M"
@@ -83,7 +101,8 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                       edge="end"
                       aria-label="add"
                       onClick={() => {
-                        if (current.length > 0) setItems((x) => [...x, current])
+                        if (!current) return
+                        setItems((x) => [...x, current])
                       }}
                       onMouseDown={(event) => event.preventDefault()}
                     >

@@ -19,6 +19,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Alert } from "@mui/material"
+import { getBasicToken } from "./helper"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -133,13 +134,13 @@ const useStyles = makeStyles((theme) => ({
 
 const fetchCoordinators = async (participant) => {
   const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+
   let result = await (
     await fetch(`${baseUrl}/${participant}/cordinators`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: getBasicToken(),
       },
       credentials: "include",
     })
@@ -187,38 +188,19 @@ export default function Messages({
     true
   )
 
-  const duration = (date: Date) => {
-    var delta = Math.abs(date.getTime() - new Date().getTime()) / 1000
-
-    var days = Math.floor(delta / 86400)
-    delta -= days * 86400
-    if (days > 0) return days + (days > 1 ? " " + `${t("days")}` : `${t("day")}`)
-
-    var hours = Math.floor(delta / 3600) % 24
-    if (hours > 0) return hours + (hours > 1 ? " hrs" : "hr")
-
-    delta -= hours * 3600
-    var minutes = Math.floor(delta / 60) % 60
-    if (minutes > 0) return minutes + (minutes > 1 ? " mins" : "min")
-
-    delta -= minutes * 60
-    var seconds = Math.floor(delta % 60)
-    return seconds + (seconds > 1 ? "sec" : "secs")
-  }
-
   const refreshMessages = async () => {
     setConversations(
       Object.fromEntries(
         (
           await Promise.all(
-            [participant || ""].map(async (x) => [
+            [participant || ""]?.map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
           )
         )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
+          ?.filter((x: any) => x[1].message !== "404.object-not-found")
+          ?.map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -234,7 +216,7 @@ export default function Messages({
 
   const sendMessage = async (msgOpen: boolean) => {
     let msg = (currentMessage || "").trim()
-    if (msg.length === 0 || !participant) return
+    if (msg?.length === 0 || !participant) return
 
     await refreshMessages()
     let all = getMessages()
@@ -253,42 +235,38 @@ export default function Messages({
   const messageSection = () => {
     return (
       <Box>
-        {getMessages()
-          // .filter(
-          //   // (x) => (x.from = "") //&&  x.from === sender - to be replaced with different senders
-          // )
-          .map((x) => (
-            <Box
-              className={classes.innerMessage}
-              style={{
-                background:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "#F6F6F6"
-                    : "#5784EE",
-                marginLeft:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? ""
-                    : "10%",
-                marginRight:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "10%"
-                    : "",
-                borderRadius:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "0px 20px 20px 20px"
-                    : "20px 0px 20px 20px",
-                color:
-                  (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                    ? "rgba(0, 0, 0, 0.75)"
-                    : "white",
-              }}
-            >
-              <Typography>{x.text}</Typography>
-            </Box>
-          ))}
+        {getMessages()?.map((x) => (
+          <Box
+            className={classes.innerMessage}
+            style={{
+              background:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "#F6F6F6"
+                  : "#5784EE",
+              marginLeft:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? ""
+                  : "10%",
+              marginRight:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "10%"
+                  : "",
+              borderRadius:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "0px 20px 20px 20px"
+                  : "20px 0px 20px 20px",
+              color:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "rgba(0, 0, 0, 0.75)"
+                  : "white",
+            }}
+          >
+            <Typography>{x.text}</Typography>
+          </Box>
+        ))}
 
         <Divider />
-        {(coordinators || []).length == 0 && (
+        {(coordinators || [])?.length == 0 && (
           <Box>
             <Alert severity="warning">{`${t("No Coach or Support staff are available for messaging.")}`}</Alert>
           </Box>
@@ -330,7 +308,6 @@ export default function Messages({
           fullScreen
           open={open}
           onClose={() => {
-            // setDialogOpen(false)
             setOpen(false)
           }}
         >
@@ -338,7 +315,6 @@ export default function Messages({
             <Toolbar className={classes.toolbardashboard}>
               <IconButton
                 onClick={() => {
-                  // setDialogOpen(false)
                   setOpen(false)
                   window.history.back()
                 }}
@@ -355,14 +331,6 @@ export default function Messages({
               >
                 {`${t("Conversations")}`}
               </Typography>
-              {/* <Typography
-                  variant="h5"
-                  style={{
-                    marginLeft: supportsSidebar ? 0 : undefined,
-                  }}
-                >
-                  {sender}
-                </Typography> */}
             </Toolbar>
           </AppBar>
           <Container className={classes.containerWidth}>

@@ -43,14 +43,14 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const { t } = useTranslation()
-  const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
+  const displayKeys = () => Object.keys(value[0] || {})?.filter((x) => !(hiddenKeys || []).includes(x))
   const classes = useStyles()
   return (
     <div style={{ overflowX: "auto" }}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            {displayKeys().map((key) => (
+            {displayKeys()?.map((key) => (
               <TableCell key={key} title={humanize(key)}>
                 {humanize(key)}
               </TableCell>
@@ -61,7 +61,7 @@ export default function ArrayView({
           {value.map((row, index) => (
             <React.Fragment>
               <TableRow hover key={index}>
-                {displayKeys().map((key) =>
+                {displayKeys()?.map((key) =>
                   Array.isArray(row[key]) ? (
                     <ArrayView value={row[key]} />
                   ) : !!row[key] && typeof row[key] === "object" ? (
@@ -79,7 +79,7 @@ export default function ArrayView({
               </TableRow>
               {hasSpanningRowForIndex?.(index) && (
                 <TableRow key={`${index}-optional`}>
-                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(row.item)}</TableCell>
+                  <TableCell colSpan={displayKeys()?.length}>{spanningRowForIndex?.(row.item)}</TableCell>
                 </TableRow>
               )}
             </React.Fragment>

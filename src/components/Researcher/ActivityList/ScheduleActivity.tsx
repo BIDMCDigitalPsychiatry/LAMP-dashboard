@@ -80,9 +80,6 @@ export default function ScheduleActivity({ activity, activities, setActivities, 
             </IconButton>
           </Box>
           <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
-          {/* 
-          Percentage settings section can be enabled by uncommenting this.
-          {activity.spec === "lamp.survey" && <PercentageSettings activityId={activity.id} />} */}
         </DialogContent>
       </Dialog>
     </span>

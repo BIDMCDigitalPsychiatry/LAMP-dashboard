@@ -63,8 +63,8 @@ export default function DeleteSensor({
 
   useEffect(() => {
     if (!!profile) {
-      LAMP.Participant.allByStudy(sensors[0].study_id).then((result) => {
-        setParticipantCount(result.length)
+      LAMP.Participant.allByStudy(sensors[0]?.id).then((result) => {
+        setParticipantCount(result?.length)
       })
     }
   }, [])
@@ -73,7 +73,7 @@ export default function DeleteSensor({
     setConfirmStatus(status === "Yes" ? true : false)
     if (status === "Yes") {
       setLoading(true)
-      if (sensors.length > 0) {
+      if (sensors?.length > 0) {
         for (let eachSensorIds of sensors) {
           await LAMP.Sensor.delete(eachSensorIds.id).then((data: any) => {
             if (!data.error) {
@@ -86,12 +86,15 @@ export default function DeleteSensor({
     }
     setLoading(false)
     setSensors()
+    enqueueSnackbar(`${t("Successfully deleted the selected Sensors.")}`, {
+      variant: "success",
+    })
     setConfirmationDialog(0)
   }
 
   useEffect(() => {
-    if (confirmStatus) {
-      if (deletedStudyIds.length > 0) {
+    if (confirmStatus && LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      if (deletedStudyIds?.length > 0) {
         let idCounts = {}
         deletedStudyIds.forEach((x) => (idCounts[x] = (idCounts[x] || 0) + 1))
         Object.keys(idCounts).forEach(function (key) {
@@ -111,8 +114,8 @@ export default function DeleteSensor({
   }, [deletedStudyIds])
 
   useEffect(() => {
-    if (confirmStatus) {
-      if (deletedIds.length > 0) {
+    if (confirmStatus && LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      if (deletedIds?.length > 0) {
         Service.delete("sensors", deletedIds)
       } else {
         enqueueSnackbar(`${t("An error occured while deleting. Please try again.")}`, {

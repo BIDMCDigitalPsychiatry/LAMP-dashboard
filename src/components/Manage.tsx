@@ -27,31 +27,36 @@ export default function Manage({ participant, activities, showStreak, ...props }
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { t } = useTranslation()
   useEffect(() => {
+    // Filter Manage activities and load associated tags once
     setLoading(true)
-    let gActivities = activities.filter(
-      (x: any) =>
-        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
-          (typeof x?.category === "undefined" || x?.category === null)) ||
-        (!!x?.category && x?.category.includes("manage"))
-    )
-    setSavedActivities(gActivities)
-    if (gActivities.length > 0) {
-      Service.getAllTags("activitytags").then((data) => {
-        setTag(
-          (data || []).filter(
-            (x: any) =>
-              ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
-                (typeof x?.category === "undefined" || x?.category === null)) ||
-              (!!x?.category && x?.category.includes("manage"))
+    const refreshTags = () => {
+      let gActivities = activities?.filter(
+        (x: any) =>
+          ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
+            (typeof x?.category === "undefined" || x?.category === null)) ||
+          (!!x?.category && x?.category.includes("manage"))
+      )
+      setSavedActivities(gActivities)
+      if (gActivities?.length > 0) {
+        Service.getAllTags("activitytags").then((data) => {
+          setTag(
+            (data || [])?.filter(
+              (x: any) =>
+                ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
+                  (typeof x?.category === "undefined" || x?.category === null)) ||
+                (!!x?.category && x?.category.includes("manage"))
+            )
           )
-        )
+          setLoading(false)
+        })
+      } else {
         setLoading(false)
-      })
-    } else {
-      setLoading(false)
+      }
     }
+    refreshTags()
+    window.addEventListener("activityTagsUpdated", refreshTags)
+    return () => window.removeEventListener("activityTagsUpdated", refreshTags)
   }, [])
 
   return (

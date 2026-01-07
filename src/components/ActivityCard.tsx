@@ -21,24 +21,24 @@ export default function ActivityCard({
   ...props
 }) {
   let freeText = (Array.isArray(activity.settings) ? activity.settings : [])
-    .map((x) => x.type)
-    .filter((x) => [null, "text", "paragraph"].includes(x))
+    ?.map((x) => x.type)
+    ?.filter((x) => [null, "text", "paragraph"].includes(x))
 
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
-  const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
+  const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText?.length))
   const { t } = useTranslation()
   const selectedActivity = activity
-  events.sort((a, b) => a.timestamp - b.timestamp)
+  events?.sort((a, b) => a.timestamp - b.timestamp)
   let each = Object.values(
     events
-      .map((d) =>
+      ?.map((d) =>
         d.temporal_slices
-          .filter((t) => t.type != "manual_exit")
-          .map((t, index) => ({
+          ?.filter((t) => t.type != "manual_exit")
+          ?.map((t, index) => ({
             item:
               activity.spec === "lamp.symbol_digit_substitution"
-                ? d.temporal_slices.length > index + 1
+                ? d.temporal_slices?.length > index + 1
                   ? "Digit " + (index + 1) + " : " + t.type
                   : t.type
                 : activity.spec === "lamp.maze_game"
@@ -66,16 +66,16 @@ export default function ActivityCard({
                 : 0,
           }))
       )
-      .reduce((x, y) => x.concat(y), [])
-      .groupBy("item")
+      ?.reduce((x, y) => x?.concat(y), [])
+      ?.groupBy("item")
   )
-    .map((v: any) => Object.assign({}, ...v))
-    .reduce((x, y) => x.concat(y), [])
+    ?.map((v: any) => Object?.assign({}, ...v))
+    ?.reduce((x, y) => x?.concat(y), [])
   let eachData = []
-  each = each.map((d, key) => {
+  each = each?.map((d, key) => {
     let keys = Object.keys(d)
     eachData[d["item"]] = []
-    keys.map((k) => {
+    keys?.map((k) => {
       if (k !== "item") {
         eachData[d["item"]].push({
           x: k,
@@ -144,14 +144,14 @@ export default function ActivityCard({
       </Box>
       <Divider />
       {Boolean(visibleSlice) ? (
-        (visibleSlice.slice || []).length === 0 ? (
+        (visibleSlice?.slice || [])?.length === 0 ? (
           <Typography variant="subtitle2" style={{ margin: 16 }}>
             {`${t("No detail view available.")}`}
           </Typography>
         ) : (
           <ArrayView
             hiddenKeys={["x"]}
-            value={(visibleSlice.slice || []).map((x, index) => ({
+            value={(visibleSlice?.slice || [])?.map((x, index) => ({
               item: x.item,
               value:
                 activity.spec === "lamp.maze_game"
@@ -190,10 +190,10 @@ export default function ActivityCard({
           )}
           value={Object.values(
             events
-              .map((d) =>
+              ?.map((d) =>
                 d.temporal_slices
-                  .filter((t) => t.type != "manual_exit")
-                  .map((t, index) => ({
+                  ?.filter((t) => t.type != "manual_exit")
+                  ?.map((t, index) => ({
                     item: activity.spec === "lamp.maze_game" ? t.level : t.item,
                     [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                       activity.spec === "lamp.maze_game"
@@ -215,11 +215,11 @@ export default function ActivityCard({
                         : 0,
                   }))
               )
-              .reduce((x, y) => x.concat(y), [])
-              .groupBy("item")
+              ?.reduce((x, y) => x?.concat(y), [])
+              ?.groupBy("item")
           )
-            .map((v: any) => Object.assign({}, ...v))
-            .reduce((x, y) => x.concat(y), [])}
+            ?.map((v: any) => Object?.assign({}, ...v))
+            ?.reduce((x, y) => x?.concat(y), [])}
         />
       ) : (
         <Sparkline
@@ -229,7 +229,7 @@ export default function ActivityCard({
           YAxisLabel={`${t("Score")}`}
           color={colors.blue[500]}
           startDate={startDate}
-          data={events.map((d) => ({
+          data={events?.map((d) => ({
             x: new Date(d.timestamp),
             y: strategies[activity.spec]
               ? strategies[activity.spec](
@@ -238,7 +238,7 @@ export default function ActivityCard({
                     activity.spec === "lamp.spin_wheel" ||
                     activity.spec === "lamp.pop_the_bubbles" ||
                     activity.spec === "lamp.maze_game"
-                    ? d.temporal_slices.filter((t) => t.type != "manual_exit")
+                    ? d.temporal_slices?.filter((t) => t.type != "manual_exit")
                     : activity.spec === "lamp.scratch_image" ||
                       activity.spec === "lamp.breathe" ||
                       activity.spec === "lamp.tips"
@@ -248,12 +248,12 @@ export default function ActivityCard({
                   undefined
                 )
               : 0,
-            slice: d.temporal_slices.filter((t) => t.type != "manual_exit"),
+            slice: d.temporal_slices?.filter((t) => t.type != "manual_exit"),
             missing:
               activity.spec === "lamp.survey" ||
               activity.spec === "lamp.pop_the_bubbles" ||
               activity.spec === "lamp.emotion_recognition"
-                ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
+                ? d.temporal_slices?.filter((z) => [null, "NULL"].includes(z.value))?.length > 0
                 : false,
           }))}
           onClick={(datum) =>

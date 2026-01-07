@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Chip, Tooltip, makeStyles } from "@material-ui/core"
 import { getTimeAgo } from "./Index"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -45,30 +44,19 @@ export const dataQuality = (passive, timeAgo, t, classes) => ({
       : classes.dataGrey,
 })
 
-export default function Passive({ participant, ...props }) {
+export default function Passive({ sensor, ...props }) {
   const classes = useStyles()
-  const [passive, setPassive] = useState(null)
   const { t, i18n } = useTranslation()
   const timeAgo = getTimeAgo(i18n.language)
+  const [passive, setPassive] = useState(null)
 
   useEffect(() => {
-    let isCancelled = false
-    setTimeout(() => {
-      Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-        if (!isCancelled) {
-          let passive = {
-            gps: !!data[0]?.gps && data[0]?.gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
-            accel:
-              !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
-          }
-          setPassive(passive)
-        }
-      })
-      return () => {
-        isCancelled = true
-      }
-    }, 3000)
-  }, [])
+    let passive = {
+      gps: !!sensor?.gps && sensor?.gps?.length > 0 ? sensor?.gps?.slice(-1)[0] : [],
+      accel: !!sensor?.accelerometer && sensor?.accelerometer?.length > 0 ? sensor?.accelerometer?.slice(-1)[0] : [],
+    }
+    setPassive(passive)
+  }, [sensor])
 
   return (
     <Tooltip title={dataQuality(passive, timeAgo, t, classes).title}>

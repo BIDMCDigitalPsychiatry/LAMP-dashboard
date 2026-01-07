@@ -1,6 +1,7 @@
 import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
+import { getBasicToken } from "../helper"
 
 interface StudyObject {
   id: string
@@ -18,7 +19,7 @@ export const fetchResult = async (id, type, modal) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: getBasicToken(),
       },
       credentials: "include",
     })
@@ -34,7 +35,7 @@ export const fetchPostData = async (id, type, modal, methodType, bodyData) => {
       method: methodType,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: getBasicToken(),
       },
       credentials: "include",
       body: JSON.stringify(bodyData),
@@ -49,20 +50,20 @@ const saveStudiesAndParticipants = (result, studies, researcherId) => {
   let sensors = []
   let studiesList = []
   if (Array.isArray(result.studies)) {
-    result.studies.map((study) => {
-      participants = participants.concat(study.participants)
-      activities = activities.concat(study.activities)
-      sensors = sensors.concat(study.sensors)
+    result.studies?.map((study) => {
+      participants = participants?.concat(study.participants)
+      activities = activities?.concat(study.activities)
+      sensors = sensors?.concat(study.sensors)
     })
-    studies.map((study) => {
-      studiesList = studiesList.concat(study.name)
+    studies?.map((study) => {
+      studiesList = studiesList?.concat(study.name)
     })
   }
   let studiesSelected =
     localStorage.getItem("studies_" + researcherId) !== null
       ? JSON.parse(localStorage.getItem("studies_" + researcherId))
       : []
-  if (studiesSelected.length === 0) {
+  if (studiesSelected?.length === 0) {
     localStorage.setItem("studies_" + researcherId, JSON.stringify(studiesList))
     localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(1))
   }
@@ -94,7 +95,9 @@ export const saveDemoData = () => {
   Service.updateValues(
     "studies",
     {
-      studies: [{ participant_count: 1, sensor_count: demo_db.Sensor.length, activity_count: demo_db.Activity.length }],
+      studies: [
+        { participant_count: 1, sensor_count: demo_db.Sensor?.length, activity_count: demo_db.Activity?.length },
+      ],
     },
     ["sensor_count", "activity_count", "participant_count"]
   )
@@ -124,14 +127,14 @@ export const saveDataToCache = (id) => {
       "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
       " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"
   ).then((data: any) => {
-    let studies = Object.values(data?.studies || []).map((study: StudyObject) => {
+    let studies = Object.values(data?.studies || [])?.map((study: StudyObject) => {
       return {
         id: study?.id || "",
         name: study?.name || "",
         isMessagingEnabled: study?.isMessagingEnabled,
-        participant_count: (study?.participants || []).length,
-        activity_count: (study?.activities || []).length,
-        sensor_count: (study?.sensors || []).length,
+        participant_count: (study?.participants || [])?.length,
+        activity_count: (study?.activities || [])?.length,
+        sensor_count: (study?.sensors || [])?.length,
       }
     })
     saveStudiesAndParticipants(data, studies, id)

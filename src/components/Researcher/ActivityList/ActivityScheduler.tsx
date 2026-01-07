@@ -50,7 +50,7 @@ export default function ActivityScheduler({ activity, activities, setActivities,
 
   const updateActivitySchedule = async (x, index, type) => {
     if (type === "add") {
-      setActivityData({ ...activityData, schedule: activity["schedule"].concat(x) })
+      setActivityData({ ...activityData, schedule: activity["schedule"]?.concat(x) })
     } else if (type == "edit") {
       let data = activityData
       data["schedule"][index] = x
@@ -99,13 +99,15 @@ export default function ActivityScheduler({ activity, activities, setActivities,
           </TableRow>
         </TableHead>
         <TableBody>
-          {(schedule || []).map((row, index) => (
+          {(schedule || [])?.map((row, index) => (
             <ScheduleRow
               scheduleRow={row}
               index={index}
               updateActivitySchedule={updateActivitySchedule}
               showNotificationInput={showNotificationInputs[index] || false}
               setShowNotificationInput={(value: boolean) => toggleNotificationInput(index, value)}
+              // existingSchedules={schedule}
+              existingSchedules={activities.flatMap((a) => a.schedule || [])}
             />
           ))}
         </TableBody>

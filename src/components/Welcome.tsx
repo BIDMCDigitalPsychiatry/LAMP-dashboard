@@ -28,7 +28,7 @@ export default function Welcome({ activities, onClose, ...props }) {
           </Typography>
           <br />
           <Grid container direction="row" spacing={4}>
-            {activities.map((x) => (
+            {activities?.map((x) => (
               <Grid item xs={3}>
                 <Card
                   raised={true}

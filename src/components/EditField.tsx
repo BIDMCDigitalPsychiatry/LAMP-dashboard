@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-
 // Local Imports
 import LAMP from "lamp-core"
 
@@ -23,7 +22,7 @@ export default function EditField({ participant, onUpdate, ...props }: { partici
     if (!!alias) return
     LAMP.Type.getAttachment(participant.id, "lamp.name")
       .then((res: any) =>
-        res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null
+        res.error === undefined && typeof res.data === "string" && res.data?.length > 0 ? res.data : null
       )
       .then((res) => setAlias((oldValue.current = res)))
       .catch((err) =>

@@ -122,8 +122,8 @@ export default function ActivityRow({
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {(activity?.schedule ?? []).map((sc) => (
-              <Box>{`${t(intervals.filter((i) => i.key === sc.repeat_interval)[0]?.value)}`}</Box>
+            {(activity?.schedule ?? [])?.map((sc) => (
+              <Box>{`${t(intervals?.filter((i) => i.key === sc.repeat_interval)[0]?.value)}`}</Box>
             ))}
           </Typography>
         </Grid>

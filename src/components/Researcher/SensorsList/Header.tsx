@@ -40,6 +40,7 @@ export default function Header({
   setChangeCount,
   setOrder,
   order,
+  sensorsByStudy,
   ...props
 }: {
   studies?: Array<Object>
@@ -52,6 +53,7 @@ export default function Header({
   setChangeCount?: Function
   setOrder?: Function
   order?: boolean
+  sensorsByStudy?: Record<string, number>
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
@@ -84,11 +86,12 @@ export default function Header({
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
             setSelectedStudies={setSelectedStudies}
+            filterData={sensorsByStudy}
           />
         </Box>
       )}
 
-      {(selectedSensors || []).length > 0 && (
+      {(selectedSensors || [])?.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <DeleteSensor sensors={selectedSensors} setSensors={setSensors} />

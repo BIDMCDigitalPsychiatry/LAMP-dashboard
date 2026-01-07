@@ -17,8 +17,8 @@ function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id, null, true)
-  return [...original]
+  const original = await LAMP.Activity.allByParticipant(participant.id, null, true)
+  return [...original?.data]
 }
 
 async function getVisualizations(participant: ParticipantObj) {
@@ -38,20 +38,20 @@ async function getActivityEvents(
   _hidden: string[]
 ): Promise<{ [groupName: string]: ActivityEventObj[] }> {
   let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
-    .map((x) => ({
+    ?.map((x) => ({
       ...x,
       activity: _activities.find((y) => x.activity === y.id),
     }))
-    .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
-    .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
-    .map((x) => ({
+    ?.filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
+    ?.sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
+    ?.map((x) => ({
       ...x,
       activity: (x.activity || { name: "" }).name,
     }))
-    .groupBy("activity") as any
+    ?.groupBy("activity") as any
   let customEvents = _activities
-    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
-    .map((x) =>
+    ?.filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
+    ?.map((x) =>
       x?.settings?.map((y, idx) =>
         original?.[y.activity]
           ?.map((z) => ({
@@ -61,15 +61,15 @@ async function getActivityEvents(
             activity: x.name,
             slices: z.temporal_slices.find((a) => a.item === y.question),
           }))
-          .filter((y) => y.slices !== undefined)
+          ?.filter((y) => y.slices !== undefined)
       )
     )
-    .filter((x) => x !== undefined)
-    .flat(2)
-    .groupBy("activity")
-  let customGroups = Object.entries(customEvents).map(([k, x]) => [
+    ?.filter((x) => x !== undefined)
+    ?.flat(2)
+    ?.groupBy("activity")
+  let customGroups = Object.entries(customEvents)?.map(([k, x]) => [
     k,
-    Object.values(x.groupBy("timestamp")).map((z: any) => ({
+    Object.values(x?.groupBy("timestamp"))?.map((z: any) => ({
       timestamp: z?.[0].timestamp,
       duration: z?.[0].duration,
       activity: z?.[0].activity,
@@ -78,11 +78,11 @@ async function getActivityEvents(
         z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
           length:
             z
-              .map((a) => a.idx)
-              .sort()
-              .slice(-1)[0] + 1,
+              ?.map((a) => a.idx)
+              ?.sort()
+              ?.slice(-1)[0] + 1,
         })
-      ).map((a) => (a === undefined ? {} : a)),
+      )?.map((a) => (a === undefined ? {} : a)),
     })),
   ])
   return Object.fromEntries([...Object.entries(original), ...customGroups])
@@ -90,19 +90,19 @@ async function getActivityEvents(
 
 // Perform event coalescing/grouping by sensor or activity type.
 async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupName: string]: SensorEventObj[] }> {
-  let _events = ((await LAMP.SensorEvent.allByParticipant(participant.id)) as any).groupBy("sensor")
+  let _events = ((await LAMP.SensorEvent.allByParticipant(participant.id)) as any)?.groupBy("sensor")
 
   // Perform datetime coalescing to either days or weeks.
   _events["lamp.steps"] = Object.values(
     ((_events || {})["lamp.steps"] || [])
-      .map((x) => ({
+      ?.map((x) => ({
         ...x,
         timestamp: Math.round(x.timestamp / (24 * 60 * 60 * 1000)) /* days */,
       }))
-      .groupBy("timestamp")
+      ?.groupBy("timestamp")
   )
-    .map((x: any[]) =>
-      x.reduce(
+    ?.map((x: any[]) =>
+      x?.reduce(
         (a, b) =>
           !!a.timestamp
             ? {
@@ -116,7 +116,7 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
         {}
       )
     )
-    .map((x) => ({
+    ?.map((x) => ({
       ...x,
       timestamp: x.timestamp * (24 * 60 * 60 * 1000) /* days */,
     }))
@@ -125,10 +125,10 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
 
 // Perform count coalescing on processed events grouped by type.
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
-  return Object.assign(
+  return Object?.assign(
     {},
-    ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
-      [k]: v.length,
+    ...Object.entries(activity_events || {})?.map(([k, v]: [string, any[]]) => ({
+      [k]: v?.length,
     }))
   )
 }
@@ -141,66 +141,6 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
         ?.length ?? 0,
     "Step Count": sensor_events?.["lamp.steps"]?.length ?? 0,
   }
-}
-
-function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
-  const { t } = useTranslation()
-  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
-  return [
-    [
-      {
-        label: `${t("Alone")}`,
-        value: gps_events.filter((x) => x.data.context.social === "alone").length,
-      },
-      {
-        label: `${t("Friends")}`,
-        value: gps_events.filter((x) => x.data.context.social === "friends").length,
-      },
-      {
-        label: `${t("Family")}`,
-        value: gps_events.filter((x) => x.data.context.social === "family").length,
-      },
-      {
-        label: `${t("Peers")}`,
-        value: gps_events.filter((x) => x.data.context.social === "peers").length,
-      },
-      {
-        label: `${t("Crowd")}`,
-        value: gps_events.filter((x) => x.data.context.social === "crowd").length,
-      },
-    ],
-    [
-      {
-        label: `${t("Home")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
-          .length,
-      },
-      {
-        label: `${t("School")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "school").length,
-      },
-      {
-        label: `${t("Work")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "work").length,
-      },
-      {
-        label: `${t("Hospital")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
-      },
-      {
-        label: `${t("Outside")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "outside").length,
-      },
-      {
-        label: `${t("Shopping")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
-      },
-      {
-        label: `${t("Transit")}`,
-        value: gps_events.filter((x) => x.data.context.environment === "transit").length,
-      },
-    ],
-  ]
 }
 
 export default function ParticipantData({
@@ -250,12 +190,12 @@ export default function ParticipantData({
 
   const earliestDate = () =>
     (activities || [])
-      .filter((x) => (selectedActivities || []).includes(x.name))
-      .map((x) => (activityEvents || {})[x.name] || [])
-      .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
-      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
-      .slice(0, 1)
-      .map((x) => (x === 0 ? undefined : new Date(x)))[0]
+      ?.filter((x) => (selectedActivities || []).includes(x.name))
+      ?.map((x) => (activityEvents || {})[x.name] || [])
+      ?.map((x) => (x?.length === 0 ? 0 : x?.slice(0, 1)[0].timestamp))
+      ?.sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
+      ?.slice(0, 1)
+      ?.map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
   return (
     <React.Fragment>
@@ -278,8 +218,8 @@ export default function ParticipantData({
         <MultipleSelect
           selected={selectedActivities}
           items={(activities || [])
-            .filter((x) => ["lamp.survey", "lamp.dashboard.custom_survey_group"].includes(x.spec) || !!showAll)
-            .map((x) => `${x.name}`)}
+            ?.filter((x) => ["lamp.survey", "lamp.dashboard.custom_survey_group"].includes(x.spec) || !!showAll)
+            ?.map((x) => `${x.name}`)}
           showZeroBadges={false}
           badges={activityCounts}
           onChange={(x) => setSelectedActivities(x)}
@@ -297,7 +237,7 @@ export default function ParticipantData({
             />
           </React.Fragment>
         )}
-        {Object.keys(visualizations).length > 0 && (
+        {Object.keys(visualizations)?.length > 0 && (
           <React.Fragment>
             <Divider style={{ margin: "8px -16px 8px -16px" }} />
             <Typography variant="overline">{`${t("Automations")}`}</Typography>
@@ -307,25 +247,25 @@ export default function ParticipantData({
                 "An experimental visualization generated by an automation you or your clinician have installed."
               )}`}
               selected={selectedExperimental || []}
-              items={Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", ""))}
+              items={Object.keys(visualizations)?.map((x) => x.replace("lamp.dashboard.experimental.", ""))}
               showZeroBadges={false}
               badges={Object.keys(visualizations)
-                .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-                .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
+                ?.map((x) => x.replace("lamp.dashboard.experimental.", ""))
+                ?.reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
               onChange={(x) => setSelectedExperimental(x)}
             />
           </React.Fragment>
         )}
       </Box>
       <Box display="none" displayPrint="block">
-        {activities.map((x) => (
+        {activities?.map((x) => (
           <Card style={{ padding: 8, margin: 16 }}>
             <Typography variant="h6">{`${t(x.name)}`}</Typography>
             <Typography variant="subtitle2" color="primary">
-              {((activityEvents || {})[x.name] || []).slice(-1).length > 0
+              {((activityEvents || {})[x.name] || [])?.slice(-1)?.length > 0
                 ? strategies["lamp.survey"](
                     ((activityEvents || {})[x.name] || [])
-                      .slice(-1)?.[0]
+                      ?.slice(-1)?.[0]
                       ?.temporal_slices.filter((t) => t.type != "manual_exit"),
                     x,
                     undefined
@@ -335,7 +275,7 @@ export default function ParticipantData({
           </Card>
         ))}
       </Box>
-      {(selectedActivities || []).length + (selectedSensors || []).length + (selectedExperimental || []).length ===
+      {(selectedActivities || [])?.length + (selectedSensors || [])?.length + (selectedExperimental || [])?.length ===
         0 && (
         <Box
           display="flex"
@@ -357,8 +297,8 @@ export default function ParticipantData({
       )}
       <Box displayPrint="visible">
         {(activities || [])
-          .filter((x) => (selectedActivities || []).includes(x.name) || !!printView)
-          .map((activity) => (
+          ?.filter((x) => (selectedActivities || []).includes(x.name) || !!printView)
+          ?.map((activity) => (
             <Card
               key={activity.id}
               style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
@@ -392,7 +332,6 @@ export default function ParticipantData({
               {`${t("Environmental Context")}`}
             </Typography>
             <Divider />
-            {/* <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} /> */}
           </Card>
         )}
         {((selectedSensors || []).includes("Step Count") || !!printView) && (
@@ -417,7 +356,7 @@ export default function ParticipantData({
             />
           </Card>
         )}
-        {(selectedExperimental || []).map((x) => (
+        {(selectedExperimental || [])?.map((x) => (
           <Card key={x} style={{ marginTop: 16, marginBottom: 16 }}>
             <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
               {x}

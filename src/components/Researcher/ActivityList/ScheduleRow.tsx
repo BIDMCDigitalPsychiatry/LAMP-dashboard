@@ -19,7 +19,7 @@ import {
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
-
+import AccessTimeIcon from "@material-ui/icons/AccessTime"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
@@ -96,7 +96,7 @@ const formTheme = createTheme({
 })
 
 export const getDate = (val) => {
-  if ((val || "").length > 0) {
+  if ((val || "")?.length > 0) {
     const dateVal = val.split("T")[0].split("-")
     const timeVal = val.split("T")[1].split(":")
     const newDate = new Date()
@@ -115,7 +115,7 @@ export const manyDates = (items) =>
   items?.length > 0
     ? items
         ?.slice(0, 3)
-        .map((x) => getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
+        ?.map((x) => getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
 
@@ -176,6 +176,7 @@ export default function ScheduleRow({
   updateActivitySchedule,
   setShowNotificationInput,
   showNotificationInput,
+  existingSchedules,
   ...props
 }: {
   scheduleRow: any
@@ -183,6 +184,7 @@ export default function ScheduleRow({
   updateActivitySchedule: Function
   setShowNotificationInput: any
   showNotificationInput: boolean
+  existingSchedules: any
 }) {
   const classes = useStyles()
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
@@ -222,8 +224,8 @@ export default function ScheduleRow({
     )
   }
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const handleNotificationChange = () => {
@@ -240,7 +242,9 @@ export default function ScheduleRow({
             <MuiThemeProvider theme={formTheme}>
               <MuiPickersUtilsProvider locale={localeMap[getSelectedLanguage()]} utils={DateFnsUtils}>
                 <KeyboardDatePicker
+                  disablePast
                   clearable
+                  autoOk
                   value={data?.start_date ? getDate(data.start_date ?? "") : ""}
                   onBlur={(event) => {
                     const date = new Date(event.target.value)
@@ -257,10 +261,19 @@ export default function ScheduleRow({
                   }}
                   onChange={(date) => {
                     if (!!date) {
+                      const now = new Date()
+                      const selectedDate = new Date(date)
+                      selectedDate.setHours(0, 0, 0, 0)
+                      if (selectedDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+                        alert(t("You cannot schedule activities for past dates."))
+                        return
+                      }
+
                       date.setHours(1)
                       date.setMinutes(0)
                       date.setSeconds(0)
                     }
+
                     setData({
                       ...data,
                       start_date: date?.isValid() ? dateInUTCformat(date) : null,
@@ -285,6 +298,7 @@ export default function ScheduleRow({
           ) : (
             <KeyboardTimePicker
               className={classes.datePicker}
+              keyboardIcon={<AccessTimeIcon />}
               size="small"
               autoOk
               variant="inline"
@@ -296,9 +310,11 @@ export default function ScheduleRow({
               helperText={`${t("Select the start time.")}`}
               InputAdornmentProps={{ position: "end" }}
               value={data.time ? getDate(data.time ?? "") : ""}
-              defaultValue={data.time ? getDate(data.time ?? "") : ""}
+              // defaultValue={data.time ? getDate(data.time ?? "") : ""}
               onChange={(date) => {
-                setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
+                if (date) {
+                  setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
+                }
               }}
               onBlur={(event) => {
                 const date = data?.start_date ? new Date(data?.start_date) : new Date()
@@ -323,7 +339,11 @@ export default function ScheduleRow({
         </TableCell>
         <TableCell>
           {!isEdit ? (
-            data.repeat_interval
+            data.repeat_interval ? (
+              data.repeat_interval.charAt(0).toUpperCase() + data.repeat_interval?.slice(1)
+            ) : (
+              ""
+            )
           ) : (
             <FormControl variant="outlined" size="small">
               <Select
@@ -337,7 +357,7 @@ export default function ScheduleRow({
                 }}
                 style={{ width: "100%", maxWidth: 175 }}
               >
-                {intervals.map((interval, index) => (
+                {intervals?.map((interval, index) => (
                   <MenuItem key={interval.key} value={interval.key}>
                     {interval.value}
                   </MenuItem>
@@ -367,7 +387,12 @@ export default function ScheduleRow({
                   {`${t("No custom times")}`}
                 </Button>
               ) : (
-                <InlineMenu customTimes={data.custom_time} onChange={(x) => setData({ ...data, custom_time: x })} />
+                <InlineMenu
+                  customTimes={data.custom_time}
+                  onChange={(x) => setData({ ...data, custom_time: x })}
+                  startDate={data.start_date}
+                  startTime={data.time}
+                />
               )}
             </span>
           )}
@@ -401,11 +426,20 @@ export default function ScheduleRow({
                   <IconButton
                     className={classes.btnIcon}
                     onClick={() => {
-                      if (validate()) {
-                        updateActivitySchedule(data, index, "edit")
-                        setEdit(false)
-                        setShowNotificationInput(false)
+                      if (!validate()) return
+
+                      const duplicate = existingSchedules.some(
+                        (item, i) => i !== index && item.start_date === data.start_date && item.time === data.time
+                      )
+
+                      if (duplicate) {
+                        alert(t("You already have an activity scheduled at this date and time."))
+                        return
                       }
+
+                      updateActivitySchedule(data, index, "edit")
+                      setEdit(false)
+                      setShowNotificationInput(false)
                     }}
                   >
                     <Icon>done</Icon>
@@ -422,11 +456,6 @@ export default function ScheduleRow({
                       }
                       setShowNotificationInput(false)
                     }}
-                    // onClick={() => {
-                    //   setEdit(false)
-                    //   setShowNotificationInput(false)
-                    //   setData(scheduleRow) //To make the state value to its initial value other wise updated state value is showing
-                    // }}
                   >
                     <Icon>close</Icon>
                   </IconButton>
@@ -497,19 +526,6 @@ export default function ScheduleRow({
           </TableCell>
         </TableRow>
       )}
-      {/* <TableRow style={{ display: showReminderSettings ? "" : "none" }}>
-        <ReminderSettings
-          isEdit={isEdit}
-          reminderSettings={data.reminderSettings}
-          repeat_interval={data?.repeat_interval}
-          onUpdate={(settings) => {
-            setData({
-              ...data,
-              reminderSettings: settings,
-            })
-          }}
-        />
-      </TableRow> */}
     </>
   )
 }

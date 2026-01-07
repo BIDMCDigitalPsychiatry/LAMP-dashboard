@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Icon, IconButton, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, Icon, IconButton, makeStyles, Theme, createStyles } from "@material-ui/core"
 import EditUserField from "./EditUserField"
-import LAMP from "lamp-core"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,13 +18,6 @@ export default function ParticipantName({ participant, updateParticipant, openSe
   const [editUserId, setEditUserId] = useState("")
   const [aliasName, setAliasName] = useState("")
   const [name, setName] = useState(participant.name ?? "")
-
-  useEffect(() => {
-    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      setAliasName(data[0]?.name ?? participant.id ?? "")
-      setName(data[0]?.name ?? participant.id ?? "")
-    })
-  }, [participant])
 
   useEffect(() => {
     if (openSettings) setEditData(false)
@@ -54,9 +45,9 @@ export default function ParticipantName({ participant, updateParticipant, openSe
             editUserId={editUserId}
             updateName={updateName}
           />
-        ) : aliasName && editUserId === participant.id && aliasName?.trim().length > 0 ? (
+        ) : aliasName && editUserId === participant.id && aliasName?.trim()?.length > 0 ? (
           aliasName
-        ) : name && name?.trim().length > 0 ? (
+        ) : name && name?.trim()?.length > 0 ? (
           name
         ) : (
           participant.id

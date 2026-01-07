@@ -112,12 +112,7 @@ export default function AddUser({
           enqueueSnackbar(`${t("Could not create credential for id.", { id: id })}`, { variant: "error" })
         } else {
           newParticipant.study_id = selectedStudy
-          newParticipant.study_name = studies.filter((study) => study.id === selectedStudy)[0]?.name
-          Service.addData("participants", [newParticipant])
-          Service.updateCount("studies", selectedStudy, "participant_count")
-          Service.getData("studies", selectedStudy).then((studiesObject) => {
-            handleNewStudy(studiesObject)
-          })
+          newParticipant.study_name = studies?.filter((study) => study.id === selectedStudy)[0]?.name
           setNewId(newParticipant.id)
         }
         ids = [...ids, id]
@@ -146,7 +141,7 @@ export default function AddUser({
       setShowErrorMsg(true)
       return false
     } else {
-      let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
+      let studyName = studies?.filter((study) => study.id === selectedStudy)[0]?.name
       setStudyBtnClicked(true)
       let newParticipant: any = {}
       newParticipant.id = "U" + crypto.getRandomValues(new Uint32Array(1))[0].toString().substring(0, 8)
@@ -207,7 +202,7 @@ export default function AddUser({
             onChange={handleChangeStudy}
             helperText={!validate() ? `${t("Please select the group")}` : ""}
           >
-            {(studies || []).map((study) => (
+            {(studies || [])?.map((study) => (
               <MenuItem key={study.id} value={study.id}>
                 {study.name}
               </MenuItem>

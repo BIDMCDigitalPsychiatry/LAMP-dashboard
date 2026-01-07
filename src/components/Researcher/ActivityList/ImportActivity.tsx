@@ -30,7 +30,9 @@ import { useDropzone } from "react-dropzone"
 import { useTranslation } from "react-i18next"
 import { saveSurveyActivity, saveCTestActivity, addActivity } from "../ActivityList/ActivityMethods"
 import Pagination from "../../PaginatedElement"
-import { Service } from "../../DBService/DBService"
+import LAMP from "lamp-core"
+import { addHideSubactivities } from "./Activity"
+import { getActivitiesByStudyWithDeduplication } from "../../../helper/functions"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -203,6 +205,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function ImportActivity({ ...props }) {
+  const { researcherId } = props
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -216,21 +219,39 @@ export default function ImportActivity({ ...props }) {
   const [studies, setStudies] = useState(null)
   const [activities, setActivities] = useState(null)
 
+  const getAllStudies = async () => {
+    await LAMP.Study.allByResearcher(researcherId).then((studies) => {
+      setStudies(studies)
+      setLoading(false)
+    })
+  }
+
+  const getActivitiesByStudy = async (studyId) => {
+    setLoading(true)
+    const studyActivities = await getActivitiesByStudyWithDeduplication(studyId)
+    studyActivities?.map((activity: any) => {
+      activity.study_id = studyId
+      return activity
+    })
+    setActivities(studyActivities)
+    setLoading(false)
+  }
+
   useEffect(() => {
     setLoading(true)
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      Service.getAll("activities").then((activities) => {
-        setActivities(activities)
-        setLoading(false)
-      })
-    })
+    getAllStudies()
   }, [])
+
+  useEffect(() => {
+    if (selectedStudy) {
+      getActivitiesByStudy(selectedStudy)
+    }
+  }, [selectedStudy])
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
     setPage(page)
-    setPaginatedImported(importFile.slice(page * rowCount, page * rowCount + rowCount))
+    setPaginatedImported(importFile?.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   // Import a file containing pre-linked Activity objects from another Study.
@@ -238,11 +259,11 @@ export default function ImportActivity({ ...props }) {
     setLoading(true)
     let status = true
     const _importFile = [...importFile] // clone it so we can close the dialog first
-    let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
+    let allIDs = _importFile?.map((x) => x.id)?.reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     // checking and updating duplicate activities under same group
     checkDuplicateUpdateActivity(_importFile, activities, selectedStudy)
     // CTests and Surveys.
-    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.module"].includes(x.spec))) {
+    for (let x of _importFile?.filter((x) => !["lamp.group", "lamp.module"].includes(x.spec))) {
       try {
         let newItem =
           x.spec === "lamp.survey"
@@ -273,13 +294,12 @@ export default function ImportActivity({ ...props }) {
     }
 
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
-    for (let x of _importFile.filter((x) => ["lamp.module", "lamp.group"].includes(x.spec))) {
+    for (let x of _importFile?.filter((x) => ["lamp.module", "lamp.group"].includes(x.spec))) {
       try {
         if (!isValidModuleImport(x, allIDs, selectedStudy, activities)) {
           status = false
           continue
         }
-
         let newItem = await saveCTestActivity({
           ...x,
           id: undefined,
@@ -288,10 +308,24 @@ export default function ImportActivity({ ...props }) {
           settings: {
             ...x.settings,
             activities: Array.isArray(x.settings?.activities)
-              ? x.settings.activities.map((id) => allIDs[id] ?? id)
+              ? x.settings.activities?.map((id) => allIDs[id] ?? id)
               : [],
           },
         })
+        if (!!newItem.data) {
+          allIDs[x.id] = newItem.data
+        }
+        if (!!x.settings.hide_sub_activities) {
+          addHideSubactivities(
+            {
+              ...x.settings,
+              activities: Array.isArray(x.settings?.activities)
+                ? x.settings.activities?.map((id) => allIDs[id] ?? id)
+                : [],
+            },
+            newItem.data
+          )
+        }
         if (!!newItem.data) {
           addActivity(
             {
@@ -322,8 +356,8 @@ export default function ImportActivity({ ...props }) {
   const isValidModuleImport = (group, allIDs, selectedStudyId, existingActivities) => {
     const importedActivityIds = Object.keys(allIDs)
     const existingStudyActivities = existingActivities
-      .filter((activity) => activity.study_id === selectedStudyId)
-      .map((activity) => activity.id)
+      ?.filter((activity) => activity.study_id === selectedStudyId)
+      ?.map((activity) => activity.id)
     const allValidIds = [...importedActivityIds, ...existingStudyActivities]
 
     return Array.isArray(group.settings?.activities)
@@ -333,8 +367,8 @@ export default function ImportActivity({ ...props }) {
 
   const checkDuplicateUpdateActivity = (obj, activitiesList, selectedStudyId) => {
     const objArray = obj
-    objArray.map((eachData, i) => {
-      let activityStudyCount = activitiesList.reduce(function (n, eachActivity) {
+    objArray?.map((eachData, i) => {
+      let activityStudyCount = activitiesList?.reduce(function (n, eachActivity) {
         return n + (eachActivity.study_id === selectedStudyId)
       }, 0)
       const nameExists = activitiesList.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
@@ -356,9 +390,9 @@ export default function ImportActivity({ ...props }) {
       let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
       if (
         Array.isArray(obj) &&
-        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
+        obj?.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule)?.length > 0
       ) {
-        setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
+        setPaginatedImported(obj?.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
       } else {
         enqueueSnackbar(`${t("Couldn't import the Activities.")}`, { variant: "error" })
@@ -368,7 +402,7 @@ export default function ImportActivity({ ...props }) {
   }, [])
 
   // eslint-disable-next-line
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: "application/json,.json",
     maxSize: 25 * 1024 * 1024 /* 5MB */,
@@ -409,7 +443,7 @@ export default function ImportActivity({ ...props }) {
                 setSelectedStudy(event.target.value)
               }}
             >
-              {(studies || []).map((study) => (
+              {(studies || [])?.map((study) => (
                 <MenuItem key={study.id} value={study.id}>
                   {study.name}
                 </MenuItem>
@@ -440,12 +474,18 @@ export default function ImportActivity({ ...props }) {
         <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
           <DialogTitle>{`${t("Continue importing?")}`}</DialogTitle>
           <DialogContent dividers={false}>
-            {(paginatedImported || []).map((activity) => (
+            {(paginatedImported || [])?.map((activity) => (
               <Box className={classes.importList}>
                 <Box>{activity.name}</Box>
               </Box>
             ))}
-            <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
+            <Pagination
+              data={importFile}
+              updatePage={handleChangePage}
+              rowPerPage={[5, 10]}
+              defaultCount={5}
+              totalCount={importFile?.length}
+            />
             <Typography className={classes.errorMsg}>
               {`${t("The Activities having same name under the selected group will be duplicated into new name.")}`}
             </Typography>

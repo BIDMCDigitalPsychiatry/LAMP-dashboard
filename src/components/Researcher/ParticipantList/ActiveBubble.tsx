@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Chip, Tooltip, makeStyles } from "@material-ui/core"
 import { getTimeAgo } from "./Index"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -27,7 +26,7 @@ const activeDataQuality = (active, classes) => ({
       : classes.dataGrey,
 })
 
-export default function Active({ participant, ...props }) {
+export default function Active({ event, participant, ...props }) {
   const classes = useStyles()
   const [logins, setLogins] = useState(null)
   const [active, setActive] = useState(null)
@@ -35,21 +34,11 @@ export default function Active({ participant, ...props }) {
   const timeAgo = getTimeAgo(i18n.language)
 
   useEffect(() => {
-    let isCancelled = false
-    setTimeout(() => {
-      Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-        if (!isCancelled) {
-          let res = data[0]?.analytics
-          setLogins(!!res && res.length > 0 ? res[0] : null)
-          let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
-          setActive(active)
-        }
-      })
-      return () => {
-        isCancelled = true
-      }
-    }, 3000)
-  }, [])
+    let res = event?.analytics
+    setLogins(!!res && res?.length > 0 ? res[0] : null)
+    let active = !!event?.active && event?.active?.length > 0 ? event?.active[0] : []
+    setActive(active)
+  }, [event])
 
   const dateInfo = (id) => ({
     relative: active?.timestamp ?? 0,

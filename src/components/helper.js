@@ -1,5 +1,7 @@
+import LAMP from "lamp-core"
+
 export function extractIdsWithHierarchy(data) {
-  return data.map((item) => {
+  return data?.map((item) => {
     const result = {
       id: item.id,
       spec: item.spec,
@@ -8,7 +10,7 @@ export function extractIdsWithHierarchy(data) {
       parentModule: item.parentModule,
       parentString: item.parentString,
     }
-    if (item.subActivities && item.subActivities.length > 0) {
+    if (item.subActivities && item.subActivities?.length > 0) {
       result.subActivities = extractIdsWithHierarchy(item.subActivities)
     }
     return result
@@ -32,4 +34,8 @@ export function clearLocalStorageItems() {
   }
   localStorage.setItem("loginAttempts", loginAttempts)
   sessionStorage.clear()
+}
+
+export function getBasicToken() {
+  return "Basic " + LAMP.Auth._auth.id + ":" + LAMP.Auth._auth.password
 }

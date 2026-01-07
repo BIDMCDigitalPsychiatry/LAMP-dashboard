@@ -64,13 +64,13 @@ export default function RemindBefore({ ...props }) {
             }}
           >
             <MenuItem value={null}>Select</MenuItem>
-            {options.map((option) => (
+            {options?.map((option) => (
               <MenuItem value={option.value}>{option.text}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </Grid>
-      {(repeatOptions || []).length > 0 && (
+      {(repeatOptions || [])?.length > 0 && (
         <Repeat
           disabled={props.disabled}
           options={repeatOptions ?? []}

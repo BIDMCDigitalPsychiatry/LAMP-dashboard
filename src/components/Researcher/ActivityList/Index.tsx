@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
-import { Service } from "../../DBService/DBService"
 import { useTranslation } from "react-i18next"
 import ActivityItem from "./ActivityItem"
 import Header from "./Header"
-import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { Service } from "../../DBService/DBService"
+import { sortData } from "../Dashboard"
+import { getBasicToken } from "../../helper"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -67,7 +68,6 @@ export const availableActivitySpecs = [
   "lamp.fragmented_letters",
   "lamp.digit_span",
   "lamp.memory_game",
-  "lamp.zoom_meeting",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -111,13 +111,22 @@ export default function ActivityList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [totalCount, setTotalCount] = useState(0)
+  const [activityByStudy, setActivityByStudy] = useState({})
+  const [filters, setFilters] = useState({
+    sort: "createdAt",
+    order: order ? "asc" : "desc",
+    search: "",
+    page: 1,
+    limit: 40,
+  })
 
   useInterval(
     () => {
       setLoading(true)
       getAllStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
 
@@ -132,12 +141,13 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
+    if (order !== filters.order) setFilters((prev) => ({ ...prev, order: order ? "asc" : "desc" }))
+  }, [order])
+
+  useEffect(() => {
+    const userToken: any = getBasicToken()
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      if ((selected || []).length > 0) {
+      if ((selected || [])?.length > 0) {
         searchActivities()
       } else {
         setActivities([])
@@ -146,35 +156,48 @@ export default function ActivityList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected])
+
+  useEffect(() => {
+    if (researcherId && studies?.length) {
+      searchActivities()
+    }
+  }, [researcherId, selectedStudies, filters])
 
   const handleChange = (activity, checked) => {
     if (checked) {
       setSelectedActivities((prevState) => [...prevState, activity])
     } else {
-      let selected = selectedActivities.filter((item) => item.id != activity.id)
+      let selected = selectedActivities?.filter((item) => item.id != activity.id)
       setSelectedActivities(selected)
     }
   }
 
-  const searchActivities = (searchVal?: string) => {
+  const searchActivitiesForDemo = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0) {
+    const selectedData = selected?.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData?.length > 0) {
       setLoading(true)
       let result = []
       Service.getAll("activities").then((activitiesData) => {
         setAllActivities(activitiesData)
-        if (!!searchTxt && searchTxt.trim().length > 0) {
-          result = result.concat(activitiesData)
-          result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
+        if (!!searchTxt && searchTxt.trim()?.length > 0) {
+          result = result?.concat(activitiesData)
+          result = result?.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
           setActivities(sortData(result, selectedData, "name"))
         } else {
-          result = result.concat(activitiesData)
+          result = result?.concat(activitiesData)
           setActivities(sortData(result, selectedData, "name"))
         }
+        const allCounts = (result || [])?.reduce((acc: Record<string, number>, a: any) => {
+          const key = a.study_id || a.study || "unknown"
+          acc[key] = (acc[key] || 0) + 1
+          return acc
+        }, {} as Record<string, number>)
+        setActivityByStudy(allCounts)
+        setTotalCount(result?.length)
         setPaginatedActivities(
-          sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+          sortData(result, selectedData, "name")?.slice(page * rowCount, page * rowCount + rowCount)
         )
         setLoading(false)
       })
@@ -185,21 +208,63 @@ export default function ActivityList({
     setSelectedActivities([])
   }
 
+  const searchActivities = async (searchVal?: string) => {
+    if (LAMP.Auth._auth.serverAddress === "demo.lamp.digital") {
+      searchActivitiesForDemo(searchVal)
+      return
+    }
+    try {
+      setLoading(true)
+      const searchTxt = searchVal ?? search
+      const studyIds =
+        selectedStudies?.map((name) => studies?.find((s) => s.name === name)?.name)?.filter(Boolean) || []
+
+      const requestBody = {
+        studies: studyIds,
+        sort: filters.order,
+        search: searchTxt?.trim(),
+        page: filters.page,
+        limit: filters.limit,
+      }
+      const result = await LAMP.Researcher.activitiesList(researcherId, requestBody)
+      const activityArray = result?.activities || []
+      const mapped = activityArray?.map((p) => ({
+        ...p,
+        id: p._id,
+        name: p.name || p._id,
+        study_name: p.studyName,
+        spec: p.spec,
+        settings: p.settings,
+        schedule: p.schedule,
+        category: p.category,
+        parent: p._parent,
+        timestamp: p.timestamp,
+        deleted: p._deleted,
+      }))
+      setActivities(mapped)
+      const total = !!result?.totalActivities
+        ? Object.values(result?.totalActivities)?.reduce((sum, value) => Number(sum) + Number(value), 0)
+        : 0
+      setActivityByStudy(result?.totalActivities || {})
+      setTotalCount(result?.count || 0)
+      setPaginatedActivities(mapped?.slice(0, rowCount))
+    } catch (err) {
+      console.error(" Error fetching activities:", err)
+
+      setPaginatedActivities([])
+    } finally {
+      setLoading(false)
+    }
+    setSelectedActivities([])
+  }
   const handleSearchData = (val: string) => {
     setSearch(val)
     searchActivities(val)
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
-    setLoading(true)
-    setRowCount(rowCount)
-    setPage(page)
+    setFilters((prev) => ({ ...prev, page: page + 1, limit: rowCount }))
     localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    setPaginatedActivities(
-      sortData(activities, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
-    )
-    setLoading(false)
   }
 
   return (
@@ -218,12 +283,14 @@ export default function ActivityList({
         setActivities={searchActivities}
         setOrder={setOrder}
         order={order}
+        activityByStudy={activityByStudy}
+        setSelectedActivities={setSelectedActivities}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!activities && activities.length > 0 ? (
+          {!!activities && activities?.length > 0 ? (
             <Grid container spacing={3}>
-              {paginatedActivities.map((activity) => (
+              {paginatedActivities?.map((activity) => (
                 <Grid item lg={6} xs={12} key={activity.id}>
                   <ActivityItem
                     activity={activity}
@@ -243,6 +310,7 @@ export default function ActivityList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                totalCount={totalCount}
               />
             </Grid>
           ) : (

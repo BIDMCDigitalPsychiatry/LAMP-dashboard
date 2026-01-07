@@ -96,7 +96,7 @@ export default function Streak({
           <Typography variant="h5" gutterBottom>
             <ReactMarkdown
               children={t(
-                !!activity?.streakTitle && activity?.streakTitle.trim().length > 0
+                !!activity?.streakTitle && activity?.streakTitle.trim()?.length > 0
                   ? activity?.streakTitle
                   : "Nice work!"
               )}
@@ -108,7 +108,7 @@ export default function Streak({
           <Typography className={classes.ribbonText} component="p">
             <ReactMarkdown
               children={t(
-                !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
+                !!activity?.streakDesc && activity?.streakDesc.trim()?.length > 0
                   ? activity?.streakDesc
                   : "You’re on a streak, keep it going"
               )}

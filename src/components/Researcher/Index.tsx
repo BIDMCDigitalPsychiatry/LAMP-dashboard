@@ -1,19 +1,18 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React, { lazy, Suspense, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import locale_lang from "../../locale_map.json"
-import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
-import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
+import { saveDemoData } from "../../components/Researcher/SaveResearcherData"
+import { lazyRetry } from "../../helper/functions"
+const Dashboard = lazy(lazyRetry(() => import("./Dashboard")))
 
 export default function Researcher({ researcher, onParticipantSelect, mode, tab, ...props }) {
   const { t, i18n } = useTranslation()
-  // const [dataWorker] = useWorker(saveDataToCache)
-  // const [demoWorker] = useWorker(saveDemoData)
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
@@ -26,31 +25,20 @@ export default function Researcher({ researcher, onParticipantSelect, mode, tab,
     i18n.changeLanguage(language)
     ;(async () => {
       let lampAuthId = LAMP.Auth._auth.id
-      let lampAuthPswd = LAMP.Auth._auth.password
-      // if (LAMP.Auth._type === "researcher") {
-      //   lampAuthId === "researcher@demo.lamp.digital"
-      //     ? demoWorker()
-      //     : dataWorker(lampAuthId + ":" + lampAuthPswd, researcher.id)
-      // } else if (LAMP.Auth._type === "admin") {
-      //   if (researcher.id) {
-      //     dataWorker(lampAuthId + ":" + lampAuthPswd, researcher.id)
-      //   }
-      // }
+
       if (LAMP.Auth._type === "researcher") {
         lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital"
           ? saveDemoData()
-          : saveDataToCache(researcher.id)
-      } else if (LAMP.Auth._type === "admin") {
-        if (researcher.id) {
-          saveDataToCache(researcher.id)
-        }
+          : ""
       }
     })()
   }, [])
 
   return (
     <React.Fragment>
-      <Dashboard onParticipantSelect={onParticipantSelect} researcherId={researcher.id} mode={mode} tab={tab} />
+      <Suspense fallback={<div />}>
+        <Dashboard onParticipantSelect={onParticipantSelect} researcherId={researcher.id} mode={mode} tab={tab} />
+      </Suspense>
     </React.Fragment>
   )
 }

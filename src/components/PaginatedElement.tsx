@@ -9,6 +9,7 @@ export default function Pagination({
   defaultCount,
   currentPage,
   currentRowCount,
+  totalCount,
   type,
   ...props
 }: {
@@ -19,6 +20,7 @@ export default function Pagination({
   currentPage?: number
   currentRowCount?: number
   type?: number
+  totalCount?: number
 }) {
   const [page, setPage] = useState(currentPage)
   const [rowCount, setRowCount] = useState(currentRowCount ?? defaultCount ?? (type ? 10 : 40))
@@ -33,12 +35,12 @@ export default function Pagination({
   }
 
   useEffect(() => {
-    updatePage(data.length < page * rowCount ? 0 : page, rowCount)
+    updatePage(page, rowCount)
   }, [page])
 
   useEffect(() => {
-    setPage(data.length < page * rowCount ? 0 : page)
-    updatePage(data.length < page * rowCount ? 0 : page, rowCount)
+    setPage(data?.length < page * rowCount ? 0 : page)
+    updatePage(page, rowCount)
   }, [rowCount])
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function Pagination({
   }, [currentPage])
 
   useEffect(() => {
-    setRowCount(currentRowCount ?? (type ? 10 : 40))
+    setRowCount(currentRowCount ?? defaultCount ?? (type ? 10 : 40))
   }, [currentRowCount])
 
   return (
@@ -54,7 +56,7 @@ export default function Pagination({
       <TablePagination
         component="div"
         labelRowsPerPage={`${t("Rows per page")}:`}
-        count={(data || []).length}
+        count={totalCount}
         rowsPerPage={rowCount}
         page={page ?? 0}
         onPageChange={handleChangePage}

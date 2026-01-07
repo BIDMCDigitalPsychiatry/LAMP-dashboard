@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react"
 import { Typography, makeStyles, Box, Grid, Container, useMediaQuery, useTheme, Icon } from "@material-ui/core"
 import WeekView from "./WeekView"
-import LAMP from "lamp-core"
 import { DatePicker } from "@material-ui/pickers"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
@@ -106,18 +105,18 @@ function getWeekDates() {
 const getJournals = async (journals: any) => {
   let weekdays = getWeekDates()
   let weekData = journals
-    .filter(
+    ?.filter(
       (journal: any) =>
         new Date(journal.timestamp).getMonth() === new Date().getMonth() &&
         weekdays.indexOf(new Date(journal.timestamp).getDate()) > -1
     )
-    .map((journal) => journal)
+    ?.map((journal) => journal)
   let monthData = journals
-    .filter((journal: any) => new Date(journal.timestamp).getMonth() === new Date().getMonth())
-    .map((journal) => journal)
+    ?.filter((journal: any) => new Date(journal.timestamp).getMonth() === new Date().getMonth())
+    ?.map((journal) => journal)
   let others = journals
-    .filter((journal: any) => new Date(journal.timestamp).getMonth() !== new Date().getMonth())
-    .map((journal) => journal)
+    ?.filter((journal: any) => new Date(journal.timestamp).getMonth() !== new Date().getMonth())
+    ?.map((journal) => journal)
 
   let data = {
     "This week": weekData,
@@ -157,14 +156,14 @@ export default function VoiceRecoding({ selectedEvents, ...props }) {
   useEffect(() => {
     setJournals(selectedEvents)
     getJournals(selectedEvents).then(setAllJournals)
-    setSelectedDates(selectedEvents.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
+    setSelectedDates(selectedEvents?.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
   }, [])
 
   useEffect(() => {
     if (allJournals !== null) {
-      Object.keys(allJournals).map((each) => {
-        if (allJournals[each].length > 0 && text.length === 0) {
-          allJournals[each].map((journal, index) => {
+      Object.keys(allJournals)?.map((each) => {
+        if (allJournals[each]?.length > 0 && text?.length === 0) {
+          allJournals[each]?.map((journal, index) => {
             setOpen({ ...open, [index]: false })
             let jText = journal.static_data.url
             setText({ ...text, [index]: jText })
@@ -203,11 +202,11 @@ export default function VoiceRecoding({ selectedEvents, ...props }) {
                   This date
                 </Box>
                 {journals
-                  .filter(
+                  ?.filter(
                     (journal) =>
                       new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
                   )
-                  .map((journal, index) => (
+                  ?.map((journal, index) => (
                     <Box boxShadow={0} key={index}>
                       <Grid item>
                         <Box className={classes.recordingStyle} onClick={() => handleOpen(index, journal)}>
@@ -223,14 +222,14 @@ export default function VoiceRecoding({ selectedEvents, ...props }) {
           ) : (
             <div>
               {allJournals !== null &&
-                Object.keys(allJournals).map((each) => (
+                Object.keys(allJournals)?.map((each) => (
                   <Container>
-                    {allJournals[each].length > 0 && (
+                    {allJournals[each]?.length > 0 && (
                       <Container className={classes.recordingHistory}>
                         <Box fontWeight="fontWeightBold" className={classes.recordingday}>
                           {each}
                         </Box>
-                        {allJournals[each].map((journal, index) => (
+                        {allJournals[each]?.map((journal, index) => (
                           <Box boxShadow={0} key={index}>
                             <Grid item>
                               <Box className={classes.recordingStyle} onClick={() => handleOpen(index, journal)}>

@@ -1,7 +1,6 @@
 import React from "react"
 import {
   Box,
-  Typography,
   Card,
   CardHeader,
   CardActions,
@@ -21,42 +20,41 @@ import {
   generate_activity_dict,
   ts_to_UTC_String,
   stringify_obj_values,
-  generate_participant_tag_info,
 } from "./DataPortalShared"
 import { useDrag } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
 import { generate_ids, queryDictionary } from "./DataPortalShared"
-
 import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
 import { useTranslation } from "react-i18next"
 import { getSelfHelpAllActivityEvents } from "../Participant"
+import { getBasicToken } from "../helper"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
   const [expanded, setExpanded] = React.useState(false)
   const [isAlphabetized, toggleAlphabetized] = React.useState(
-    Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator"
+    Object.keys(tags_object).includes(id[id?.length - 1]) && id[id?.length - 1] !== "Administrator"
   )
   const [alphabetizedTree, setAlphabetizedTree] = React.useState(null)
   function alphabetizeTree(array) {
-    if (!Array.isArray(array) || array.length === 1) return array
-    let res = array.slice().sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
+    if (!Array.isArray(array) || array?.length === 1) return array
+    let res = array?.slice()?.sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
     return res
   }
   const { t } = useTranslation()
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TARGETINFO",
-    item: { target: id[id.length - 1], type, name, id_string: id },
+    item: { target: id[id?.length - 1], type, name, id_string: id },
     canDrag: () => {
       return (
         !expanded &&
-        !Object.keys(tags_object).includes(id[id.length - 1]) &&
-        id[id.length - 1] !== undefined &&
-        id[id.length - 1] !== null &&
+        !Object.keys(tags_object).includes(id[id?.length - 1]) &&
+        id[id?.length - 1] !== undefined &&
+        id[id?.length - 1] !== null &&
         name !== "Administrator" &&
-        !queryables_array.includes(id[id.length - 1])
+        !queryables_array.includes(id[id?.length - 1])
       )
     },
     collect: (monitor) => ({
@@ -69,8 +67,8 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
 
   const useStyles = makeStyles((theme) => ({
     treeCard: {
-      width: `${100 - 2 * (id.length > 2 ? 1 : 0)}%`,
-      marginLeft: `${2 * (id.length > 2 ? 1 : 0)}%`,
+      width: `${100 - 2 * (id?.length > 2 ? 1 : 0)}%`,
+      marginLeft: `${2 * (id?.length > 2 ? 1 : 0)}%`,
       marginTop: "5px",
     },
     cardActions: {
@@ -161,7 +159,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       let res = await fetch(`https://${token.server}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${userToken.accessToken}`,
+          Authorization: getBasicToken(),
         },
         credentials: "include",
         body: query,
@@ -185,29 +183,29 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       if (!expanded) return
       setTree(tags_object[type])
     }, [expanded])
-  } else if (Object.keys(tags_object).includes(id[id.length - 1])) {
+  } else if (Object.keys(tags_object).includes(id[id?.length - 1])) {
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
       let testQuery =
-        id[id.length - 1] === "Researcher"
+        id[id?.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
-          : id[id.length - 1] === "Study"
-          ? `$LAMP.Study.list("${id[id.length - 2]}")`
-          : id[id.length - 1] === "Participant"
-          ? queryDictionary.participantsWithName(id[id.length - 2])
-          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")`
+          : id[id?.length - 1] === "Study"
+          ? `$LAMP.Study.list("${id[id?.length - 2]}")`
+          : id[id?.length - 1] === "Participant"
+          ? queryDictionary.participantsWithName(id[id?.length - 2])
+          : `$LAMP.${id[id?.length - 1]}.list("${id[id?.length - 2]}")`
       getData(testQuery).then((res) => {
         if (!Array.isArray(res)) res = [res]
         setTree(res)
         setAlphabetizedTree(alphabetizeTree(res))
       })
     }, [expanded])
-  } else if (queryables_array.includes(id[id.length - 1])) {
+  } else if (queryables_array.includes(id[id?.length - 1])) {
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")`
+      let testQuery = `$LAMP.${id[id?.length - 1]}.list("${id?.length >= 2 ? id[id?.length - 2] : ""}")`
       onSetQuery(testQuery)
     }, [expanded])
   }
@@ -216,8 +214,8 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   else {
     React.useEffect(() => {
       if (!expanded) return
-      //(`Getting static options for id: ${id[id.length-2]}`)
-      setTree(tags_object[id[id.length - 2]])
+      //(`Getting static options for id: ${id[id?.length-2]}`)
+      setTree(tags_object[id[id?.length - 2]])
     }, [expanded])
   }
 
@@ -226,7 +224,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   let day = dateObj.getDate()
   let year = dateObj.getFullYear()
   let newdate = month + "_" + day + "_" + year
-  const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id.length - 1]}_Activity_Data_${newdate}.csv`
+  const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id?.length - 1]}_Activity_Data_${newdate}.csv`
   const [downloadName, setDownloadName] = React.useState(defaultDownloadName)
 
   const defaultExplodeParticipant = true
@@ -249,7 +247,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   ) {
     //TODO: add selection between one big file and multiple files
     //TODO: add json vs csv selection
-    console.log(`Downloading data for ${id}`)
 
     //first, let's generate a complete id list
     let id_obj = await generate_ids(id, true)
@@ -259,21 +256,21 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
 
     //now, let's pull some data
     let resultsPulled = (await Promise.all(
-      id_list.map(async (id) => {
+      id_list?.map(async (id) => {
         let res: Array<any> =
           LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
             ? await getSelfHelpAllActivityEvents()
             : await LAMP.ActivityEvent.allByParticipant(id)
-        res = res.reduce((acc, event) => {
+        res = res?.reduce((acc, event) => {
           let activity_obj = {
             ActivityName: lookup_dict[event.activity]?.name ?? "UNKNOWN",
             ActivityDate: ts_to_UTC_String(event.timestamp),
             ...event,
           }
-          if (chosen_activities.length === 0) return acc.concat([activity_obj])
+          if (chosen_activities?.length === 0) return acc?.concat([activity_obj])
           else {
             return activity_obj["ActivityName"] && chosen_activities.indexOf(activity_obj["ActivityName"]) !== -1
-              ? acc.concat([activity_obj])
+              ? acc?.concat([activity_obj])
               : acc
           }
         }, [])
@@ -286,13 +283,13 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     )) as Array<any>
 
     if (explode_by_participant) {
-      resultsPulled = resultsPulled.reduce((acc, participant_object) => {
-        return (acc as Array<any>).concat(
+      resultsPulled = resultsPulled?.reduce((acc, participant_object) => {
+        return (acc as Array<any>)?.concat(
           JSON.parse(participant_object["activityEvents"])
-            .map((activity) => {
+            ?.map((activity) => {
               //let final_object:
               if (explode_temporal_slices && activity?.temporal_slices?.length) {
-                return activity.temporal_slices.map((slice) => {
+                return activity.temporal_slices?.map((slice) => {
                   //explode out temporal slices
                   let obj = { ...activity }
                   delete obj.temporal_slices
@@ -318,8 +315,8 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   },
                 ]
             })
-            .reduce((acc, elem) => {
-              return acc.concat(elem)
+            ?.reduce((acc, elem) => {
+              return acc?.concat(elem)
             }, [])
         )
       }, [])
@@ -336,34 +333,34 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   }, [showFilter])
 
   const [copyText, setCopyText] = React.useState(
-    `${t("Copy")} ${id.length >= 2 ? id[id.length - 2] : ""} ${t("ID to clipboard")}`
+    `${t("Copy")} ${id?.length >= 2 ? id[id?.length - 2] : ""} ${t("ID to clipboard")}`
   )
 
   return (
-    <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
+    <Card ref={drag} key={"div" + id[id?.length - 1]} raised={true} className={classes.treeCard}>
       <CardHeader
         className={classes.cardHeader}
-        key={"text" + id[id.length - 1]}
-        title={`${name ? name : id[id.length - 1]}`}
+        key={"text" + id[id?.length - 1]}
+        title={`${name ? name : id[id?.length - 1]}`}
         action={
-          id.length >= 2 &&
-          Object.keys(tags_object).includes(id[id.length - 2]) && (
+          id?.length >= 2 &&
+          Object.keys(tags_object).includes(id[id?.length - 2]) && (
             <Tooltip title={copyText}>
               <IconButton
                 className={classes.treeButton}
                 onClick={() => {
                   navigator.clipboard
-                    .writeText(id[id.length - 1])
+                    .writeText(id[id?.length - 1])
                     .then(() => {
                       setCopyText("Copied!")
                       setTimeout(() => {
-                        setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)
+                        setCopyText(`Copy ${id[id?.length - 2]} ID to clipboard`)
                       }, 5000)
                     })
                     .catch(() => {
                       setCopyText("Unable to copy!")
                       setTimeout(() => {
-                        setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)
+                        setCopyText(`Copy ${id[id?.length - 2]} ID to clipboard`)
                       }, 5000)
                     })
                 }}
@@ -376,7 +373,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       />
 
       {showFilter && (
-        <ClickAwayListener onClickAway={() => toggleShowFilter(currentFilter.length !== 0)}>
+        <ClickAwayListener onClickAway={() => toggleShowFilter(currentFilter?.length !== 0)}>
           <CardContent>
             {expanded && (
               <TextField
@@ -385,8 +382,8 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                 onChange={(e) => {
                   setCurrentFilter(e.target.value)
                 }}
-                label={`Filter ${id[id.length - 1]}s`}
-                placeholder={`Search ${id[id.length - 1]} list`}
+                label={`Filter ${id[id?.length - 1]}s`}
+                placeholder={`Search ${id[id?.length - 1]} list`}
                 inputRef={filterRef}
                 InputProps={{
                   disableUnderline: true,
@@ -397,7 +394,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         </ClickAwayListener>
       )}
       <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
-        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
+        {Object.keys(tags_object).includes(id[id?.length - 1]) && id[id?.length - 1] !== "Administrator" && expanded && (
           <Tooltip title={isAlphabetized ? `${t("Sort by date of creation")}` : `${t("Alphabetize List")}`}>
             <IconButton
               className={isAlphabetized ? classes.treeButtonHighlighted : classes.treeButton}
@@ -408,10 +405,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
           </Tooltip>
         )}
 
-        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
-          <Tooltip title={`${t("Filter")}${currentFilter.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
+        {Object.keys(tags_object).includes(id[id?.length - 1]) && id[id?.length - 1] !== "Administrator" && expanded && (
+          <Tooltip title={`${t("Filter")}${currentFilter?.length ? `(${t("currently")}:${currentFilter})` : ""}`}>
             <IconButton
-              className={currentFilter.length ? classes.treeButtonHighlighted : classes.treeButton}
+              className={currentFilter?.length ? classes.treeButtonHighlighted : classes.treeButton}
               onClick={() => {
                 toggleShowFilter(!showFilter)
                 setCurrentFilter("")
@@ -422,183 +419,187 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
           </Tooltip>
         )}
 
-        {!Object.keys(tags_object).includes(id[id.length - 1]) && Object.keys(tags_object).includes(id[id.length - 2]) && (
-          <SelectionWindow
-            openButtonText={`Download ${id[id.length - 2]} data`}
-            customButton={
-              <IconButton className={classes.treeButton}>
-                <Icon>get_app</Icon>
-              </IconButton>
-            }
-            displaySubmitButton={true}
-            runOnOpen={async () => {
-              setDownloadName(defaultDownloadName)
-              setExplodeTemporalSlices(defaultExplodeTemporalSlices)
-              setExplodeParticipant(defaultExplodeParticipant)
-              setDownloadAllActivities(defaultDownloadAllActivities)
-              setChosenActivities([])
-              setActivityList(
-                (Object.values(await generate_activity_dict(id[id.length - 1], token)).reduce((acc, elem) => {
-                  return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>).concat([elem])
-                }, []) as Array<any>).sort((a, b) => a["name"].localeCompare(b["name"]))
-              )
-            }}
-            handleResult={() =>
-              downloadData(
-                id[id.length - 1],
-                downloadName,
-                explodeParticipant,
-                explodeTemporalSlices,
-                downloadAllActivities ? activityList.map((elem) => elem["name"]) : chosenActivityList
-              )
-            }
-            closesOnSubmit={false}
-            exposeButton={true}
-            submitText={`Download`}
-            children={
-              <React.Fragment>
-                Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
-                <br />
-                <FormControlLabel
-                  classes={{ root: classes.downloadFormControl }}
-                  labelPlacement={"top"}
-                  control={
-                    <TextField
-                      value={downloadName}
-                      onChange={(e) => {
-                        setDownloadName(e.target.value)
-                      }}
-                    />
-                  }
-                  label={
-                    <Box component="span" fontWeight={600}>
-                      {`${t("File Name")}`}
-                    </Box>
-                  }
-                />
-                <br />
-                <FormControlLabel
-                  classes={{ root: classes.downloadFormControl }}
-                  onClick={() => setExplodeParticipant(!explodeParticipant)}
-                  control={<Checkbox checked={explodeParticipant} />}
-                  label={
-                    <Box component="span" fontWeight={600}>
-                      {`${t("Separate participant data into multiple lines for each activity")}`}
-                    </Box>
-                  }
-                />
-                {explodeParticipant && (
+        {!Object.keys(tags_object).includes(id[id?.length - 1]) &&
+          Object.keys(tags_object).includes(id[id?.length - 2]) && (
+            <SelectionWindow
+              openButtonText={`Download ${id[id?.length - 2]} data`}
+              customButton={
+                <IconButton className={classes.treeButton}>
+                  <Icon>get_app</Icon>
+                </IconButton>
+              }
+              displaySubmitButton={true}
+              runOnOpen={async () => {
+                setDownloadName(defaultDownloadName)
+                setExplodeTemporalSlices(defaultExplodeTemporalSlices)
+                setExplodeParticipant(defaultExplodeParticipant)
+                setDownloadAllActivities(defaultDownloadAllActivities)
+                setChosenActivities([])
+                setActivityList(
+                  (Object.values(await generate_activity_dict(id[id?.length - 1], token))?.reduce((acc, elem) => {
+                    return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>)?.concat([elem])
+                  }, []) as Array<any>)?.sort((a, b) => a["name"].localeCompare(b["name"]))
+                )
+              }}
+              handleResult={() =>
+                downloadData(
+                  id[id?.length - 1],
+                  downloadName,
+                  explodeParticipant,
+                  explodeTemporalSlices,
+                  downloadAllActivities ? activityList?.map((elem) => elem["name"]) : chosenActivityList
+                )
+              }
+              closesOnSubmit={false}
+              exposeButton={true}
+              submitText={`Download`}
+              children={
+                <React.Fragment>
+                  Download Data for {id[id?.length - 2]} {name ? name : id[id?.length - 1]}
+                  <br />
                   <FormControlLabel
                     classes={{ root: classes.downloadFormControl }}
-                    onClick={() => setExplodeTemporalSlices(!explodeTemporalSlices)}
-                    control={<Checkbox checked={explodeTemporalSlices} />}
+                    labelPlacement={"top"}
+                    control={
+                      <TextField
+                        value={downloadName}
+                        onChange={(e) => {
+                          setDownloadName(e.target.value)
+                        }}
+                      />
+                    }
                     label={
                       <Box component="span" fontWeight={600}>
-                        {`${t("Separate activity data into multiple lines for each response")}`}
+                        {`${t("File Name")}`}
                       </Box>
                     }
                   />
-                )}
-                <FormControlLabel
-                  classes={{ root: classes.downloadFormControl }}
-                  onClick={() => setDownloadAllActivities(!downloadAllActivities)}
-                  control={<Checkbox checked={downloadAllActivities} />}
-                  label={
-                    <Box component="span" fontWeight={600}>
-                      {`${t("Download data for all activities for this")}`} {id[id.length - 2]}
-                    </Box>
-                  }
-                />
-                {activityList.length > 0 && !downloadAllActivities && (
-                  <Box>
-                    <Box className={classes.categoryBox}>
-                      {activityList
-                        .reduce((acc, activity) => {
-                          //we return a list of all unique activity specs
-                          return acc.indexOf(activity["spec"]) === -1 &&
-                            activityList.filter((elem) => elem["spec"] == activity["spec"]).length > 1
-                            ? acc.concat([activity["spec"]])
-                            : acc
-                        }, [])
-                        .sort((a, b) => a.localeCompare(b))
-                        .map((spec) => {
-                          return (
-                            <Card key={spec} className={classes.tagCard}>
-                              <CardHeader
-                                onClick={() => {
-                                  //toggle the clicked tag in the pending update list
-                                  //first, get a list of all activity names that fit this spec
-                                  let toggleList = activityList.reduce((acc, activity) => {
-                                    return activity["spec"] == spec && acc.indexOf(activity["name"]) === -1
-                                      ? acc.concat([activity["name"]])
-                                      : acc
-                                  }, [])
+                  <br />
+                  <FormControlLabel
+                    classes={{ root: classes.downloadFormControl }}
+                    onClick={() => setExplodeParticipant(!explodeParticipant)}
+                    control={<Checkbox checked={explodeParticipant} />}
+                    label={
+                      <Box component="span" fontWeight={600}>
+                        {`${t("Separate participant data into multiple lines for each activity")}`}
+                      </Box>
+                    }
+                  />
+                  {explodeParticipant && (
+                    <FormControlLabel
+                      classes={{ root: classes.downloadFormControl }}
+                      onClick={() => setExplodeTemporalSlices(!explodeTemporalSlices)}
+                      control={<Checkbox checked={explodeTemporalSlices} />}
+                      label={
+                        <Box component="span" fontWeight={600}>
+                          {`${t("Separate activity data into multiple lines for each response")}`}
+                        </Box>
+                      }
+                    />
+                  )}
+                  <FormControlLabel
+                    classes={{ root: classes.downloadFormControl }}
+                    onClick={() => setDownloadAllActivities(!downloadAllActivities)}
+                    control={<Checkbox checked={downloadAllActivities} />}
+                    label={
+                      <Box component="span" fontWeight={600}>
+                        {`${t("Download data for all activities for this")}`} {id[id?.length - 2]}
+                      </Box>
+                    }
+                  />
+                  {activityList?.length > 0 && !downloadAllActivities && (
+                    <Box>
+                      <Box className={classes.categoryBox}>
+                        {activityList
+                          ?.reduce((acc, activity) => {
+                            //we return a list of all unique activity specs
+                            return acc.indexOf(activity["spec"]) === -1 &&
+                              activityList?.filter((elem) => elem["spec"] == activity["spec"])?.length > 1
+                              ? acc?.concat([activity["spec"]])
+                              : acc
+                          }, [])
+                          ?.sort((a, b) => a.localeCompare(b))
+                          ?.map((spec) => {
+                            return (
+                              <Card key={spec} className={classes.tagCard}>
+                                <CardHeader
+                                  onClick={() => {
+                                    //toggle the clicked tag in the pending update list
+                                    //first, get a list of all activity names that fit this spec
+                                    let toggleList = activityList?.reduce((acc, activity) => {
+                                      return activity["spec"] == spec && acc.indexOf(activity["name"]) === -1
+                                        ? acc?.concat([activity["name"]])
+                                        : acc
+                                    }, [])
 
-                                  //copy the chosen activity list and push to it
-                                  let currentList = chosenActivityList.slice()
-                                  toggleList.forEach((name) => {
-                                    let index = currentList.indexOf(name)
-                                    if (index === -1) {
-                                      currentList.push(name)
+                                    //copy the chosen activity list and push to it
+                                    let currentList = chosenActivityList?.slice()
+                                    toggleList.forEach((name) => {
+                                      let index = currentList.indexOf(name)
+                                      if (index === -1) {
+                                        currentList.push(name)
+                                      }
+                                    })
+                                    setChosenActivities(currentList)
+                                  }}
+                                  classes={{ title: classes.tagCardHeader }}
+                                  title={`Select all ${spec} activities`}
+                                />
+                              </Card>
+                            )
+                          })}
+                      </Box>
+
+                      <Box className={classes.categoryBox}>
+                        {activityList
+                          ?.reduce(
+                            (acc, elem) => (acc.indexOf(elem["name"]) !== -1 ? acc : acc?.concat(elem["name"])),
+                            []
+                          )
+                          ?.map((name) => {
+                            return (
+                              <Card key={name} className={classes.tagCard}>
+                                <CardHeader
+                                  onClick={() => {
+                                    //toggle the clicked tag in the pending update list
+                                    let index = chosenActivityList.indexOf(name)
+                                    if (index !== -1) {
+                                      setChosenActivities(chosenActivityList?.filter((elem) => elem !== name))
+                                    } else {
+                                      setChosenActivities(chosenActivityList?.concat([name]))
                                     }
-                                  })
-                                  setChosenActivities(currentList)
-                                }}
-                                classes={{ title: classes.tagCardHeader }}
-                                title={`Select all ${spec} activities`}
-                              />
-                            </Card>
-                          )
-                        })}
-                    </Box>
-
-                    <Box className={classes.categoryBox}>
-                      {activityList
-                        .reduce((acc, elem) => (acc.indexOf(elem["name"]) !== -1 ? acc : acc.concat(elem["name"])), [])
-                        .map((name) => {
-                          return (
-                            <Card key={name} className={classes.tagCard}>
-                              <CardHeader
-                                onClick={() => {
-                                  //toggle the clicked tag in the pending update list
-                                  let index = chosenActivityList.indexOf(name)
-                                  if (index !== -1) {
-                                    setChosenActivities(chosenActivityList.filter((elem) => elem !== name))
-                                  } else {
-                                    setChosenActivities(chosenActivityList.concat([name]))
+                                  }}
+                                  classes={{ title: classes.tagCardHeader }}
+                                  title={name}
+                                  action={
+                                    <Checkbox
+                                      className={classes.tagCheckbox}
+                                      color={"primary"}
+                                      checked={chosenActivityList.indexOf(name) !== -1}
+                                    />
                                   }
-                                }}
-                                classes={{ title: classes.tagCardHeader }}
-                                title={name}
-                                action={
-                                  <Checkbox
-                                    className={classes.tagCheckbox}
-                                    color={"primary"}
-                                    checked={chosenActivityList.indexOf(name) !== -1}
-                                  />
-                                }
-                              />
-                            </Card>
-                          )
-                        })}
+                                />
+                              </Card>
+                            )
+                          })}
+                      </Box>
                     </Box>
-                  </Box>
-                )}
-              </React.Fragment>
-            }
-          />
-        )}
+                  )}
+                </React.Fragment>
+              }
+            />
+          )}
 
         {isGUIEditor &&
-          !Object.keys(tags_object).includes(id[id.length - 1]) &&
-          Object.keys(tags_object).includes(id[id.length - 2]) && (
-            <Tooltip title={`${t("Analyze")} ${id[id.length - 2]}`}>
+          !Object.keys(tags_object).includes(id[id?.length - 1]) &&
+          Object.keys(tags_object).includes(id[id?.length - 2]) && (
+            <Tooltip title={`${t("Analyze")} ${id[id?.length - 2]}`}>
               <IconButton
                 className={classes.treeButton}
                 onClick={() =>
                   onUpdateGUI({
                     _update: ["target", "type", "name", "id_string"],
-                    content: [id[id.length - 1], type, name, id],
+                    content: [id[id?.length - 1], type, name, id],
                   })
                 }
               >
@@ -608,9 +609,9 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
           )}
 
         <IconButton className={classes.treeButton} onClick={() => setExpanded(!expanded)}>
-          {queryables_array.includes(id[id.length - 1]) ? (
+          {queryables_array.includes(id[id?.length - 1]) ? (
             !isGUIEditor ? (
-              <Tooltip title={`Load ${id[id.length - 1]} query for ${id[id.length - 2]} into terminal`}>
+              <Tooltip title={`Load ${id[id?.length - 1]} query for ${id[id?.length - 2]} into terminal`}>
                 <Icon>arrow_forward</Icon>
               </Tooltip>
             ) : null
@@ -627,7 +628,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       </CardActions>
       {/*For each branch in our tree, we output some info and create a new level*/}
       {expanded &&
-        (!!treeDisplay ? (isAlphabetized && !!alphabetizedTree ? alphabetizedTree : treeDisplay) : []).map(
+        (!!treeDisplay ? (isAlphabetized && !!alphabetizedTree ? alphabetizedTree : treeDisplay) : [])?.map(
           (branch, index) =>
             (!currentFilter ||
               currentFilter === "" ||
@@ -636,7 +637,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                 branch.name &&
                 branch.name.toLowerCase().indexOf(currentFilter.toLowerCase()) !== -1)) && (
               <RenderTree
-                key={"tree" + id[id.length - 1] + index}
+                key={"tree" + id[id?.length - 1] + index}
                 id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
                 name={typeof branch === "string" ? branch : branch.name}
                 type={typeof branch === "string" ? branch : branch.id}

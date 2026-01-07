@@ -8,6 +8,7 @@ import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { getBasicToken } from "../../helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,15 +73,28 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [totalCount, setTotalCount] = useState(0)
+  const [sensorsByStudy, setSensorsByStudy] = useState({})
+  const [filters, setFilters] = useState({
+    sort: "createdAt",
+    order: order ? "asc" : "desc",
+    search: "",
+    page: 1,
+    limit: 40,
+  })
 
   useInterval(
     () => {
       setLoading(true)
       getAllStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
+    studies !== null && (studies || [])?.length > 0 ? null : 2000,
     true
   )
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, order: order ? "asc" : "desc" }))
+  }, [order])
 
   useEffect(() => {
     let params = JSON.parse(localStorage.getItem("sensors"))
@@ -93,12 +107,15 @@ export default function SensorsList({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
+    if (researcherId && studies?.length) {
+      searchFilterSensors()
+    }
+  }, [researcherId, selectedStudies, filters])
+
+  useEffect(() => {
+    const userToken: any = getBasicToken()
     if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      if ((selected || []).length > 0) {
+      if ((selected || [])?.length > 0) {
         searchFilterSensors()
       } else {
         setSensors([])
@@ -107,33 +124,42 @@ export default function SensorsList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
       setSelectedSensors((prevState) => [...prevState, sensorData])
     } else {
-      let selected = selectedSensors.filter((item) => item.id != sensorData.id)
+      let selected = selectedSensors?.filter((item) => item.id != sensorData.id)
       setSelectedSensors(selected)
     }
   }
-  const searchFilterSensors = (searchVal?: string) => {
+  const searchFilterSensorsForDemo = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0) {
+    const selectedData = selected?.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData?.length > 0) {
       setLoading(true)
       let result = []
       Service.getAll("sensors").then((sensorData) => {
-        if ((sensorData || []).length > 0) {
-          if (!!searchTxt && searchTxt.trim().length > 0) {
-            result = result.concat(sensorData)
-            result = result.filter((i) => i.name?.toLowerCase().includes(searchTxt?.toLowerCase()))
+        if ((sensorData || [])?.length > 0) {
+          if (!!searchTxt && searchTxt.trim()?.length > 0) {
+            result = result?.concat(sensorData)
+            result = result?.filter((i) => i.name?.toLowerCase().includes(searchTxt?.toLowerCase()))
             setSensors(sortData(result, selectedData, "name"))
           } else {
-            result = result.concat(sensorData)
+            result = result?.concat(sensorData)
             setSensors(sortData(result, selectedData, "name"))
           }
-          setPaginatedSensors(sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
+          const allCounts = (result || [])?.reduce((acc: Record<string, number>, a: any) => {
+            const key = a.study_id || a.study || "unknown"
+            acc[key] = (acc[key] || 0) + 1
+            return acc
+          }, {} as Record<string, number>)
+          setSensorsByStudy(allCounts)
+          setTotalCount(result?.length)
+          setPaginatedSensors(
+            sortData(result, selectedData, "name")?.slice(page * rowCount, page * rowCount + rowCount)
+          )
           setPage(page)
           setRowCount(rowCount)
         } else {
@@ -148,19 +174,62 @@ export default function SensorsList({
     setSelectedSensors([])
   }
 
+  const searchFilterSensors = async (searchVal?: string) => {
+    if (LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+      searchFilterSensorsForDemo(searchVal)
+      return
+    }
+    try {
+      setLoading(true)
+      const searchTxt = searchVal ?? search
+      const studyIds =
+        selectedStudies?.map((name) => studies?.find((s) => s.name === name)?.name)?.filter(Boolean) || []
+      const requestBody = {
+        studies: studyIds,
+        sort: filters.order,
+        search: searchTxt?.trim(),
+        page: filters.page,
+        limit: filters.limit,
+      }
+      const result = await LAMP.Researcher.sensorsList(researcherId, requestBody)
+      const sensorArray = result?.sensors || []
+      const mapped = sensorArray?.map((p) => ({
+        ...p,
+        id: p._id,
+        name: p.name || p._id,
+        study_name: p.studyName,
+        study_id: p._parent,
+        spec: p.spec,
+        settings: p.settings,
+        category: p.category,
+        parent: p._parent,
+        timestamp: p.timestamp,
+        deleted: p._deleted,
+      }))
+      setSensors(mapped)
+      const total = !!result?.totalSensors
+        ? Object.values(result?.totalSensors)?.reduce((sum, value) => Number(sum) + Number(value), 0)
+        : 0
+      setSensorsByStudy(result?.totalSensors || {})
+      setTotalCount(result?.count || 0)
+      setPaginatedSensors(mapped?.slice(0, rowCount))
+    } catch (err) {
+      console.error(" Error fetching sensors:", err)
+      setPaginatedSensors([])
+    } finally {
+      setLoading(false)
+    }
+    setSelectedSensors([])
+  }
+
   const handleSearchData = (val: string) => {
     setSearch(val)
     searchFilterSensors(val)
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
-    setLoading(true)
-    setRowCount(rowCount)
-    setPage(page)
-    localStorage.setItem("sensors", JSON.stringify({ page: page, rowCount: rowCount }))
-    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    setPaginatedSensors(sortData(sensors, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
-    setLoading(false)
+    setFilters((prev) => ({ ...prev, page: page + 1, limit: rowCount }))
+    localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))
   }
 
   return (
@@ -178,12 +247,13 @@ export default function SensorsList({
         setSensors={searchFilterSensors}
         setOrder={setOrder}
         order={order}
+        sensorsByStudy={sensorsByStudy}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {sensors !== null && sensors.length > 0 ? (
+          {sensors !== null && sensors?.length > 0 ? (
             <Grid container spacing={3}>
-              {(paginatedSensors ?? []).map((item, index) => (
+              {(paginatedSensors ?? [])?.map((item, index) => (
                 <Grid item lg={6} xs={12} key={item.id}>
                   <SensorListItem
                     sensor={item}
@@ -200,6 +270,7 @@ export default function SensorsList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                totalCount={totalCount}
               />
             </Grid>
           ) : (

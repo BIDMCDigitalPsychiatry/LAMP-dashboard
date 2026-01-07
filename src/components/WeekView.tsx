@@ -50,7 +50,7 @@ function getDates() {
   let years = []
   let first
   let curr = new Date()
-  if(curr.getDay() === 0) curr.setDate(curr.getDate() - 6)
+  if (curr.getDay() === 0) curr.setDate(curr.getDate() - 6)
   for (let i = 1; i < 8; i++) {
     first = curr.getDate() - curr.getDay() + i
     let day = new Date(curr.setDate(first))
@@ -86,7 +86,7 @@ export default function WeekView({
       }}
     >
       <Grid container spacing={0}>
-        {days.map((day, index) => (
+        {days?.map((day, index) => (
           <Grid item xs>
             <Paper
               className={classnames(

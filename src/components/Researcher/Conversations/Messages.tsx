@@ -170,38 +170,19 @@ export default function Messages({
     true
   )
 
-  const duration = (date: Date) => {
-    var delta = Math.abs(date.getTime() - new Date().getTime()) / 1000
-
-    var days = Math.floor(delta / 86400)
-    delta -= days * 86400
-    if (days > 0) return days + (days > 1 ? " " + `${t("days")}` : `${t("day")}`)
-
-    var hours = Math.floor(delta / 3600) % 24
-    if (hours > 0) return hours + (hours > 1 ? " hrs" : "hr")
-
-    delta -= hours * 3600
-    var minutes = Math.floor(delta / 60) % 60
-    if (minutes > 0) return minutes + (minutes > 1 ? " mins" : "min")
-
-    delta -= minutes * 60
-    var seconds = Math.floor(delta % 60)
-    return seconds + (seconds > 1 ? "sec" : "secs")
-  }
-
   const refreshMessages = async () => {
     setConversations(
       Object.fromEntries(
         (
           await Promise.all(
-            [participant || ""].map(async (x) => [
+            [participant || ""]?.map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
           )
         )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
+          ?.filter((x: any) => x[1].message !== "404.object-not-found")
+          ?.map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -217,7 +198,7 @@ export default function Messages({
 
   const sendMessage = async (msgOpen: boolean) => {
     let msg = (currentMessage || "").trim()
-    if (msg.length === 0 || !participant) return
+    if (msg?.length === 0 || !participant) return
 
     await refreshMessages()
     let all = getMessages()
@@ -236,7 +217,7 @@ export default function Messages({
   const messageSection = (type: number) => {
     return (
       <Box>
-        {getMessages().map((x) => (
+        {getMessages()?.map((x) => (
           <Box
             className={classes.innerMessage}
             style={{
@@ -270,9 +251,13 @@ export default function Messages({
         <Box my={2} display="flex" className={classes.composeMsg}>
           <Box width="100%" className={classes.composeTextarea}>
             <TextareaAutosize
-              placeholder={`${t("text")}`}
+              placeholder={`${t("Text")}`}
               value={currentMessage || ""}
-              onChange={(event) => setCurrentMessage(event.target.value)}
+              onChange={(event) => {
+                const value = event.target.value
+                const formatted = value.charAt(0).toUpperCase() + value?.slice(1)
+                setCurrentMessage(formatted)
+              }}
               style={{ display: addMsg ? "block" : "none" }}
             />
           </Box>

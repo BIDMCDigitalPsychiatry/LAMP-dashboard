@@ -66,7 +66,7 @@ export default function ActivityImage({ ...props }) {
   const [checked, setChecked] = useState(props.value?.checked ?? false)
   const { enqueueSnackbar } = useSnackbar()
 
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setImage)
     }, []),

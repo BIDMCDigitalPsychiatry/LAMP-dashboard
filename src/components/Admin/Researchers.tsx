@@ -176,43 +176,33 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   const [rowCount, setRowCount] = useState(40)
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
+  const [totalCount, setTotalCount] = useState(0)
   const classes = useStyles()
 
   const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const matched_codes = Object.keys(locale_lang)?.filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes?.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
-
-  useEffect(() => {
-    refreshResearchers()
-  }, [])
 
   const refreshResearchers = () => {
     setPaginatedResearchers([])
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search?.trim()?.length > 0) {
-        data = (data || []).filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
+        data = (data || [])?.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
         setResearchers(data)
       } else {
         setResearchers(data)
       }
+      setTotalCount(data?.length)
       setPaginatedResearchers(data?.slice(0, rowCount))
     })
   }
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      refreshResearchers()
-    } else {
-      window.location.href = "/#/"
-    }
-  }, [search, sessionStorage.getItem("tokenInfo")])
+    refreshResearchers()
+  }, [search])
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id
@@ -253,7 +243,12 @@ export default function Researchers({ history, updateStore, adminType, ...props 
                   />
                 </Grid>
               ))}
-              <Pagination data={researchers} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+              <Pagination
+                data={researchers}
+                updatePage={handleChangePage}
+                rowPerPage={[20, 40, 60, 80]}
+                totalCount={totalCount}
+              />
             </Grid>
           ) : (
             <Grid item lg={6} xs={12}>

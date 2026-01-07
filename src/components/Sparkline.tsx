@@ -16,7 +16,7 @@ export default function Sparkline({ ...props }) {
   }, [])
 
   let details = []
-  ;(props.data || []).map((data) => {
+  ;(props.data || [])?.map((data) => {
     if (typeof data?.x === "string") {
       let propsDate = new Date(data?.x?.replace("at ", ""))
       let timeString = propsDate.toLocaleTimeString()
