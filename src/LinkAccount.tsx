@@ -20,15 +20,7 @@ export function LinkAccount(props) {
   const configuredProviders = LAMP.Auth._configuredProviders
 
   const handleLinkOauth = async (socialProvider: string) => {
-    const result = await (
-      await fetch(`http://localhost:8083/link-social/${socialProvider}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
-    ).json()
+    const result: any = await LAMP.Credential.linkAccount(socialProvider)
     if (!!result.redirectUrl) {
       window.location.replace(result.redirectUrl)
     }
