@@ -815,7 +815,7 @@ export default function NavigationLayout({
 
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} fromParticipant={true} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} fromParticipant={false} />
         </DialogContent>
       </Dialog>
     </Box>
