@@ -7,19 +7,19 @@ import {
   Icon,
   FormGroup,
   FormControl,
-  ButtonGroup,
-  Button,
   RadioGroup,
   FormControlLabel,
   Radio,
   TextField,
   FormLabel,
+  FormHelperText,
 } from "@material-ui/core"
 import React, { useRef, useState } from "react"
 import LoginFrame from "./components/LoginFrame"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import { useAuthContext } from "./components/AuthProvider"
 
 const useAccountSetupStyles = makeStyles({
   setupTypeOption: {
@@ -39,14 +39,19 @@ const useAccountSetupStyles = makeStyles({
 
 const enum SetupSteps {
   SELECT_SETUP = "SELECT_SETUP",
-  O_AUTH = "O_AUTH",
+  OAUTH = "OAUTH",
   TWO_FACTOR = "TWO_FACTOR",
+  TWO_FACTOR_VERIFY = "TWO_FACTOR_VERIFY",
 }
 
-export function LinkAccount(props) {
+export function AccountSetupWorkflow(props) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useAccountSetupStyles()
+
+  // O-Auth providers configured for server
+  const configuredProviders = LAMP.Auth._configuredProviders
+  const { accountSetupState } = useAuthContext()
   const [currentStep, setCurrentStep] = useState(SetupSteps.SELECT_SETUP)
 
   // Display error messages only once
@@ -58,52 +63,51 @@ export function LinkAccount(props) {
     errorMessageEnqueued.current = true
   }
 
-  // O-Auth providers configured for server
-  const configuredProviders = LAMP.Auth._configuredProviders
-
-  const handleLinkOauth = async (socialProvider: string) => {
-    const result: any = await LAMP.Credential.linkAccount(socialProvider)
-    if (!!result.redirectUrl) {
-      window.location.replace(result.redirectUrl)
-    }
+  const setupStepComponents = {
+    [SetupSteps.SELECT_SETUP]: SelectMethod,
+    [SetupSteps.OAUTH]: OAuthSetup,
+    [SetupSteps.TWO_FACTOR]: TwoFactorSetup,
+    [SetupSteps.TWO_FACTOR_VERIFY]: TwoFactorVerify,
   }
-
+  const CurrentComponent = setupStepComponents[currentStep]
   return (
     <LoginFrame>
-      {currentStep === SetupSteps.TWO_FACTOR ? (
-        <TwoFactorSetup onGoBack={() => setCurrentStep(SetupSteps.SELECT_SETUP)} />
-      ) : currentStep === SetupSteps.O_AUTH ? (
-        <OAuthSetup onGoBack={() => setCurrentStep(SetupSteps.SELECT_SETUP)} />
-      ) : (
-        <React.Fragment>
-          <Box marginBottom={2}>
-            <Typography>
-              {t("You're almost done setting up your account. Pick one of the options below to finish account setup.")}
-            </Typography>
-          </Box>
-          <Box marginBottom={2}>
-            <PickSetupOption
-              text={t("Link to External Account")}
-              onSelect={() => {
-                setCurrentStep(SetupSteps.O_AUTH)
-              }}
-            />
-          </Box>
-          <Box marginBottom={2}>
-            <PickSetupOption
-              text={t("Username and Password")}
-              onSelect={() => {
-                setCurrentStep(SetupSteps.TWO_FACTOR)
-              }}
-            />
-          </Box>
-        </React.Fragment>
-      )}
+      <CurrentComponent setCurrentStep={setCurrentStep}></CurrentComponent>
     </LoginFrame>
   )
 }
 
-function TwoFactorSetup({ onGoBack }) {
+function SelectMethod({ setCurrentStep }) {
+  const { t } = useTranslation()
+
+  return (
+    <Box>
+      <Box marginBottom={2}>
+        <Typography>
+          {t("You're almost done setting up your account. Pick one of the options below to finish account setup.")}
+        </Typography>
+      </Box>
+      <Box marginBottom={2}>
+        <PickSetupOption
+          text={t("Link to External Account")}
+          onSelect={() => {
+            setCurrentStep(SetupSteps.OAUTH)
+          }}
+        />
+      </Box>
+      <Box marginBottom={2}>
+        <PickSetupOption
+          text={t("Username and Password")}
+          onSelect={() => {
+            setCurrentStep(SetupSteps.TWO_FACTOR)
+          }}
+        />
+      </Box>
+    </Box>
+  )
+}
+
+function TwoFactorSetup({ setCurrentStep }) {
   const { t } = useTranslation()
   const classes = useAccountSetupStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -157,7 +161,7 @@ function TwoFactorSetup({ onGoBack }) {
     })
 
     if (configResult?.message === "ok") {
-      // Show verify page!
+      setCurrentStep(SetupSteps.TWO_FACTOR_VERIFY)
     } else {
       enqueueSnackbar(t("Could not configure two factor authentication at this time."))
     }
@@ -200,7 +204,12 @@ function TwoFactorSetup({ onGoBack }) {
         </FormGroup>
       </Box>
       <Grid container direction="row" justifyContent="space-between">
-        <Fab variant="circular" type="button" onClick={onGoBack} aria-label={t("Go Back")}>
+        <Fab
+          variant="circular"
+          type="button"
+          onClick={() => setCurrentStep(SetupSteps.SELECT_SETUP)}
+          aria-label={t("Go Back")}
+        >
           <Icon>arrow_back</Icon>
         </Fab>
         <Fab
@@ -217,7 +226,7 @@ function TwoFactorSetup({ onGoBack }) {
   )
 }
 
-function OAuthSetup({ onGoBack }) {
+function OAuthSetup({ setCurrentStep }) {
   const classes = useAccountSetupStyles()
   const { t } = useTranslation()
 
@@ -248,9 +257,132 @@ function OAuthSetup({ onGoBack }) {
           ))}
         </Grid>
       </Box>
-      <Fab variant="circular" type="button" onClick={onGoBack} aria-label={t("Go Back")}>
+      <Fab
+        variant="circular"
+        type="button"
+        onClick={() => setCurrentStep(SetupSteps.SELECT_SETUP)}
+        aria-label={t("Go Back")}
+      >
         <Icon>arrow_back</Icon>
       </Fab>
+    </Box>
+  )
+}
+
+function TwoFactorVerify({ setCurrentStep }) {
+  const { t } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return (
+    <Box>
+      <TwoFactorVerifyForm
+        onSuccess={() => {
+          setCurrentStep
+        }}
+        onError={() => {
+          enqueueSnackbar(t("Failed to verify code"), { variant: "error" })
+        }}
+      />
+      <Fab
+        variant="circular"
+        type="button"
+        onClick={() => setCurrentStep(SetupSteps.TWO_FACTOR)}
+        aria-label={t("Go Back")}
+      >
+        <Icon>arrow_back</Icon>
+      </Fab>
+    </Box>
+  )
+}
+
+export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined }) {
+  const { t } = useTranslation()
+  const classes = useAccountSetupStyles()
+  const { enqueueSnackbar } = useSnackbar()
+  const [code, setCode] = useState("")
+  const [codeErrors, setCodeErrors] = useState("")
+  const { refreshSessionInfo } = useAuthContext()
+
+  const CODE_REGEX = /^\d{6}$/
+
+  const validateCode = () => {
+    if (!code.match(CODE_REGEX)) {
+      setCodeErrors(t("Please enter a valid 6 digit code."))
+      return false
+    } else {
+      setCodeErrors("")
+      return true
+    }
+  }
+
+  const resendCode = async () => {
+    // TODO: Add resend code cooldown
+    const resendCodeResult: any = await LAMP.Credential.sendTwoFactorCode()
+    if (resendCodeResult?.message === "ok") {
+      enqueueSnackbar(t("Successfully sent code"), { variant: "success" })
+    } else {
+      enqueueSnackbar(t("Failed to resend code."), { variant: "error" })
+    }
+    console.log("Send code")
+  }
+
+  const verifyCode = async () => {
+    if (!validateCode()) {
+      return
+    }
+    try {
+      const verifyResult: any = await LAMP.Credential.verifyTwoFactorCode(code)
+      console.log("verifyResult: ", verifyResult)
+      if (verifyResult?.message === "ok") {
+        refreshSessionInfo()
+        onSuccess && onSuccess()
+      } else {
+        onError && onError()
+      }
+    } catch (e) {
+      onError && onError()
+    }
+  }
+
+  return (
+    <Box>
+      <Typography>
+        {t(
+          "A six digit code has been sent to you. If you have not received your code, wait a few minutes, and check your spam folder."
+        )}
+      </Typography>
+      <Box marginY={2}>
+        <FormGroup>
+          <TextField
+            id="2fa-code"
+            name="code"
+            variant="outlined"
+            onChange={(event) => {
+              setCode(event.target.value)
+            }}
+            label={t("Code")}
+            value={code}
+            error={!!codeErrors}
+          />
+          {!!codeErrors && <FormHelperText error={true}> {codeErrors} </FormHelperText>}
+        </FormGroup>
+      </Box>
+      <Box marginTop={0} marginBottom={3}>
+        <Grid container direction="row" justifyContent="space-between">
+          <Fab variant="extended" type="button" onClick={resendCode} aria-Label={t("Resend code")}>
+            {t("Resend code")}
+          </Fab>
+          <Fab
+            variant="extended"
+            type="button"
+            onClick={verifyCode}
+            aria-label={t("Verify code")}
+            className={classes.blueButton}
+          >
+            {t("Verify code")}
+          </Fab>
+        </Grid>
+      </Box>
     </Box>
   )
 }
