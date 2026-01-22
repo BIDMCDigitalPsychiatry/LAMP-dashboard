@@ -1,6 +1,5 @@
 import LAMP from "lamp-core"
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { buildLampServerRequestUrl } from "../utilities"
+import React, { createContext, useContext, useEffect, useState } from "react"
 
 export type AuthContextType = {
   authorizationHeader: string | undefined
@@ -9,6 +8,7 @@ export type AuthContextType = {
   refreshSessionInfo: () => any | undefined
   accountSetupState: string | undefined
   requireVerification: boolean
+  sessionInfo: { [key: string]: any } | undefined
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -18,6 +18,7 @@ export const AuthContext = createContext<AuthContextType>({
   refreshSessionInfo: undefined,
   accountSetupState: undefined,
   requireVerification: false,
+  sessionInfo: undefined,
 })
 
 // AuthProvider should inject information about the currently logged in user
@@ -25,21 +26,14 @@ export const AuthContext = createContext<AuthContextType>({
 export function AuthContextProvider({ ...props }) {
   const [authorizationHeader, setAuthorizationHeader] = useState("")
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [accountSetupState, setAccountSetupState] = useState(undefined)
-  const [requireVerification, setRequireVerification] = useState(false)
+  const [sessionInfo, setSessionInfo] = useState(undefined)
+  const accountSetupState = sessionInfo?.accountSetupState
+  const requireVerification = sessionInfo?.require2FAVerification
 
   const refreshSessionInfo = async () => {
-    const sessionInfo: any = await LAMP.Auth.fetch_session_info()
-    if (sessionInfo?.accountSetupState && sessionInfo.accountSetupState !== accountSetupState) {
-      setAccountSetupState(sessionInfo.accountSetupState)
-    }
-    if (
-      sessionInfo?.require2FAVerification !== undefined &&
-      sessionInfo.require2FAVerification !== requireVerification
-    ) {
-      setRequireVerification(sessionInfo?.require2FAVerification || false)
-    }
-    return sessionInfo
+    const sessionInfoResult: any = await LAMP.Auth.fetch_session_info()
+    setSessionInfo(sessionInfoResult)
+    return sessionInfoResult
   }
 
   const authContextState: AuthContextType = {
@@ -55,6 +49,7 @@ export function AuthContextProvider({ ...props }) {
     refreshSessionInfo: refreshSessionInfo,
     accountSetupState: accountSetupState,
     requireVerification: requireVerification,
+    sessionInfo: sessionInfo,
   }
 
   // Keep authContextState in sync with the values stored by lamp-core
