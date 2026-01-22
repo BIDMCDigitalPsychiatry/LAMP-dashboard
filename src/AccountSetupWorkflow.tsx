@@ -315,7 +315,7 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
     }
   }
 
-  const resendCode = async () => {
+  const sendCode = async () => {
     // TODO: Add resend code cooldown
     const resendCodeResult: any = await LAMP.Credential.sendTwoFactorCode()
     if (resendCodeResult?.message === "ok") {
@@ -369,8 +369,8 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
       </Box>
       <Box marginTop={0} marginBottom={3}>
         <Grid container direction="row" justifyContent="space-between">
-          <Fab variant="extended" type="button" onClick={resendCode} aria-Label={t("Resend code")}>
-            {t("Resend code")}
+          <Fab variant="extended" type="button" onClick={sendCode} aria-Label={t("Send code")}>
+            {t("Send code")}
           </Fab>
           <Fab
             variant="extended"
