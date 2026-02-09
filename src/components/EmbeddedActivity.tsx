@@ -232,7 +232,7 @@ export default function EmbeddedActivity({
         tag = (tag || []).filter((t) => t !== data.activity)
       }
       await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
-      delete data.static_data.is_favorite
+      delete data.static_data?.is_favorite
     }
     return data
   }

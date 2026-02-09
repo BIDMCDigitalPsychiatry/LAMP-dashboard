@@ -1,4 +1,4 @@
-// Core Imports
+7 // Core Imports
 import React, { useState, useEffect } from "react"
 import { Box, Grid, Icon } from "@material-ui/core"
 import LAMP from "lamp-core"

@@ -3,6 +3,8 @@ import { useAuthContext } from "./AuthProvider"
 import LoginWorkflow from "./LoginWorkflow"
 import { AccountSetupWorkflow, TwoFactorVerifyForm } from "../AccountSetupWorkflow"
 import LoginFrame from "./LoginFrame"
+import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next"
 
 export default function AuthenticatedRoute({
   children,
@@ -40,9 +42,16 @@ export default function AuthenticatedRoute({
 }
 
 function TwoFactorVerificationPage({}) {
+  const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
+
   return (
     <LoginFrame>
-      <TwoFactorVerifyForm onSuccess={() => console.log("success")} onError={() => console.log("Error")} />
+      <TwoFactorVerifyForm
+        onError={() =>
+          enqueueSnackbar(`${t("Failed to verify. Make you sure you entered the correct code.")}`, { variant: "error" })
+        }
+      />
     </LoginFrame>
   )
 }

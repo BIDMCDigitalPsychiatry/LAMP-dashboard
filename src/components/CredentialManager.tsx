@@ -17,6 +17,8 @@ import {
   useTheme,
   ThemeProvider,
   createTheme,
+  Fab,
+  Input,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -27,6 +29,8 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
+import SnackMessage from "./SnackMessage"
+import { useAuthContext } from "./AuthProvider"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -93,6 +97,7 @@ export function CredentialEditor({
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[!@#$%^-_&*?])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
   const USERNAME_REGEX = /^[\w\-]{2,}$/ // TODO: Write a real username regex
   const { t } = useTranslation()
+  const { refreshSessionInfo } = useAuthContext()
 
   useEffect(() => {
     setPhoto(auxData.photo)
@@ -207,7 +212,7 @@ export function CredentialEditor({
   }
   // show or hide save credentials tick only when all form fields have valid data
   const saveTickDisabled = () => {
-    if (mode === "reset-password" && password === confirmPassword) {
+    if (["reset-password", "reset-my-password"].includes(mode) && password === confirmPassword) {
       return false
     }
     const submitAvailableConditions = [
@@ -222,6 +227,43 @@ export function CredentialEditor({
       fromParticipant ? formErrors.usernameError.length === 0 : formErrors.emailError.length === 0,
     ]
     return !submitAvailableConditions.every((condition) => condition)
+  }
+
+  const handleClearAccountSetup = async () => {
+    try {
+      const result: any = await LAMP.Credential.clearAccountSetup(credential.origin, credential.access_key)
+      console.log(result)
+      enqueueSnackbar(t("Successfully reset credential. New temporary password is: "), {
+        variant: "success",
+        persist: true,
+        content: () => (
+          <SnackMessage message={`${t("New temporary password for: ")} ${credential.description}`}>
+            <Box>
+              <Box marginY={1}>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  label={`${t("Access Key")}: `}
+                  value={credential.access_key}
+                />
+              </Box>
+              <Box marginY={1}>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  label={`${t("Temporary Password")}: `}
+                  value={result.newTemporaryPassword}
+                />
+              </Box>
+            </Box>
+          </SnackMessage>
+        ),
+      })
+      refreshSessionInfo()
+    } catch (e) {
+      console.log(e)
+      enqueueSnackbar(t("Failed to reset credential."), { variant: "error" })
+    }
   }
 
   return (
@@ -368,7 +410,7 @@ export function CredentialEditor({
           style={{ marginBottom: 16 }}
         />
       )}
-      {["create-new", "reset-password", "update-profile"].includes(mode) && (
+      {["create-new", "reset-password", "reset-my-password", "update-profile"].includes(mode) && (
         <Box width={1}>
           <TextField
             fullWidth
@@ -407,7 +449,7 @@ export function CredentialEditor({
                     </Tooltip>
                   </InputAdornment>
                 ),
-                !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
+                !["reset-password", "reset-my-password", "create-new", "update-profile"].includes(mode) ? undefined : (
                   <InputAdornment position="end" key="b">
                     <Tooltip title={`${t("Save Credential")}`}>
                       <IconButton
@@ -475,6 +517,51 @@ export function CredentialEditor({
           </Tooltip>
         </Grid>
       )}
+      {["clear-setup"].includes(mode) && (
+        <Grid container direction="column">
+          {credential.account_setup_state === "TWO_FACTOR" && (
+            <React.Fragment>
+              <Box marginY={1}>
+                <Typography>
+                  {t(
+                    "Resetting this user's credential will create a new temporary password, and clear their two factor authentication configuration."
+                  )}
+                </Typography>
+              </Box>
+              <Box marginY={1}>
+                <Typography>
+                  {t(
+                    "The next time they log in, they will be prompted to set up oauth, or re-configure two factor authentication."
+                  )}
+                </Typography>
+              </Box>
+            </React.Fragment>
+          )}
+          {credential.account_setup_state === "OAUTH" && (
+            <React.Fragment>
+              <Box marginY={1}>
+                <Typography>
+                  {t(
+                    "Resetting this user's credential will create a new temporary password. The next time they log in they will be prompted to set up two factor authentication, or reconfigure oauth."
+                  )}
+                </Typography>
+              </Box>
+              <Box marginY={1}>
+                <Typography>
+                  {t(
+                    "Warning: Resetting this user's credential will not completely revoke their access. In order to prevent them from logging in again, you must delete this credential."
+                  )}
+                </Typography>
+              </Box>
+            </React.Fragment>
+          )}
+          <Box marginY={1} display="flex" justifyContent="flex-end">
+            <Fab type="button" variant="extended" onClick={handleClearAccountSetup}>
+              {t("Reset Credential")}
+            </Fab>
+          </Box>
+        </Grid>
+      )}
     </Grid>
   )
 }
@@ -482,14 +569,15 @@ export function CredentialEditor({
 export async function updateDetails(id, data, mode, allRoles, type, title) {
   try {
     id = !!title ? null : id
-    if (mode === "reset-password" && !!data.password) {
+    if (["reset-password", "reset-my-password"].includes(mode) && !!data.password) {
       if (
         !!((await LAMP.Credential.update(id, data.credential.access_key, {
           ...data.credential,
           secret_key: data.password,
         })) as any).error
-      )
+      ) {
         return -4
+      }
     } else if (mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
       let result = (await LAMP.Credential.create(id, data.emailAddress, data.password, data.name, data.username)) as any
       if (!!result.error) {
@@ -551,6 +639,13 @@ export const CredentialManager: React.FunctionComponent<{
   const [ext, setExt] = useState([])
   const [int, setInt] = useState([])
   const [permissions, setPermissions] = useState([])
+
+  // Whether or not to display the reset two factor/oauth option for the selected credential
+  // NOTE: Only session based servers return an account setup state value with credentials,
+  //       so do not assume it will always be defined
+  const selectedHasClearableSetup = ["TWO_FACTOR", "OAUTH"].some(
+    (accountState) => accountState === selected.credential?.account_setup_state
+  )
 
   useEffect(() => {
     LAMP.Type.parent(id)
@@ -659,6 +754,7 @@ export const CredentialManager: React.FunctionComponent<{
         setCredentials(cred, permissions)
       })
       setRoles()
+      onComplete && onComplete()
       return setSelected({
         anchorEl: undefined,
         credential: undefined,
@@ -690,58 +786,66 @@ export const CredentialManager: React.FunctionComponent<{
 
   return (
     <Box {...props} style={{ margin: 24 }}>
-      <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
-        <Grid item xs={12}>
+      {mode === "reset-my-password" ? (
+        <Box marginBottom={2}>
           <Typography variant="h6" align="center">
-            {`${t("Manage Credentials")}`}
+            {t("Change My Password")}
           </Typography>
-        </Grid>
-        {allCreds.map((x, idx) => (
-          <Grid item key={idx}>
-            <Tooltip
-              title={
-                <React.Fragment>
-                  {x.description}
-                  <br />
-                  {x.access_key}
-                </React.Fragment>
-              }
-            >
+        </Box>
+      ) : (
+        <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
+          <Grid item xs={12}>
+            <Typography variant="h6" align="center">
+              {`${t("Manage Credentials")}`}
+            </Typography>
+          </Grid>
+          {allCreds.map((x, idx) => (
+            <Grid item key={idx}>
+              <Tooltip
+                title={
+                  <React.Fragment>
+                    {x.description}
+                    <br />
+                    {x.access_key}
+                  </React.Fragment>
+                }
+              >
+                <IconButton
+                  onClick={(event) =>
+                    setSelected((selected) => ({
+                      anchorEl: event.currentTarget,
+                      credential: x,
+                      mode: undefined,
+                    }))
+                  }
+                >
+                  <Avatar
+                    src={(allRoles[(x || {}).access_key] || {}).photo}
+                    style={{ backgroundColor: theme.palette.primary.main }}
+                  >
+                    {x.description.substring(0, 1)}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          ))}
+          <Grid item>
+            <Tooltip title={`${t("Add Credentials")}`}>
               <IconButton
-                onClick={(event) =>
+                onClick={() =>
                   setSelected((selected) => ({
-                    anchorEl: event.currentTarget,
-                    credential: x,
-                    mode: undefined,
+                    anchorEl: undefined,
+                    credential: undefined,
+                    mode: selected.mode === "create-new" ? undefined : "create-new",
                   }))
                 }
               >
-                <Avatar
-                  src={(allRoles[(x || {}).access_key] || {}).photo}
-                  style={{ backgroundColor: theme.palette.primary.main }}
-                >
-                  {x.description.substring(0, 1)}
-                </Avatar>
+                <Avatar style={{ backgroundColor: theme.palette.secondary.main }}>+</Avatar>
               </IconButton>
             </Tooltip>
           </Grid>
-        ))}
-        <Grid item>
-          <Tooltip title={`${t("Add Credentials")}`}>
-            <IconButton
-              onClick={() =>
-                setSelected((selected) => ({
-                  anchorEl: undefined,
-                  credential: undefined,
-                  mode: selected.mode === "create-new" ? undefined : "create-new",
-                }))
-              }
-            >
-              <Avatar style={{ backgroundColor: theme.palette.secondary.main }}>+</Avatar>
-            </IconButton>
-          </Tooltip>
         </Grid>
-      </Grid>
+      )}
       <Menu keepMounted anchorEl={selected.anchorEl} open={!!selected.anchorEl} onClose={() => setSelected({})}>
         <MenuItem
           onClick={() =>
@@ -754,17 +858,32 @@ export const CredentialManager: React.FunctionComponent<{
         >
           {`${t("Update Photo & Role")}`}
         </MenuItem>
-        <MenuItem
-          onClick={() =>
-            setSelected((selected) => ({
-              anchorEl: undefined,
-              credential: selected.credential,
-              mode: "reset-password",
-            }))
-          }
-        >
-          {`${t("Reset Password")}`}
-        </MenuItem>
+        {!selectedHasClearableSetup && (
+          <MenuItem
+            onClick={() =>
+              setSelected((selected) => ({
+                anchorEl: undefined,
+                credential: selected.credential,
+                mode: "reset-password",
+              }))
+            }
+          >
+            {`${t("Reset Password")}`}
+          </MenuItem>
+        )}
+        {selectedHasClearableSetup && (
+          <MenuItem
+            onClick={() => {
+              setSelected((selected) => ({
+                anchorEl: undefined,
+                credential: selected.credential,
+                mode: "clear-setup",
+              }))
+            }}
+          >
+            {`${t("Reset OAuth / Two Factor")}`}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={() =>
             _deleteCredential(selected.credential).then(() =>

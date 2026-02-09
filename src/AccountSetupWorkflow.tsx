@@ -148,7 +148,6 @@ function TwoFactorSetup({ setCurrentStep }) {
   }
 
   const handleSubmit = async () => {
-    console.log(">>> Handle submit...")
     // Validate form
     if (!validateForm()) {
       return
@@ -241,7 +240,7 @@ function OAuthSetup({ setCurrentStep }) {
   return (
     <Box>
       <Box marginY={3}>
-        <Grid direction="row" justifyContent="space-evenly">
+        <Grid container direction="row" justifyContent="space-evenly">
           {configuredProviders.map((providerId) => (
             <Fab
               variant="extended"
@@ -316,14 +315,12 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
   }
 
   const sendCode = async () => {
-    // TODO: Add resend code cooldown
     const resendCodeResult: any = await LAMP.Credential.sendTwoFactorCode()
     if (resendCodeResult?.message === "ok") {
       enqueueSnackbar(t("Successfully sent code"), { variant: "success" })
     } else {
       enqueueSnackbar(t("Failed to resend code."), { variant: "error" })
     }
-    console.log("Send code")
   }
 
   const verifyCode = async () => {
@@ -332,7 +329,6 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
     }
     try {
       const verifyResult: any = await LAMP.Credential.verifyTwoFactorCode(code)
-      console.log("verifyResult: ", verifyResult)
       if (verifyResult?.message === "ok") {
         refreshSessionInfo()
         onSuccess && onSuccess()

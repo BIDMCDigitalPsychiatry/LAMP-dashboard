@@ -547,12 +547,17 @@ function AppRouter({ setConfirmSession, ...props }) {
               >
                 <React.Fragment>
                   <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
-                  <Messages
-                    style={{ margin: "0px -16px -16px -16px" }}
-                    refresh={true}
-                    participantOnly
-                    participant={getParticipant(props.match.params.id)?.id ?? null}
-                  />
+                  {/* TODO (appRouter refactor): The extra isLoggedIn check is required in order to force a rerender 
+                      when the participant is done being fetched. 
+                  */}
+                  {isLoggedIn && getParticipant(props.match.params.id) && (
+                    <Messages
+                      style={{ margin: "0px -16px -16px -16px" }}
+                      refresh={true}
+                      participantOnly
+                      participant={getParticipant(props.match.params.id)?.id ?? null}
+                    />
+                  )}
                 </React.Fragment>
               </AuthenticatedRoute>
             )}
@@ -825,6 +830,7 @@ function AppRouter({ setConfirmSession, ...props }) {
                 reset={reset}
               >
                 {/* TODO: Only viewable to the correct people */}
+
                 {!isLoggedIn || !getResearcher(props.match.params.id) ? (
                   <React.Fragment />
                 ) : (
@@ -911,7 +917,7 @@ function AppRouter({ setConfirmSession, ...props }) {
               >
                 {/* TODO: Removed login from here, needs a better loading page */}
                 {!isLoggedIn || !getParticipant(props.match.params.id) ? (
-                  <React.Fragment />
+                  <React.Fragment></React.Fragment>
                 ) : (
                   <React.Fragment>
                     <PageTitle>{`${t("User number", { number: getParticipant(props.match.params.id).id })}`}</PageTitle>
