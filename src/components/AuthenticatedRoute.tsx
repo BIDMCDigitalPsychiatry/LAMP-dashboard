@@ -51,6 +51,7 @@ function TwoFactorVerificationPage({}) {
         onError={() =>
           enqueueSnackbar(`${t("Failed to verify. Make you sure you entered the correct code.")}`, { variant: "error" })
         }
+        introTextOverride={`${t("Click 'Send Code' to receive your two factor verification code.")}`}
       />
     </LoginFrame>
   )

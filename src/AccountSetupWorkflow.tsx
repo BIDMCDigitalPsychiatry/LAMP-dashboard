@@ -170,13 +170,15 @@ function TwoFactorSetup({ setCurrentStep }) {
     <Box>
       <Box marginY={3}>
         <FormGroup>
-          <RadioGroup name="identifier-type" value={identifierType} onChange={handleChangeIdentifierType}>
-            <FormLabel component="legend">{t("Authenticate using")}: </FormLabel>
-            <Grid container direction="row" justifyContent="space-evenly">
-              <FormControlLabel value="email" control={<Radio />} label={t("Email")} />
-              <FormControlLabel value="phone" control={<Radio />} label={t("Phone")} />
-            </Grid>
-          </RadioGroup>
+          {false && ( // Temporary way of disabling phone based 2FA. It would be better to add this to server info and show/hide based on server
+            <RadioGroup name="identifier-type" value={identifierType} onChange={handleChangeIdentifierType}>
+              <FormLabel component="legend">{t("Authenticate using")}: </FormLabel>
+              <Grid container direction="row" justifyContent="space-evenly">
+                <FormControlLabel value="email" control={<Radio />} label={t("Email")} />
+                <FormControlLabel value="phone" control={<Radio />} label={t("Phone")} />
+              </Grid>
+            </RadioGroup>
+          )}
           {identifierType === "email" && (
             <TextField
               id="identifier-email"
@@ -294,7 +296,7 @@ function TwoFactorVerify({ setCurrentStep }) {
   )
 }
 
-export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined }) {
+export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined, introTextOverride = undefined }) {
   const { t } = useTranslation()
   const classes = useAccountSetupStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -343,9 +345,10 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
   return (
     <Box>
       <Typography>
-        {t(
-          "A six digit code has been sent to you. If you have not received your code, wait a few minutes, and check your spam folder."
-        )}
+        {introTextOverride ||
+          t(
+            "A six digit code has been sent to you. If you have not received your code, wait a few minutes, and check your spam folder."
+          )}
       </Typography>
       <Box marginY={2}>
         <FormGroup>
