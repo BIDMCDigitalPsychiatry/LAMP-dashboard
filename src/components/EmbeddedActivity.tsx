@@ -124,12 +124,17 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         setLoading(false)
       } else if (!saved && currentActivity?.id !== null && currentActivity?.id !== "") {
         let data = JSON.parse(e.data)
-        if (!!data["timestamp"]) {
+        if (!!data["timestamp"] || !!data["timestamp/Date+Time"]) {
           setLoading(true)
           delete data["activity"]
           delete data["timestamp"]
+          delete data["timestamp/Date+Time"]
           data["activity"] = currentActivity.id
-          data["timestamp"] = activityTimestamp
+          if (currentActivity.spec === "lamp.memory_game") {
+            data["timestamp/Date+Time"] = activityTimestamp
+          } else {
+            data["timestamp"] = activityTimestamp
+          }
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
