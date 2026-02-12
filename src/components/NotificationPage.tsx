@@ -235,7 +235,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
-              } else if (!!data && !!data?.timestamp) {
+              } else if (!!data && (!!data?.timestamp || !!data["timestamp/Date+Time"])) {
                 showVisualPopup(activity)
               }
             }}
