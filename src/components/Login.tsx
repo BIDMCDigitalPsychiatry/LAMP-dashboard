@@ -4,18 +4,15 @@ import {
   Fab,
   Box,
   TextField,
-  Slide,
   Menu,
   MenuItem,
   Icon,
   IconButton,
   InputAdornment,
-  colors,
   Grid,
-  makeStyles,
-  createStyles,
   Link,
-  Theme,
+  Typography,
+  Button,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
@@ -23,69 +20,22 @@ import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
-import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as Logo } from "../icons/Logo.svg"
-import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
-import { Autocomplete } from "@mui/material"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
 import { clearLocalStorageItems } from "./helper"
 import { useAuthContext } from "./AuthProvider"
+import LoginFrame, { useLoginStyles } from "./LoginFrame"
 
-type SuggestedUrlOption = {
-  label: string
-}
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    logoLogin: {
-      width: 90,
-      margin: "0 auto 30px",
-      textAlign: "center",
-      [theme.breakpoints.down("xs")]: {
-        width: 69,
-        marginBottom: 30,
-      },
-    },
-    logoText: {
-      width: "100%",
-      textAlign: "center",
-      [theme.breakpoints.down("xs")]: {
-        width: "80%",
-        margin: "0 auto",
-      },
-      "& svg": { width: "100%", height: 41, marginBottom: 10 },
-    },
-    textfieldStyle: {
-      backgroundColor: "#f5f5f5",
-      borderRadius: 10,
-      "& fieldset": { border: 0 },
-      "& .MuiInputBase-inputAdornedEnd": { paddingRight: 48 },
-    },
-    buttonNav: {
-      "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
-    },
-    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
-    loginContainer: { height: "90vh", paddingTop: "3%" },
-    loginInner: { maxWidth: 320 },
-    loginDisabled: {
-      opacity: 0.5,
-    },
-  })
-)
-
-export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, ...props }) {
+export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, clearServer, ...props }) {
   const { t, i18n } = useTranslation()
-  const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
+  const [state, setState] = useState({ id: undefined, password: undefined })
   const [showPassword, setShowPassword] = useState(false)
-  const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
-  const [helpMenu, setHelpMenu] = useState<Element>()
   const [loginClick, setLoginClick] = useState(true)
-  const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
-  const classes = useStyles()
+  const classes = useLoginStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
   const getSelectedLanguage = () => {
@@ -100,6 +50,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const LOCKOUT_TIME_KEY = "lockoutTime"
   const [isLockedOut, setIsLockedOut] = useState(false)
   const { setIsLoggedIn } = useAuthContext()
+  const srcLocked = props.srcLocked
 
   useEffect(() => {
     setConfirmSession(false)
@@ -128,36 +79,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   }, [])
 
   useEffect(() => {
-    const cachedOptions = localStorage.getItem("cachedOptions")
-    let options: SuggestedUrlOption[]
-    if (!cachedOptions) {
-      options = [
-        { label: "api.lamp.digital" },
-        { label: "mindlamp-api.pronet.med.yale.edu" },
-        { label: "mindlamp.orygen.org.au" },
-        { label: "mindlamp-qa.dmh.lacounty.gov" },
-      ]
-    } else {
-      options = (JSON.parse(cachedOptions) || []).filter((o) => typeof o?.label !== "undefined")
-    }
-    setOptions(options)
-    let query = window.location.hash.split("?")
-    if (!!query && query.length > 1) {
-      let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
-      if (typeof src === "string" && src.length > 0) {
-        setState((state) => ({ ...state, serverAddress: src }))
-        setSrcLocked(true)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
-
-  let handleServerInput = (value) => {
-    setState({ ...state, serverAddress: value?.label ?? value })
-  }
 
   let handleChange = (event) =>
     setState({
@@ -184,11 +107,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       return
     }
     setLoginClick(true)
-    if (!!state.serverAddress && !options.find((item) => item?.label == state.serverAddress)) {
-      options.push({ label: state.serverAddress })
-      localStorage.setItem("cachedOptions", JSON.stringify(options))
-    }
-    setOptions(options)
+
     // setLoginClick(true)
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
@@ -203,7 +122,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         res = await setIdentity({
           id: state.id,
           password: state.password,
-          serverAddress: state.serverAddress,
+          serverAddress: LAMP.Auth._auth.serverAddress,
         })
       } catch (err) {
         // Failed login throws an error
@@ -284,6 +203,16 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     //   setLoginClick(false)
     // })
   }
+
+  const configuredProviders = LAMP.Auth._configuredProviders
+
+  const handleOAuthLogin = async (socialProvider) => {
+    const result = (await LAMP.Credential.startOAuth(socialProvider)) as any
+    if (result.redirectUrl) {
+      window.location.replace(result.redirectUrl)
+    }
+  }
+
   const handleSubmit = () => {
     LAMP.initializeDemoDB(self_help_db)
     localStorage.setItem("demo_mode", "self_help")
@@ -296,285 +225,214 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   return (
     <>
-      <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-        <ResponsiveMargin>
-          <IconButton
-            style={{ position: "fixed", top: 8, right: 8 }}
-            onClick={(event) => setHelpMenu(event.currentTarget)}
-          >
-            <Icon>help</Icon>
-          </IconButton>
-          <Menu
-            id="simple-menu"
-            anchorEl={helpMenu}
-            keepMounted
-            open={Boolean(helpMenu)}
-            onClose={() => setHelpMenu(undefined)}
-          >
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital/troubleshooting", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://community.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("mailto:team@digitalpsych.org", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital/privacy/", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
-            </MenuItem>
-          </Menu>
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            className={classes.loginContainer}
-          >
-            <Grid item className={classes.loginInner}>
-              <form onSubmit={(e) => handleLogin(e)}>
-                <Box>
-                  <Box className={classes.logoLogin}>
-                    <Logo />
-                  </Box>
-                  <Box className={classes.logoText}>
-                    <Logotext />
-                    <div
-                      style={{
-                        height: 6,
-                        marginBottom: 30,
-                        background:
-                          "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
-                      }}
-                    />
-                  </Box>
-                  {isLockedOut && (
-                    <div style={{ marginBottom: "12px" }}>
-                      <span style={{ color: "red", fontSize: "14px" }}>
-                        {t("Too many login attempts. Try again after 1 hour.")}
-                      </span>
-                    </div>
-                  )}
-                  <TextField
-                    select
-                    label={`${t("Select Language")}`}
-                    style={{ width: "100%" }}
-                    onChange={(event) => {
-                      setSelectedLanguage(event.target.value)
-                    }}
-                    variant="filled"
-                    value={selectedLanguage || "en-US"}
-                  >
-                    {Object.keys(locale_lang).map((key, value) => {
-                      if (userLanguages.includes(key)) {
-                        return (
-                          <MenuItem key={key} value={key}>
-                            {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
-                          </MenuItem>
-                        )
-                      }
-                    })}
-                  </TextField>
-                  <Autocomplete
-                    freeSolo={true}
-                    id="serever-selector"
-                    options={options}
-                    sx={{ width: "100%", marginTop: "12px" }}
-                    value={state.serverAddress || ""}
-                    onChange={(event, value) => handleServerInput(value)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="serverAddress"
-                        variant="filled"
-                        value={state.serverAddress || ""}
-                        onChange={(event) => handleServerInput(event.target.value)}
-                        InputProps={{ ...params.InputProps, disableUnderline: true }}
-                        label={t("Server Address")}
-                        helperText={t("Don't enter a domain if you're not sure what this option does.")}
-                      />
-                    )}
-                  />
-                  <TextField
-                    required
-                    name="id"
-                    type="email"
-                    margin="normal"
-                    variant="outlined"
-                    style={{ width: "100%", height: 50 }}
-                    placeholder={`${t("my.email@address.com")}`}
-                    value={state.id || ""}
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                    InputProps={{
-                      classes: {
-                        root: classes.textfieldStyle,
-                      },
-                      autoCapitalize: "off",
-                    }}
-                  />
-
-                  <TextField
-                    required
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    margin="normal"
-                    variant="outlined"
-                    style={{ width: "100%", height: 50, marginBottom: 40 }}
-                    placeholder="•••••••••"
-                    value={state.password || ""}
-                    onChange={handleChange}
-                    InputProps={{
-                      classes: {
-                        root: classes.textfieldStyle,
-                      },
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={() => setShowPassword(!showPassword)}
-                            onMouseDown={(event) => event.preventDefault()}
-                            edge="end"
-                          >
-                            <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-
-                  <Box className={classes.buttonNav} width={1} textAlign="center">
-                    <Fab
-                      variant="extended"
-                      type="submit"
-                      style={{ background: "#7599FF", color: "White" }}
-                      onClick={handleLogin}
-                      className={loginClick && isLockedOut ? classes.loginDisabled : ""}
-                      disabled={loginClick && isLockedOut}
-                    >
-                      {`${t("Login")}`}
-                      <input
-                        type="submit"
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          left: 0,
-                          width: "100%",
-                          opacity: 0,
-                        }}
-                        disabled={loginClick && isLockedOut}
-                      />
-                    </Fab>
-                  </Box>
-
-                  <Box textAlign="center" width={1} mt={4} mb={4}>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        LAMP.initializeDemoDB(demo_db)
-                        localStorage.setItem("demo_mode", "try_it")
-                        setTryitMenu(event.currentTarget)
-                      }}
-                      // setTryitMenu(event.currentTarget)}
-                    >
-                      {`${t("Try it")}`}
-                    </Link>
-                    <br />
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        setOpen(true)
-                      }}
-                    >
-                      {`${t("Self Help")}`}
-                    </Link>
-                    {/* <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                  >
-                    {`${t("Research studies using mindLAMP")}`}
-                  </Link> */}
-                    <Menu
-                      keepMounted
-                      open={Boolean(tryitMenu)}
-                      anchorPosition={tryitMenu?.getBoundingClientRect()}
-                      anchorReference="anchorPosition"
-                      onClose={() => setTryitMenu(undefined)}
-                    >
-                      <MenuItem disabled divider>
-                        <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "researcher")
-                        }}
-                      >
-                        {`${t("Researcher")}`}
-                      </MenuItem>
-                      <MenuItem
-                        divider
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "clinician")
-                        }}
-                      >
-                        {`${t("Clinician")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "participant")
-                        }}
-                      >
-                        {`${t("Participant")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "patient")
-                        }}
-                      >
-                        {`${t("User")}`}
-                      </MenuItem>
-                    </Menu>
-                  </Box>
-                </Box>
-              </form>
+      <LoginFrame>
+        <Grid item className={classes.loginInner}>
+          <Box marginY={2} bgcolor="primary" padding={2} className={classes.textfieldStyle}>
+            <Grid container direction="row" wrap="nowrap">
+              <Box>
+                <IconButton style={{ background: "#7599FF", color: "White" }} onClick={() => clearServer()}>
+                  <Icon>arrow_back</Icon>
+                </IconButton>
+              </Box>
+              <Box sx={{ flexGrow: "1" }} alignContent={"center"}>
+                <Typography align="center">{LAMP.Auth._auth.serverAddress}</Typography>
+              </Box>
             </Grid>
-          </Grid>
-        </ResponsiveMargin>
-      </Slide>
+          </Box>
+          <form onSubmit={(e) => handleLogin(e)}>
+            <Box>
+              {isLockedOut && (
+                <div style={{ marginBottom: "12px" }}>
+                  <span style={{ color: "red", fontSize: "14px" }}>
+                    {t("Too many login attempts. Try again after 1 hour.")}
+                  </span>
+                </div>
+              )}
+              <TextField
+                select
+                label={`${t("Select Language")}`}
+                style={{ width: "100%" }}
+                onChange={(event) => {
+                  setSelectedLanguage(event.target.value)
+                }}
+                variant="filled"
+                value={selectedLanguage || "en-US"}
+              >
+                {Object.keys(locale_lang).map((key, value) => {
+                  if (userLanguages.includes(key)) {
+                    return (
+                      <MenuItem key={key} value={key}>
+                        {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+                      </MenuItem>
+                    )
+                  }
+                })}
+              </TextField>
+
+              <TextField
+                required
+                name="id"
+                type="email"
+                margin="normal"
+                variant="outlined"
+                style={{ width: "100%", height: 50 }}
+                placeholder={`${t("my.email@address.com")}`}
+                value={state.id || ""}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  classes: {
+                    root: classes.textfieldStyle,
+                  },
+                  autoCapitalize: "off",
+                }}
+              />
+              <TextField
+                required
+                name="password"
+                type={showPassword ? "text" : "password"}
+                margin="normal"
+                variant="outlined"
+                style={{ width: "100%", height: 50, marginBottom: 40 }}
+                placeholder="•••••••••"
+                value={state.password || ""}
+                onChange={handleChange}
+                InputProps={{
+                  classes: {
+                    root: classes.textfieldStyle,
+                  },
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={(event) => event.preventDefault()}
+                        edge="end"
+                      >
+                        <Icon>{showPassword ? "visibility_off" : "visibility"}</Icon>
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Box className={classes.buttonNav} width={1} textAlign="center">
+                <Fab
+                  variant="extended"
+                  type="submit"
+                  style={{ background: "#7599FF", color: "White" }}
+                  onClick={handleLogin}
+                  className={loginClick && isLockedOut ? classes.loginDisabled : ""}
+                  disabled={loginClick && isLockedOut}
+                >
+                  {`${t("Login")}`}
+                  <input
+                    type="submit"
+                    style={{
+                      cursor: "pointer",
+                      position: "absolute",
+                      top: 0,
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      width: "100%",
+                      opacity: 0,
+                    }}
+                    disabled={loginClick && isLockedOut}
+                  />
+                </Fab>
+              </Box>
+              <Box textAlign="center" width={1} mt={4} mb={4}>
+                <Link
+                  underline="none"
+                  className={classes.linkBlue}
+                  onClick={(event) => {
+                    LAMP.initializeDemoDB(demo_db)
+                    localStorage.setItem("demo_mode", "try_it")
+                    setTryitMenu(event.currentTarget)
+                  }}
+                  // setTryitMenu(event.currentTarget)}
+                >
+                  {`${t("Try it")}`}
+                </Link>
+                <br />
+                <Link
+                  underline="none"
+                  className={classes.linkBlue}
+                  onClick={(event) => {
+                    setOpen(true)
+                  }}
+                >
+                  {`${t("Self Help")}`}
+                </Link>
+                {/* <Link
+                underline="none"
+                className={classes.linkBlue}
+                onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
+              >
+                {`${t("Research studies using mindLAMP")}`}
+              </Link> */}
+                <Menu
+                  keepMounted
+                  open={Boolean(tryitMenu)}
+                  anchorPosition={tryitMenu?.getBoundingClientRect()}
+                  anchorReference="anchorPosition"
+                  onClose={() => setTryitMenu(undefined)}
+                >
+                  <MenuItem disabled divider>
+                    <b>{`${t("Try mindLAMP out as a...")}`}</b>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleLogin(event, "researcher")
+                    }}
+                  >
+                    {`${t("Researcher")}`}
+                  </MenuItem>
+                  <MenuItem
+                    divider
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleLogin(event, "clinician")
+                    }}
+                  >
+                    {`${t("Clinician")}`}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleLogin(event, "participant")
+                    }}
+                  >
+                    {`${t("Participant")}`}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleLogin(event, "patient")
+                    }}
+                  >
+                    {`${t("User")}`}
+                  </MenuItem>
+                </Menu>
+              </Box>
+            </Box>
+          </form>
+          <Box>
+            {configuredProviders.map((providerKey) => (
+              <Fab
+                variant="extended"
+                type="button"
+                style={{ background: "#7599FF", color: "White" }}
+                onClick={() => handleOAuthLogin(providerKey)}
+                key={`login-with-${providerKey}`}
+              >
+                {providerKey}
+              </Fab>
+            ))}
+          </Box>
+        </Grid>
+      </LoginFrame>
       <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
     </>
   )

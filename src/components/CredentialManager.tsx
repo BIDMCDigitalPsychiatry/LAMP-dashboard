@@ -78,6 +78,7 @@ export function CredentialEditor({
   const [name, setName] = useState(credential?.name ?? "")
   const [role, setRole] = useState(credential?.tooltip ?? "")
   const [emailAddress, setEmailAddress] = useState(credential?.email ?? "")
+  const [username, setUsername] = useState(credential?.username ?? "")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [accepted, setAccepted] = useState(true)
@@ -86,9 +87,11 @@ export function CredentialEditor({
     nameError: "",
     emailError: "",
     passwordError: "",
+    usernameError: "",
   })
   const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))$/
   const PASSWORD_REGEX = /^(?=.*\d)(?=.*[!@#$%^-_&*?])(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+  const USERNAME_REGEX = /^[\w\-]{2,}$/ // TODO: Write a real username regex
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -142,6 +145,7 @@ export function CredentialEditor({
       setAccepted(valid)
     })()
   }, [password])
+
   // validating email input field
   const validateEmailField = (value) => {
     if (EMAIL_REGEX.test(value)) {
@@ -156,6 +160,22 @@ export function CredentialEditor({
       }))
     }
   }
+  // Validating username field
+  const validateUsernameField = (value) => {
+    if (USERNAME_REGEX.test(value) || EMAIL_REGEX.test(value)) {
+      setFormErrors((prev) => ({
+        ...prev,
+        usernameError: "",
+      }))
+    } else {
+      setFormErrors((prev) => ({
+        ...prev,
+        usernameError:
+          "Enter a valid email address or a valid username containing letters, numbers, underscores, and dashes.",
+      }))
+    }
+  }
+
   // validating password input field with criteria
   const validatePasswordField = (value) => {
     if (PASSWORD_REGEX.test(value)) {
@@ -186,28 +206,22 @@ export function CredentialEditor({
     }
   }
   // show or hide save credentials tick only when all form fields have valid data
-  const showSaveTick = () => {
+  const saveTickDisabled = () => {
     if (mode === "reset-password" && password === confirmPassword) {
       return false
     }
-    if (
-      password === confirmPassword &&
-      name?.length > 0 &&
-      role?.length > 0 &&
-      emailAddress?.length > 0 &&
-      password?.length > 0 &&
-      confirmPassword?.length > 0
-    ) {
-      if (
-        formErrors.nameError.length === 0 &&
-        formErrors.emailError.length === 0 &&
-        formErrors.passwordError.length === 0
-      ) {
-        return false
-      }
-    } else {
-      return true
-    }
+    const submitAvailableConditions = [
+      password === confirmPassword,
+      name?.length > 0,
+      role?.length > 0,
+      fromParticipant ? username?.length > 0 : emailAddress?.length > 0,
+      password?.length > 0,
+      confirmPassword?.length > 0,
+      formErrors.nameError.length === 0,
+      formErrors.passwordError.length === 0,
+      fromParticipant ? formErrors.usernameError.length === 0 : formErrors.emailError.length === 0,
+    ]
+    return !submitAvailableConditions.every((condition) => condition)
   }
 
   return (
@@ -289,8 +303,9 @@ export function CredentialEditor({
                       <IconButton
                         edge="end"
                         aria-label="save role"
-                        onClick={() =>
-                          onChange({
+                        onClick={() => {
+                          console.log("On click I think of end...")
+                          return onChange({
                             credential,
                             photo,
                             name,
@@ -298,7 +313,7 @@ export function CredentialEditor({
                             emailAddress,
                             password,
                           })
-                        }
+                        }}
                         onMouseDown={(event) => event.preventDefault()}
                       >
                         <Icon>check_circle</Icon>
@@ -321,7 +336,7 @@ export function CredentialEditor({
           </TextField>
         </ThemeProvider>
       )}
-      {["create-new", "update-profile"].includes(mode) && (
+      {!fromParticipant && ["create-new", "update-profile"].includes(mode) && (
         <TextField
           error={formErrors.emailError.length > 0}
           fullWidth
@@ -337,6 +352,22 @@ export function CredentialEditor({
           style={{ marginBottom: 16 }}
         />
       )}
+      {fromParticipant && ["create-new", "update-profile"].includes(mode) && (
+        <TextField
+          error={formErrors.usernameError.length > 0}
+          fullWidth
+          label={`${t("Username")}`}
+          type="text"
+          variant="outlined"
+          helperText={formErrors.usernameError}
+          value={username}
+          onChange={(event) => {
+            setUsername(event.target.value)
+            validateUsernameField(event.target.value)
+          }}
+          style={{ marginBottom: 16 }}
+        />
+      )}
       {["create-new", "reset-password", "update-profile"].includes(mode) && (
         <Box width={1}>
           <TextField
@@ -346,7 +377,7 @@ export function CredentialEditor({
             variant="outlined"
             error={!accepted || formErrors.passwordError.length > 0 ? true : false}
             helperText={
-              !showSaveTick()
+              !saveTickDisabled()
                 ? "On the right of the box, press the check mark in the circle to save changes."
                 : formErrors.passwordError
             }
@@ -382,17 +413,30 @@ export function CredentialEditor({
                       <IconButton
                         edge="end"
                         aria-label="submit credential"
-                        disabled={showSaveTick()}
-                        onClick={() =>
-                          onChange({
+                        disabled={saveTickDisabled()}
+                        onClick={() => {
+                          const data = {
                             credential,
                             photo,
                             name,
                             role,
-                            emailAddress,
                             password,
-                          })
-                        }
+                            emailAddress,
+                            username,
+                          }
+                          if (mode === "create-new" && fromParticipant) {
+                            // Use a placeholder email address when the username is not a valid email
+                            if (EMAIL_REGEX.test(username)) {
+                              data.emailAddress = username
+                            } else {
+                              data.emailAddress = `${username}@digitalpsych.org`
+                            }
+                          }
+                          if (username === "") {
+                            data.username = undefined
+                          }
+                          onChange(data)
+                        }}
                         onMouseDown={(event) => event.preventDefault()}
                       >
                         <Icon>check_circle</Icon>
@@ -447,7 +491,7 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
       )
         return -4
     } else if (mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
-      let result = (await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any
+      let result = (await LAMP.Credential.create(id, data.emailAddress, data.password, data.name, data.username)) as any
       if (!!result.error) {
         return result.error
       }
