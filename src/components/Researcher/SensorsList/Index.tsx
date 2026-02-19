@@ -8,6 +8,7 @@ import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { useAuthContext } from "../../AuthProvider"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,6 +73,7 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const { isLoggedIn } = useAuthContext()
 
   useInterval(
     () => {
@@ -93,11 +95,7 @@ export default function SensorsList({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+    if (isLoggedIn || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchFilterSensors()
       } else {
@@ -107,7 +105,7 @@ export default function SensorsList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected, isLoggedIn])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {

@@ -29,6 +29,7 @@ import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
+import { AuthContextProvider, useAuthContext } from "./AuthProvider"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -97,6 +98,7 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
   const location: any = useLocation()
+  const { setIsLoggedIn, isLoggedIn } = useAuthContext()
 
   useEffect(() => {
     const isLoginPage = location.pathname === "/"
@@ -109,10 +111,10 @@ function AppRouter({ setConfirmSession, ...props }) {
     } catch (error) {
       console.log(error)
     }
-    const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+
     const hasRoleFlag = localStorage.getItem("isParticipant")
 
-    if (userToken && !hasRoleFlag) {
+    if (isLoggedIn && !hasRoleFlag) {
       const firstPath = window.location.hash
       const participantRegex = /^#\/participant\/[^\/]+\/assess$/
 
@@ -122,11 +124,7 @@ function AppRouter({ setConfirmSession, ...props }) {
         localStorage.setItem("isParticipant", "false")
       }
     }
-    if (
-      LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
-      location?.pathname === "/" &&
-      !userToken?.accessToken
-    ) {
+    if (LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" && location?.pathname === "/" && !isLoggedIn) {
       reset()
     }
   }, [location?.pathname])
@@ -168,6 +166,7 @@ function AppRouter({ setConfirmSession, ...props }) {
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
   const [loading, setLoading] = useState(false)
   const [participantSelected, setParticipantSelected] = useState(false)
+
   useEffect(() => {
     setParticipantSelected(false)
     if (localStorage.getItem("demo_mode") === "try_it") {
@@ -188,6 +187,8 @@ function AppRouter({ setConfirmSession, ...props }) {
         setLoading(false)
         return
       }
+
+      // TODO: double check, but this looks like the magic one time login link implementation
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
@@ -195,43 +196,18 @@ function AppRouter({ setConfirmSession, ...props }) {
       const password = x[1].trim()
 
       ;(async () => {
-        await LAMP.Auth.set_identity({
-          id: userName,
-          password: password,
-          serverAddress:
-            x.length > 2 && typeof x[2] !== "undefined"
-              ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-              : "api.lamp.digital",
-        })
-        if (userName && password) {
-          try {
-            const res = await LAMP.Credential.login(userName, password)
-            sessionStorage.setItem(
-              "tokenInfo",
-              JSON.stringify({ accessToken: res?.data?.access_token, refreshToken: res?.data?.refresh_token })
-            )
-            setAuthenticated(true)
-            reset({
-              id: x[0],
-              password: x[1],
-              serverAddress:
-                x.length > 2 && typeof x[2] !== "undefined"
-                  ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-                  : "api.lamp.digital",
-            }).then((x) => {
-              window.location.href = query[0]
-              setLoading(false)
-            })
-          } catch (error) {
-            setLoading(false)
-            enqueueSnackbar(`${t("Some error occured. Please login again")}`, {
-              variant: "error",
-            })
-            window.location.href = "/#/"
-            console.log(error)
-          }
-        } else {
-          setLoading(false)
+        try {
+          await LAMP.Auth.set_identity({
+            id: userName,
+            password: password,
+            serverAddress:
+              x.length > 2 && typeof x[2] !== "undefined"
+                ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+                : "api.lamp.digital",
+          })
+          setIsLoggedIn && setIsLoggedIn(true)
+        } catch {
+          setIsLoggedIn && setIsLoggedIn(false)
         }
       })()
     } else if (!state.identity) {
@@ -252,16 +228,22 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [])
 
   const refreshPage = () => {
-    LAMP.Auth.refresh_identity().then((x) => {
-      getAdminType()
-      setState((state) => ({
-        ...state,
-        identity: LAMP.Auth._me,
-        auth: LAMP.Auth._auth,
-        authType: LAMP.Auth._type,
-        activeTab: LAMP.Auth._type === "participant" ? "assess" : "users",
-      }))
-    })
+    LAMP.Auth.refresh_identity().then(
+      () => {
+        getAdminType()
+        setState((state) => ({
+          ...state,
+          identity: LAMP.Auth._me,
+          auth: LAMP.Auth._auth,
+          authType: LAMP.Auth._type,
+          activeTab: LAMP.Auth._type === "participant" ? "assess" : "users",
+        }))
+        setIsLoggedIn && setIsLoggedIn(true)
+      },
+      () => {
+        setIsLoggedIn && setIsLoggedIn(false)
+      }
+    )
   }
 
   const getAdminType = async () => {
@@ -360,9 +342,8 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [state])
 
   const logout = async () => {
-    const token = sessionStorage.getItem("tokenInfo")
     try {
-      await LAMP.Credential.logout(token)
+      await LAMP.Credential.logout()
     } catch (err) {
       console.error("Logout failed:", err)
     } finally {
@@ -370,13 +351,10 @@ function AppRouter({ setConfirmSession, ...props }) {
     }
   }
 
-  let reset = async (identity?: any) => {
-    if (identity?.id != "selfHelp@demo.lamp.digital") {
-      Service.deleteUserDB()
-    }
+  const clearCurrentUser = async () => {
     Service.deleteUserDB()
     Service.deleteDB()
-    if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
+    if (LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
       !!(state.identity as any)?.id &&
         (await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
@@ -387,17 +365,39 @@ function AppRouter({ setConfirmSession, ...props }) {
             device_type: "Dashboard",
             user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
           },
-        } as any).then((res) => sessionStorage.removeItem("tokenInfo")))
+        } as any).then((res) => setIsLoggedIn && setIsLoggedIn(false)))
     }
 
-    await LAMP.Auth.set_identity(identity).catch((e) => {
-      enqueueSnackbar(`${t("Invalid id or password.")}`, {
-        variant: "error",
-      })
-      return
-    })
+    await LAMP.Auth.set_identity(undefined)
 
-    if (!!identity) {
+    setState((state) => ({
+      ...state,
+      identity: null,
+      auth: null,
+      authType: null,
+      activeTab: null,
+      lastDomain: ["api.lamp.digital", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
+        ? undefined
+        : state?.auth?.serverAddress,
+    }))
+    localStorage.setItem("verified", JSON.stringify({ value: false }))
+    setIsLoggedIn && setIsLoggedIn(false)
+    localStorage.removeItem("isParticipant")
+    localStorage.removeItem("isLoginPage")
+    window.location.href = "/#/"
+  }
+
+  const setIdentity = async (identity: any) => {
+    if (identity?.id != "selfHelp@demo.lamp.digital") {
+      Service.deleteUserDB()
+    }
+
+    try {
+      // Login to server
+      await LAMP.Auth.set_identity(identity)
+      setIsLoggedIn && setIsLoggedIn(true)
+
+      // Set up state
       getAdminType()
       let type = {
         identity: LAMP.Auth._me,
@@ -407,22 +407,22 @@ function AppRouter({ setConfirmSession, ...props }) {
       }
       setState((state) => ({ ...state, ...type }))
       return type
+    } catch (err) {
+      // Display login failed toast
+      enqueueSnackbar(`${t("Invalid id or password.")}`, {
+        variant: "error",
+      })
+      setIsLoggedIn && setIsLoggedIn(false)
+    }
+  }
+
+  // If identity is defined, attempt to log the user in
+  // If identity is not defined, log the current user out and clear any remaining data
+  let reset = async (identity?: any) => {
+    if (!!identity) {
+      return await setIdentity(identity)
     } else {
-      setState((state) => ({
-        ...state,
-        identity: null,
-        auth: null,
-        authType: null,
-        activeTab: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"]?.includes(state?.auth?.serverAddress)
-          ? undefined
-          : state?.auth?.serverAddress,
-      }))
-      localStorage.setItem("verified", JSON.stringify({ value: false }))
-      sessionStorage.removeItem("tokenInfo")
-      localStorage.removeItem("isParticipant")
-      localStorage.removeItem("isLoginPage")
-      window.location.href = "/#/"
+      return await clearCurrentUser()
     }
   }
 
@@ -472,13 +472,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     setState((state) => ({
       ...state,
       surveyDone: true,
-    }))
-  }
-
-  const setServerAddress = (address) => {
-    setState((state) => ({
-      ...state,
-      lastDomain: true,
     }))
   }
 
@@ -1295,7 +1288,9 @@ export default function App({ ...props }) {
               onClose={() => setConfirmSession(false)}
             />
             <HashRouter>
-              <AppRouter {...props} setConfirmSession={setConfirmSession} />
+              <AuthContextProvider>
+                <AppRouter {...props} setConfirmSession={setConfirmSession} />
+              </AuthContextProvider>
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>

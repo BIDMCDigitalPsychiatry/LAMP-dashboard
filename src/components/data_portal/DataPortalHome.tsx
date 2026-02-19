@@ -22,6 +22,7 @@ import jsonata from "jsonata"
 import { useDrop } from "react-dnd"
 import { useTranslation } from "react-i18next"
 import { buildLampServerRequestUrl } from "../../utilities"
+import { useAuthContext } from "../AuthProvider"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -42,14 +43,14 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     query: "",
     type: "",
   })
+  const { authorizationHeader } = useAuthContext()
   const runQuery = async () => {
     try {
       jsonata(query)["errors"] // check for errors first (change from .errors() made for TSX compliance)
-      const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
       let res = await fetch(buildLampServerRequestUrl(token.server), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${userToken.accessToken}`,
+          Authorization: authorizationHeader,
         },
         credentials: "include",
         body: query,

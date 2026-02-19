@@ -25,6 +25,7 @@ import { Service } from "../../DBService/DBService"
 import { fetchPostData, fetchResult } from "../SaveResearcherData"
 import { updateActivityData, addActivity } from "../ActivityList/ActivityMethods"
 import NewPatientDetail from "./NewPatientDetail"
+import { useAuthContext } from "../../AuthProvider"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -77,6 +78,7 @@ export default function PatientStudyCreator({
   const [createPatient, setCreatePatient] = useState(false)
   const [loading, setLoading] = useState(false)
   const [newId, setNewId] = useState(null)
+  const { authorizationHeader } = useAuthContext()
 
   const validate = () => {
     return !(
@@ -213,7 +215,7 @@ export default function PatientStudyCreator({
       should_add_participant: createPatient ? createPatient : false,
       name: studyName,
     }
-    fetchPostData(authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
+    fetchPostData(authId, "study/clone", "researcher", "POST", bodyData, authorizationHeader).then((studyData) => {
       let newStudyId = studyData.data
       let newUriStudyID = "?study_id=" + newStudyId
       if (duplicateStudyName) {
@@ -226,14 +228,14 @@ export default function PatientStudyCreator({
             sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
           }
           Service.addData("studies", [newStudyData])
-          fetchResult(authId, "activity" + newUriStudyID, "researcher").then((result) => {
+          fetchResult(authId, "activity" + newUriStudyID, "researcher", authorizationHeader).then((result) => {
             let filteredActivities = (result?.activities || []).filter(
               (eachActivities) => eachActivities.study_id === newStudyId
             )
             saveStudyData(filteredActivities, "activities")
           })
 
-          fetchResult(authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
+          fetchResult(authId, "sensor" + newUriStudyID, "researcher", authorizationHeader).then((resultData) => {
             let filteredSensors = (resultData?.sensors || []).filter((eachSensors) => {
               return eachSensors.study_id === newStudyId
             })
@@ -241,7 +243,7 @@ export default function PatientStudyCreator({
           })
           let updatedNewStudy = newStudyData
           if (createPatient) {
-            fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
+            fetchResult(authId, "participant" + newUriStudyID, "researcher", authorizationHeader).then((results) => {
               if (results.studies[0].participants.length > 0) {
                 let filteredParticipants = results.studies[0].participants.filter(
                   (eachParticipant) => eachParticipant.study_id === newStudyId
@@ -270,7 +272,7 @@ export default function PatientStudyCreator({
           sensor_count: 0,
         }
         if (createPatient) {
-          fetchResult(authId, "participant" + newUriStudyID, "researcher").then((results) => {
+          fetchResult(authId, "participant" + newUriStudyID, "researcher", authorizationHeader).then((results) => {
             if (results.studies[0].participants.length > 0) {
               let filteredParticipants = results.studies[0].participants.filter(
                 (eachParticipant) => eachParticipant.study_id === newStudyId

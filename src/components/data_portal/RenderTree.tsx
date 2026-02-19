@@ -33,10 +33,12 @@ import * as jsonexport from "jsonexport/dist"
 import { useTranslation } from "react-i18next"
 import { getSelfHelpAllActivityEvents } from "../Participant"
 import { buildLampServerRequestUrl } from "../../utilities"
+import { useAuthContext } from "../AuthProvider"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
   const [expanded, setExpanded] = React.useState(false)
+  const { authorizationHeader } = useAuthContext()
   const [isAlphabetized, toggleAlphabetized] = React.useState(
     Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator"
   )
@@ -158,11 +160,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   //let's define our function we'll use to ping the api
   const getData = async (query) => {
     try {
-      const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
       let res = await fetch(buildLampServerRequestUrl(token.server), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${userToken.accessToken}`,
+          Authorization: authorizationHeader,
         },
         credentials: "include",
         body: query,
@@ -256,7 +257,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     let id_obj = await generate_ids(id, true)
     let id_list = Object.keys(id_obj)
     //now, let's get our lookup dict
-    let lookup_dict = await generate_activity_dict(id, token)
+    let lookup_dict = await generate_activity_dict(id, token, authorizationHeader)
 
     //now, let's pull some data
     let resultsPulled = (await Promise.all(
@@ -439,9 +440,12 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               setDownloadAllActivities(defaultDownloadAllActivities)
               setChosenActivities([])
               setActivityList(
-                (Object.values(await generate_activity_dict(id[id.length - 1], token)).reduce((acc, elem) => {
-                  return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>).concat([elem])
-                }, []) as Array<any>).sort((a, b) => a["name"].localeCompare(b["name"]))
+                (Object.values(await generate_activity_dict(id[id.length - 1], token, authorizationHeader)).reduce(
+                  (acc, elem) => {
+                    return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>).concat([elem])
+                  },
+                  []
+                ) as Array<any>).sort((a, b) => a["name"].localeCompare(b["name"]))
               )
             }}
             handleResult={() =>

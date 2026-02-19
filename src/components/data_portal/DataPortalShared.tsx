@@ -54,7 +54,7 @@ export function ajaxRequest(parameters) {
 }
 
 //jsonata fetch
-export const jsonataFetch = async (query, access_key, secret_key, server) => {
+export const jsonataFetch = async (query, server, authorizationHeader) => {
   try {
     const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
     let res = await fetch(buildLampServerRequestUrl(server), {
@@ -315,6 +315,7 @@ export async function generate_study_ids(id_set) {
 export async function generate_activity_dict(
   id_set,
   token,
+  authorizationHeader,
   included_details = ["name", "spec"],
   already_reduced = false
 ) {
@@ -327,9 +328,7 @@ export async function generate_activity_dict(
   //it fetches too much information and is inefficient.
   //Let's use a jsonata query instead!
   const res = await Promise.all(
-    id_list.map((id) =>
-      jsonataFetch(queryDictionary["activityFromStudy"](id), token.username, token.password, token.server)
-    )
+    id_list.map((id) => jsonataFetch(queryDictionary["activityFromStudy"](id), token.server, authorizationHeader))
   )
   //flatten the array of arrays
   let studyArray = res
