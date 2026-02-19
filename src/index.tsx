@@ -49,6 +49,12 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
   }
   ;(window.CustomEvent as any) = CustomEvent
 })()
+
+// Enable lamp-core's dev mode in order to make server requests over http
+if (process.env.REACT_APP_USE_HTTPS === "false") {
+  LAMP.enableDevMode()
+}
+
 // Initialize the demo DB for "Try It" mode.
 // Tie-in for the mobile apps.
 // Login only if we are a participant.

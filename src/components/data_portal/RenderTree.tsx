@@ -32,6 +32,7 @@ import { saveAs } from "file-saver"
 import * as jsonexport from "jsonexport/dist"
 import { useTranslation } from "react-i18next"
 import { getSelfHelpAllActivityEvents } from "../Participant"
+import { buildLampServerRequestUrl } from "../../utilities"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -158,7 +159,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   const getData = async (query) => {
     try {
       const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
-      let res = await fetch(`https://${token.server}`, {
+      let res = await fetch(buildLampServerRequestUrl(token.server), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${userToken.accessToken}`,

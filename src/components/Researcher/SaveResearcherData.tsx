@@ -1,6 +1,7 @@
 import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
+import { buildLampServerRequestUrl } from "../../utilities"
 
 interface StudyObject {
   id: string
@@ -11,7 +12,7 @@ interface StudyObject {
   sensors: Array<any>
 }
 export const fetchResult = async (id, type, modal) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
@@ -27,7 +28,7 @@ export const fetchResult = async (id, type, modal) => {
 }
 
 export const fetchPostData = async (id, type, modal, methodType, bodyData) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {

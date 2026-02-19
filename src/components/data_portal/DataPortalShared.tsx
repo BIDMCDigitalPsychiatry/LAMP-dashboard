@@ -1,6 +1,7 @@
 import React from "react"
 import { createStyles, makeStyles, Theme } from "@material-ui/core"
 import LAMP from "lamp-core"
+import { buildLampServerRequestUrl } from "../../utilities"
 
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = React.useState(() => {
@@ -56,7 +57,7 @@ export function ajaxRequest(parameters) {
 export const jsonataFetch = async (query, access_key, secret_key, server) => {
   try {
     const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
-    let res = await fetch(`https://${server}`, {
+    let res = await fetch(buildLampServerRequestUrl(server), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${userToken.accessToken}`,

@@ -88,6 +88,7 @@
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
+    "dev": "node buildEnv dev && react-scripts start",
     "start": "node buildEnv prod && react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
