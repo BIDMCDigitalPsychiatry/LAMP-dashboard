@@ -178,6 +178,15 @@ const useStyles = makeStyles((theme: Theme) =>
         marginBottom: 16,
       },
     },
+    pdfMessage: {
+      fontSize: 13,
+      fontWeight: 500,
+      color: "rgba(0, 0, 0, 0.6)",
+      lineHeight: 1.5,
+      textAlign: "left",
+      marginTop: -20,
+      marginBottom: 20,
+    },
   })
 )
 
@@ -448,6 +457,9 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      <div className={classes.pdfMessage}>
+        {t("A related PDF containing your health data is available. Please refer to the study guide to access it.")}
+      </div>
       <ActivityBox
         participant={participant}
         savedActivities={savedActivities}
