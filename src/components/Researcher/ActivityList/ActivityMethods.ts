@@ -492,6 +492,69 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.video_recording": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          properties: {
+            maxDuration: {
+              title: i18n.t("Maximum duration"),
+              description: i18n.t("Maximum recording duration in seconds."),
+              type: "number",
+              default: 60,
+              minimum: 0,
+              maximum: 300,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            resolution: {
+              title: i18n.t("Resolution"),
+              type: "string",
+              enum: ["480p", "720p", "1080p"],
+              enumNames: [i18n.t("480p"), i18n.t("720p"), i18n.t("1080p")],
+              default: "720p",
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            maxBitrate: {
+              title: i18n.t("Bitrate"),
+              description: i18n.t("Maximum bitrate for the recording."),
+              type: "string",
+              enum: ["1Mbps", "2Mbps", "4Mbps", "8Mbps"],
+              enumNames: [i18n.t("1Mbps"), i18n.t("2Mbps"), i18n.t("4Mbps"), i18n.t("8Mbps")],
+              default: "2Mbps",
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            frameRate: {
+              title: i18n.t("Frame rate"),
+              description: i18n.t("Frames per second for the recording."),
+              type: "number",
+              default: 30,
+              minimum: 1,
+              maximum: 60,
+              "ui:grid": {
+                xs: 6,
+              },
+            },
+            metadataCapture: {
+              title: i18n.t("Capture metadata with the recording."),
+              type: "boolean",
+              default: false,
+              "ui:widget": "checkbox",
+              "ui:grid": {
+                xs: 12,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.spatial_span": {
       type: "object",
       properties: {

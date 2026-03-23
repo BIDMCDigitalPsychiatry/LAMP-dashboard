@@ -163,6 +163,7 @@ export default function AddActivity({
     "lamp.voice_survey": `${t("Speech Recording")}`,
     "lamp.fragmented_letters": `${t("Fragmented Letters")}`,
     "lamp.digit_span": `${t("Digit Span")}`,
+    "lamp.video_recording": `${t("Video Recording")}`,
   }
 
   const getActivitySpec = async (id) => {

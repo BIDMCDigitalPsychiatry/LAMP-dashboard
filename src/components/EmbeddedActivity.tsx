@@ -53,6 +53,7 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
+  "lamp.video_recording": "video_recording",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
