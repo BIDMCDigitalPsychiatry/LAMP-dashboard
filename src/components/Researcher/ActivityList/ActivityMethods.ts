@@ -513,8 +513,8 @@ export const SchemaList = () => {
             resolution: {
               title: i18n.t("Resolution"),
               type: "string",
-              enum: ["480p", "720p", "1080p"],
-              enumNames: [i18n.t("480p"), i18n.t("720p"), i18n.t("1080p")],
+              enum: ["720p", "1080p"],
+              enumNames: [i18n.t("720p"), i18n.t("1080p")],
               default: "720p",
               "ui:grid": {
                 xs: 6,
@@ -524,8 +524,8 @@ export const SchemaList = () => {
               title: i18n.t("Bitrate"),
               description: i18n.t("Maximum bitrate for the recording."),
               type: "string",
-              enum: ["1Mbps", "2Mbps", "4Mbps", "8Mbps"],
-              enumNames: [i18n.t("1Mbps"), i18n.t("2Mbps"), i18n.t("4Mbps"), i18n.t("8Mbps")],
+              enum: ["2Mbps", "3Mbps", "4Mbps"],
+              enumNames: [i18n.t("2Mbps"), i18n.t("3Mbps"), i18n.t("4Mbps")],
               default: "2Mbps",
               "ui:grid": {
                 xs: 6,
@@ -536,8 +536,8 @@ export const SchemaList = () => {
               description: i18n.t("Frames per second for the recording."),
               type: "number",
               default: 30,
-              minimum: 1,
-              maximum: 60,
+              minimum: 24,
+              maximum: 30,
               "ui:grid": {
                 xs: 6,
               },

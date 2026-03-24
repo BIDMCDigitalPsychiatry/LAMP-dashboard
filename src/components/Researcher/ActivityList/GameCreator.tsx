@@ -108,6 +108,23 @@ export default function GameCreator({
     validate()
   }, [data])
 
+  const validateVideoRecordingParams = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      typeof data.settings?.maxDuration == null ||
+      typeof data.settings?.frameRate == null ||
+      data.settings?.maxDuration < 1 ||
+      data.settings?.maxDuration > 300 ||
+      data.settings?.frameRate < 1 ||
+      data.settings?.frameRate > 60 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
   const validateQuestions = (questions) => {
     let status = 0
     if (!!questions && questions.length > 0) {
@@ -229,6 +246,11 @@ export default function GameCreator({
       )
     } else if ((value?.spec && value.spec === "lamp.recording") || activitySpecId === "lamp.recording") {
       return validateRecording(duplicates)
+    } else if (
+      (value?.spec && ["lamp.video_recording"].includes(value.spec)) ||
+      ["lamp.video_recording"].includes(activitySpecId)
+    ) {
+      return validateVideoRecordingParams(duplicates)
     } else if (
       (value?.spec && ["lamp.dbt_diary_card"].includes(value.spec)) ||
       activitySpecId === "lamp.dbt_diary_card"
