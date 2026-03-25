@@ -18,7 +18,6 @@ import {
   ThemeProvider,
   createTheme,
   Fab,
-  Input,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -31,6 +30,7 @@ import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import SnackMessage from "./SnackMessage"
 import { useAuthContext } from "./AuthProvider"
+import { ManageApiKey } from "./Admin/ManageApiKey"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -562,6 +562,7 @@ export function CredentialEditor({
           </Box>
         </Grid>
       )}
+      {["manage-api-keys"].includes(mode) && <ManageApiKey credential={credential}></ManageApiKey>}
     </Grid>
   )
 }
@@ -639,6 +640,7 @@ export const CredentialManager: React.FunctionComponent<{
   const [ext, setExt] = useState([])
   const [int, setInt] = useState([])
   const [permissions, setPermissions] = useState([])
+  const { sessionInfo } = useAuthContext()
 
   // Whether or not to display the reset two factor/oauth option for the selected credential
   // NOTE: Only session based servers return an account setup state value with credentials,
@@ -646,6 +648,8 @@ export const CredentialManager: React.FunctionComponent<{
   const selectedHasClearableSetup = ["TWO_FACTOR", "OAUTH"].some(
     (accountState) => accountState === selected.credential?.account_setup_state
   )
+
+  const canManageApiKeys = LAMP.Auth._authScheme === "session" && sessionInfo.userType === "admin"
 
   useEffect(() => {
     LAMP.Type.parent(id)
@@ -882,6 +886,19 @@ export const CredentialManager: React.FunctionComponent<{
             }}
           >
             {`${t("Reset OAuth / Two Factor")}`}
+          </MenuItem>
+        )}
+        {canManageApiKeys && (
+          <MenuItem
+            onClick={() => {
+              setSelected((selected) => ({
+                anchorEl: undefined,
+                credential: selected.credential,
+                mode: "manage-api-keys",
+              }))
+            }}
+          >
+            {`${t("Manage API Key")}`}
           </MenuItem>
         )}
         <MenuItem

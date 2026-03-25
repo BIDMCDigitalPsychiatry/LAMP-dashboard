@@ -449,7 +449,7 @@ export default function PreventSelectedActivities({
           activity.spec === "lamp.dbt_diary_card" ||
           activity.spec === "lamp.goals" ||
           activity.spec === "lamp.medications" ? (
-            <Grid item xs={6} sm={3} md={3} lg={3}>
+            <Grid item xs={6} sm={3} md={3} lg={3} key={activity.id}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card
                   className={classes.prevent}

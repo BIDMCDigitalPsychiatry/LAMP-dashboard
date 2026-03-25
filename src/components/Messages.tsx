@@ -170,7 +170,7 @@ export default function Messages({
             "Content-Type": "application/json",
             Authorization: authorizationHeader,
           },
-          credentials: "include",
+          credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
         })
       ).json()
       return result

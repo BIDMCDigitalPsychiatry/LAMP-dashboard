@@ -165,7 +165,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         headers: {
           Authorization: authorizationHeader,
         },
-        credentials: "include",
+        credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
         body: query,
       })
       return JSON.parse(await res.text())

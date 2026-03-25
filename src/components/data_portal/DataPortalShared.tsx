@@ -33,7 +33,7 @@ export function ajaxRequest(parameters) {
       : parameters.data
     : ""
   let xmlhttp = new XMLHttpRequest()
-  xmlhttp.withCredentials = true
+  xmlhttp.withCredentials = LAMP.Auth._authScheme === "session"
   xmlhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       if (parameters.callback) parameters.callback(this.responseText)
@@ -62,7 +62,7 @@ export const jsonataFetch = async (query, server, authorizationHeader) => {
       headers: {
         Authorization: `Bearer ${userToken.accessToken}`,
       },
-      credentials: "include",
+      credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
       body: query,
     })
     let text = await res.text()
