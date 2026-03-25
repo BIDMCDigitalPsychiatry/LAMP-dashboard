@@ -23,6 +23,7 @@ import { useDrop } from "react-dnd"
 import { useTranslation } from "react-i18next"
 import { buildLampServerRequestUrl } from "../../utilities"
 import { useAuthContext } from "../AuthProvider"
+import LAMP from "lamp-core"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -52,7 +53,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         headers: {
           Authorization: authorizationHeader,
         },
-        credentials: "include",
+        credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
         body: query,
       })
       let text = await res.text()

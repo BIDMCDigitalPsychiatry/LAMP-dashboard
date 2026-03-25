@@ -20,7 +20,7 @@ export const fetchResult = async (id, type, modal, authorizationHeader) => {
         "Content-Type": "application/json",
         Authorization: authorizationHeader,
       },
-      credentials: "include",
+      credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
     })
   ).json()
   return result
@@ -35,7 +35,7 @@ export const fetchPostData = async (id, type, modal, methodType, bodyData, autho
         "Content-Type": "application/json",
         Authorization: authorizationHeader,
       },
-      credentials: "include",
+      credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
       body: JSON.stringify(bodyData),
     })
   ).json()
