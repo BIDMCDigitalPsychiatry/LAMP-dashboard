@@ -1758,7 +1758,8 @@ export async function getDefaultTab(spec) {
       spec === "lamp.medications" ||
       spec === "lamp.journal" ||
       spec === "lamp.breathe" ||
-      spec === "lamp.scratch_image"
+      spec === "lamp.scratch_image" ||
+      spec === "lamp.video_recording"
     ) {
       return "manage"
     }
