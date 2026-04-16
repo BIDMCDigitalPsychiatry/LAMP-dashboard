@@ -53,7 +53,7 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
-  "lamp.video_recording": "video_recording",
+  "lamp.video_recording": "videojournal",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -212,12 +212,24 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setSaved(false)
       setSettings({
         ...settings,
+        participantId: participant?.id ?? participant,
         activity: currentActivity,
         configuration: { language: i18n.language },
         autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
+      console.log("settings", {
+        ...settings,
+        participantId: participant?.id ?? participant,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
+        noBack: noBack,
+      })
+      if (currentActivity.spec === "lamp.video_recording") {
+        response = atob(await (await fetch("/videojournal.html.b64")).text())
+      }
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
@@ -236,6 +248,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const loadFallBack = async () => {
     if (!!demoActivities[currentActivity.spec]) {
+      console.log({ currentActivity })
+
+      if (currentActivity.spec === "lamp.video_recording") {
+        return atob(await (await fetch("/videojournal.html.b64")).text())
+      }
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
       return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())

@@ -118,8 +118,8 @@ export default function GameCreator({
       typeof data.settings?.frameRate == null ||
       data.settings?.maxDuration < 1 ||
       data.settings?.maxDuration > 300 ||
-      data.settings?.frameRate < 1 ||
-      data.settings?.frameRate > 60 ||
+      data.settings?.frameRate < 24 ||
+      data.settings?.frameRate > 30 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )

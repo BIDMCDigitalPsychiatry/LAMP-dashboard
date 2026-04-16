@@ -14,6 +14,8 @@ import {
   createStyles,
   DialogProps,
   Link,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
@@ -24,6 +26,15 @@ import gfm from "remark-gfm"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+
+/** mindLAMP native apps inject these bridges (see index.tsx); mobile Safari/Chrome do not. */
+function isMindLampNativeWebView(): boolean {
+  if (typeof window === "undefined") return false
+  const w = window as any
+  return (
+    typeof w?.webkit?.messageHandlers?.login?.postMessage === "function" || typeof w?.login?.postMessage === "function"
+  )
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -182,6 +193,34 @@ export default function ActivityPopup({
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
+  const activityHref = `/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`
+  const beginButtonClassName = classnames(
+    classes.btngreen,
+    classes.linkButton,
+    type === "Manage"
+      ? classes.btnManage
+      : type === "Assess"
+      ? classes.btnAsses
+      : type === "Learn"
+      ? classes.btnLearn
+      : classes.btnPrevent
+  )
+
+  const postBeginVideoDiaryToNative = (e: React.MouseEvent) => {
+    const payload = {
+      settings: activity?.settings,
+      activityId: activity?.id,
+      participantId: participant?.id,
+    }
+    ;(window as any)?.webkit?.messageHandlers?.beginVideoDiary?.postMessage?.(payload)
+    ;(window as any)?.beginVideoDiary?.postMessage?.(JSON.stringify(payload))
+    props.onClose?.(e, "backdropClick")
+  }
+
+  const isVideoRecordingOnMobile = isMobile && activity?.spec === "lamp.video_recording" && isMindLampNativeWebView()
 
   return (
     <React.Fragment>
@@ -277,23 +316,24 @@ export default function ActivityPopup({
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={3}>
-            <Link
-              href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
-              underline="none"
-              className={classnames(
-                classes.btngreen,
-                classes.linkButton,
-                type === "Manage"
-                  ? classes.btnManage
-                  : type === "Assess"
-                  ? classes.btnAsses
-                  : type === "Learn"
-                  ? classes.btnLearn
-                  : classes.btnPrevent
-              )}
-            >
-              {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
-            </Link>
+            {isVideoRecordingOnMobile ? (
+              <Link
+                component="button"
+                type="button"
+                underline="none"
+                className={beginButtonClassName}
+                onClick={(e) => {
+                  e.preventDefault()
+                  postBeginVideoDiaryToNative(e)
+                }}
+              >
+                {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
+              </Link>
+            ) : (
+              <Link href={activityHref} underline="none" className={beginButtonClassName}>
+                {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
+              </Link>
+            )}
           </Box>
         </DialogActions>
       </Dialog>
