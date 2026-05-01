@@ -94,8 +94,10 @@ function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
   const setApiServer = (serverAddress: string) => {
-    LAMP.Auth._auth.serverAddress = serverAddress
-    if (LAMP.API) {
+    if (LAMP.Auth._auth) {
+      LAMP.Auth._auth.serverAddress = serverAddress
+    }
+    if (LAMP.API?.configuration) {
       LAMP.API.configuration.base = `https://${serverAddress}`
     }
   }
