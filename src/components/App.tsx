@@ -9,6 +9,8 @@ import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Login from "./Login"
+import ServerGateway, { getSavedServer, isExternalDashboard, buildExternalRedirectUrl, saveServer, clearSavedServer } from "./ServerGateway"
+import type { ServerOption } from "./ServerGateway"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -92,6 +94,31 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
+  const [serverSelected, setServerSelected] = useState<boolean>(() => {
+    const saved = getSavedServer()
+    if (!saved) return false
+    // If external dashboard, redirect immediately (handles app relaunch)
+    if (isExternalDashboard(saved)) {
+      window.location.href = buildExternalRedirectUrl(saved)
+      return true
+    }
+    // If our dashboard with a different API server, set it
+    if (saved.apiServerUrl) {
+      LAMP.Auth.set_server(saved.apiServerUrl)
+    }
+    return true
+  })
+
+  const handleServerSelect = (server: ServerOption) => {
+    if (isExternalDashboard(server)) {
+      window.location.href = buildExternalRedirectUrl(server)
+      return
+    }
+    if (server.apiServerUrl) {
+      LAMP.Auth.set_server(server.apiServerUrl)
+    }
+    setServerSelected(true)
+  }
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
@@ -406,6 +433,11 @@ function AppRouter({ ...props }) {
         })
       })
     }
+  }
+
+  // Show server gateway before anything else if no server is selected and user isn't logged in
+  if (!serverSelected && !state.identity) {
+    return <ServerGateway onSelectServer={handleServerSelect} />
   }
 
   return (
