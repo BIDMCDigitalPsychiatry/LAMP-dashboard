@@ -42,13 +42,6 @@ const KNOWN_SERVERS: ServerOption[] = [
     apiServerUrl: "api.lamp.digital",
   },
   {
-    name: "AMP Schizophrenia",
-    description: "Psychosis Risk Outcomes Network",
-    logo: AmpSczLogo,
-    dashboardUrl: "https://mindlamp.pronet.med.yale.edu",
-    apiServerUrl: "mindlamp-api.pronet.med.yale.edu",
-  },
-  {
     name: "ProCAN",
     description: "Psychosis Risk Outcomes Network",
     logo: AmpSczLogo,
@@ -75,6 +68,13 @@ const KNOWN_SERVERS: ServerOption[] = [
     dashboardUrl: "https://dashboard.abhacus-lamp.com",
     apiServerUrl: "api.abhacus-lamp.com",
   },  
+  {
+    name: "AMP Schizophrenia",
+    description: "Psychosis Risk Outcomes Network",
+    logo: AmpSczLogo,
+    dashboardUrl: "https://mindlamp.pronet.med.yale.edu",
+    apiServerUrl: "mindlamp-api.pronet.med.yale.edu",
+  },
 ]
 
 const STORAGE_KEY = "selectedServer"
@@ -205,7 +205,7 @@ export default function ServerGateway({ onSelectServer }: { onSelectServer: (ser
           <Typography
             style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", textAlign: "center", marginBottom: 20 }}
           >
-            {t("Select your organization to continue.")}
+            {t("Select your organization or study to continue.")}
           </Typography>
 
           {KNOWN_SERVERS.map((server, i) => (
