@@ -9,8 +9,7 @@ import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Login from "./Login"
-import ServerGateway, { getSavedServer, isExternalDashboard, buildExternalRedirectUrl, saveServer, clearSavedServer } from "./ServerGateway"
-import type { ServerOption } from "./ServerGateway"
+import ServerGateway, { getSavedServer, isExternalDashboard, buildExternalRedirectUrl } from "./ServerGateway"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -94,6 +93,13 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
+  const setApiServer = (serverAddress: string) => {
+    LAMP.Auth._auth.serverAddress = serverAddress
+    if (LAMP.API) {
+      LAMP.API.configuration.base = `https://${serverAddress}`
+    }
+  }
+
   const [serverSelected, setServerSelected] = useState<boolean>(() => {
     const saved = getSavedServer()
     if (!saved) return false
@@ -104,7 +110,7 @@ function AppRouter({ ...props }) {
     }
     // If our dashboard with a different API server, set it
     if (saved.apiServerUrl) {
-      LAMP.Auth.set_server(saved.apiServerUrl)
+      setApiServer(saved.apiServerUrl)
     }
     return true
   })
@@ -115,7 +121,7 @@ function AppRouter({ ...props }) {
       return
     }
     if (server.apiServerUrl) {
-      LAMP.Auth.set_server(server.apiServerUrl)
+      setApiServer(server.apiServerUrl)
     }
     setServerSelected(true)
   }
