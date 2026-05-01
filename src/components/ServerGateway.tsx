@@ -42,15 +42,15 @@ const KNOWN_SERVERS: ServerOption[] = [
     apiServerUrl: "api.lamp.digital",
   },
   {
-    name: "AMP SCHIZOPHRENIA",
-    description: "Psychosis Risk Outcomes Network (ProNET)",
+    name: "AMP Schizophrenia",
+    description: "Psychosis Risk Outcomes Network",
     logo: AmpSczLogo,
     dashboardUrl: "https://mindlamp.pronet.med.yale.edu",
     apiServerUrl: "mindlamp-api.pronet.med.yale.edu",
   },
   {
     name: "ProCAN",
-    description: "Psychosis Risk Outcomes Network (ProNET)",
+    description: "Psychosis Risk Outcomes Network",
     logo: AmpSczLogo,
     dashboardUrl: "https://mindlamp.procan.med.yale.edu",
     apiServerUrl: "mindlamp-api.procan.med.yale.edu",
