@@ -20,6 +20,7 @@ import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
+import { clearSavedServer, getSavedServer } from "./ServerGateway"
 
 // Local Imports
 import { ResponsiveMargin } from "./Utils"
@@ -303,26 +304,27 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       }
                     })}
                   </TextField>
-                  <Autocomplete
-                    freeSolo={true}
-                    id="serever-selector"
-                    options={options}
-                    sx={{ width: "100%", marginTop: "12px" }}
-                    value={state.serverAddress || ""}
-                    onChange={(event, value) => handleServerInput(value)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="serverAddress"
-                        variant="filled"
-                        value={state.serverAddress || ""}
-                        onChange={(event) => handleServerInput(event.target.value)}
-                        InputProps={{ ...params.InputProps, disableUnderline: true }}
-                        label={t("Server Address")}
-                        helperText={t("Don't enter a domain if you're not sure what this option does.")}
-                      />
-                    )}
-                  />
+                  {(() => {
+                    const saved = getSavedServer()
+                    return saved ? (
+                      <Box style={{ textAlign: "center", margin: "12px 0" }}>
+                        <span style={{ fontSize: 13, color: "rgba(0,0,0,0.5)" }}>
+                          {saved.name || saved.apiServerUrl}
+                        </span>
+                        {" — "}
+                        <Link
+                          underline="none"
+                          style={{ fontSize: 13, color: "#6083E7", fontWeight: "bold", cursor: "pointer" }}
+                          onClick={() => {
+                            clearSavedServer()
+                            window.location.reload()
+                          }}
+                        >
+                          {t("Change")}
+                        </Link>
+                      </Box>
+                    ) : null
+                  })()}
                   <TextField
                     required
                     name="id"
