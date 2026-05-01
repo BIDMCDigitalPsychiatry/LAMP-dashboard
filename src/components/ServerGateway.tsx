@@ -18,6 +18,8 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import MindLAMPLogo from "../icons/Logo.svg"
 import MindBenchLogo from "../icons/MindBench.png"
+import MountSinaiLogo from "../icons/MountSinai.png"
+import OxfordHealthLogo from "../icons/OxfordHealth.png"
 import LAMP from "lamp-core"
 
 // Each card represents a deployment that users can connect to.
@@ -34,9 +36,22 @@ export type ServerOption = {
 const KNOWN_SERVERS: ServerOption[] = [
   {
     name: "mindLAMP",
-    description: "Default BIDMC server",
+    description: "Beth Israel Deaconess Medical Center",
     logo: MindLAMPLogo,
     apiServerUrl: "api.lamp.digital",
+  },
+  {
+    name: "PREDiCTOR",
+    description: "Mount Sinai Health System",
+    logo: MountSinaiLogo,
+    apiServerUrl: "api.mshai.org",
+  },
+  {
+    name: "ABHACUS",
+    description: "Oxford Health",
+    logo: OxfordHealthLogo,
+    dashboardUrl: "https://dashboard.abhacus-lamp.com",
+    apiServerUrl: "api.abhacus-lamp.com",
   },
   {
     name: "MindBench",
