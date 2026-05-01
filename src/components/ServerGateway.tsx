@@ -16,6 +16,8 @@ import { useTranslation } from "react-i18next"
 import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
+import MindLAMPLogo from "../icons/Logo.svg"
+import MindBenchLogo from "../icons/MindBench.png"
 import LAMP from "lamp-core"
 
 // Each card represents a deployment that users can connect to.
@@ -33,15 +35,16 @@ const KNOWN_SERVERS: ServerOption[] = [
   {
     name: "mindLAMP",
     description: "Default BIDMC server",
+    logo: MindLAMPLogo,
     apiServerUrl: "api.lamp.digital",
   },
-  // Add more cards here as teams onboard:
-  // {
-  //   name: "LST",
-  //   description: "Longitudinal Study Tracker",
-  //   dashboardUrl: "https://lst-dashboard.azure.com",
-  //   apiServerUrl: "lst-api.azure.com",
-  // },
+  {
+    name: "MindBench",
+    description: "MindBench",
+    logo: MindBenchLogo,
+    dashboardUrl: "https://mindbench.ai",
+    apiServerUrl: "mindbench.ai",
+  },
 ]
 
 const STORAGE_KEY = "selectedServer"
@@ -178,11 +181,20 @@ export default function ServerGateway({ onSelectServer }: { onSelectServer: (ser
           {KNOWN_SERVERS.map((server, i) => (
             <Card key={i} className={classes.card} elevation={0}>
               <CardActionArea onClick={() => handleSelectCard(server)}>
-                <CardContent className={classes.cardContent}>
-                  <Typography className={classes.cardName}>{server.name}</Typography>
-                  {server.description && (
-                    <Typography className={classes.cardDescription}>{server.description}</Typography>
+                <CardContent className={classes.cardContent} style={{ display: "flex", alignItems: "center" }}>
+                  {server.logo && (
+                    <img
+                      src={server.logo}
+                      alt={server.name}
+                      style={{ width: 40, height: 40, borderRadius: 8, marginRight: 16, objectFit: "contain" }}
+                    />
                   )}
+                  <div>
+                    <Typography className={classes.cardName}>{server.name}</Typography>
+                    {server.description && (
+                      <Typography className={classes.cardDescription}>{server.description}</Typography>
+                    )}
+                  </div>
                 </CardContent>
               </CardActionArea>
             </Card>
