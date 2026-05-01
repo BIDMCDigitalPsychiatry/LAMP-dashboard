@@ -17,9 +17,10 @@ import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import MindLAMPLogo from "../icons/Logo.svg"
-import MindBenchLogo from "../icons/MindBench.png"
 import MountSinaiLogo from "../icons/MountSinai.png"
 import OxfordHealthLogo from "../icons/OxfordHealth.png"
+import LevelUpLogo from "../icons/LevelUp.png"
+import AmpSczLogo from "../icons/AMP Scz.jpeg"
 import LAMP from "lamp-core"
 
 // Each card represents a deployment that users can connect to.
@@ -41,10 +42,31 @@ const KNOWN_SERVERS: ServerOption[] = [
     apiServerUrl: "api.lamp.digital",
   },
   {
+    name: "AMP SCHIZOPHRENIA",
+    description: "Psychosis Risk Outcomes Network (ProNET)",
+    logo: AmpSczLogo,
+    dashboardUrl: "https://mindlamp.pronet.med.yale.edu",
+    apiServerUrl: "mindlamp-api.pronet.med.yale.edu",
+  },
+  {
+    name: "ProCAN",
+    description: "Psychosis Risk Outcomes Network (ProNET)",
+    logo: AmpSczLogo,
+    dashboardUrl: "https://mindlamp.procan.med.yale.edu",
+    apiServerUrl: "mindlamp-api.procan.med.yale.edu",
+  },
+  {
     name: "PREDiCTOR",
     description: "Mount Sinai Health System",
     logo: MountSinaiLogo,
     apiServerUrl: "api.mshai.org",
+  },
+  {
+    name: "LevelUp",
+    description: "Henry Jackson Foundation",
+    logo: LevelUpLogo,
+    dashboardUrl: "https://mindlamp.armylevelup.app",
+    apiServerUrl: "mindlamp-api.armylevelup.app",
   },
   {
     name: "ABHACUS",
@@ -52,14 +74,7 @@ const KNOWN_SERVERS: ServerOption[] = [
     logo: OxfordHealthLogo,
     dashboardUrl: "https://dashboard.abhacus-lamp.com",
     apiServerUrl: "api.abhacus-lamp.com",
-  },
-  {
-    name: "MindBench",
-    description: "MindBench",
-    logo: MindBenchLogo,
-    dashboardUrl: "https://mindbench.ai",
-    apiServerUrl: "mindbench.ai",
-  },
+  },  
 ]
 
 const STORAGE_KEY = "selectedServer"
