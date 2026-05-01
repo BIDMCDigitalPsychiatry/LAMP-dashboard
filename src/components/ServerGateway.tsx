@@ -154,7 +154,7 @@ export default function ServerGateway({ onSelectServer }: { onSelectServer: (ser
   }
 
   return (
-    <ResponsiveMargin>
+    <ResponsiveMargin style={{ width: "100%", margin: "0 auto" }}>
       <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.container}>
         <Grid item style={{ maxWidth: 360, width: "100%" }}>
           <Box className={classes.logoLogin}>
