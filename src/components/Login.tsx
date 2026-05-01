@@ -307,21 +307,45 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   {(() => {
                     const saved = getSavedServer()
                     return saved ? (
-                      <Box style={{ textAlign: "center", margin: "12px 0" }}>
-                        <span style={{ fontSize: 13, color: "rgba(0,0,0,0.5)" }}>
-                          {saved.name || saved.apiServerUrl}
-                        </span>
-                        {" — "}
-                        <Link
-                          underline="none"
-                          style={{ fontSize: 13, color: "#6083E7", fontWeight: "bold", cursor: "pointer" }}
+                      <Box style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        margin: "12px 0",
+                        padding: "10px 16px",
+                        borderRadius: 10,
+                        backgroundColor: "#f5f5f5",
+                      }}>
+                        <Box style={{ display: "flex", alignItems: "center" }}>
+                          {saved.logo && (
+                            <img
+                              src={saved.logo}
+                              alt={saved.name}
+                              style={{ width: 28, height: 28, borderRadius: 6, marginRight: 10, objectFit: "contain" }}
+                            />
+                          )}
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(0,0,0,0.7)" }}>
+                            {saved.name || saved.apiServerUrl}
+                          </span>
+                        </Box>
+                        <Fab
+                          size="small"
+                          variant="extended"
+                          style={{
+                            background: "#7599FF",
+                            color: "white",
+                            boxShadow: "none",
+                            textTransform: "capitalize",
+                            fontSize: 13,
+                            height: 32,
+                          }}
                           onClick={() => {
                             clearSavedServer()
                             window.location.reload()
                           }}
                         >
                           {t("Change")}
-                        </Link>
+                        </Fab>
                       </Box>
                     ) : null
                   })()}
