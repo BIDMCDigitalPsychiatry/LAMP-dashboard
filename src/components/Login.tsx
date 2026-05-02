@@ -328,24 +328,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                             {saved.name || saved.apiServerUrl}
                           </span>
                         </Box>
-                        <Fab
-                          size="small"
-                          variant="extended"
-                          style={{
-                            background: "#7599FF",
-                            color: "white",
-                            boxShadow: "none",
-                            textTransform: "capitalize",
-                            fontSize: 13,
-                            height: 32,
-                          }}
+                        <button
                           onClick={() => {
                             clearSavedServer()
                             window.location.reload()
                           }}
+                          style={{
+                            background: "transparent",
+                            color: "#7599FF",
+                            border: "1px solid #7599FF",
+                            borderRadius: 8,
+                            padding: "6px 20px",
+                            fontSize: 13,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
                         >
                           {t("Change")}
-                        </Fab>
+                        </button>
                       </Box>
                     ) : null
                   })()}
@@ -385,30 +385,25 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     }}
                   />
 
-                  <Box className={classes.buttonNav} width={1} textAlign="center">
-                    <Fab
-                      variant="extended"
+                  <Box width={1} textAlign="center">
+                    <button
                       type="submit"
-                      style={{ background: "#7599FF", color: "White" }}
                       onClick={handleLogin}
-                      className={loginClick ? classes.loginDisabled : ""}
+                      disabled={loginClick}
+                      style={{
+                        background: loginClick ? "#ccc" : "#7599FF",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "10px 32px",
+                        fontSize: 15,
+                        fontWeight: 600,
+                        cursor: loginClick ? "default" : "pointer",
+                        width: 200,
+                      }}
                     >
                       {`${t("Login")}`}
-                      <input
-                        type="submit"
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          left: 0,
-                          width: "100%",
-                          opacity: 0,
-                        }}
-                        disabled={loginClick}
-                      />
-                    </Fab>
+                    </button>
                   </Box>
 
                   <Box textAlign="center" width={1} mt={4} mb={4}>

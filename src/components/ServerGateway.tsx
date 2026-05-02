@@ -232,14 +232,20 @@ export default function ServerGateway({ onSelectServer }: { onSelectServer: (ser
 
           {!showCustom ? (
             <Typography
-              style={{ fontSize: 14, color: "#6083E7", fontWeight: "bold", cursor: "pointer", textAlign: "center", marginTop: 8 }}
-              onClick={() => setShowCustom(true)}
+              style={{ fontSize: 14, color: "#6083E7", fontWeight: "bold", cursor: "pointer", textAlign: "center", marginTop: 8, marginBottom: 40 }}
+              onClick={() => {
+                setShowCustom(true)
+                setTimeout(() => {
+                  document.getElementById("custom-server-input")?.scrollIntoView({ behavior: "smooth", block: "center" })
+                }, 100)
+              }}
             >
               {t("Connect to a different server")}
             </Typography>
           ) : (
-            <Box className={classes.customSection}>
+            <Box className={classes.customSection} style={{ marginBottom: 40 }}>
               <TextField
+                id="custom-server-input"
                 fullWidth
                 variant="filled"
                 label={t("Server Address")}
@@ -249,15 +255,24 @@ export default function ServerGateway({ onSelectServer }: { onSelectServer: (ser
                 InputProps={{ disableUnderline: true }}
                 style={{ marginBottom: 12 }}
               />
-              <Box className={classes.buttonNav} textAlign="center">
-                <Fab
-                  variant="extended"
-                  style={{ background: "#7599FF", color: "White" }}
+              <Box textAlign="center">
+                <button
                   onClick={handleCustomConnect}
                   disabled={!customServer}
+                  style={{
+                    background: !customServer ? "#ccc" : "#7599FF",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "10px 32px",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: !customServer ? "default" : "pointer",
+                    width: 200,
+                  }}
                 >
                   {t("Connect")}
-                </Fab>
+                </button>
               </Box>
             </Box>
           )}
