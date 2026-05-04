@@ -34,7 +34,7 @@ export type ServerOption = {
   apiServerUrl: string // the LAMP API server address
 }
 
-const KNOWN_SERVERS: ServerOption[] = [
+export const KNOWN_SERVERS: ServerOption[] = [
   {
     name: "mindLAMP",
     description: "Beth Israel Deaconess Medical Center",

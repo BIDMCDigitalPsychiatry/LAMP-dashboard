@@ -9,7 +9,14 @@ import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Login from "./Login"
-import ServerGateway, { getSavedServer, isExternalDashboard, buildExternalRedirectUrl, ServerOption } from "./ServerGateway"
+import ServerGateway, {
+  getSavedServer,
+  saveServer,
+  isExternalDashboard,
+  buildExternalRedirectUrl,
+  KNOWN_SERVERS,
+  ServerOption,
+} from "./ServerGateway"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
@@ -104,17 +111,34 @@ function AppRouter({ ...props }) {
 
   const [serverSelected, setServerSelected] = useState<boolean>(() => {
     const saved = getSavedServer()
-    if (!saved) return false
-    // If external dashboard, redirect immediately (handles app relaunch)
-    if (isExternalDashboard(saved)) {
-      window.location.href = buildExternalRedirectUrl(saved)
+    if (saved) {
+      // If external dashboard, redirect immediately (handles app relaunch)
+      if (isExternalDashboard(saved)) {
+        window.location.href = buildExternalRedirectUrl(saved)
+        return true
+      }
+      // If our dashboard with a different API server, set it
+      if (saved.apiServerUrl) {
+        setApiServer(saved.apiServerUrl)
+      }
       return true
     }
-    // If our dashboard with a different API server, set it
-    if (saved.apiServerUrl) {
-      setApiServer(saved.apiServerUrl)
-    }
-    return true
+
+    // No saved selection — check for an active lamp-core session in sessionStorage
+    // so existing logged-in users aren't bounced to the gateway on first deploy.
+    try {
+      const auth = JSON.parse(sessionStorage.getItem("LAMP._auth") ?? "null")
+      if (auth?.id && auth?.password) {
+        const sa = auth.serverAddress || "api.lamp.digital"
+        const known = KNOWN_SERVERS.find((s) => s.apiServerUrl === sa && !s.dashboardUrl)
+        const inferred: ServerOption = known ?? { name: "Custom", apiServerUrl: sa }
+        saveServer(inferred)
+        setApiServer(sa)
+        return true
+      }
+    } catch {}
+
+    return false
   })
 
   const handleServerSelect = (server: ServerOption) => {
