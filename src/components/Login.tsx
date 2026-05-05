@@ -329,6 +329,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                           </span>
                         </Box>
                         <button
+                          type="button"
                           onClick={() => {
                             clearSavedServer()
                             window.location.reload()

@@ -218,7 +218,7 @@ function AppRouter({ ...props }) {
             ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
             : "api.lamp.digital",
       }).then((x) => {
-        window.location.href = query[0]
+        window.history.replaceState({}, "", query[0])
       })
     } else if (!state.identity) {
       refreshPage()
