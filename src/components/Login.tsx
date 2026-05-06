@@ -78,7 +78,11 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const { t, i18n } = useTranslation()
-  const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
+  const [state, setState] = useState({
+    serverAddress: lastDomain ?? getSavedServer()?.apiServerUrl,
+    id: undefined,
+    password: undefined,
+  })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
