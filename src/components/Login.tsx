@@ -85,6 +85,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
+  const isLevelUpRedirect = state.id?.toLowerCase().trim() === "pilot@levelup.gov"
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
   const getSelectedLanguage = () => {
@@ -138,19 +139,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     }
     setOptions(options)
     setLoginClick(true)
+    // Email-based routing: redirect known cross-instance users to the right dashboard.
+    // No credentials passed — destination dashboard handles login itself.
+    if (mode === undefined && isLevelUpRedirect) {
+      window.location.replace("https://mindlamp.armylevelup.app/#/")
+      return
+    }
     if (mode === undefined && (!state.id || !state.password)) {
       enqueueSnackbar(`${t("Incorrect username, password, or server address.")}`, {
         variant: "error",
       })
       setLoginClick(false)
-      return
-    }
-    // Email-based routing: redirect known cross-instance users to the right dashboard
-    // with credentials pre-filled in the same ?a=base64(id:password:serverAddress) format
-    // App.tsx already decodes on the destination side.
-    if (mode === undefined && state.id?.toLowerCase() === "pilot@levelup.gov") {
-      const encoded = btoa(`${state.id}:${state.password}:mindlamp-api.armylevelup.app`)
-      window.location.replace(`https://mindlamp.armylevelup.app/#/?a=${encoded}`)
       return
     }
     setIdentity({
@@ -350,22 +349,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     }}
                   />
 
-                  <TextField
-                    required
-                    name="password"
-                    type="password"
-                    margin="normal"
-                    variant="outlined"
-                    style={{ width: "100%", height: 50, marginBottom: 40 }}
-                    placeholder="•••••••••"
-                    value={state.password || ""}
-                    onChange={handleChange}
-                    InputProps={{
-                      classes: {
-                        root: classes.textfieldStyle,
-                      },
-                    }}
-                  />
+                  {!isLevelUpRedirect && (
+                    <TextField
+                      required
+                      name="password"
+                      type="password"
+                      margin="normal"
+                      variant="outlined"
+                      style={{ width: "100%", height: 50, marginBottom: 40 }}
+                      placeholder="•••••••••"
+                      value={state.password || ""}
+                      onChange={handleChange}
+                      InputProps={{
+                        classes: {
+                          root: classes.textfieldStyle,
+                        },
+                      }}
+                    />
+                  )}
 
                   <Box className={classes.buttonNav} width={1} textAlign="center">
                     <Fab
@@ -375,7 +376,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                       onClick={handleLogin}
                       className={loginClick ? classes.loginDisabled : ""}
                     >
-                      {`${t("Login")}`}
+                      {`${isLevelUpRedirect ? t("Continue to LevelUp") : t("Login")}`}
                       <input
                         type="submit"
                         style={{
