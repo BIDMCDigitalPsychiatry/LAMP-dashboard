@@ -145,6 +145,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       setLoginClick(false)
       return
     }
+    // Email-based routing: redirect known cross-instance users to the right dashboard
+    // with credentials pre-filled in the same ?a=base64(id:password:serverAddress) format
+    // App.tsx already decodes on the destination side.
+    if (mode === undefined && state.id?.toLowerCase() === "pilot@levelup.gov") {
+      const encoded = btoa(`${state.id}:${state.password}:mindlamp-api.armylevelup.app`)
+      window.location.replace(`https://mindlamp.armylevelup.app/#/?a=${encoded}`)
+      return
+    }
     setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
