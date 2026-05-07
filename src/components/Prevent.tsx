@@ -178,7 +178,7 @@ const useStyles = makeStyles((theme: Theme) =>
         marginBottom: 16,
       },
     },
-    pdfMessage: {
+    healthDataDisclaimer: {
       fontSize: 13,
       fontWeight: 500,
       color: "rgba(0, 0, 0, 0.6)",
@@ -457,7 +457,7 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <div className={classes.pdfMessage}>
+      <div className={classes.healthDataDisclaimer}>
         {t(
           "This app collects health data as part of the research study you are enrolled in. Your data is held by your study team. Please contact your study coordinator to view, request a copy, or ask any questions about the data collected from your account."
         )}
