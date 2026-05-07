@@ -458,7 +458,9 @@ export default function Prevent({
         <CircularProgress color="inherit" />
       </Backdrop>
       <div className={classes.pdfMessage}>
-        {t("A related PDF containing your health data is available. Please refer to the study guide to access it.")}
+        {t(
+          "This app collects health data as part of the research study you are enrolled in. Your data is held by your study team. Please contact your study coordinator to view, request a copy, or ask any questions about the data collected from your account."
+        )}
       </div>
       <ActivityBox
         participant={participant}
