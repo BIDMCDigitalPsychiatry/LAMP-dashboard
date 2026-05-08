@@ -653,7 +653,7 @@ export default function Prevent({
               }
             }}
           >
-            <span>{t("About the health data collected by this app")}</span>
+            <span>{t("About this app's use of health data")}</span>
             <Icon>{disclaimerOpen ? "expand_less" : "expand_more"}</Icon>
           </div>
           <Collapse in={disclaimerOpen} timeout="auto" unmountOnExit>
