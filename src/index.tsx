@@ -65,11 +65,17 @@ LAMP.addEventListener("LOGOUT", ({ detail }) => {
   ;(window as any)?.logout?.postMessage?.(JSON.stringify(detail))
 })
 
-ReactDOM.render(<App />, root)
-serviceWorker.register({
-  onUpdate: (registration) => {
-    //alert('Updating to the latest available version of mindLAMP.')
-    if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
-    window.location.reload()
-  },
-})
+// Sticky redirect: if the user previously chose to continue to LevelUp,
+// send them back there before mounting the app so there's no flash of login UI.
+if (localStorage.getItem("lamp.redirectTarget") === "levelup") {
+  window.location.replace("https://mindlamp.armylevelup.app/#/")
+} else {
+  ReactDOM.render(<App />, root)
+  serviceWorker.register({
+    onUpdate: (registration) => {
+      //alert('Updating to the latest available version of mindLAMP.')
+      if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
+      window.location.reload()
+    },
+  })
+}
