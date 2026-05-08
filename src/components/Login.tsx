@@ -372,7 +372,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     className={classes.buttonNav}
                     width={1}
                     textAlign="center"
-                    style={isLevelUpRedirect ? { marginTop: 60 } : undefined}
+                    style={isLevelUpRedirect ? { marginTop: 40 } : undefined}
                   >
                     <Fab
                       variant="extended"
