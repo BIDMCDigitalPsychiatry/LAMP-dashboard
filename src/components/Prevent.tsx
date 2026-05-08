@@ -659,7 +659,7 @@ export default function Prevent({
           <Collapse in={disclaimerOpen} timeout="auto" unmountOnExit>
             <div className={classes.healthDataDisclaimerBody}>
               {t(
-                "This app collects health data as part of the research study you are enrolled in. The rest of your data is held by your study team. Please contact your study coordinator to view, request a copy, or ask any questions about the data collected from your account."
+                "This app may collect health data as part of the research study you are enrolled in. The rest of your data is held by your study team. Please contact your study coordinator to view, request a copy, or ask any questions about the data collected from your account."
               )}
             </div>
           </Collapse>
