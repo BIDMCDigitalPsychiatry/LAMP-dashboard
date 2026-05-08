@@ -368,7 +368,12 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     />
                   )}
 
-                  <Box className={classes.buttonNav} width={1} textAlign="center">
+                  <Box
+                    className={classes.buttonNav}
+                    width={1}
+                    textAlign="center"
+                    style={isLevelUpRedirect ? { marginTop: 60 } : undefined}
+                  >
                     <Fab
                       variant="extended"
                       type="submit"
@@ -394,87 +399,12 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     </Fab>
                   </Box>
 
-                  <Box textAlign="center" width={1} mt={4} mb={4}>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        LAMP.initializeDemoDB(demo_db)
-                        localStorage.setItem("demo_mode", "try_it")
-                        setTryitMenu(event.currentTarget)
-                      }}
-                    >
-                      {`${t("Try it")}`}
-                    </Link>
-                    <Link
-                      underline="none"
-                      className={classes.linkBlue}
-                      onClick={(event) => {
-                        setOpen(true)
-                      }}
-                    >
-                      {`${t("Self Help")}`}
-                    </Link>
-                    {/* <br />
-                  <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                  >
-                    {`${t("Research studies using mindLAMP")}`}
-                  </Link> */}
-                    <Menu
-                      keepMounted
-                      open={Boolean(tryitMenu)}
-                      anchorPosition={tryitMenu?.getBoundingClientRect()}
-                      anchorReference="anchorPosition"
-                      onClose={() => setTryitMenu(undefined)}
-                    >
-                      <MenuItem disabled divider>
-                        <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "researcher")
-                        }}
-                      >
-                        {`${t("Researcher")}`}
-                      </MenuItem>
-                      <MenuItem
-                        divider
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "clinician")
-                        }}
-                      >
-                        {`${t("Clinician")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "participant")
-                        }}
-                      >
-                        {`${t("Participant")}`}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "patient")
-                        }}
-                      >
-                        {`${t("User")}`}
-                      </MenuItem>
-                    </Menu>
-                  </Box>
                 </Box>
               </form>
             </Grid>
           </Grid>
         </ResponsiveMargin>
       </Slide>
-      <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
     </>
   )
 }
