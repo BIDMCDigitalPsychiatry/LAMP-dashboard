@@ -67,8 +67,13 @@ LAMP.addEventListener("LOGOUT", ({ detail }) => {
 
 // Sticky redirect: if the user previously chose to continue to LevelUp,
 // send them back there before mounting the app so there's no flash of login UI.
+// Forward the ?a= URL parameter (native-injected base64 credentials) so the
+// LevelUp dashboard can restore the session instead of showing a login screen.
 if (localStorage.getItem("lamp.redirectTarget") === "levelup") {
-  window.location.replace("https://mindlamp.armylevelup.app/#/")
+  const hash = window.location.hash
+  const queryStart = hash.indexOf("?")
+  const params = queryStart >= 0 ? hash.substring(queryStart) : ""
+  window.location.replace(`https://mindlamp.armylevelup.app/#/${params}`)
 } else {
   ReactDOM.render(<App />, root)
   serviceWorker.register({

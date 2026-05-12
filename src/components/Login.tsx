@@ -140,12 +140,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     setOptions(options)
     setLoginClick(true)
     // Email-based routing: redirect known cross-instance users to the right dashboard.
-    // No credentials passed — destination dashboard handles login itself.
+    // Forward any ?a= URL parameter present so the destination can restore an
+    // existing session (relevant on cold-start launches where native has injected
+    // credentials into our load URL).
     if (mode === undefined && isLevelUpRedirect) {
       // Persist the choice so cold starts of the app land on LevelUp directly
       // instead of bouncing through this login screen each time.
       localStorage.setItem("lamp.redirectTarget", "levelup")
-      window.location.replace("https://mindlamp.armylevelup.app/#/")
+      const hash = window.location.hash
+      const queryStart = hash.indexOf("?")
+      const params = queryStart >= 0 ? hash.substring(queryStart) : ""
+      window.location.replace(`https://mindlamp.armylevelup.app/#/${params}`)
       return
     }
     if (mode === undefined && (!state.id || !state.password)) {
