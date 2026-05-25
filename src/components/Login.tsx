@@ -85,7 +85,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [options, setOptions] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const isLevelUpRedirect = state.id?.toLowerCase().trim() === "pilot@levelup.gov"
+  const isLevelUpRedirect = state.id?.toLowerCase().trim() === "soldier@levelup.gov"
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
   const [open, setOpen] = useState(false)
   const getSelectedLanguage = () => {
