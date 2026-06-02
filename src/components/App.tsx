@@ -231,11 +231,13 @@ function AppRouter({ setConfirmSession, ...props }) {
     // passing the token to the server
     const currentSearch = new URLSearchParams(window.location.search)
     const loginToken = currentSearch.get("finishLoginToken")
-    if (loginToken) {
-      const serverAddress = localStorage.getItem("lastServerSelected")
+    const serverAddress = currentSearch.get("serverAddress") || localStorage.getItem("lastServerSelected")
+    if (!!loginToken && !!serverAddress) {
       await LAMP.Auth.set_server(serverAddress)
-      await LAMP.Credential.finishOAuth(loginToken)
-      window.history.replaceState(null, "", window.location.pathname)
+      if (LAMP.Auth._authScheme === "session") {
+        const result = await LAMP.finalizeLogin(loginToken)
+        window.history.replaceState(null, "", window.location.pathname)
+      }
     }
 
     // Get the information associated with the currently logged in user if there is one
