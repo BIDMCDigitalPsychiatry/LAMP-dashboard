@@ -150,7 +150,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       const hash = window.location.hash
       const queryStart = hash.indexOf("?")
       const params = queryStart >= 0 ? hash.substring(queryStart) : ""
-      window.location.replace(`https://mindlamp.armylevelup.app/#/${params}`)
+      // iOS WKWebView writes localStorage to disk on a background thread. Navigating
+      // cross-origin immediately after setItem can tear down the page before that write
+      // commits, so the flag is missing on the next cold start. Defer the redirect briefly
+      // to give the write time to land before we leave the origin.
+      setTimeout(() => {
+        window.location.replace(`https://mindlamp.armylevelup.app/#/${params}`)
+      }, 250)
       return
     }
     if (mode === undefined && (!state.id || !state.password)) {
