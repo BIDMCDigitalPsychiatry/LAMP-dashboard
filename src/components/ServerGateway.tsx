@@ -118,7 +118,7 @@ const useStyles = makeStyles((theme: Theme) =>
       gridTemplateColumns: "1fr",
       gap: 12,
       marginBottom: 12,
-      [theme.breakpoints.up("sm")]: { gridTemplateColumns: "1fr 1fr" },
+      "@media (min-width: 550px)": { gridTemplateColumns: "1fr 1fr" },
     },
     card: {
       borderRadius: 10,

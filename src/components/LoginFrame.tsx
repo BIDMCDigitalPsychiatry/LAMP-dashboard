@@ -54,7 +54,7 @@ export const useLoginStyles = makeStyles((theme: Theme) =>
     // opens up on larger viewports so cards can flow into two columns.
     loginInnerWide: {
       maxWidth: 320,
-      [theme.breakpoints.up("sm")]: { maxWidth: 640, width: "100%" },
+      "@media (min-width: 550px)": { maxWidth: 640, width: "100%" },
     },
     loginDisabled: {
       opacity: 0.5,
