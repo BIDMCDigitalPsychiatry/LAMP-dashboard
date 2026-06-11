@@ -240,7 +240,6 @@ export default function ServerGateway({ onSetServer, srcLockedState }) {
             value={customServer}
             onChange={(e) => setCustomServer(e.target.value)}
             placeholder="api.example.com"
-            helperText={t("Don't enter a domain if you're not sure what this option does.")}
             InputProps={{ disableUnderline: true, classes: { root: loginClasses.textfieldStyle } }}
             style={{ marginBottom: 12 }}
           />

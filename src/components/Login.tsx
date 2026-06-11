@@ -27,6 +27,7 @@ import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
 import { clearLocalStorageItems } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
+import { KNOWN_SERVERS } from "./ServerGateway"
 
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, clearServer, ...props }) {
   const { t, i18n } = useTranslation()
@@ -227,18 +228,56 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     <>
       <LoginFrame>
         <Grid item className={classes.loginInner}>
-          <Box marginY={2} bgcolor="primary" padding={2} className={classes.textfieldStyle}>
-            <Grid container direction="row" wrap="nowrap">
-              <Box>
-                <IconButton style={{ background: "#7599FF", color: "White" }} onClick={() => clearServer()}>
-                  <Icon>arrow_back</Icon>
-                </IconButton>
+          {(() => {
+            // Show the friendly server card (logo + name) when the selected server
+            // is a known deployment; fall back to the raw address for custom servers.
+            const serverAddress = LAMP.Auth._auth.serverAddress
+            const known = KNOWN_SERVERS.find((s) => s.apiServerUrl === serverAddress)
+            return (
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  margin: "12px 0",
+                  padding: "10px 16px",
+                  borderRadius: 10,
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                <Box style={{ display: "flex", alignItems: "center" }}>
+                  {known?.logo && (
+                    <img
+                      src={known.logo}
+                      alt={known.name}
+                      style={{ width: 28, height: 28, borderRadius: 6, marginRight: 10, objectFit: "contain" }}
+                    />
+                  )}
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "rgba(0,0,0,0.7)" }}>
+                    {known?.name || serverAddress}
+                  </span>
+                </Box>
+                {!srcLocked && (
+                  <button
+                    type="button"
+                    onClick={() => clearServer()}
+                    style={{
+                      background: "transparent",
+                      color: "#7599FF",
+                      border: "1px solid #7599FF",
+                      borderRadius: 8,
+                      padding: "6px 20px",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {`${t("Change")}`}
+                  </button>
+                )}
               </Box>
-              <Box sx={{ flexGrow: "1" }} alignContent={"center"}>
-                <Typography align="center">{LAMP.Auth._auth.serverAddress}</Typography>
-              </Box>
-            </Grid>
-          </Box>
+            )
+          })()}
           <form onSubmit={(e) => handleLogin(e)}>
             <Box>
               {isLockedOut && (
