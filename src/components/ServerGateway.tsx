@@ -135,8 +135,10 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: "bold",
       cursor: "pointer",
       textAlign: "center",
-      marginTop: 8,
+      marginTop: 16,
       marginBottom: 40,
+      paddingTop: 12,
+      borderTop: "1px solid #e0e0e0",
     },
     customSection: { marginTop: 16, marginBottom: 40, padding: "12px 0", borderTop: "1px solid #e0e0e0" },
   })
