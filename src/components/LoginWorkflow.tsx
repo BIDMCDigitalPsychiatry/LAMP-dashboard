@@ -1,6 +1,6 @@
 import LAMP from "lamp-core"
 import React, { useState } from "react"
-import SelectServer from "./SelectServer"
+import ServerGateway from "./ServerGateway"
 import Login from "./Login"
 
 export default function LoginWorkflow({ setIdentity, state, onComplete, setAuthenticated, setConfirmSession }) {
@@ -24,7 +24,7 @@ export default function LoginWorkflow({ setIdentity, state, onComplete, setAuthe
           }}
         />
       ) : (
-        <SelectServer
+        <ServerGateway
           onSetServer={() => {
             setIsServerAddressSelected(true)
           }}
