@@ -154,15 +154,10 @@ export default function ServerGateway({ onSetServer, srcLockedState }) {
   const [customServer, setCustomServer] = useState("")
   const [showCustom, setShowCustom] = useState(false)
 
-  useEffect(() => {
-    // Sticky external redirect: if a previously chosen server is an external
-    // dashboard, send the WebView there immediately (handles app cold starts).
-    const saved = getSavedServer()
-    if (saved && isExternalDashboard(saved)) {
-      window.location.href = buildExternalRedirectUrl(saved)
-      return
-    }
+  // NOTE: the sticky external-server redirect happens pre-mount in src/index.tsx —
+  // it must run before App.tsx consumes the ?a= auth-link param at mount.
 
+  useEffect(() => {
     // ?src= deep link forces a specific server and locks the selection.
     const query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -186,7 +181,13 @@ export default function ServerGateway({ onSetServer, srcLockedState }) {
   const handleSelectCard = (server: ServerOption) => {
     if (isExternalDashboard(server)) {
       saveServer(server)
-      window.location.href = buildExternalRedirectUrl(server)
+      // iOS WKWebView writes localStorage to disk on a background thread. Navigating
+      // cross-origin immediately after setItem can tear down the page before that
+      // write commits, losing the sticky selection on the next cold start. Defer the
+      // redirect briefly to give the write time to land before we leave the origin.
+      setTimeout(() => {
+        window.location.replace(buildExternalRedirectUrl(server))
+      }, 100)
       return
     }
     selectInternal(server.apiServerUrl)

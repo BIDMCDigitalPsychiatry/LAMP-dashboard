@@ -5,6 +5,13 @@ import LAMP from "lamp-core"
 
 // Local Imports
 import App from "./components/App"
+import {
+  getSavedServer,
+  saveServer,
+  isExternalDashboard,
+  buildExternalRedirectUrl,
+  KNOWN_SERVERS,
+} from "./components/ServerGateway"
 import * as serviceWorker from "./serviceWorker"
 
 // External Imports
@@ -65,17 +72,39 @@ LAMP.addEventListener("LOGIN", ({ detail }) => {
 })
 
 // Tie-in for the mobile apps.
-// FIXME: Logout only if we were a participant... right now the app should ignore erroneous logouts.
 LAMP.addEventListener("LOGOUT", ({ detail }) => {
+  // Only forward real participant logouts to native. Erroneous logouts on load
+  // cause the older iOS app to wipe all WKWebView storage (cross-origin),
+  // which breaks session/redirect state for other dashboards.
+  if (LAMP.Auth?._type !== "participant") return
   ;(window as any)?.webkit?.messageHandlers?.logout?.postMessage?.(detail)
   ;(window as any)?.logout?.postMessage?.(JSON.stringify(detail))
 })
 
-ReactDOM.render(<App />, root)
-serviceWorker.register({
-  onUpdate: (registration) => {
-    //alert('Updating to the latest available version of mindLAMP.')
-    if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
-    window.location.reload()
-  },
-})
+// Migration shim: older builds (feature/email-routing) persisted the LevelUp
+// redirect choice under "lamp.redirectTarget". Map it to the gateway's saved
+// server so those users keep auto-redirecting.
+if (localStorage.getItem("lamp.redirectTarget") === "levelup" && !getSavedServer()) {
+  const levelUp = KNOWN_SERVERS.find((s) => s.name === "LevelUp")
+  if (levelUp) saveServer(levelUp)
+  localStorage.removeItem("lamp.redirectTarget")
+}
+
+// Sticky redirect: if the user previously chose an external dashboard, send the
+// WebView there before mounting the app — App.tsx consumes the ?a= auth-link at
+// mount, so redirecting any later would swallow credentials meant for the
+// destination. Forward all hash query params (?a= etc.) so the external
+// dashboard can restore the session instead of showing a login screen.
+const savedServer = getSavedServer()
+if (savedServer && isExternalDashboard(savedServer)) {
+  window.location.replace(buildExternalRedirectUrl(savedServer))
+} else {
+  ReactDOM.render(<App />, root)
+  serviceWorker.register({
+    onUpdate: (registration) => {
+      //alert('Updating to the latest available version of mindLAMP.')
+      if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
+      window.location.reload()
+    },
+  })
+}
