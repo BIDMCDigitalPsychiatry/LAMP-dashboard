@@ -162,7 +162,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
           device_type: "Dashboard",
           user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
         },
-      } as any).then((res) => console.dir(res))
+      } as any)
       await LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
     }
     if (res?.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {

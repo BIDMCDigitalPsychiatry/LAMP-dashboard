@@ -127,7 +127,8 @@ export default function TwoFA({ ...props }) {
         }
       })
     } catch (e) {
-      console.dir(e)
+      // Swallow without logging — the surrounding request contains the
+      // app-gateway API key and the plaintext 2FA passcode.
     }
   }
 

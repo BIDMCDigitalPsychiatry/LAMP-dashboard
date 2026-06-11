@@ -231,8 +231,8 @@ export function CredentialEditor({
 
   const handleClearAccountSetup = async () => {
     try {
+      // Do not log `result` — it contains the new temporary password.
       const result: any = await LAMP.Credential.clearAccountSetup(credential.origin, credential.access_key)
-      console.log(result)
       enqueueSnackbar(t("Successfully reset credential. New temporary password is: "), {
         variant: "success",
         persist: true,
@@ -261,7 +261,6 @@ export function CredentialEditor({
       })
       refreshSessionInfo()
     } catch (e) {
-      console.log(e)
       enqueueSnackbar(t("Failed to reset credential."), { variant: "error" })
     }
   }
