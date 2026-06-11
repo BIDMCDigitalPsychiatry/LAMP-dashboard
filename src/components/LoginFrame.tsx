@@ -50,13 +50,19 @@ export const useLoginStyles = makeStyles((theme: Theme) =>
     linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 320 },
+    // Wide variant for the server gateway: identical to loginInner on phones,
+    // opens up on larger viewports so cards can flow into two columns.
+    loginInnerWide: {
+      maxWidth: 320,
+      [theme.breakpoints.up("sm")]: { maxWidth: 640, width: "100%" },
+    },
     loginDisabled: {
       opacity: 0.5,
     },
   })
 )
 
-export default function LoginFrame({ children }) {
+export default function LoginFrame({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
   const { t, i18n } = useTranslation()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const classes = useLoginStyles()
@@ -115,7 +121,7 @@ export default function LoginFrame({ children }) {
           </MenuItem>
         </Menu>
         <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
-          <Grid item className={classes.loginInner}>
+          <Grid item className={wide ? classes.loginInnerWide : classes.loginInner}>
             <Box className={classes.logoLogin}>
               <Logo />
             </Box>

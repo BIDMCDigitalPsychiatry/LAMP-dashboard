@@ -111,8 +111,16 @@ export function buildExternalRedirectUrl(server: ServerOption): string {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     intro: { fontSize: 14, color: "rgba(0,0,0,0.6)", textAlign: "center", marginBottom: 20 },
-    card: {
+    // Single column on phones (unchanged); two columns once the wide LoginFrame
+    // variant gives us room on larger viewports.
+    cardGrid: {
+      display: "grid",
+      gridTemplateColumns: "1fr",
+      gap: 12,
       marginBottom: 12,
+      [theme.breakpoints.up("sm")]: { gridTemplateColumns: "1fr 1fr" },
+    },
+    card: {
       borderRadius: 10,
       border: "1px solid #e0e0e0",
       "&:hover": { borderColor: "#7599FF" },
@@ -199,24 +207,26 @@ export default function ServerGateway({ onSetServer, srcLockedState }) {
   }
 
   return (
-    <LoginFrame>
+    <LoginFrame wide>
       <Typography className={classes.intro}>{t("Select your organization or study to continue.")}</Typography>
 
-      {KNOWN_SERVERS.map((server, i) => (
-        <Card key={i} className={classes.card} elevation={0}>
-          <CardActionArea onClick={() => handleSelectCard(server)}>
-            <CardContent className={classes.cardContent}>
-              {server.logo && <img src={server.logo} alt={server.name} className={classes.cardLogo} />}
-              <div>
-                <Typography className={classes.cardName}>{server.name}</Typography>
-                {server.description && (
-                  <Typography className={classes.cardDescription}>{server.description}</Typography>
-                )}
-              </div>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      ))}
+      <Box className={classes.cardGrid}>
+        {KNOWN_SERVERS.map((server, i) => (
+          <Card key={i} className={classes.card} elevation={0}>
+            <CardActionArea onClick={() => handleSelectCard(server)} style={{ height: "100%" }}>
+              <CardContent className={classes.cardContent}>
+                {server.logo && <img src={server.logo} alt={server.name} className={classes.cardLogo} />}
+                <div>
+                  <Typography className={classes.cardName}>{server.name}</Typography>
+                  {server.description && (
+                    <Typography className={classes.cardDescription}>{server.description}</Typography>
+                  )}
+                </div>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        ))}
+      </Box>
 
       {!showCustom ? (
         <Typography
