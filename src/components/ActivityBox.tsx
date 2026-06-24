@@ -6,6 +6,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
+import { activityIcons } from "../icons/activities"
 import { useTranslation } from "react-i18next"
 import ActivityPopup from "./ActivityPopup"
 import ReactMarkdown from "react-markdown"
@@ -811,6 +812,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                     ? `url(${ScratchCard}) center center/contain no-repeat`
                                     : activity?.spec === "lamp.zoom_meeting"
                                     ? `url(${VideoMeeting}) center center/contain no-repeat`
+                                    : activityIcons[activity?.spec]
+                                    ? `url(${activityIcons[activity?.spec]}) center center/contain no-repeat`
                                     : `url(${InfoIcon}) center center/contain no-repeat`,
                                 }}
                               ></Box>
@@ -928,6 +931,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                                 ? `url(${ScratchCard}) center center/contain no-repeat`
                                 : activity?.spec === "lamp.zoom_meeting"
                                 ? `url(${VideoMeeting}) center center/contain no-repeat`
+                                : activityIcons[activity?.spec]
+                                ? `url(${activityIcons[activity?.spec]}) center center/contain no-repeat`
                                 : `url(${InfoIcon}) center center/contain no-repeat`,
                             }}
                           ></Box>

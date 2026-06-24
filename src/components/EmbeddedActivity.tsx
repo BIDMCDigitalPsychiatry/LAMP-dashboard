@@ -58,6 +58,19 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
+  "lamp.wcst": "wcst",
+  "lamp.mental_rotation": "mentalrotation",
+  "lamp.memory_match": "memorymatch",
+  "lamp.sliding_puzzle": "slidingpuzzle",
+  "lamp.letter_logic": "letterlogic",
+  "lamp.nonogram": "nonogram",
+  "lamp.lexical_decision": "lexicaldecision",
+  "lamp.stroop": "stroop",
+  "lamp.flanker": "flanker",
+  "lamp.nback": "nback",
+  "lamp.water_sort": "watersort",
+  "lamp.delay_discounting": "delaydiscounting",
+  "lamp.tower_of_london": "toweroflondon",
 }
 
 export default function EmbeddedActivity({

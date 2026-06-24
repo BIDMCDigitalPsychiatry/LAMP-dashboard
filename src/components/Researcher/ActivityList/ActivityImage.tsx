@@ -19,6 +19,7 @@ import Maze from "../../../icons/VisualPopup/Maze.svg"
 import SpatialSpan from "../../../icons/VisualPopup/SpatialSpan.svg"
 import SpinWheel from "../../../icons/VisualPopup/SpinWheel.svg"
 import Symbol_Digit from "../../../icons/VisualPopup/Symbol_Digit.svg"
+import { activityIcons } from "../../../icons/activities"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 const useStyles = makeStyles((theme: Theme) =>
@@ -102,6 +103,9 @@ export default function ActivityImage({ ...props }) {
         break
       case "lamp.spin_wheel":
         setImage(SpinWheel)
+        break
+      default:
+        if (activityIcons[props.activitySpecId]) setImage(activityIcons[props.activitySpecId])
         break
     }
   }, [])
