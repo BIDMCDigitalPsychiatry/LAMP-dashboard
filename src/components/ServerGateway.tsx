@@ -45,7 +45,7 @@ export const KNOWN_SERVERS: ServerOption[] = [
   },
   {
     name: "LevelUp",
-    description: "Henry Jackson Foundation",
+    description: "SAFEGUARD",
     logo: LevelUpLogo,
     dashboardUrl: "https://mindlamp.armylevelup.app",
     apiServerUrl: "mindlamp-api.armylevelup.app",
