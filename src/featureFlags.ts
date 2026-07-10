@@ -7,3 +7,7 @@
 // restore the UI. Researcher-side module creation is intentionally NOT
 // gated here.
 export const MODULES_ENABLED = false
+
+// Hides the participant-facing Messages icon (comment badge in the top bar,
+// NavigationLayout). Researcher-side Conversations are NOT gated here.
+export const MESSAGING_ENABLED = false

@@ -41,6 +41,7 @@ import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import { Position } from "monaco-editor"
 import Notifications from "./Notifications"
 import { useAuthContext } from "./AuthProvider"
+import { MESSAGING_ENABLED } from "../featureFlags"
 import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -628,28 +629,31 @@ export default function NavigationLayout({
                 </Container>
               )}
               <Box flexGrow={1} />
-              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                // participant?.isMessagingEnabled && (
-                // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
-                <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
-                    <Tooltip title={`${t("Messages")}`}>
-                      <Badge
-                        badgeContent={msgCount > 0 ? msgCount : undefined}
-                        color="primary"
-                        onClick={() => {
-                          localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
-                          updateAnalytics()
-                        }}
-                      >
-                        <Icon>comment</Icon>
-                      </Badge>
-                    </Tooltip>
-                  ) : (
-                    ""
-                  )}
-                </Box>
-              )}
+              {MESSAGING_ENABLED &&
+                typeof title != "undefined" &&
+                title.startsWith("User") &&
+                title !== "User Administrator" && (
+                  // participant?.isMessagingEnabled && (
+                  // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
+                  <Box className={classes.headerRight}>
+                    {hideNotifications.indexOf(activeTab) < 0 ? (
+                      <Tooltip title={`${t("Messages")}`}>
+                        <Badge
+                          badgeContent={msgCount > 0 ? msgCount : undefined}
+                          color="primary"
+                          onClick={() => {
+                            localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+                            updateAnalytics()
+                          }}
+                        >
+                          <Icon>comment</Icon>
+                        </Badge>
+                      </Tooltip>
+                    ) : (
+                      ""
+                    )}
+                  </Box>
+                )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
                 <Box className={classes.headerRight}>
                   {hideNotifications.indexOf(activeTab) < 0 ? (
