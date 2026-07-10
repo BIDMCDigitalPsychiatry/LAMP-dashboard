@@ -7,6 +7,7 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { activityIcons } from "../icons/activities"
+import { MODULES_ENABLED } from "../featureFlags"
 import { useTranslation } from "react-i18next"
 import ActivityPopup from "./ActivityPopup"
 import ReactMarkdown from "react-markdown"
@@ -656,11 +657,12 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     setMessage("There are no " + type + " activities available.")
   }, [type])
 
-  const [tab, setTab] = useState("modules")
+  const [tab, setTab] = useState(MODULES_ENABLED ? "modules" : "other")
 
   useEffect(() => {
     if (localStorage.getItem("tab")) {
-      setTab(localStorage.getItem("tab"))
+      const savedTab = localStorage.getItem("tab")
+      setTab(!MODULES_ENABLED && savedTab === "modules" ? "other" : savedTab)
       setTimeout(() => {
         localStorage.removeItem("tab")
       }, 1000)
@@ -678,7 +680,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setTab("favorite")
         } else {
           setTab(
-            (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
+            MODULES_ENABLED &&
+              (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
               ? "modules"
               : "other"
           )
@@ -713,23 +716,26 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   return (
     <Box>
       <TabContext value={tab}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          {(favorites || []).length > 0 ? (
-            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-              <Tab label="Favorites" value="favorite" />
-              <Tab label="Modules" value="modules" />
-              <Tab label="Other Activities" value="other" />
-            </TabList>
-          ) : (
-            <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-              <Tab label="Modules" value="modules" />
-              <Tab label="Other Activities" value="other" />
-            </TabList>
-          )}
-        </Box>
+        {((favorites || []).length > 0 || MODULES_ENABLED) && (
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            {(favorites || []).length > 0 ? (
+              <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+                <Tab label="Favorites" value="favorite" />
+                {MODULES_ENABLED && <Tab label="Modules" value="modules" />}
+                <Tab label="Other Activities" value="other" />
+              </TabList>
+            ) : (
+              <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
+                <Tab label="Modules" value="modules" />
+                <Tab label="Other Activities" value="other" />
+              </TabList>
+            )}
+          </Box>
+        )}
         {(favorites || []).length > 0 && (
           <TabPanel value="favorite" className={classes.tabPanelMain}>
-            {((moduleData || [])?.filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
+            {MODULES_ENABLED &&
+            ((moduleData || [])?.filter((activity) => (favorites || []).some((fav) => fav?.id === activity?.id)) || [])
               .length ? (
               <ActivityAccordian
                 data={moduleData?.filter((activity) => favorites?.some((fav) => fav?.id === activity?.id)) || []}
@@ -743,7 +749,8 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             ) : (
               <></>
             )}
-            {shownActivities
+            {MODULES_ENABLED &&
+            shownActivities
               .filter((activity) => activity.spec == "lamp.module")
               ?.filter((activity) => favorites.includes(activity)).length > 0 ? (
               <>
@@ -841,25 +848,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
           </TabPanel>
         )}
-        <TabPanel value="modules" className={classes.tabPanelMain}>
-          {(moduleData || []).length > 0 ? (
-            <ActivityAccordian
-              data={moduleData}
-              type={type}
-              tag={tag}
-              handleSubModule={handleSubModule}
-              participant={participant}
-              setFavorites={setFavorites}
-              tab={tab}
-            />
-          ) : (
-            <></>
-          )}
-          {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
-            <>
-              <h3>Unstarted Modules</h3>
+        {MODULES_ENABLED && (
+          <TabPanel value="modules" className={classes.tabPanelMain}>
+            {(moduleData || []).length > 0 ? (
               <ActivityAccordian
-                data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
+                data={moduleData}
                 type={type}
                 tag={tag}
                 handleSubModule={handleSubModule}
@@ -867,18 +860,34 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 setFavorites={setFavorites}
                 tab={tab}
               />
-            </>
-          ) : (
-            <></>
-          )}
-          {(shownActivities || []).filter((activity) => activity.spec == "lamp.module").length === 0 &&
-            (moduleData || []).length === 0 && (
-              <Box display="flex" className={classes.blankMsg} ml={1}>
-                <Icon>info</Icon>
-                <p>{`${t(message)}`}</p>
-              </Box>
+            ) : (
+              <></>
             )}
-        </TabPanel>
+            {shownActivities.filter((activity) => activity.spec == "lamp.module").length > 0 ? (
+              <>
+                <h3>Unstarted Modules</h3>
+                <ActivityAccordian
+                  data={shownActivities.filter((activity) => activity.spec == "lamp.module")}
+                  type={type}
+                  tag={tag}
+                  handleSubModule={handleSubModule}
+                  participant={participant}
+                  setFavorites={setFavorites}
+                  tab={tab}
+                />
+              </>
+            ) : (
+              <></>
+            )}
+            {(shownActivities || []).filter((activity) => activity.spec == "lamp.module").length === 0 &&
+              (moduleData || []).length === 0 && (
+                <Box display="flex" className={classes.blankMsg} ml={1}>
+                  <Icon>info</Icon>
+                  <p>{`${t(message)}`}</p>
+                </Box>
+              )}
+          </TabPanel>
+        )}
         <TabPanel value="other" className={classes.tabPanelMain}>
           <Grid container spacing={2}>
             {(savedActivities || []).filter((activity) => activity.spec != "lamp.module").length ? (
