@@ -189,7 +189,11 @@ function AppRouter({ setConfirmSession, ...props }) {
 
       // TODO: double check, but this looks like the magic one time login link implementation
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      if (a === undefined) window.location.href = "/#/"
+      if (a === undefined) {
+        window.location.href = "/#/"
+        setLoading(false)
+        return
+      }
       let x = atob(a).split(":")
       const userName = x[0].trim()
       const password = x[1].trim()
@@ -204,9 +208,25 @@ function AppRouter({ setConfirmSession, ...props }) {
                 ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
                 : "api.lamp.digital",
           })
+          // Complete the login the same way refreshPage() does — without this the
+          // app stays on the loading backdrop forever (mobile ?a= cold-start).
+          getAdminType()
+          setState((state) => ({
+            ...state,
+            identity: LAMP.Auth._me,
+            auth: LAMP.Auth._auth,
+            authType: LAMP.Auth._type,
+            activeTab: LAMP.Auth._type === "participant" ? "assess" : "users",
+          }))
           setIsLoggedIn && setIsLoggedIn(true)
+          // Drop the ?a= credentials from the hash now that login is complete.
+          window.location.href = query[0]
         } catch {
           setIsLoggedIn && setIsLoggedIn(false)
+          enqueueSnackbar(`${t("Some error occured. Please login again")}`, { variant: "error" })
+          window.location.href = "/#/"
+        } finally {
+          setLoading(false)
         }
       })()
     } else if (!state.identity) {
