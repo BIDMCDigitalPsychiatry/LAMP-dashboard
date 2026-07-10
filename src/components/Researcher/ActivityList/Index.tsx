@@ -82,6 +82,7 @@ export const availableActivitySpecs = [
   "lamp.water_sort",
   "lamp.delay_discounting",
   "lamp.tower_of_london",
+  "lamp.simple_rt",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -115,6 +116,9 @@ export const games = [
   "lamp.water_sort",
   "lamp.delay_discounting",
   "lamp.tower_of_london",
+  "lamp.simple_rt",
+  // Legacy alias for early lamp.n_back registrations (not offered for creation).
+  "lamp.n_back",
 ]
 export default function ActivityList({
   researcherId,

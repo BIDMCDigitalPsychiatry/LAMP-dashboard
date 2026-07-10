@@ -20,6 +20,7 @@ import { LinkRenderer } from "./ActivityPopup"
 import ScratchCard from "../icons/ScratchCard.svg"
 import InfoIcon from "../icons/Info.svg"
 import VideoMeeting from "../icons/Video.svg"
+import { activityIcons } from "../icons/activities"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import emoji from "remark-emoji"
@@ -397,6 +398,8 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
                           ? `url(${ScratchCard}) center center/contain no-repeat`
                           : activity?.spec === "lamp.zoom_meeting"
                           ? `url(${VideoMeeting}) center center/contain no-repeat`
+                          : activityIcons[activity?.spec]
+                          ? `url(${activityIcons[activity?.spec]}) center center/contain no-repeat`
                           : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
                     ></Box>

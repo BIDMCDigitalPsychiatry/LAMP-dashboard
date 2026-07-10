@@ -71,6 +71,9 @@ const demoActivities = {
   "lamp.water_sort": "watersort",
   "lamp.delay_discounting": "delaydiscounting",
   "lamp.tower_of_london": "toweroflondon",
+  "lamp.simple_rt": "simplert",
+  // Legacy alias: an early N-Back registration used lamp.n_back; keep those loading.
+  "lamp.n_back": "nback",
 }
 
 export default function EmbeddedActivity({

@@ -2317,6 +2317,50 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.simple_rt": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["simple_trials", "choice_trials", "min_isi_ms", "max_isi_ms"],
+          properties: {
+            simple_trials: {
+              title: i18n.t("Simple RT Trials"),
+              description: i18n.t("Number of simple reaction time trials"),
+              type: "number",
+              minimum: 1,
+              maximum: 100,
+              default: 20,
+              "ui:grid": { xs: 6 },
+            },
+            choice_trials: {
+              title: i18n.t("Choice RT Trials"),
+              description: i18n.t("Number of choice reaction time trials (0 to skip)"),
+              type: "number",
+              minimum: 0,
+              maximum: 100,
+              default: 20,
+              "ui:grid": { xs: 6 },
+            },
+            min_isi_ms: {
+              title: i18n.t("Min Inter-stimulus Interval (ms)"),
+              type: "number",
+              minimum: 500,
+              default: 1000,
+              "ui:grid": { xs: 6 },
+            },
+            max_isi_ms: {
+              title: i18n.t("Max Inter-stimulus Interval (ms)"),
+              type: "number",
+              minimum: 1500,
+              default: 4000,
+              "ui:grid": { xs: 6 },
+            },
+          },
+        },
+      },
+    },
   }
 }
 

@@ -14,6 +14,7 @@ import NBack from "./NBack.svg"
 import WaterSort from "./WaterSort.svg"
 import DelayDiscounting from "./DelayDiscounting.svg"
 import TowerOfLondon from "./TowerOfLondon.svg"
+import SimpleRT from "./SimpleRT.svg"
 
 export const activityIcons: { [spec: string]: string } = {
   "lamp.wcst": WCST,
@@ -29,4 +30,7 @@ export const activityIcons: { [spec: string]: string } = {
   "lamp.water_sort": WaterSort,
   "lamp.delay_discounting": DelayDiscounting,
   "lamp.tower_of_london": TowerOfLondon,
+  "lamp.simple_rt": SimpleRT,
+  // Legacy alias for early lamp.n_back registrations.
+  "lamp.n_back": NBack,
 }

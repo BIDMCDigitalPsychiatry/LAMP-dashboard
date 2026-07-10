@@ -24,6 +24,7 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
+import { activityIcons } from "../icons/activities"
 import WeekView from "./WeekView"
 import LAMP from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
@@ -895,6 +896,8 @@ export default function Feed({
                                       ? `url(${
                                           (tag || []).filter((x) => x.id === feed.activityData?.id)[0]?.photo
                                         }) center center/contain no-repeat`
+                                      : activityIcons[feed.activityData?.spec]
+                                      ? `url(${activityIcons[feed.activityData?.spec]}) center center/contain no-repeat`
                                       : `url(${InfoIcon}) center center/contain no-repeat`,
                                   }}
                                 ></Box>
