@@ -100,11 +100,10 @@ if (savedServer && isExternalDashboard(savedServer)) {
   window.location.replace(buildExternalRedirectUrl(savedServer))
 } else {
   ReactDOM.render(<App />, root)
-  serviceWorker.register({
-    onUpdate: (registration) => {
-      //alert('Updating to the latest available version of mindLAMP.')
-      if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
-      window.location.reload()
-    },
-  })
+  // The build does not ship a service-worker.js (registration 404s), so
+  // register() can never install or update a worker — it only leaves service
+  // workers from historical deployments in control, serving stale bundles.
+  // Unregister to actively evict them; restore register() only once a worker
+  // script is actually emitted by the build.
+  serviceWorker.unregister()
 }

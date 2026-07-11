@@ -15,6 +15,14 @@ import WaterSort from "./WaterSort.svg"
 import DelayDiscounting from "./DelayDiscounting.svg"
 import TowerOfLondon from "./TowerOfLondon.svg"
 import SimpleRT from "./SimpleRT.svg"
+import BalloonRisk from "./BalloonRisk.svg"
+import PopTheBubbles from "./PopTheBubbles.svg"
+import SpinWheel from "./SpinWheel.svg"
+import SpatialSpan from "./SpatialSpan.svg"
+import DCog from "./DCog.svg"
+import DigitSpan from "./DigitSpan.svg"
+import SymbolDigitSubstitution from "./SymbolDigitSubstitution.svg"
+import TrailsB from "./TrailsB.svg"
 
 export const activityIcons: { [spec: string]: string } = {
   "lamp.wcst": WCST,
@@ -33,4 +41,13 @@ export const activityIcons: { [spec: string]: string } = {
   "lamp.simple_rt": SimpleRT,
   // Legacy alias for early lamp.n_back registrations.
   "lamp.n_back": NBack,
+  // Pre-existing activities that have SVGs in LAMP-activities/icons.
+  "lamp.balloon_risk": BalloonRisk,
+  "lamp.pop_the_bubbles": PopTheBubbles,
+  "lamp.spin_wheel": SpinWheel,
+  "lamp.spatial_span": SpatialSpan,
+  "lamp.dcog": DCog,
+  "lamp.digit_span": DigitSpan,
+  "lamp.symbol_digit_substitution": SymbolDigitSubstitution,
+  "lamp.trails_b": TrailsB,
 }
