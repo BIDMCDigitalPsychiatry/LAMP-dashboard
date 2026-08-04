@@ -3,7 +3,7 @@ import { Box, Card, CardActionArea, CardContent, Typography, TextField, makeStyl
 import { useTranslation } from "react-i18next"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
 import MindLAMPLogo from "../icons/Logo.svg"
-import MountSinaiLogo from "../icons/MountSinai.png"
+import PredictorLogo from "../icons/Predictor.png"
 import OxfordHealthLogo from "../icons/OxfordHealth.png"
 import LevelUpLogo from "../icons/LevelUp.png"
 import AmpSczLogo from "../icons/AMP Scz.jpeg"
@@ -40,7 +40,7 @@ export const KNOWN_SERVERS: ServerOption[] = [
   {
     name: "PREDiCTOR",
     description: "Mount Sinai Health System",
-    logo: MountSinaiLogo,
+    logo: PredictorLogo,
     apiServerUrl: "api.mshai.org",
   },
   {
