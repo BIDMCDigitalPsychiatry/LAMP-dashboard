@@ -20,6 +20,7 @@ import { Service } from "../../DBService/DBService"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
+import { useAuthContext } from "../../AuthProvider"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -96,6 +97,7 @@ export default function StudiesList({
   const [loading, setLoading] = useState(true)
   const [enabledMessagingStudyIds, setEnabledMessagingStudyIds] = useState([])
   const { enqueueSnackbar } = useSnackbar()
+  const { isLoggedIn } = useAuthContext()
 
   useInterval(
     () => {
@@ -137,16 +139,12 @@ export default function StudiesList({
   }, [allStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+    if (isLoggedIn || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       searchFilterStudies()
     } else {
       window.location.href = "/#/"
     }
-  }, [search, sessionStorage.getItem("tokenInfo")])
+  }, [search, isLoggedIn])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)

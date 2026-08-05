@@ -58,6 +58,22 @@ const demoActivities = {
   "lamp.trails_b": "dottouch",
   "lamp.voice_survey": "speechrecording",
   "lamp.digit_span": "digitspan",
+  "lamp.wcst": "wcst",
+  "lamp.mental_rotation": "mentalrotation",
+  "lamp.memory_match": "memorymatch",
+  "lamp.sliding_puzzle": "slidingpuzzle",
+  "lamp.letter_logic": "letterlogic",
+  "lamp.nonogram": "nonogram",
+  "lamp.lexical_decision": "lexicaldecision",
+  "lamp.stroop": "stroop",
+  "lamp.flanker": "flanker",
+  "lamp.nback": "nback",
+  "lamp.water_sort": "watersort",
+  "lamp.delay_discounting": "delaydiscounting",
+  "lamp.tower_of_london": "toweroflondon",
+  "lamp.simple_rt": "simplert",
+  // Legacy alias: an early N-Back registration used lamp.n_back; keep those loading.
+  "lamp.n_back": "nback",
 }
 
 export default function EmbeddedActivity({
@@ -181,12 +197,17 @@ export default function EmbeddedActivity({
         setLoading(false)
       } else if (!saved && currentActivity?.id !== null && currentActivity?.id !== "") {
         let data = JSON.parse(e.data)
-        if (!!data["timestamp"]) {
+        if (!!data["timestamp"] || !!data["timestamp/Date+Time"]) {
           setLoading(true)
           delete data["activity"]
           delete data["timestamp"]
+          delete data["timestamp/Date+Time"]
           data["activity"] = currentActivity.id
-          data["timestamp"] = activityTimestamp
+          if (currentActivity.spec === "lamp.memory_game") {
+            data["timestamp/Date+Time"] = activityTimestamp
+          } else {
+            data["timestamp"] = activityTimestamp
+          }
           data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           if (LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital") {
@@ -232,7 +253,7 @@ export default function EmbeddedActivity({
         tag = (tag || []).filter((t) => t !== data.activity)
       }
       await LAMP.Type.setAttachment(participant, "me", "lamp.dashboard.favorite_activities", tag)
-      delete data.static_data.is_favorite
+      delete data.static_data?.is_favorite
     }
     return data
   }

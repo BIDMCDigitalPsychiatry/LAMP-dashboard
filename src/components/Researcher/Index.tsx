@@ -5,11 +5,11 @@ import locale_lang from "../../locale_map.json"
 import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
+import { useAuthContext } from "../AuthProvider"
 
 export default function Researcher({ researcher, onParticipantSelect, mode, tab, ...props }) {
   const { t, i18n } = useTranslation()
-  // const [dataWorker] = useWorker(saveDataToCache)
-  // const [demoWorker] = useWorker(saveDemoData)
+  const { authorizationHeader } = useAuthContext()
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -39,10 +39,10 @@ export default function Researcher({ researcher, onParticipantSelect, mode, tab,
       if (LAMP.Auth._type === "researcher") {
         lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital"
           ? saveDemoData()
-          : saveDataToCache(researcher.id)
+          : saveDataToCache(researcher.id, authorizationHeader)
       } else if (LAMP.Auth._type === "admin") {
         if (researcher.id) {
-          saveDataToCache(researcher.id)
+          saveDataToCache(researcher.id, authorizationHeader)
         }
       }
     })()

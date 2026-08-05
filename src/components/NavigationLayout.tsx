@@ -30,7 +30,7 @@ import {
   createStyles,
 } from "@material-ui/core"
 // Local Imports
-import { CredentialManager } from "./CredentialManager"
+import { CredentialEditor, CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
@@ -40,6 +40,9 @@ import { useLocation } from "react-router-dom"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import { Position } from "monaco-editor"
 import Notifications from "./Notifications"
+import { useAuthContext } from "./AuthProvider"
+import { MESSAGING_ENABLED } from "../featureFlags"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -293,6 +296,7 @@ export default function NavigationLayout({
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
+  const [changeMyPassword, setChangeMyPassword] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
@@ -311,6 +315,7 @@ export default function NavigationLayout({
   const [notifications, setNotification] = useState([])
   const [notificationLoader, setNotificationLoader] = useState(true)
   const location = useLocation()
+  const { sessionInfo } = useAuthContext()
   useEffect(() => {
     LAMP.Type.getAttachment(id, "lamp.name").then((res: any) => {
       setName(res?.data ?? "")
@@ -527,6 +532,10 @@ export default function NavigationLayout({
                     {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{`${t("Manage Credentials")}`}</MenuItem>
                     )}
+                    {(authType === "admin" || authType === "researcher") &&
+                      sessionInfo.accountSetupState !== "OAUTH" && (
+                        <MenuItem onClick={() => setChangeMyPassword(true)}>{t("Change My Password")}</MenuItem>
+                      )}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
                     </MenuItem>
@@ -620,28 +629,31 @@ export default function NavigationLayout({
                 </Container>
               )}
               <Box flexGrow={1} />
-              {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                // participant?.isMessagingEnabled && (
-                // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
-                <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
-                    <Tooltip title={`${t("Messages")}`}>
-                      <Badge
-                        badgeContent={msgCount > 0 ? msgCount : undefined}
-                        color="primary"
-                        onClick={() => {
-                          localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
-                          updateAnalytics()
-                        }}
-                      >
-                        <Icon>comment</Icon>
-                      </Badge>
-                    </Tooltip>
-                  ) : (
-                    ""
-                  )}
-                </Box>
-              )}
+              {MESSAGING_ENABLED &&
+                typeof title != "undefined" &&
+                title.startsWith("User") &&
+                title !== "User Administrator" && (
+                  // participant?.isMessagingEnabled && (
+                  // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
+                  <Box className={classes.headerRight}>
+                    {hideNotifications.indexOf(activeTab) < 0 ? (
+                      <Tooltip title={`${t("Messages")}`}>
+                        <Badge
+                          badgeContent={msgCount > 0 ? msgCount : undefined}
+                          color="primary"
+                          onClick={() => {
+                            localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+                            updateAnalytics()
+                          }}
+                        >
+                          <Icon>comment</Icon>
+                        </Badge>
+                      </Tooltip>
+                    ) : (
+                      ""
+                    )}
+                  </Box>
+                )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
                 <Box className={classes.headerRight}>
                   {hideNotifications.indexOf(activeTab) < 0 ? (
@@ -815,9 +827,55 @@ export default function NavigationLayout({
 
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} fromParticipant={true} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} fromParticipant={false} />
         </DialogContent>
       </Dialog>
+
+      <Dialog open={changeMyPassword} onClose={() => setChangeMyPassword(false)}>
+        <DialogContent>
+          <ChangeMyPassword closeModal={() => setChangeMyPassword(false)} />
+        </DialogContent>
+      </Dialog>
+    </Box>
+  )
+}
+
+function ChangeMyPassword({ closeModal }) {
+  const { sessionInfo, refreshSessionInfo } = useAuthContext()
+  const [credential, setCredential] = useState(undefined)
+  const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
+
+  useEffect(() => {
+    try {
+      LAMP.Credential.list(sessionInfo.me?.id || null).then((result) => {
+        for (let cred of result) {
+          if ((cred as any).access_key === sessionInfo.accessKey) {
+            setCredential(cred)
+            break
+          }
+        }
+      })
+    } catch (e) {}
+  }, [])
+
+  function onPasswordChanged() {
+    enqueueSnackbar(`${t("Successfully changed password.")}`, { variant: "success" })
+    closeModal()
+  }
+  return (
+    <Box>
+      {!!credential ? (
+        <CredentialManager
+          id={credential.origin}
+          credential={credential}
+          fromParticipant={false}
+          mode="reset-my-password"
+          onComplete={onPasswordChanged}
+        />
+      ) : (
+        <CircularProgress />
+      )}
     </Box>
   )
 }

@@ -29,6 +29,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import VideoMeeting from "../icons/Video.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+import { activityIcons } from "../icons/activities"
 import NotificationPage from "./NotificationPage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LAMP from "lamp-core"
@@ -366,6 +367,8 @@ export default function ActivityPopup({
                   ? `url(${ScratchCard}) center center/contain no-repeat`
                   : activity?.spec === "lamp.zoom_meeting"
                   ? `url(${VideoMeeting}) center center/contain no-repeat`
+                  : activityIcons[activity?.spec]
+                  ? `url(${activityIcons[activity?.spec]}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>

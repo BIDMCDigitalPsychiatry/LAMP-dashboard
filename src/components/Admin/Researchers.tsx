@@ -1,4 +1,4 @@
-// Core Imports
+7 // Core Imports
 import React, { useState, useEffect } from "react"
 import { Box, Grid, Icon } from "@material-ui/core"
 import LAMP from "lamp-core"
@@ -8,6 +8,7 @@ import locale_lang from "../../locale_map.json"
 import Pagination from "../PaginatedElement"
 import ResearcherRow from "./ResearcherRow"
 import Header from "./Header"
+import { useAuthContext } from "../AuthProvider"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -177,6 +178,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
   const classes = useStyles()
+  const { isLoggedIn } = useAuthContext()
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -203,16 +205,8 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   }
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
-      refreshResearchers()
-    } else {
-      window.location.href = "/#/"
-    }
-  }, [search, sessionStorage.getItem("tokenInfo")])
+    refreshResearchers()
+  }, [search, isLoggedIn])
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id

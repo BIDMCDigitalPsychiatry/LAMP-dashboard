@@ -1,6 +1,7 @@
 import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
+import { buildLampServerRequestUrl, composeRequestPath } from "../../utilities"
 
 interface StudyObject {
   id: string
@@ -10,33 +11,31 @@ interface StudyObject {
   activities: Array<any>
   sensors: Array<any>
 }
-export const fetchResult = async (id, type, modal) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+export const fetchResult = async (id, type, modal, authorizationHeader) => {
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   let result = await (
-    await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
+    await fetch(composeRequestPath([baseUrl, modal, id, "_lookup", type]), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: authorizationHeader,
       },
-      credentials: "include",
+      credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
     })
   ).json()
   return result
 }
 
-export const fetchPostData = async (id, type, modal, methodType, bodyData) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
+export const fetchPostData = async (id, type, modal, methodType, bodyData, authorizationHeader) => {
+  const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
+        Authorization: authorizationHeader,
       },
-      credentials: "include",
+      credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
       body: JSON.stringify(bodyData),
     })
   ).json()
@@ -100,7 +99,7 @@ export const saveDemoData = () => {
   )
 }
 
-export const saveDataToCache = (id) => {
+export const saveDataToCache = (id, authorizationHeader) => {
   Service.addData("researcher", [{ id: id }])
 
   LAMP.API.query(
@@ -136,11 +135,11 @@ export const saveDataToCache = (id) => {
     })
     saveStudiesAndParticipants(data, studies, id)
     studies?.map((study) => {
-      fetchResult(study.id, "participant/mode/1", "study").then((sensors) => {
+      fetchResult(study.id, "participant/mode/1", "study", authorizationHeader).then((sensors) => {
         saveSettings(sensors, "accelerometer")
         saveSettings(sensors, "analytics")
         saveSettings(sensors, "gps")
-        fetchResult(study.id, "participant/mode/2", "study").then((events) => {
+        fetchResult(study.id, "participant/mode/2", "study", authorizationHeader).then((events) => {
           saveSettings(events, "active")
         })
       })

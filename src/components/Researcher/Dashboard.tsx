@@ -31,6 +31,7 @@ import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
 import Conversations from "./Conversations/Index"
+import { useAuthContext } from "../AuthProvider"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -186,6 +187,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [role, setRole] = useState(null)
+  const { isLoggedIn } = useAuthContext()
   useInterval(
     () => {
       setLoading(true)
@@ -211,7 +213,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
 
   useEffect(() => {
     getAllStudies()
-  }, [researcher, sessionStorage.getItem("tokenInfo")])
+  }, [researcher, isLoggedIn])
 
   useEffect(() => {
     if (!!newStudy) getAllStudies()

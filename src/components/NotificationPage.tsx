@@ -296,13 +296,13 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
               } else if (data?.clickBack === true) {
-                if (!!data && !!data?.timestamp) {
+                if (!!data && (!!data?.timestamp || !!data["timestamp/Date+Time"])) {
                   showVisualPopup(activity)
                 } else {
                   if (mode === null) window.location.href = "/#/"
                   else history.back()
                 }
-              } else if (!!data && !!data?.timestamp) {
+              } else if (!!data && (!!data?.timestamp || !!data["timestamp/Date+Time"])) {
                 showVisualPopup(activity)
               }
             }}

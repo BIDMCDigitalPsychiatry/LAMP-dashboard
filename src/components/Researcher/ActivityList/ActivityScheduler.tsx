@@ -106,6 +106,7 @@ export default function ActivityScheduler({ activity, activities, setActivities,
               updateActivitySchedule={updateActivitySchedule}
               showNotificationInput={showNotificationInputs[index] || false}
               setShowNotificationInput={(value: boolean) => toggleNotificationInput(index, value)}
+              key={index}
             />
           ))}
         </TableBody>

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
   Typography,
   makeStyles,
@@ -19,6 +19,8 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Alert } from "@mui/material"
+import { buildLampServerRequestUrl } from "../utilities"
+import { useAuthContext } from "./AuthProvider"
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
     borderRadius: "10px",
@@ -131,22 +133,6 @@ const useStyles = makeStyles((theme) => ({
   composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
-const fetchCoordinators = async (participant) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
-  const userToken: any = JSON.parse(sessionStorage.getItem("tokenInfo"))
-  let result = await (
-    await fetch(`${baseUrl}/${participant}/cordinators`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + userToken.accessToken,
-      },
-      credentials: "include",
-    })
-  ).json()
-  return result
-}
-
 export default function Messages({
   refresh,
   participant,
@@ -172,6 +158,25 @@ export default function Messages({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [coordinators, setCoordinators] = useState([])
   const { t } = useTranslation()
+  const { authorizationHeader } = useAuthContext()
+
+  const fetchCoordinators = useCallback(
+    async (participant) => {
+      const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
+      let result = await (
+        await fetch(`${baseUrl}/${participant}/cordinators`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationHeader,
+          },
+          credentials: LAMP.Auth._authScheme === "session" ? "include" : undefined,
+        })
+      ).json()
+      return result
+    },
+    [authorizationHeader]
+  )
 
   useEffect(() => {
     fetchCoordinators(participant).then((coordinators) => {

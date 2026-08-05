@@ -21,6 +21,7 @@ import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
+import { activityIcons } from "../../../icons/activities"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
 import { Service } from "../../DBService/DBService"
@@ -600,7 +601,7 @@ export default function GameCreator({
               ? JournalIcon
               : (value?.spec && "lamp.breathe" === value.spec) || "lamp.breathe" === activitySpecId
               ? BreatheIcon
-              : null
+              : activityIcons[value?.spec ?? activitySpecId] ?? null
           }
         />
         {validateAudioSize() > breatheFileLimit && (

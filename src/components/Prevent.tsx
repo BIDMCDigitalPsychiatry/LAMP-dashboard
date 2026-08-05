@@ -14,6 +14,7 @@ import {
   Link,
   Backdrop,
   CircularProgress,
+  Collapse,
   makeStyles,
   Theme,
   createStyles,
@@ -178,6 +179,29 @@ const useStyles = makeStyles((theme: Theme) =>
         marginBottom: 16,
       },
     },
+    healthDataDisclaimer: {
+      marginTop: 40,
+      marginBottom: 24,
+      padding: "12px 16px",
+      borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+    },
+    healthDataDisclaimerToggle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: 500,
+      color: "rgba(0, 0, 0, 0.6)",
+      userSelect: "none",
+      "& .MuiIcon-root": { fontSize: 20 },
+    },
+    healthDataDisclaimerBody: {
+      marginTop: 8,
+      fontSize: 13,
+      lineHeight: 1.5,
+      color: "rgba(0, 0, 0, 0.6)",
+    },
   })
 )
 
@@ -317,6 +341,7 @@ export default function Prevent({
   const [activityEvents, setActivityEvents] = React.useState({})
   const [timeSpans, setTimeSpans] = React.useState({})
   const [loading, setLoading] = React.useState(true)
+  const [disclaimerOpen, setDisclaimerOpen] = React.useState(false)
   const [visualizations, setVisualizations] = React.useState({})
   const [cortex, setCortex] = React.useState({})
   const [selectedActivities, setSelectedActivities] = React.useState([])
@@ -412,7 +437,8 @@ export default function Prevent({
             activity.spec !== "lamp.group" &&
             activity.spec !== "lamp.tips" &&
             activity.spec !== "lamp.module" &&
-            activity.spec !== "lamp.zoom_meeting"
+            activity.spec !== "lamp.zoom_meeting" &&
+            activity.spec !== "lamp.fragmented_letters"
         )
         setActivities(activities)
         setSelectedActivities(activities.map((activity) => activity.name))
@@ -614,6 +640,32 @@ export default function Prevent({
             </DialogActions>
           </Dialog>
         </Box>
+      )}
+      {!loading && (
+        <div className={classes.healthDataDisclaimer}>
+          <div
+            className={classes.healthDataDisclaimerToggle}
+            role="button"
+            tabIndex={0}
+            onClick={() => setDisclaimerOpen(!disclaimerOpen)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                setDisclaimerOpen(!disclaimerOpen)
+              }
+            }}
+          >
+            <span>{t("About this app's use of health data")}</span>
+            <Icon>{disclaimerOpen ? "expand_less" : "expand_more"}</Icon>
+          </div>
+          <Collapse in={disclaimerOpen} timeout="auto" unmountOnExit>
+            <div className={classes.healthDataDisclaimerBody}>
+              {t(
+                "This app may collect health data as part of the research study you are enrolled in. The rest of your data is held by your study team. Please contact your study coordinator to view, request a copy, or ask any questions about the data collected from your account."
+              )}
+            </div>
+          </Collapse>
+        </div>
       )}
     </Container>
   )

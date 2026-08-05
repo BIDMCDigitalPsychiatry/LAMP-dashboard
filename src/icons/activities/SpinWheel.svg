@@ -1,0 +1,17 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Outer ring -->
+<circle cx="50" cy="52" r="36" fill="#C75E5A"/>
+<!-- Inner wheel -->
+<circle cx="50" cy="52" r="32" fill="#FAC1B5"/>
+<!-- Segments (6 alternating) -->
+<path d="M50 52L50 20L77.7 36Z" fill="#F9907B"/>
+<path d="M50 52L77.7 68L77.7 36Z" fill="#C75E5A"/>
+<path d="M50 52L50 84L77.7 68Z" fill="#F9907B"/>
+<path d="M50 52L50 84L22.3 68Z" fill="#C75E5A"/>
+<path d="M50 52L22.3 36L22.3 68Z" fill="#F9907B"/>
+<path d="M50 52L50 20L22.3 36Z" fill="#C75E5A"/>
+<!-- Center hub -->
+<circle cx="50" cy="52" r="5" fill="white"/>
+<!-- Pointer -->
+<path d="M50 6L44 16L56 16Z" fill="#C75E5A"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- 3x3 grid of squares -->
+<rect x="14" y="14" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="40" y="14" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="66" y="14" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="14" y="40" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="40" y="40" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="66" y="40" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="14" y="66" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="40" y="66" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<rect x="66" y="66" width="20" height="20" rx="3" fill="#FAC1B5"/>
+<!-- Highlighted sequence: 3 squares lit up -->
+<rect x="14" y="14" width="20" height="20" rx="3" fill="#C75E5A"/>
+<rect x="40" y="40" width="20" height="20" rx="3" fill="#F9907B"/>
+<rect x="66" y="66" width="20" height="20" rx="3" fill="#C75E5A"/>
+</svg>

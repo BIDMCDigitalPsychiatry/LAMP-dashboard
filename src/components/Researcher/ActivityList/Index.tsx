@@ -8,6 +8,7 @@ import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
 import useInterval from "../../useInterval"
 import LAMP from "lamp-core"
+import { useAuthContext } from "../../AuthProvider"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -68,6 +69,20 @@ export const availableActivitySpecs = [
   "lamp.digit_span",
   "lamp.memory_game",
   "lamp.zoom_meeting",
+  "lamp.wcst",
+  "lamp.mental_rotation",
+  "lamp.memory_match",
+  "lamp.sliding_puzzle",
+  "lamp.letter_logic",
+  "lamp.nonogram",
+  "lamp.lexical_decision",
+  "lamp.stroop",
+  "lamp.flanker",
+  "lamp.nback",
+  "lamp.water_sort",
+  "lamp.delay_discounting",
+  "lamp.tower_of_london",
+  "lamp.simple_rt",
 ]
 export const games = [
   "lamp.jewels_a",
@@ -88,6 +103,22 @@ export const games = [
   "lamp.fragmented_letters",
   "lamp.digit_span",
   "lamp.memory_game",
+  "lamp.wcst",
+  "lamp.mental_rotation",
+  "lamp.memory_match",
+  "lamp.sliding_puzzle",
+  "lamp.letter_logic",
+  "lamp.nonogram",
+  "lamp.lexical_decision",
+  "lamp.stroop",
+  "lamp.flanker",
+  "lamp.nback",
+  "lamp.water_sort",
+  "lamp.delay_discounting",
+  "lamp.tower_of_london",
+  "lamp.simple_rt",
+  // Legacy alias for early lamp.n_back registrations (not offered for creation).
+  "lamp.n_back",
 ]
 export default function ActivityList({
   researcherId,
@@ -111,6 +142,7 @@ export default function ActivityList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const { isLoggedIn } = useAuthContext()
 
   useInterval(
     () => {
@@ -132,11 +164,7 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    const userToken: any =
-      typeof sessionStorage.getItem("tokenInfo") !== "undefined" && !!sessionStorage.getItem("tokenInfo")
-        ? JSON.parse(sessionStorage.getItem("tokenInfo"))
-        : null
-    if (!!userToken || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
+    if (isLoggedIn || LAMP.Auth?._auth?.serverAddress == "demo.lamp.digital") {
       if ((selected || []).length > 0) {
         searchActivities()
       } else {
@@ -146,7 +174,7 @@ export default function ActivityList({
     } else {
       window.location.href = "/#/"
     }
-  }, [selected, sessionStorage.getItem("tokenInfo")])
+  }, [selected, isLoggedIn])
 
   const handleChange = (activity, checked) => {
     if (checked) {

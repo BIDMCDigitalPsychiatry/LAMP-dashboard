@@ -37,6 +37,22 @@ export const games = [
   "lamp.fragmented_letters",
   "lamp.digit_span",
   "lamp.memory_game",
+  "lamp.wcst",
+  "lamp.mental_rotation",
+  "lamp.memory_match",
+  "lamp.sliding_puzzle",
+  "lamp.letter_logic",
+  "lamp.nonogram",
+  "lamp.lexical_decision",
+  "lamp.stroop",
+  "lamp.flanker",
+  "lamp.nback",
+  "lamp.water_sort",
+  "lamp.delay_discounting",
+  "lamp.tower_of_london",
+  "lamp.simple_rt",
+  // Legacy alias for early lamp.n_back registrations (not offered for creation).
+  "lamp.n_back",
 ]
 
 const useStyles = makeStyles((theme: Theme) =>
