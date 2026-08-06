@@ -41,7 +41,7 @@ export const KNOWN_SERVERS: ServerOption[] = [
     name: "PREDiCTOR",
     description: "Mount Sinai Health System",
     logo: PredictorLogo,
-    apiServerUrl: "api.mshai.org",
+    apiServerUrl: "api.mindlamp.mshai.org",
   },
   {
     name: "LevelUp",
