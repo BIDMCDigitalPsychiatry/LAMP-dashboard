@@ -29,7 +29,7 @@ export const fetchResult = async (id, type, modal, authorizationHeader) => {
 export const fetchPostData = async (id, type, modal, methodType, bodyData, authorizationHeader) => {
   const baseUrl = buildLampServerRequestUrl(LAMP.Auth._auth.serverAddress || "api.lamp.digital")
   let result = await (
-    await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
+    await fetch(composeRequestPath([baseUrl, modal, id, type]), {
       method: methodType,
       headers: {
         "Content-Type": "application/json",
