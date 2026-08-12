@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "author": "BIDMC Division of Digital Psychiatry",
   "description": "LAMP Dashboard",
+  "license": "AGPL-3.0-only",
   "private": true,
   "homepage": ".",
   "favicon": "/logo.png",
