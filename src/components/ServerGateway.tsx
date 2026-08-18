@@ -7,6 +7,7 @@ import PredictorLogo from "../icons/Predictor.png"
 import OxfordHealthLogo from "../icons/OxfordHealth.png"
 import LevelUpLogo from "../icons/LevelUp.png"
 import AmpSczLogo from "../icons/AMP Scz.jpeg"
+import McLeanITPLogo from "../icons/McLeanITP.png"
 import LAMP from "lamp-core"
 
 // Each card represents a deployment a participant can connect to.
@@ -63,6 +64,12 @@ export const KNOWN_SERVERS: ServerOption[] = [
     logo: AmpSczLogo,
     dashboardUrl: "https://mindlamp.pronet.med.yale.edu",
     apiServerUrl: "mindlamp-api.pronet.med.yale.edu",
+  },
+  {
+    name: "McLean ITP",
+    description: "Institute for Technology in Psychiatry",
+    logo: McLeanITPLogo,
+    apiServerUrl: "api.mindlamp.itpmclean.org",
   },
 ]
 

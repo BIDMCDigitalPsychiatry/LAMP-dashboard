@@ -345,7 +345,6 @@ export function CredentialEditor({
                         edge="end"
                         aria-label="save role"
                         onClick={() => {
-                          console.log("On click I think of end...")
                           return onChange({
                             credential,
                             photo,
@@ -701,9 +700,9 @@ export const CredentialManager: React.FunctionComponent<{
     if (LAMP.Auth._type === "researcher" || LAMP.Auth._type === "admin") {
       if (shouldSyncWithChildren !== true) return
       LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
-        !!res.data
-          ? LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
-          : console.log("no roles to sync")
+        if (!!res.data) {
+          LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
+        }
       })
     }
   }, [shouldSyncWithChildren, allRoles])
