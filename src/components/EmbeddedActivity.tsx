@@ -248,7 +248,7 @@ export default function EmbeddedActivity({
       delete data.static_data?.is_favorite
       return data
     }
-    if (typeof data?.static_data?.is_favorite !== undefined) {
+    if (typeof data?.static_data?.is_favorite !== "undefined") {
       let tag = favoriteActivities
       if (!!data?.static_data?.is_favorite) {
         if ((tag || []).filter((t) => t == data.activity).length === 0) {
