@@ -443,8 +443,8 @@ export default function EmbeddedActivity({
         onClose={() => {
           setOpen(false)
           localStorage.removeItem("activityFromModule")
-          const response =
-            typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
+          const stored = localStorage.getItem("response")
+          const response = stored ? JSON.parse(stored) : null
           if (response) {
             handleSaveData({ data: response })
           }
