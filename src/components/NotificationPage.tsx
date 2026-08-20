@@ -26,6 +26,7 @@ import { Service } from "./DBService/DBService"
 import VisualPopup from "./VisualPopup"
 import ModuleActivity from "./ModuleActivity"
 import ResponsiveDialog from "./ResponsiveDialog"
+import { FAVORITES_ENABLED } from "../featureFlags"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -130,6 +131,12 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   }, [activityId])
 
   useEffect(() => {
+    // NOTE: the effect below gates activity loading on this being non-null, so
+    // set an empty list rather than leaving it unset when favorites are off.
+    if (!FAVORITES_ENABLED) {
+      setFavoriteActivities([])
+      return
+    }
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>

@@ -7,7 +7,7 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { activityIcons } from "../icons/activities"
-import { MODULES_ENABLED } from "../featureFlags"
+import { FAVORITES_ENABLED, MODULES_ENABLED } from "../featureFlags"
 import { useTranslation } from "react-i18next"
 import ActivityPopup from "./ActivityPopup"
 import ReactMarkdown from "react-markdown"
@@ -596,13 +596,15 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
     }
     localStorage.removeItem("moduleId")
     localStorage.removeItem("lastAnsweredIndex")
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0] ?? []
-      setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
-    })()
+    if (FAVORITES_ENABLED) {
+      ;(async () => {
+        let tag =
+          [await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0] ?? []
+        setFavorites((savedActivities || []).filter((activity) => tag.includes(activity.id)))
+      })()
+    }
     setShownActivities(savedActivities)
 
     const runAsync = async () => {
@@ -662,7 +664,9 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     if (localStorage.getItem("tab")) {
       const savedTab = localStorage.getItem("tab")
-      setTab(!MODULES_ENABLED && savedTab === "modules" ? "other" : savedTab)
+      const isHiddenTab =
+        (!MODULES_ENABLED && savedTab === "modules") || (!FAVORITES_ENABLED && savedTab === "favorite")
+      setTab(isHiddenTab ? "other" : savedTab)
       setTimeout(() => {
         localStorage.removeItem("tab")
       }, 1000)
@@ -699,7 +703,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   }
 
   useEffect(() => {
-    if (tab === "favorite") {
+    if (FAVORITES_ENABLED && tab === "favorite") {
       ;(async () => {
         let tag =
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
@@ -720,9 +724,11 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             {(favorites || []).length > 0 ? (
               <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
-                <Tab label="Favorites" value="favorite" />
-                {MODULES_ENABLED && <Tab label="Modules" value="modules" />}
-                <Tab label="Other Activities" value="other" />
+                {[
+                  <Tab key="favorite" label="Favorites" value="favorite" />,
+                  MODULES_ENABLED ? <Tab key="modules" label="Modules" value="modules" /> : null,
+                  <Tab key="other" label="Other Activities" value="other" />,
+                ].filter(Boolean)}
               </TabList>
             ) : (
               <TabList onChange={(e, val) => setTab(val)} className={classes.tabHeader}>
@@ -905,7 +911,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                     }}
                     className={classes.thumbMain}
                   >
-                    {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
+                    {FAVORITES_ENABLED && (favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                       <Icon className={classes.favstar}>star_rounded</Icon>
                     )}
 

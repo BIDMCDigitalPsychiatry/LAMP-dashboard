@@ -17,6 +17,7 @@ import {
 } from "@mui/material"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ActivityListForModule from "./ActivityListForModule"
+import { FAVORITES_ENABLED } from "../featureFlags"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -373,6 +374,7 @@ const ModuleActivity = ({ ...props }) => {
 
   const [favorites, setFavorites] = useState([])
   useEffect(() => {
+    if (!FAVORITES_ENABLED) return
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>

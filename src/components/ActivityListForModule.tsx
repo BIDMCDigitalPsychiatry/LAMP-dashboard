@@ -26,6 +26,7 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import LAMP from "lamp-core"
+import { FAVORITES_ENABLED } from "../featureFlags"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -349,7 +350,7 @@ const renderActivities = (type, tag, favorites, handleClickOpen, handleSubModule
               }}
               className={classes.thumbMain}
             >
-              {(favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
+              {FAVORITES_ENABLED && (favorites || []).filter((f) => f?.id == activity?.id).length > 0 && (
                 <Icon className={classes.favstar}>star_rounded</Icon>
               )}
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -430,6 +431,7 @@ export default function ActivityListForModule({ ...props }) {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
   useEffect(() => {
+    if (!FAVORITES_ENABLED) return
     // Fetch favorite activities for the participant
     ;(async () => {
       const tag: string[] =
@@ -457,6 +459,7 @@ export default function ActivityListForModule({ ...props }) {
   }
 
   const handleFavoriteClick = async (activityId: string) => {
+    if (!FAVORITES_ENABLED) return
     try {
       const result: any = await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")
       let tag: string[] = !!result.error ? [] : result.data ?? []
@@ -495,17 +498,19 @@ export default function ActivityListForModule({ ...props }) {
                 <Grid item>
                   <Box display="flex" alignItems="center">
                     <Typography variant="h6">{module.name}</Typography>
-                    <Fab
-                      className={`${classes.headerTitleIcon} ${
-                        (favorites || []).filter((f) => f == module?.id).length > 0 ? "active" : ""
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleFavoriteClick(module.id)
-                      }}
-                    >
-                      <Icon>star_rounded</Icon>
-                    </Fab>
+                    {FAVORITES_ENABLED && (
+                      <Fab
+                        className={`${classes.headerTitleIcon} ${
+                          (favorites || []).filter((f) => f == module?.id).length > 0 ? "active" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleFavoriteClick(module.id)
+                        }}
+                      >
+                        <Icon>star_rounded</Icon>
+                      </Fab>
+                    )}
                   </Box>
                 </Grid>
               </Grid>
