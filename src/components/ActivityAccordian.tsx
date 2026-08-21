@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core"
 import InfoIcon from "../icons/Info.svg"
 import LAMP from "lamp-core"
+import { FAVORITES_ENABLED } from "../featureFlags"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     favstar: {
@@ -196,7 +197,7 @@ const moduleAccordianContent = (module, classes, tag, favoriteIds, handleFavorit
           <Box>
             <Box display="flex" alignItems="center">
               <Typography variant="h6">{module.name}</Typography>
-              {module.name !== "Other activities" && (
+              {FAVORITES_ENABLED && module.name !== "Other activities" && (
                 <Tooltip
                   title={
                     favoriteIds.includes(module.id)
@@ -258,6 +259,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
   useEffect(() => {
+    if (!FAVORITES_ENABLED) return
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
@@ -268,6 +270,7 @@ const ActivityAccordion = ({ data, type, tag, handleSubModule, participant, setF
   }, [])
 
   const handleFavoriteClick = async (activityId: string) => {
+    if (!FAVORITES_ENABLED) return
     try {
       const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
       let tag: string[] = !!result.error ? [] : result.data ?? []

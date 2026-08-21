@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { Service } from "./DBService/DBService"
+import { FAVORITES_ENABLED } from "../featureFlags"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -89,13 +90,19 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   }, [groupActivities])
 
   useEffect(() => {
-    ;(async () => {
-      let tag =
-        [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
-          !!y?.error ? undefined : y?.data
-        )[0] ?? []
-      setFavoriteActivities(tag)
-    })()
+    // NOTE: the effect above gates on this being non-null, so set an empty
+    // list rather than leaving it unset when favorites are off.
+    if (FAVORITES_ENABLED) {
+      ;(async () => {
+        let tag =
+          [await LAMP.Type.getAttachment(participant, "lamp.dashboard.favorite_activities")].map((y: any) =>
+            !!y?.error ? undefined : y?.data
+          )[0] ?? []
+        setFavoriteActivities(tag)
+      })()
+    } else {
+      setFavoriteActivities([])
+    }
     LAMP.Activity.view(activity.id).then((data) => {
       setIndex(-1)
       if (Array.isArray(data.settings)) {

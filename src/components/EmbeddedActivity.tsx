@@ -21,6 +21,7 @@ import { Service } from "./DBService/DBService"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ModuleActivity from "./ModuleActivity"
 import NotificationPage from "./NotificationPage"
+import { FAVORITES_ENABLED } from "../featureFlags"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -243,7 +244,11 @@ export default function EmbeddedActivity({
   }, [iFrame])
 
   const updateFavorite = async (data) => {
-    if (typeof data?.static_data?.is_favorite !== undefined) {
+    if (!FAVORITES_ENABLED) {
+      delete data.static_data?.is_favorite
+      return data
+    }
+    if (typeof data?.static_data?.is_favorite !== "undefined") {
       let tag = favoriteActivities
       if (!!data?.static_data?.is_favorite) {
         if ((tag || []).filter((t) => t == data.activity).length === 0) {
@@ -336,7 +341,7 @@ export default function EmbeddedActivity({
         autoCorrect: !(exist === "true"),
         noBack: noBack,
         forward: props?.forward ?? false,
-        is_favorite: (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
+        is_favorite: FAVORITES_ENABLED && (favoriteActivities || []).filter((t) => t == currentActivity.id).length > 0,
         activeTab: lastActiveTab,
       })
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
@@ -438,8 +443,8 @@ export default function EmbeddedActivity({
         onClose={() => {
           setOpen(false)
           localStorage.removeItem("activityFromModule")
-          const response =
-            typeof localStorage.getItem("response") != "undefined" ? JSON.parse(localStorage.getItem("response")) : null
+          const stored = localStorage.getItem("response")
+          const response = stored ? JSON.parse(stored) : null
           if (response) {
             handleSaveData({ data: response })
           }

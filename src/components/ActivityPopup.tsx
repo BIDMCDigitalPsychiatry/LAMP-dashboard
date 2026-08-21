@@ -35,6 +35,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import LAMP from "lamp-core"
 import { isMobile } from "react-device-detect"
 import { useSnackbar } from "notistack"
+import { FAVORITES_ENABLED } from "../featureFlags"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -241,6 +242,7 @@ export default function ActivityPopup({
   }, [activity])
 
   useEffect(() => {
+    if (!FAVORITES_ENABLED) return
     ;(async () => {
       let tag =
         [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
@@ -251,6 +253,7 @@ export default function ActivityPopup({
   }, [])
 
   const handleFavoriteClick = async (activityId) => {
+    if (!FAVORITES_ENABLED) return
     try {
       const result: any = await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")
       let tag: string[] = !!result.error ? [] : result.data ?? []
@@ -269,7 +272,7 @@ export default function ActivityPopup({
   }
 
   const handleCloseActivityPopup = (activity) => {
-    if (activity?.spec === "lamp.group" && tab === "favorite") {
+    if (FAVORITES_ENABLED && activity?.spec === "lamp.group" && tab === "favorite") {
       ;(async () => {
         let tag =
           [await LAMP.Type.getAttachment(participant?.id, "lamp.dashboard.favorite_activities")].map((y: any) =>
@@ -382,7 +385,7 @@ export default function ActivityPopup({
                 remarkPlugins={[gfm, emoji]}
                 components={{ link: LinkRenderer }}
               />
-              {activity?.spec === "lamp.group" && (
+              {FAVORITES_ENABLED && activity?.spec === "lamp.group" && (
                 <Tooltip
                   title={
                     favoriteIds.includes(activity.id)
