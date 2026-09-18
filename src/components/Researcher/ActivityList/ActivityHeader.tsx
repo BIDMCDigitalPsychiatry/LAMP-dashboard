@@ -66,7 +66,7 @@ export default function ActivityHeader({
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [streak, setStreak] = useState(details?.streak ? details?.streak : null)
-  const [visualSettings, setVisualSettings] = useState(details?.visual_settings ? details?.visual_settings : null)
+  const [visualSettings, setVisualSettings] = useState(details?.visualSettings ? details?.visualSettings : null)
   const [showFeed, setShowFeed] = useState(
     typeof details?.showFeed !== "undefined" && details?.showFeed !== null ? details?.showFeed : true
   )
