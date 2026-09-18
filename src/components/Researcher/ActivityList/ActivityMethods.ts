@@ -2518,6 +2518,7 @@ export async function saveTipActivity(x) {
   if (!x.id && x.name) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
@@ -2527,6 +2528,7 @@ export async function saveTipActivity(x) {
       settings: x.settings,
     })) as any
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
