@@ -2394,14 +2394,18 @@ export function spliceActivity({ raw, tag }) {
             question.options === null
               ? null
               : question.type !== "matrix" && question.type !== "time"
-              ? question.options?.map((z, idx2) => ({
-                  value: z,
-                  feedback_text: tag?.questions?.[idx]?.options?.[idx2]?.feedback_text ?? "",
-                  pros: tag?.questions?.[idx]?.options?.[idx2]?.pros ?? "",
-                  cons: tag?.questions?.[idx]?.options?.[idx2]?.cons ?? "",
-                  description: tag?.questions?.[idx]?.options?.[idx2]?.description,
-                  contigencySettings: tag?.questions?.[idx]?.options?.[idx2]?.contigencySettings,
-                }))
+              ? question.options?.map((z, idx2) => {
+                  const opt = tag?.questions?.[idx]?.options?.[idx2]
+                  return {
+                    value: z,
+                    feedback_text: opt?.feedback_text ?? "",
+                    pros: opt?.pros ?? "",
+                    cons: opt?.cons ?? "",
+                    // Attachments written before 2026.08.05 store each option as a plain string
+                    description: typeof opt === "string" ? opt : opt?.description,
+                    contigencySettings: opt?.contigencySettings,
+                  }
+                })
               : question.options,
 
           warnings: question.warnings,
@@ -2518,6 +2522,7 @@ export async function saveTipActivity(x) {
   if (!x.id && x.name) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
@@ -2527,6 +2532,7 @@ export async function saveTipActivity(x) {
       settings: x.settings,
     })) as any
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
       photo: x.icon,
       streak: x.streak,
       showFeed: x.showFeed,
