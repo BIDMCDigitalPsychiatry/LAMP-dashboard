@@ -123,12 +123,14 @@ function AppRouter({ setConfirmSession, ...props }) {
         localStorage.setItem("isParticipant", "false")
       }
     }
-    // Don't wipe auth state while a ?a= credential login (mobile cold start) is
+    // Don't wipe auth state while a ?a= or ?finishLoginToken= login (mobile cold start) is
     // still being processed by the mount effect below — reset()'s concurrent
     // set_identity(undefined) nulls LAMP.configuration mid-login, racing the ?a=
     // flow into the account-setup chooser or back to the login screen, and its
     // LOGOUT event makes the native apps delete their stored credentials.
-    const pendingAuthQuery = new URLSearchParams(window.location.hash.split("?")[1] ?? "").has("a")
+    const pendingAuthQuery =
+      new URLSearchParams(window.location.hash.split("?")[1] ?? "").has("a") ||
+      new URLSearchParams(window.location.search).has("finishLoginToken")
     if (
       LAMP.Auth?._auth?.serverAddress !== "demo.lamp.digital" &&
       location?.pathname === "/" &&
@@ -267,7 +269,7 @@ function AppRouter({ setConfirmSession, ...props }) {
       await LAMP.Auth.set_server(serverAddress)
       if (LAMP.Auth._authScheme === "session") {
         const result = await LAMP.finalizeLogin(loginToken)
-        window.history.replaceState(null, "", window.location.pathname)
+        window.history.replaceState(null, "", window.location.pathname + window.location.hash)
       }
     }
 
