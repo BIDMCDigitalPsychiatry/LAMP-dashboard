@@ -5,6 +5,9 @@ import { AccountSetupWorkflow, TwoFactorVerifyForm } from "../AccountSetupWorkfl
 import LoginFrame from "./LoginFrame"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import { Box, Button, Typography } from "@material-ui/core"
+import LAMP from "lamp-core"
+import { isInMobileApp } from "./helper"
 
 export default function AuthenticatedRoute({
   children,
@@ -30,6 +33,8 @@ export default function AuthenticatedRoute({
           setAuthenticated={setAuthenticated}
           setConfirmSession={setConfirmSession}
         />
+      ) : isInMobileApp() && LAMP.Auth._type !== "participant" ? (
+        <UseWebDashboardPage reset={reset} />
       ) : requireSetup ? (
         <AccountSetupWorkflow />
       ) : requireVerification ? (
@@ -38,6 +43,24 @@ export default function AuthenticatedRoute({
         children
       )}
     </React.Fragment>
+  )
+}
+
+// The mobile apps are for participants; researchers and admins use the web dashboard
+function UseWebDashboardPage({ reset }) {
+  const { t } = useTranslation()
+
+  return (
+    <LoginFrame>
+      <Box textAlign="center">
+        <Typography gutterBottom>
+          {t("Researcher and administrator accounts can't be used in the mobile app. Please log in on the web dashboard.")}
+        </Typography>
+        <Button variant="contained" color="primary" onClick={() => reset()}>
+          {t("Log out")}
+        </Button>
+      </Box>
+    </LoginFrame>
   )
 }
 
