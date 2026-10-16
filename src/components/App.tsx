@@ -176,7 +176,8 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
-  const [loading, setLoading] = useState(false)
+  // Start on so the login page doesn't flash while the startup login runs
+  const [loading, setLoading] = useState(true)
   const [participantSelected, setParticipantSelected] = useState(false)
 
   useEffect(() => {
@@ -243,7 +244,8 @@ function AppRouter({ setConfirmSession, ...props }) {
         }
       })()
     } else if (!state.identity) {
-      refreshPage()
+      refreshPage().finally(() => setLoading(false))
+    } else {
       setLoading(false)
     }
     document.addEventListener("visibilitychange", function logData() {
