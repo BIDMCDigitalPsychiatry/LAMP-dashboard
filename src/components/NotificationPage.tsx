@@ -18,7 +18,7 @@ import {
 import LAMP from "lamp-core"
 import Streak from "./Streak"
 import EmbeddedActivity from "./EmbeddedActivity"
-import { getEvents } from "./Participant"
+import { getActivityTag, getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
@@ -154,9 +154,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         LAMP.Activity.view(id)
           .then((data: any) => {
             if (!!data) {
-              Service.getUserDataByKey("activitytags", [id], "id").then((tags) => {
-                setTag(tags[0])
-                const tag = tags[0]
+              getActivityTag(data).then((tag) => {
+                setTag(tag)
                 data =
                   data.spec === "lamp.survey"
                     ? spliceActivity({ raw: data, tag })
