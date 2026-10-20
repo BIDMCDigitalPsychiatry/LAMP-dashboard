@@ -215,14 +215,18 @@ function AppRouter({ setConfirmSession, ...props }) {
 
       ;(async () => {
         try {
-          await LAMP.Auth.set_identity({
-            id: userName,
-            password: password,
-            serverAddress:
-              x.length > 2 && typeof x[2] !== "undefined"
-                ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-                : "api.lamp.digital",
-          })
+          await LAMP.Auth.set_identity(
+            {
+              id: userName,
+              password: password,
+              serverAddress:
+                x.length > 2 && typeof x[2] !== "undefined"
+                  ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+                  : "api.lamp.digital",
+            },
+            // Old store apps only keep a login whose LOGIN event includes the credentials
+            true
+          )
           // Complete the login the same way refreshPage() does — without this the
           // app stays on the loading backdrop forever (mobile ?a= cold-start).
           getAdminType()
