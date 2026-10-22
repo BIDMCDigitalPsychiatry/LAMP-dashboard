@@ -32,6 +32,7 @@ import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
 import { getDate } from "./Researcher/ActivityList/ScheduleRow"
 import { Service } from "./DBService/DBService"
+import { getLocalDayBounds } from "../utilities"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -460,11 +461,7 @@ export default function Feed({
   }
 
   const getEvents = async (date: Date) => {
-    date.setHours(0)
-    date.setMinutes(0)
-    date.setSeconds(0)
-    let startTime = date.getTime()
-    let endTime = startTime + 86400000
+    const { startTime, endTime } = getLocalDayBounds(date)
     let activityEvents =
       LAMP.Auth._auth.id === "selfHelp@demo.lamp.digital"
         ? await getSelfHelpAllActivityEvents(startTime, endTime)
