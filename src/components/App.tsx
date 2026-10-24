@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, colors, Backdrop, CircularProgress } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, colors } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -28,6 +28,8 @@ import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
+import LogoIcon from "../icons/Logo.svg"
+import { isInMobileApp } from "./helper"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
 import AuthenticatedRoute from "./AuthenticatedRoute"
 
@@ -176,7 +178,8 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
-  const [loading, setLoading] = useState(false)
+  // Start on so the login page doesn't flash while the startup login runs
+  const [loading, setLoading] = useState(true)
   const [participantSelected, setParticipantSelected] = useState(false)
 
   useEffect(() => {
@@ -213,14 +216,18 @@ function AppRouter({ setConfirmSession, ...props }) {
 
       ;(async () => {
         try {
-          await LAMP.Auth.set_identity({
-            id: userName,
-            password: password,
-            serverAddress:
-              x.length > 2 && typeof x[2] !== "undefined"
-                ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-                : "api.lamp.digital",
-          })
+          await LAMP.Auth.set_identity(
+            {
+              id: userName,
+              password: password,
+              serverAddress:
+                x.length > 2 && typeof x[2] !== "undefined"
+                  ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+                  : "api.lamp.digital",
+            },
+            // Old store apps only keep a login whose LOGIN event includes the credentials
+            true
+          )
           // Complete the login the same way refreshPage() does — without this the
           // app stays on the loading backdrop forever (mobile ?a= cold-start).
           getAdminType()
@@ -243,7 +250,8 @@ function AppRouter({ setConfirmSession, ...props }) {
         }
       })()
     } else if (!state.identity) {
-      refreshPage()
+      refreshPage().finally(() => setLoading(false))
+    } else {
       setLoading(false)
     }
     document.addEventListener("visibilitychange", function logData() {
@@ -442,8 +450,8 @@ function AppRouter({ setConfirmSession, ...props }) {
     }
 
     try {
-      // Login to server
-      await LAMP.Auth.set_identity(identity)
+      // Login to server. Temporary legacy mobile app support: remove the second argument at sunset (LAMP-server#312)
+      await LAMP.Auth.set_identity(identity, isInMobileApp())
       setIsLoggedIn && setIsLoggedIn(true)
 
       // Set up state
@@ -555,15 +563,23 @@ function AppRouter({ setConfirmSession, ...props }) {
   return (
     <>
       {!!loading ? (
-        <Backdrop
+        // Splash screen, matching the mobile apps' native splash (logo on white)
+        <div
           style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
             zIndex: 9999,
-            color: "#fff",
+            background: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          open={loading}
         >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+          <img src={LogoIcon} alt="mindLAMP" width={69} height={109} />
+        </div>
       ) : (
         <Switch>
           <Route

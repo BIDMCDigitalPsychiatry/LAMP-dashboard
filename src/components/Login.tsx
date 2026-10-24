@@ -24,7 +24,7 @@ import { useTranslation } from "react-i18next"
 import demo_db from "../demo_db.json"
 import self_help_db from "../self_help_db.json"
 import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
-import { clearLocalStorageItems } from "./helper"
+import { clearLocalStorageItems, isInMobileApp } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
 import { KNOWN_SERVERS } from "./ServerGateway"
@@ -205,7 +205,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     // })
   }
 
-  const configuredProviders = LAMP.Auth._configuredProviders
+  // Google blocks OAuth sign-in inside the mobile apps' web views
+  const configuredProviders = isInMobileApp() ? [] : LAMP.Auth._configuredProviders
 
   const handleOAuthLogin = async (socialProvider) => {
     const result = (await LAMP.Credential.startOAuth(socialProvider)) as any
