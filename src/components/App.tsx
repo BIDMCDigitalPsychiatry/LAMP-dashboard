@@ -29,6 +29,7 @@ import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
 import LogoIcon from "../icons/Logo.svg"
+import { isInMobileApp } from "./helper"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
 import AuthenticatedRoute from "./AuthenticatedRoute"
 
@@ -449,8 +450,8 @@ function AppRouter({ setConfirmSession, ...props }) {
     }
 
     try {
-      // Login to server
-      await LAMP.Auth.set_identity(identity)
+      // Login to server. Temporary legacy mobile app support: remove the second argument at sunset (LAMP-server#312)
+      await LAMP.Auth.set_identity(identity, isInMobileApp())
       setIsLoggedIn && setIsLoggedIn(true)
 
       // Set up state
