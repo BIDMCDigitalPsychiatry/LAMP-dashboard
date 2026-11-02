@@ -17,7 +17,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
 import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
-import { Service } from "./DBService/DBService"
+import { getActivityTag } from "./Participant"
 import { FAVORITES_ENABLED } from "../featureFlags"
 
 const useStyles = makeStyles((theme) => ({
@@ -68,8 +68,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
-        Service.getUserDataByKey("activitytags", [activity?.id], "id").then((data) => {
-          const tag = data[0]
+        getActivityTag(activity).then((tag) => {
           const dataActivity =
             activity.spec === "lamp.survey"
               ? spliceActivity({ raw: activity, tag })

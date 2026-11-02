@@ -36,12 +36,63 @@ import LAMP, {
 import { useAuthContext } from "./AuthProvider"
 
 export async function getImage(activityId: string, spec: string) {
-  return [
-    await LAMP.Type.getAttachment(
-      activityId,
-      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
-    ),
-  ].map((y: any) => (!!y?.error ? undefined : y?.data))[0]
+  const attachment: any = await LAMP.Type.getAttachment(
+    activityId,
+    spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
+  )
+  const error = attachment?.error || attachment?.message
+  if (!!error) {
+    // A real 404 means the activity has no attachment, so the defaults below are
+    // correct. Any other failure is transient: reject so callers skip the record
+    // instead of persisting it.
+    if (String(error).startsWith("404")) return undefined
+    throw new Error(String(error))
+  }
+  return attachment?.data
+}
+
+// Build the cached "activitytags" record for one activity from its attachment data.
+export function activityTagFromImage(activity: any, img: any) {
+  return {
+    id: activity.id,
+    category: activity.category,
+    showFeed: img?.showFeed ?? true,
+    spec: activity.spec,
+    description: img?.description ?? "",
+    photo: img?.photo ?? null,
+    streak: img?.streak ?? null,
+    questions: img?.questions ?? null,
+    visualSettings: img?.visualSettings ?? null,
+    branchingSettings: img?.branchingSettings ?? null,
+  }
+}
+
+// True when the cached record is missing, was stored without survey wording, or no
+// longer matches the live question/option structure (an edited survey).
+export function activityTagStale(activity: any, tag: any) {
+  if (tag === undefined || tag === null) return true
+  if (activity?.spec !== "lamp.survey") return false
+  if (tag?.questions == null) return true
+  const settings = Array.isArray(activity?.settings) ? activity.settings : []
+  const questions = Array.isArray(tag?.questions) ? tag.questions : []
+  return (
+    settings.length !== questions.length ||
+    settings.some((question, idx) => (question?.options?.length ?? 0) !== (questions[idx]?.options?.length ?? 0))
+  )
+}
+
+// Read the cached "activitytags" record, refreshing it from the server when it is
+// missing or stale. A transient fetch failure keeps the existing record.
+export async function getActivityTag(activity: any) {
+  const tag = ((await Service.getUserDataByKey("activitytags", [activity?.id], "id")) || [])[0]
+  if (!activityTagStale(activity, tag)) return tag
+  try {
+    const refreshed = activityTagFromImage(activity, await getImage(activity.id, activity.spec))
+    await Service.addUserData("activitytags", [refreshed], true)
+    return refreshed
+  } catch (e) {
+    return tag
+  }
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -439,34 +490,29 @@ export default function Participant({
     props.activeTab(tab, participant.id)
     if (activities !== null) {
       Service.getAllTags("activitytags").then((result) => {
-        if ((result || []).length == 0) {
-          let data = []
-          let count = 0
-          ;(activities || []).map((activity) => {
-            getImage(activity.id, activity.spec).then((img) => {
-              data.push({
-                id: activity.id,
-                category: activity.category,
-                showFeed: img?.showFeed ?? true,
-                spec: activity.spec,
-                description: img?.description ?? "",
-                photo: img?.photo ?? null,
-                streak: img?.streak ?? null,
-                questions: img?.questions ?? null,
-                visualSettings: img?.visualSettings ?? null,
-                branchingSettings: img?.branchingSettings ?? null,
-              })
-              if (count === activities.length - 1) {
-                Service.addUserData("activitytags", data, true).then(() => {
-                  setLoading(false)
-                })
-              }
-              count++
-            })
-          })
-        } else {
+        const cached = result || []
+        // Fill in only what the store lacks: activities added after the store was
+        // built, and survey records an earlier failed read or an edit left stale.
+        const missing = (activities || []).filter((activity) =>
+          activityTagStale(
+            activity,
+            cached.find((tag) => tag.id === activity.id)
+          )
+        )
+        if (missing.length === 0) {
           setLoading(false)
+          return
         }
+        Promise.allSettled(
+          missing.map((activity) =>
+            getImage(activity.id, activity.spec).then((img) => activityTagFromImage(activity, img))
+          )
+        ).then((results) => {
+          const data = results.filter((entry) => entry.status === "fulfilled").map((entry: any) => entry.value)
+          ;(data.length > 0 ? Service.addUserData("activitytags", data, true) : Promise.resolve()).then(() =>
+            setLoading(false)
+          )
+        })
       })
     } else {
       // setLoading(false)
