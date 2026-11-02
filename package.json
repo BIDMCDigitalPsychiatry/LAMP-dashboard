@@ -88,7 +88,7 @@
     "dev": "node buildEnv dev && react-scripts start",
     "start": "node buildEnv prod && react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
-    "test": "echo \"no tests configured\"",
+    "test": "react-scripts test",
     "build": "node buildEnv prod && react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'"
   },
