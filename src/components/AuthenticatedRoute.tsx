@@ -3,6 +3,7 @@ import { useAuthContext } from "./AuthProvider"
 import LoginWorkflow from "./LoginWorkflow"
 import { AccountSetupWorkflow, TwoFactorVerifyForm } from "../AccountSetupWorkflow"
 import LoginFrame from "./LoginFrame"
+import SplashScreen from "./SplashScreen"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { Box, Button, Typography } from "@material-ui/core"
@@ -19,7 +20,7 @@ export default function AuthenticatedRoute({
   reset,
   ...props
 }) {
-  const { isLoggedIn, accountSetupState, requireVerification } = useAuthContext()
+  const { isLoggedIn, accountSetupState, requireVerification, sessionInfo } = useAuthContext()
   const [identity, setIdentity] = identityState
   const setupCompleteStates = ["OAUTH", "TWO_FACTOR", "NOT_REQUIRED"]
   const requireSetup = !setupCompleteStates.some((s) => accountSetupState === s)
@@ -35,6 +36,9 @@ export default function AuthenticatedRoute({
         />
       ) : isInMobileApp() && LAMP.Auth._type !== "participant" ? (
         <UseWebDashboardPage reset={reset} />
+      ) : sessionInfo === undefined ? (
+        // Session info is still loading, so the setup state isn't known yet
+        <SplashScreen />
       ) : requireSetup ? (
         <AccountSetupWorkflow />
       ) : requireVerification ? (

@@ -42,7 +42,8 @@ export function AuthContextProvider({ ...props }) {
     setIsLoggedIn: (newvalue: boolean) => {
       // If logging in check for the accountSetupState
       if (newvalue) {
-        refreshSessionInfo()
+        // null on failure, so AuthenticatedRoute stops waiting for it
+        refreshSessionInfo().catch(() => setSessionInfo(null))
       }
       setIsLoggedIn(newvalue)
     },
