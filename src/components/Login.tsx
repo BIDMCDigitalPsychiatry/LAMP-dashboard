@@ -177,9 +177,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
       }
     }
-    process.env.REACT_APP_LATEST_LAMP === "true"
-      ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
-      : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
     localStorage.setItem(
       "LAMP_user_" + res?.identity?.id,
       JSON.stringify({
@@ -190,7 +187,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       await Service.deleteDB()
       await Service.deleteUserDB()
     })()
-    if (!srcLocked)
+    // No result means the login failed (setIdentity catches the error itself)
+    if (!res && !srcLocked)
       enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
     onComplete()
     setLoginClick(true)
