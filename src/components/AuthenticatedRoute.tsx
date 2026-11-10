@@ -6,9 +6,10 @@ import LoginFrame from "./LoginFrame"
 import SplashScreen from "./SplashScreen"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { Box, Button, Typography } from "@material-ui/core"
+import { Box, Typography } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { isInMobileApp } from "./helper"
+import { connectButtonStyle } from "./ServerGateway"
 
 export default function AuthenticatedRoute({
   children,
@@ -69,13 +70,16 @@ function UseWebDashboardPage({ reset }) {
 
   return (
     <LoginFrame>
+      {/* Same text and button styles as the server select screen */}
+      <Typography style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", textAlign: "center", marginBottom: 20 }}>
+        {t(
+          "Researcher and administrator accounts can't be used in the mobile app. Please log in on the web dashboard."
+        )}
+      </Typography>
       <Box textAlign="center">
-        <Typography gutterBottom>
-          {t("Researcher and administrator accounts can't be used in the mobile app. Please log in on the web dashboard.")}
-        </Typography>
-        <Button variant="contained" color="primary" onClick={logout}>
+        <button onClick={logout} style={connectButtonStyle(false)}>
           {t("Log out")}
-        </Button>
+        </button>
       </Box>
     </LoginFrame>
   )
