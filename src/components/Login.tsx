@@ -4,13 +4,11 @@ import {
   Fab,
   Box,
   TextField,
-  Menu,
   MenuItem,
   Icon,
   IconButton,
   InputAdornment,
   Grid,
-  Link,
   Typography,
   Button,
 } from "@material-ui/core"
@@ -21,9 +19,6 @@ import { Service } from "./DBService/DBService"
 
 // Local Imports
 import { useTranslation } from "react-i18next"
-import demo_db from "../demo_db.json"
-import self_help_db from "../self_help_db.json"
-import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
 import { clearLocalStorageItems, isInMobileApp } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
@@ -33,12 +28,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ id: undefined, password: undefined })
   const [showPassword, setShowPassword] = useState(false)
-  const [tryitMenu, setTryitMenu] = useState<Element>()
   const [loginClick, setLoginClick] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useLoginStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
-  const [open, setOpen] = useState(false)
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -213,11 +206,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     }
   }
 
-  const handleSubmit = () => {
-    LAMP.initializeDemoDB(self_help_db)
-    localStorage.setItem("demo_mode", "self_help")
-    handleLogin(event, "selfHelp")
-  }
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
@@ -379,81 +367,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                   />
                 </Fab>
               </Box>
-              <Box textAlign="center" width={1} mt={4} mb={4}>
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => {
-                    LAMP.initializeDemoDB(demo_db)
-                    localStorage.setItem("demo_mode", "try_it")
-                    setTryitMenu(event.currentTarget)
-                  }}
-                  // setTryitMenu(event.currentTarget)}
-                >
-                  {`${t("Try it")}`}
-                </Link>
-                <br />
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => {
-                    setOpen(true)
-                  }}
-                >
-                  {`${t("Self Help")}`}
-                </Link>
-                {/* <Link
-                underline="none"
-                className={classes.linkBlue}
-                onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-              >
-                {`${t("Research studies using mindLAMP")}`}
-              </Link> */}
-                <Menu
-                  keepMounted
-                  open={Boolean(tryitMenu)}
-                  anchorPosition={tryitMenu?.getBoundingClientRect()}
-                  anchorReference="anchorPosition"
-                  onClose={() => setTryitMenu(undefined)}
-                >
-                  <MenuItem disabled divider>
-                    <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "researcher")
-                    }}
-                  >
-                    {`${t("Researcher")}`}
-                  </MenuItem>
-                  <MenuItem
-                    divider
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "clinician")
-                    }}
-                  >
-                    {`${t("Clinician")}`}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "participant")
-                    }}
-                  >
-                    {`${t("Participant")}`}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "patient")
-                    }}
-                  >
-                    {`${t("User")}`}
-                  </MenuItem>
-                </Menu>
-              </Box>
             </Box>
           </form>
           <Box>
@@ -471,7 +384,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
           </Box>
         </Grid>
       </LoginFrame>
-      <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
     </>
   )
 }

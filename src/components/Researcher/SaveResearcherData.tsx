@@ -1,5 +1,4 @@
 import { Service } from "../DBService/DBService"
-import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
 import { buildLampServerRequestUrl, composeRequestPath } from "../../utilities"
 
@@ -77,26 +76,6 @@ export const saveStudyData = (result, type) => {
 }
 const saveSettings = (newVal, key) => {
   Service.update("participants", newVal, key, "id")
-}
-
-export const saveDemoData = () => {
-  Service.addData("researcher", [{ id: "researcher1" }])
-  Service.addData("participants", demo_db.Participant)
-  Service.addData("studies", demo_db.Study)
-  Service.addData("activities", demo_db.Activity)
-  Service.addData("sensors", demo_db.Sensor)
-  Service.updateValues("activities", { activities: [{ study_id: "study1", study_name: "Demo" }] }, [
-    "study_id",
-    "study_name",
-  ])
-  Service.updateValues("sensors", { sensors: [{ study_id: "study1", study_name: "Demo" }] }, ["study_id", "study_name"])
-  Service.updateValues(
-    "studies",
-    {
-      studies: [{ participant_count: 1, sensor_count: demo_db.Sensor.length, activity_count: demo_db.Activity.length }],
-    },
-    ["sensor_count", "activity_count", "participant_count"]
-  )
 }
 
 export const saveDataToCache = (id, authorizationHeader) => {

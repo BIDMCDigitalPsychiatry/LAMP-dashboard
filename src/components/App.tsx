@@ -23,8 +23,6 @@ import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
-import demo_db from "../demo_db.json"
-import self_help_db from "../self_help_db.json"
 import ConfirmModal from "./shared/ConfirmModal"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
@@ -184,11 +182,6 @@ function AppRouter({ setConfirmSession, ...props }) {
 
   useEffect(() => {
     setParticipantSelected(false)
-    if (localStorage.getItem("demo_mode") === "try_it") {
-      LAMP.initializeDemoDB(demo_db)
-    } else if (localStorage.getItem("demo_mode") === "self_help") {
-      LAMP.initializeDemoDB(self_help_db)
-    }
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       setLoading(true)
