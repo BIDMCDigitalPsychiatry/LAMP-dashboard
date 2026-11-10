@@ -54,13 +54,26 @@ export default function AuthenticatedRoute({
 function UseWebDashboardPage({ reset }) {
   const { t } = useTranslation()
 
+  // Ends the session on the server like the menu's Logout, then keeps the server selected for the login screen
+  const logout = async () => {
+    const server = localStorage.getItem("lastServerSelected")
+    try {
+      await LAMP.Credential.logout()
+    } catch (err) {
+      console.error("Logout failed:", err)
+    }
+    await reset()
+    if (server) await LAMP.Auth.set_server(server)
+    window.location.replace("/#/")
+  }
+
   return (
     <LoginFrame>
       <Box textAlign="center">
         <Typography gutterBottom>
           {t("Researcher and administrator accounts can't be used in the mobile app. Please log in on the web dashboard.")}
         </Typography>
-        <Button variant="contained" color="primary" onClick={() => reset()}>
+        <Button variant="contained" color="primary" onClick={logout}>
           {t("Log out")}
         </Button>
       </Box>
