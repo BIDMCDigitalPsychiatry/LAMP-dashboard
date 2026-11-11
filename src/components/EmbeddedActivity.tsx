@@ -286,22 +286,37 @@ export default function EmbeddedActivity({
             const updated = await updateFavorite(data)
             if (!!updated) {
               LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+                .then(
+                  () => {
+                    setCurrentActivity(null)
+                    setSecondaryActivity(null)
+                    localStorage.setItem(
+                      "first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id,
+                      "true"
+                    )
+                    if (currentActivity.spec === "lamp.survey") {
+                      localStorage.removeItem("activity-survey-" + currentActivity.id)
+                      localStorage.removeItem("lastAnsweredIndex")
+                    }
+
+                    setSaved(true)
+                    onComplete(
+                      typeof forward != "undefined"
+                        ? { ...data, forward: forward, done: done }
+                        : { ...data, done: done }
+                    )
+                    setLoading(false)
+                  },
+                  () => {
+                    onComplete(null)
+                    enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
+                      variant: "error",
+                    })
+                    setLoading(false)
+                  }
+                )
                 .catch((e) => {
-                  enqueueSnackbar(`${t("An error occured while saving the results.")}`, {
-                    variant: "error",
-                  })
-                })
-                .then((x) => {
-                  setCurrentActivity(null)
-                  setSecondaryActivity(null)
-                  localStorage.setItem(
-                    "first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id,
-                    "true"
-                  )
-                  setSaved(true)
-                  onComplete(
-                    typeof forward != "undefined" ? { ...data, forward: forward, done: done } : { ...data, done: done }
-                  )
+                  console.error("Post-save handling failed: ", e)
                   setLoading(false)
                 })
             } else {

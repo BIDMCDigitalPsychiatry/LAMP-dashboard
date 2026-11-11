@@ -230,28 +230,28 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   const [indexToLoad, setIndexToLoad] = useState(-1)
   const [parentString, setParentString] = useState("")
 
-  const handleClickOpen = (y: any, isAuto = false) => {
-    LAMP.Activity.view(y.id).then(async (data) => {
-      if (y.spec === "lamp.module") {
+  const handleClickOpen = (activity: any, isAuto = false) => {
+    LAMP.Activity.view(activity.id).then(async (data) => {
+      if (activity.spec === "lamp.module") {
         if (!isAuto) {
-          setShownActivities((prev) => prev.filter((item) => item.id !== y.id))
+          setShownActivities((prev) => prev.filter((item) => item.id !== activity.id))
         }
-        let moduleStartTime = await getModuleStartTime(y.id)
+        let moduleStartTime = await getModuleStartTime(activity.id)
         if (!moduleStartTime) {
-          moduleStartTime = await addActivityEventForModule(y, participant)
+          moduleStartTime = await addActivityEventForModule(activity, participant)
         }
         const initializeOpenedModule = isAuto ? true : false
         setLoadingModules(true)
         addActivityData(data, 0, moduleStartTime, null, null, initializeOpenedModule, false)
       } else {
-        setParentString(y?.parentString || "")
+        setParentString(activity?.parentString || "")
         localStorage.setItem("lastActiveTab", type)
         localStorage.setItem("tab", tab)
         setActivity(data)
         setOpen(true)
-        y.spec === "lamp.dbt_diary_card"
+        activity.spec === "lamp.dbt_diary_card"
           ? setQuestionCount(7)
-          : y.spec === "lamp.survey"
+          : activity.spec === "lamp.survey"
           ? setQuestionCount(data.settings?.length ?? 0)
           : setQuestionCount(0)
       }
@@ -588,14 +588,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   useEffect(() => {
     localStorage.removeItem("enabledActivities")
     localStorage.removeItem("parentStringForSurvey")
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i)
-      if (key?.startsWith("activity-survey-")) {
-        localStorage.removeItem(key)
-      }
-    }
     localStorage.removeItem("moduleId")
-    localStorage.removeItem("lastAnsweredIndex")
     if (FAVORITES_ENABLED) {
       ;(async () => {
         let tag =
@@ -684,8 +677,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
           setTab("favorite")
         } else {
           setTab(
-            MODULES_ENABLED &&
-              (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
+            MODULES_ENABLED && (savedActivities || []).filter((activity) => activity.spec == "lamp.module").length > 0
               ? "modules"
               : "other"
           )
