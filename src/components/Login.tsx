@@ -98,6 +98,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
+    clearOAuthError()
     clearLocalStorageItems()
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (!checkMAxAttempts()) {
@@ -201,9 +202,26 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   // Google blocks OAuth sign-in inside the mobile apps' web views
   const configuredProviders = isInMobileApp() ? [] : LAMP.Auth._configuredProviders
-  const [showStaffSignIn, setShowStaffSignIn] = useState(false)
+
+  // A refused Google login comes back with ?error= in the address (like 403.oauth-forbidden)
+  const [oauthError, setOAuthError] = useState(() => new URLSearchParams(window.location.search).get("error"))
+  const [showStaffSignIn, setShowStaffSignIn] = useState(!!oauthError)
+  const oauthErrorMessage =
+    oauthError === "403.oauth-forbidden"
+      ? t(
+          "That Google account can't sign in here. Google sign-in only works for research staff who have turned it on. Participants, please log in with your email and password above."
+        )
+      : t("Google sign-in didn't work. Please try again, or log in with your email and password above.")
+
+  // Cleared only when the user tries again, since the account setup screen also reads ?error=
+  const clearOAuthError = () => {
+    if (!oauthError) return
+    setOAuthError(null)
+    window.history.replaceState(null, "", window.location.pathname + window.location.hash)
+  }
 
   const handleOAuthLogin = async (socialProvider) => {
+    clearOAuthError()
     const result = (await LAMP.Credential.startOAuth(socialProvider)) as any
     if (result.redirectUrl) {
       window.location.replace(result.redirectUrl)
@@ -374,7 +392,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
             </Box>
           </form>
           {/* Google sign-in is only for research staff, so it stays behind a link (and is absent in the mobile apps) */}
-          {configuredProviders.length > 0 && (
+          {(configuredProviders.length > 0 || !!oauthError) && (
             <Box
               style={{
                 marginTop: 32,
@@ -407,9 +425,31 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                 </button>
               ) : (
                 <>
-                  <Typography style={{ fontSize: 13, color: "rgba(0,0,0,0.6)", textAlign: "center" }}>
-                    {`${t("For research staff who have set up Google sign-in.")}`}
-                  </Typography>
+                  {oauthError ? (
+                    <Box
+                      role="alert"
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 10,
+                        width: "100%",
+                        boxSizing: "border-box",
+                        padding: "12px 14px",
+                        borderRadius: 10,
+                        background: "#FDEDED",
+                        color: "#5F2120",
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <Icon style={{ fontSize: 18, color: "#C62828", marginTop: 1 }}>error_outline</Icon>
+                      <span>{`${oauthErrorMessage}`}</span>
+                    </Box>
+                  ) : (
+                    <Typography style={{ fontSize: 13, color: "rgba(0,0,0,0.6)", textAlign: "center" }}>
+                      {`${t("For research staff who have set up Google sign-in.")}`}
+                    </Typography>
+                  )}
                   {configuredProviders.map((providerKey) => (
                     // Follows Google's "Sign in with Google" button guidelines
                     <button
