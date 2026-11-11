@@ -23,6 +23,9 @@ import { clearLocalStorageItems, isInMobileApp } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
 import { KNOWN_SERVERS } from "./ServerGateway"
+import { ReactComponent as GoogleLogo } from "../icons/GoogleLogo.svg"
+
+const PROVIDER_NAMES = { google: "Google", apple: "Apple", microsoft: "Microsoft" }
 
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, clearServer, ...props }) {
   const { t, i18n } = useTranslation()
@@ -198,6 +201,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   // Google blocks OAuth sign-in inside the mobile apps' web views
   const configuredProviders = isInMobileApp() ? [] : LAMP.Auth._configuredProviders
+  const [showStaffSignIn, setShowStaffSignIn] = useState(false)
 
   const handleOAuthLogin = async (socialProvider) => {
     const result = (await LAMP.Credential.startOAuth(socialProvider)) as any
@@ -369,19 +373,76 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
               </Box>
             </Box>
           </form>
-          <Box>
-            {configuredProviders.map((providerKey) => (
-              <Fab
-                variant="extended"
-                type="button"
-                style={{ background: "#7599FF", color: "White" }}
-                onClick={() => handleOAuthLogin(providerKey)}
-                key={`login-with-${providerKey}`}
-              >
-                {providerKey}
-              </Fab>
-            ))}
-          </Box>
+          {/* Google sign-in is only for research staff, so it stays behind a link (and is absent in the mobile apps) */}
+          {configuredProviders.length > 0 && (
+            <Box
+              style={{
+                marginTop: 32,
+                marginBottom: 32,
+                paddingTop: showStaffSignIn ? 20 : 8,
+                borderTop: "1px solid #e0e0e0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              {!showStaffSignIn ? (
+                <button
+                  type="button"
+                  onClick={() => setShowStaffSignIn(true)}
+                  style={{
+                    minHeight: 44,
+                    padding: "0 12px",
+                    border: 0,
+                    background: "transparent",
+                    color: "#4467D6",
+                    fontFamily: "inherit",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {`${t("Research staff sign-in")}`}
+                </button>
+              ) : (
+                <>
+                  <Typography style={{ fontSize: 13, color: "rgba(0,0,0,0.6)", textAlign: "center" }}>
+                    {`${t("For research staff who have set up Google sign-in.")}`}
+                  </Typography>
+                  {configuredProviders.map((providerKey) => (
+                    // Follows Google's "Sign in with Google" button guidelines
+                    <button
+                      type="button"
+                      key={`login-with-${providerKey}`}
+                      onClick={() => handleOAuthLogin(providerKey)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 12,
+                        width: 240,
+                        height: 44,
+                        padding: "0 12px",
+                        border: "1px solid #747775",
+                        borderRadius: 22,
+                        background: "#ffffff",
+                        color: "#1F1F1F",
+                        fontFamily: "Roboto, Arial, sans-serif",
+                        fontSize: 14,
+                        fontWeight: 500,
+                        letterSpacing: 0.25,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {providerKey === "google" && <GoogleLogo aria-hidden="true" />}
+                      {`${t("Sign in with")} ${PROVIDER_NAMES[providerKey] ?? providerKey}`}
+                    </button>
+                  ))}
+                </>
+              )}
+            </Box>
+          )}
         </Grid>
       </LoginFrame>
     </>
