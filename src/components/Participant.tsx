@@ -34,15 +34,7 @@ import LAMP, {
   SensorEvent as SensorEventObj,
 } from "lamp-core"
 import { useAuthContext } from "./AuthProvider"
-
-export async function getImage(activityId: string, spec: string) {
-  return [
-    await LAMP.Type.getAttachment(
-      activityId,
-      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
-    ),
-  ].map((y: any) => (!!y?.error ? undefined : y?.data))[0]
-}
+import { loadActivityTag } from "./ActivityTags"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -438,38 +430,15 @@ export default function Participant({
   useEffect(() => {
     props.activeTab(tab, participant.id)
     if (activities !== null) {
-      Service.getAllTags("activitytags").then((result) => {
-        if ((result || []).length == 0) {
-          let data = []
-          let count = 0
-          ;(activities || []).map((activity) => {
-            getImage(activity.id, activity.spec).then((img) => {
-              data.push({
-                id: activity.id,
-                category: activity.category,
-                showFeed: img?.showFeed ?? true,
-                spec: activity.spec,
-                description: img?.description ?? "",
-                photo: img?.photo ?? null,
-                streak: img?.streak ?? null,
-                questions: img?.questions ?? null,
-                visualSettings: img?.visualSettings ?? null,
-                branchingSettings: img?.branchingSettings ?? null,
-              })
-              if (count === activities.length - 1) {
-                Service.addUserData("activitytags", data, true).then(() => {
-                  setLoading(false)
-                })
-              }
-              count++
-            })
-          })
-        } else {
+      Service.getAllTags("activitytags").then(async (cached) => {
+        try {
+          if ((cached || []).length == 0) {
+            await Promise.all((activities || []).map((activity) => loadActivityTag(activity)))
+          }
+        } finally {
           setLoading(false)
         }
       })
-    } else {
-      // setLoading(false)
     }
   }, [activities])
 
