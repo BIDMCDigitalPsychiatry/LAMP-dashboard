@@ -392,12 +392,15 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [state])
 
   const logout = async () => {
+    // reset() clears the server, so remember it for the login screen (otherwise the next login goes to api.lamp.digital)
+    const server = localStorage.getItem("lastServerSelected")
     try {
       await LAMP.Credential.logout()
     } catch (err) {
       console.error("Logout failed:", err)
     } finally {
       await reset()
+      if (server) await LAMP.Auth.set_server(server)
       window.location.replace("/#/")
     }
   }
