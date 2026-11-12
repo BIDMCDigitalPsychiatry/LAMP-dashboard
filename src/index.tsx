@@ -67,6 +67,7 @@ if (process.env.REACT_APP_USE_HTTPS === "false") {
 // Login only if we are a participant.
 LAMP.addEventListener("LOGIN", ({ detail }) => {
   // Tie-in for the mobile apps.
+  if (LAMP.Auth?._type !== "participant") return
   ;(window as any)?.webkit?.messageHandlers?.login?.postMessage?.(detail)
   ;(window as any)?.login?.postMessage?.(JSON.stringify(detail))
 })

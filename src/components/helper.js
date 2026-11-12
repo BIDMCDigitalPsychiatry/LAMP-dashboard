@@ -18,6 +18,11 @@ export function extractIdsWithHierarchy(data) {
 const LOGIN_ATTEMPTS_KEY = "loginAttempts"
 const LOCKOUT_TIME_KEY = "lockoutTime"
 
+// True inside the mindLAMP mobile apps, which inject a login bridge into their web views
+export function isInMobileApp() {
+  return !!(window?.webkit?.messageHandlers?.login || window?.login)
+}
+
 export function clearLocalStorageItems() {
   const cached = localStorage.getItem("cachedOptions")
   const loginAttempts = localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0"

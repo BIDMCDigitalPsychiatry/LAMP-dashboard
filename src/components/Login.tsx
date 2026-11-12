@@ -4,13 +4,11 @@ import {
   Fab,
   Box,
   TextField,
-  Menu,
   MenuItem,
   Icon,
   IconButton,
   InputAdornment,
   Grid,
-  Link,
   Typography,
   Button,
 } from "@material-ui/core"
@@ -21,24 +19,22 @@ import { Service } from "./DBService/DBService"
 
 // Local Imports
 import { useTranslation } from "react-i18next"
-import demo_db from "../demo_db.json"
-import self_help_db from "../self_help_db.json"
-import SelfHelpAlertPopup from "./SelfHelpAlertPopup"
-import { clearLocalStorageItems } from "./helper"
+import { clearLocalStorageItems, isInMobileApp } from "./helper"
 import { useAuthContext } from "./AuthProvider"
 import LoginFrame, { useLoginStyles } from "./LoginFrame"
 import { KNOWN_SERVERS } from "./ServerGateway"
+import { ReactComponent as GoogleLogo } from "../icons/GoogleLogo.svg"
+
+const PROVIDER_NAMES = { google: "Google", apple: "Apple", microsoft: "Microsoft" }
 
 export default function Login({ setIdentity, lastDomain, onComplete, setConfirmSession, clearServer, ...props }) {
   const { t, i18n } = useTranslation()
   const [state, setState] = useState({ id: undefined, password: undefined })
   const [showPassword, setShowPassword] = useState(false)
-  const [tryitMenu, setTryitMenu] = useState<Element>()
   const [loginClick, setLoginClick] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useLoginStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN", "de-DE", "da-DK", "fr-FR", "ko-KR", "it-IT", "zh-CN", "zh-HK"]
-  const [open, setOpen] = useState(false)
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -102,6 +98,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
 
   let handleLogin = async (event: any, mode?: string) => {
     event.preventDefault()
+    clearOAuthError()
     clearLocalStorageItems()
     const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || "0")
     if (!checkMAxAttempts()) {
@@ -177,9 +174,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
         localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
       }
     }
-    process.env.REACT_APP_LATEST_LAMP === "true"
-      ? enqueueSnackbar(`${t("Note: This is the latest version of LAMP.")}`, { variant: "info" })
-      : enqueueSnackbar(`${t("Note: This is NOT the latest version of LAMP")}`, { variant: "info" })
     localStorage.setItem(
       "LAMP_user_" + res?.identity?.id,
       JSON.stringify({
@@ -190,7 +184,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
       await Service.deleteDB()
       await Service.deleteUserDB()
     })()
-    if (!srcLocked)
+    // No result means the login failed (setIdentity catches the error itself)
+    if (!res && !srcLocked)
       enqueueSnackbar(`${t("Are you sure you're logging into the right mindLAMP server?")}`, { variant: "info" })
     onComplete()
     setLoginClick(true)
@@ -205,20 +200,34 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
     // })
   }
 
-  const configuredProviders = LAMP.Auth._configuredProviders
+  // Google blocks OAuth sign-in inside the mobile apps' web views
+  const configuredProviders = isInMobileApp() ? [] : LAMP.Auth._configuredProviders
+
+  // A refused Google login comes back with ?error= in the address (like 403.oauth-forbidden)
+  const [oauthError, setOAuthError] = useState(() => new URLSearchParams(window.location.search).get("error"))
+  const [showStaffSignIn, setShowStaffSignIn] = useState(!!oauthError)
+  const oauthErrorMessage =
+    oauthError === "403.oauth-forbidden"
+      ? t(
+          "That Google account can't sign in here. Google sign-in only works for research staff who have turned it on. Participants, please log in with your email and password above."
+        )
+      : t("Google sign-in didn't work. Please try again, or log in with your email and password above.")
+
+  // Cleared only when the user tries again, since the account setup screen also reads ?error=
+  const clearOAuthError = () => {
+    if (!oauthError) return
+    setOAuthError(null)
+    window.history.replaceState(null, "", window.location.pathname + window.location.hash)
+  }
 
   const handleOAuthLogin = async (socialProvider) => {
+    clearOAuthError()
     const result = (await LAMP.Credential.startOAuth(socialProvider)) as any
     if (result.redirectUrl) {
       window.location.replace(result.redirectUrl)
     }
   }
 
-  const handleSubmit = () => {
-    LAMP.initializeDemoDB(self_help_db)
-    localStorage.setItem("demo_mode", "self_help")
-    handleLogin(event, "selfHelp")
-  }
   const timezoneVal = () => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
@@ -380,99 +389,102 @@ export default function Login({ setIdentity, lastDomain, onComplete, setConfirmS
                   />
                 </Fab>
               </Box>
-              <Box textAlign="center" width={1} mt={4} mb={4}>
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => {
-                    LAMP.initializeDemoDB(demo_db)
-                    localStorage.setItem("demo_mode", "try_it")
-                    setTryitMenu(event.currentTarget)
-                  }}
-                  // setTryitMenu(event.currentTarget)}
-                >
-                  {`${t("Try it")}`}
-                </Link>
-                <br />
-                <Link
-                  underline="none"
-                  className={classes.linkBlue}
-                  onClick={(event) => {
-                    setOpen(true)
-                  }}
-                >
-                  {`${t("Self Help")}`}
-                </Link>
-                {/* <Link
-                underline="none"
-                className={classes.linkBlue}
-                onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-              >
-                {`${t("Research studies using mindLAMP")}`}
-              </Link> */}
-                <Menu
-                  keepMounted
-                  open={Boolean(tryitMenu)}
-                  anchorPosition={tryitMenu?.getBoundingClientRect()}
-                  anchorReference="anchorPosition"
-                  onClose={() => setTryitMenu(undefined)}
-                >
-                  <MenuItem disabled divider>
-                    <b>{`${t("Try mindLAMP out as a...")}`}</b>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "researcher")
-                    }}
-                  >
-                    {`${t("Researcher")}`}
-                  </MenuItem>
-                  <MenuItem
-                    divider
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "clinician")
-                    }}
-                  >
-                    {`${t("Clinician")}`}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "participant")
-                    }}
-                  >
-                    {`${t("Participant")}`}
-                  </MenuItem>
-                  <MenuItem
-                    onClick={(event) => {
-                      setTryitMenu(undefined)
-                      handleLogin(event, "patient")
-                    }}
-                  >
-                    {`${t("User")}`}
-                  </MenuItem>
-                </Menu>
-              </Box>
             </Box>
           </form>
-          <Box>
-            {configuredProviders.map((providerKey) => (
-              <Fab
-                variant="extended"
-                type="button"
-                style={{ background: "#7599FF", color: "White" }}
-                onClick={() => handleOAuthLogin(providerKey)}
-                key={`login-with-${providerKey}`}
-              >
-                {providerKey}
-              </Fab>
-            ))}
-          </Box>
+          {/* Google sign-in is only for research staff, so it stays behind a link (and is absent in the mobile apps) */}
+          {(configuredProviders.length > 0 || !!oauthError) && (
+            <Box
+              style={{
+                marginTop: 32,
+                marginBottom: 32,
+                paddingTop: showStaffSignIn ? 20 : 8,
+                borderTop: "1px solid #e0e0e0",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              {!showStaffSignIn ? (
+                <button
+                  type="button"
+                  onClick={() => setShowStaffSignIn(true)}
+                  style={{
+                    minHeight: 44,
+                    padding: "0 12px",
+                    border: 0,
+                    background: "transparent",
+                    color: "#4467D6",
+                    fontFamily: "inherit",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {`${t("Research staff sign-in")}`}
+                </button>
+              ) : (
+                <>
+                  {oauthError ? (
+                    <Box
+                      role="alert"
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 10,
+                        width: "100%",
+                        boxSizing: "border-box",
+                        padding: "12px 14px",
+                        borderRadius: 10,
+                        background: "#FDEDED",
+                        color: "#5F2120",
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <Icon style={{ fontSize: 18, color: "#C62828", marginTop: 1 }}>error_outline</Icon>
+                      <span>{`${oauthErrorMessage}`}</span>
+                    </Box>
+                  ) : (
+                    <Typography style={{ fontSize: 13, color: "rgba(0,0,0,0.6)", textAlign: "center" }}>
+                      {`${t("For research staff who have set up Google sign-in.")}`}
+                    </Typography>
+                  )}
+                  {configuredProviders.map((providerKey) => (
+                    // Follows Google's "Sign in with Google" button guidelines
+                    <button
+                      type="button"
+                      key={`login-with-${providerKey}`}
+                      onClick={() => handleOAuthLogin(providerKey)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 12,
+                        width: 240,
+                        height: 44,
+                        padding: "0 12px",
+                        border: "1px solid #747775",
+                        borderRadius: 22,
+                        background: "#ffffff",
+                        color: "#1F1F1F",
+                        fontFamily: "Roboto, Arial, sans-serif",
+                        fontSize: 14,
+                        fontWeight: 500,
+                        letterSpacing: 0.25,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {providerKey === "google" && <GoogleLogo aria-hidden="true" />}
+                      {`${t("Sign in with")} ${PROVIDER_NAMES[providerKey] ?? providerKey}`}
+                    </button>
+                  ))}
+                </>
+              )}
+            </Box>
+          )}
         </Grid>
       </LoginFrame>
-      <SelfHelpAlertPopup open={open} onClose={() => setOpen(false)} onSubmit={handleSubmit} />
     </>
   )
 }

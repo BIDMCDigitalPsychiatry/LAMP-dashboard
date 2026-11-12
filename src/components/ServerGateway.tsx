@@ -151,7 +151,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const connectButtonStyle = (disabled: boolean): React.CSSProperties => ({
+export const connectButtonStyle = (disabled: boolean): React.CSSProperties => ({
   background: disabled ? "#ccc" : "#7599FF",
   color: "white",
   border: "none",
