@@ -4,7 +4,6 @@ import LoginWorkflow from "./LoginWorkflow"
 import { AccountSetupWorkflow, TwoFactorVerifyForm } from "../AccountSetupWorkflow"
 import LoginFrame from "./LoginFrame"
 import SplashScreen from "./SplashScreen"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { Box, Typography } from "@material-ui/core"
 import LAMP from "lamp-core"
@@ -43,7 +42,7 @@ export default function AuthenticatedRoute({
       ) : requireSetup ? (
         <AccountSetupWorkflow />
       ) : requireVerification ? (
-        <TwoFactorVerificationPage />
+        <TwoFactorVerificationPage reset={reset} />
       ) : (
         children
       )}
@@ -51,22 +50,22 @@ export default function AuthenticatedRoute({
   )
 }
 
+// Ends the session on the server like the menu's Logout, then keeps the server selected for the login screen
+async function logoutKeepingServer(reset) {
+  const server = localStorage.getItem("lastServerSelected")
+  try {
+    await LAMP.Credential.logout()
+  } catch (err) {
+    console.error("Logout failed:", err)
+  }
+  await reset()
+  if (server) await LAMP.Auth.set_server(server)
+  window.location.replace("/#/")
+}
+
 // The mobile apps are for participants; researchers and admins use the web dashboard
 function UseWebDashboardPage({ reset }) {
   const { t } = useTranslation()
-
-  // Ends the session on the server like the menu's Logout, then keeps the server selected for the login screen
-  const logout = async () => {
-    const server = localStorage.getItem("lastServerSelected")
-    try {
-      await LAMP.Credential.logout()
-    } catch (err) {
-      console.error("Logout failed:", err)
-    }
-    await reset()
-    if (server) await LAMP.Auth.set_server(server)
-    window.location.replace("/#/")
-  }
 
   return (
     <LoginFrame>
@@ -77,7 +76,7 @@ function UseWebDashboardPage({ reset }) {
         )}
       </Typography>
       <Box textAlign="center">
-        <button onClick={logout} style={connectButtonStyle(false)}>
+        <button onClick={() => logoutKeepingServer(reset)} style={connectButtonStyle(false)}>
           {t("Log out")}
         </button>
       </Box>
@@ -85,18 +84,10 @@ function UseWebDashboardPage({ reset }) {
   )
 }
 
-function TwoFactorVerificationPage({}) {
-  const { enqueueSnackbar } = useSnackbar()
-  const { t } = useTranslation()
-
+function TwoFactorVerificationPage({ reset }) {
   return (
     <LoginFrame>
-      <TwoFactorVerifyForm
-        onError={() =>
-          enqueueSnackbar(`${t("Failed to verify. Make you sure you entered the correct code.")}`, { variant: "error" })
-        }
-        sendCodeOnOpen
-      />
+      <TwoFactorVerifyForm sendCodeOnOpen onLogout={() => logoutKeepingServer(reset)} />
     </LoginFrame>
   )
 }

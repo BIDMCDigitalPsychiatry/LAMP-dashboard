@@ -12,7 +12,6 @@ import {
   Radio,
   TextField,
   FormLabel,
-  FormHelperText,
 } from "@material-ui/core"
 import React, { useEffect, useRef, useState } from "react"
 import LoginFrame from "./components/LoginFrame"
@@ -34,6 +33,49 @@ const useAccountSetupStyles = makeStyles({
       backgroundColor: "#5c84f0",
       color: "#FFF",
     },
+  },
+  // 2FA code page, styled like the login screen
+  codeInput: {
+    display: "block",
+    width: "100%",
+    height: 56,
+    boxSizing: "border-box",
+    border: 0,
+    borderRadius: 10,
+    backgroundColor: "#f5f5f5",
+    padding: "0 14px",
+    fontFamily: "inherit",
+    fontSize: 24,
+    fontWeight: 600,
+    letterSpacing: 8,
+    textAlign: "center",
+    color: "rgba(0,0,0,0.87)",
+    "&::placeholder": { letterSpacing: "normal", fontSize: 16, fontWeight: 400, color: "#6e6e6e" },
+  },
+  verifyButton: {
+    width: 200,
+    height: 48,
+    border: 0,
+    borderRadius: 24,
+    backgroundColor: "#7599FF",
+    color: "#FFF",
+    fontFamily: "inherit",
+    fontSize: 16,
+    fontWeight: 700,
+    cursor: "pointer",
+    boxShadow: "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)",
+    "&:hover": { backgroundColor: "#5c84f0" },
+  },
+  linkButton: {
+    minHeight: 44,
+    padding: "0 8px",
+    border: 0,
+    background: "transparent",
+    color: "#4467D6",
+    fontFamily: "inherit",
+    fontSize: 14,
+    fontWeight: 700,
+    cursor: "pointer",
   },
 })
 
@@ -272,16 +314,12 @@ function OAuthSetup({ setCurrentStep }) {
 
 function TwoFactorVerify({ setCurrentStep }) {
   const { t } = useTranslation()
-  const { enqueueSnackbar } = useSnackbar()
 
   return (
     <Box>
       <TwoFactorVerifyForm
         onSuccess={() => {
           setCurrentStep
-        }}
-        onError={() => {
-          enqueueSnackbar(t("Failed to verify code"), { variant: "error" })
         }}
       />
       <Fab
@@ -296,12 +334,7 @@ function TwoFactorVerify({ setCurrentStep }) {
   )
 }
 
-export function TwoFactorVerifyForm({
-  onSuccess = undefined,
-  onError = undefined,
-  introTextOverride = undefined,
-  sendCodeOnOpen = false,
-}) {
+export function TwoFactorVerifyForm({ onSuccess = undefined, onLogout = undefined, sendCodeOnOpen = false }) {
   const { t } = useTranslation()
   const classes = useAccountSetupStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -347,60 +380,104 @@ export function TwoFactorVerifyForm({
     if (!validateCode()) {
       return
     }
+    const wrongCode = t("That code didn't work. Check the 6 digits and try again, or resend a new code.")
     try {
       const verifyResult: any = await LAMP.Credential.verifyTwoFactorCode(code)
       if (verifyResult?.message === "ok") {
         refreshSessionInfo()
         onSuccess && onSuccess()
       } else {
-        onError && onError()
+        setCodeErrors(wrongCode)
       }
     } catch (e) {
-      onError && onError()
+      setCodeErrors(wrongCode)
     }
   }
 
   return (
-    <Box>
-      <Typography>
-        {introTextOverride ||
-          t(
-            "A six digit code has been sent to you. If you have not received your code, wait a few minutes, and check your spam folder."
-          )}
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        verifyCode()
+      }}
+    >
+      <Typography component="h1" style={{ fontSize: 20, fontWeight: 600, textAlign: "center", marginBottom: 8 }}>
+        {t("Enter your verification code")}
       </Typography>
-      <Box marginY={2}>
-        <FormGroup>
-          <TextField
-            id="2fa-code"
-            name="code"
-            variant="outlined"
-            onChange={(event) => {
-              setCode(event.target.value)
-            }}
-            label={t("Code")}
-            value={code}
-            error={!!codeErrors}
-          />
-          {!!codeErrors && <FormHelperText error={true}> {codeErrors} </FormHelperText>}
-        </FormGroup>
+      <Typography
+        style={{ fontSize: 14, lineHeight: 1.5, color: "rgba(0,0,0,0.6)", textAlign: "center", marginBottom: 24 }}
+      >
+        {t(
+          "We sent a 6-digit code to the email or phone number associated with your account. It can take a minute to arrive. If it does not arrive check your spam folder or request a new code."
+        )}
+      </Typography>
+      {/* Numeric keypad on phones, and phones can fill the code in from the text or email */}
+      <input
+        id="2fa-code"
+        name="code"
+        type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        maxLength={6}
+        aria-label={t("Verification code")}
+        aria-invalid={!!codeErrors}
+        aria-describedby={codeErrors ? "2fa-code-error" : undefined}
+        placeholder={t("6-digit code")}
+        value={code}
+        onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+        className={classes.codeInput}
+        style={codeErrors ? { border: "2px solid #C62828" } : undefined}
+      />
+      {!!codeErrors && (
+        <Typography
+          id="2fa-code-error"
+          style={{ fontSize: 13, lineHeight: 1.5, color: "#B3261E", textAlign: "center", marginTop: 8 }}
+        >
+          {codeErrors}
+        </Typography>
+      )}
+      <Box textAlign="center" marginTop={3}>
+        <button type="submit" className={classes.verifyButton}>
+          {t("Verify")}
+        </button>
       </Box>
-      <Box marginTop={0} marginBottom={3}>
-        <Grid container direction="row" justifyContent="space-between">
-          <Fab variant="extended" type="button" onClick={() => sendCode()} aria-Label={t("Resend code")}>
-            {t("Resend code")}
-          </Fab>
-          <Fab
-            variant="extended"
+      <Box
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          marginTop: 20,
+          fontSize: 14,
+          color: "rgba(0,0,0,0.6)",
+        }}
+      >
+        <span>{t("Didn't get a code?")}</span>
+        <button type="button" onClick={() => sendCode()} className={classes.linkButton}>
+          {t("Resend code")}
+        </button>
+      </Box>
+      {onLogout && (
+        <Box
+          style={{
+            marginTop: 16,
+            paddingTop: 8,
+            borderTop: "1px solid #e0e0e0",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <button
             type="button"
-            onClick={verifyCode}
-            aria-label={t("Verify code")}
-            className={classes.blueButton}
+            onClick={onLogout}
+            className={classes.linkButton}
+            style={{ color: "rgba(0,0,0,0.6)", padding: "0 12px" }}
           >
-            {t("Verify code")}
-          </Fab>
-        </Grid>
-      </Box>
-    </Box>
+            {t("Log out")}
+          </button>
+        </Box>
+      )}
+    </form>
   )
 }
 
