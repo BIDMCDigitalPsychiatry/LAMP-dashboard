@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormHelperText,
 } from "@material-ui/core"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import LoginFrame from "./components/LoginFrame"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
@@ -296,7 +296,12 @@ function TwoFactorVerify({ setCurrentStep }) {
   )
 }
 
-export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined, introTextOverride = undefined }) {
+export function TwoFactorVerifyForm({
+  onSuccess = undefined,
+  onError = undefined,
+  introTextOverride = undefined,
+  sendCodeOnOpen = false,
+}) {
   const { t } = useTranslation()
   const classes = useAccountSetupStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -316,14 +321,27 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
     }
   }
 
-  const sendCode = async () => {
-    const resendCodeResult: any = await LAMP.Credential.sendTwoFactorCode()
+  const sendCode = async (showSuccess = true) => {
+    let resendCodeResult: any
+    try {
+      resendCodeResult = await LAMP.Credential.sendTwoFactorCode()
+    } catch (err) {
+      console.error("Sending the 2FA code failed:", err)
+    }
     if (resendCodeResult?.message === "ok") {
-      enqueueSnackbar(t("Successfully sent code"), { variant: "success" })
+      showSuccess && enqueueSnackbar(t("Successfully sent code"), { variant: "success" })
     } else {
       enqueueSnackbar(t("Failed to resend code."), { variant: "error" })
     }
   }
+
+  // Sends the first code once when the page opens (the setup flow sends its own code when 2FA is set up)
+  const codeSentOnOpen = useRef(false)
+  useEffect(() => {
+    if (!sendCodeOnOpen || codeSentOnOpen.current) return
+    codeSentOnOpen.current = true
+    sendCode(false)
+  }, [])
 
   const verifyCode = async () => {
     if (!validateCode()) {
@@ -368,8 +386,8 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onError = undefined
       </Box>
       <Box marginTop={0} marginBottom={3}>
         <Grid container direction="row" justifyContent="space-between">
-          <Fab variant="extended" type="button" onClick={sendCode} aria-Label={t("Send code")}>
-            {t("Send code")}
+          <Fab variant="extended" type="button" onClick={() => sendCode()} aria-Label={t("Resend code")}>
+            {t("Resend code")}
           </Fab>
           <Fab
             variant="extended"
