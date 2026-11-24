@@ -31,6 +31,8 @@ The MUI theme in `App.tsx` doesn't use these tokens yet. Its `palette.primary` i
 
 ## Color
 
+Import them as `themeColors` from `src/theme/tokens.ts` (`themeColors.primary`). Material UI's own `colors` export is a different set of palettes, and many files already import it under that name.
+
 | Token | Hex | Use |
 | --- | --- | --- |
 | `brand` | `#7599FF` | Logo, illustrations, large accents. Never text, and never under white text (2.7:1). |

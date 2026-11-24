@@ -1,7 +1,8 @@
 // Shared colors and sizes for dashboard UI. Use these instead of hex values in new or reworked screens.
 // docs/style-guide.md says when to use each one.
 
-export const colors = {
+// Named themeColors so it doesn't clash with Material UI's `colors` import
+export const themeColors = {
   // mindLAMP blue: logo, illustrations and large accents only. As text, or under white text, it fails contrast (2.7:1)
   brand: "#7599FF",
   // Buttons, links and selected states (white text on it: 5.8:1)

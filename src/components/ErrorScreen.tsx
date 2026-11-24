@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import StackTrace from "stacktrace-js"
 import LAMP from "lamp-core"
 import { dashboardVersion, serverAddress } from "./helper"
-import { colors, fontFamily, radius, shadow } from "../theme/tokens"
+import { themeColors, fontFamily, radius, shadow } from "../theme/tokens"
 import { useButtonStyles } from "../theme/styles"
 
 // Rendered by the error boundary outside the app's theme, so fonts and colors are set here
@@ -17,9 +17,9 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    background: colors.surface,
+    background: themeColors.surface,
     fontFamily,
-    color: colors.text,
+    color: themeColors.text,
   },
   card: {
     width: 540,
@@ -29,8 +29,8 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: 12,
-    background: colors.white,
-    border: `1px solid ${colors.border}`,
+    background: themeColors.white,
+    border: `1px solid ${themeColors.border}`,
     borderRadius: radius.dialog,
     boxShadow: shadow.card,
   },
@@ -41,11 +41,11 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: colors.dangerSoft,
-    color: colors.danger,
+    background: themeColors.dangerSoft,
+    color: themeColors.danger,
   },
-  title: { fontFamily: "inherit", fontSize: 22, fontWeight: 600, color: colors.text },
-  body: { fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, color: colors.textBody },
+  title: { fontFamily: "inherit", fontSize: 22, fontWeight: 600, color: themeColors.text },
+  body: { fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, color: themeColors.textBody },
   reload: { alignSelf: "flex-start", marginTop: 4, fontFamily: "inherit" },
   details: {
     marginTop: 10,
@@ -53,8 +53,8 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    background: colors.surface,
-    border: `1px solid ${colors.border}`,
+    background: themeColors.surface,
+    border: `1px solid ${themeColors.border}`,
     borderRadius: radius.control,
     userSelect: "text",
   },
@@ -62,7 +62,7 @@ const useStyles = makeStyles({
     margin: 0,
     fontSize: 12,
     fontWeight: 600,
-    color: colors.textBody,
+    color: themeColors.textBody,
     textTransform: "uppercase",
     letterSpacing: "0.04em",
   },
@@ -73,10 +73,10 @@ const useStyles = makeStyles({
     gap: "6px 12px",
     fontSize: 13,
     lineHeight: 1.45,
-    "& dt": { color: colors.textMuted },
+    "& dt": { color: themeColors.textMuted },
     "& dd": { margin: 0, overflowWrap: "anywhere" },
   },
-  error: { fontFamily: "Menlo, Consolas, monospace", fontSize: 12.5, color: colors.danger },
+  error: { fontFamily: "Menlo, Consolas, monospace", fontSize: 12.5, color: themeColors.danger },
 })
 
 /** Shown when the dashboard crashes, with the details support needs to triage a screenshot */

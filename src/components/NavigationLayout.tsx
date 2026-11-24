@@ -49,7 +49,7 @@ import { useAuthContext } from "./AuthProvider"
 import { MESSAGING_ENABLED } from "../featureFlags"
 import { useSnackbar } from "notistack"
 import { dashboardVersion, serverAddress } from "./helper"
-import { colors, radius, shadow, touchTarget } from "../theme/tokens"
+import { themeColors, radius, shadow, touchTarget } from "../theme/tokens"
 import { useButtonStyles, useDialogStyles } from "../theme/styles"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -219,14 +219,14 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 36,
       fontSize: 15,
       fontWeight: 600,
-      color: colors.primary,
-      background: colors.primarySoft,
-      boxShadow: `0 0 0 2px ${colors.white}, 0 0 0 4px ${colors.primarySoft}`,
+      color: themeColors.primary,
+      background: themeColors.primarySoft,
+      boxShadow: `0 0 0 2px ${themeColors.white}, 0 0 0 4px ${themeColors.primarySoft}`,
     },
     profileMenuPaper: {
       width: 288,
       borderRadius: radius.menu,
-      border: `1px solid ${colors.border}`,
+      border: `1px solid ${themeColors.border}`,
       boxShadow: shadow.menu,
     },
     profileMenuList: { padding: "6px 0 0" },
@@ -238,29 +238,29 @@ const useStyles = makeStyles((theme: Theme) =>
     profileMenuName: {
       fontSize: 15,
       fontWeight: 600,
-      color: colors.text,
+      color: themeColors.text,
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
     },
-    profileMenuId: { fontSize: 12.5, color: colors.textMuted },
-    profileMenuDivider: { margin: "4px 0", backgroundColor: colors.divider },
+    profileMenuId: { fontSize: 12.5, color: themeColors.textMuted },
+    profileMenuDivider: { margin: "4px 0", backgroundColor: themeColors.divider },
     profileMenuItem: {
       minHeight: touchTarget,
       margin: "2px 6px",
       padding: "0 12px",
       borderRadius: radius.item,
       fontSize: 15,
-      color: colors.textStrong,
-      "& .MuiListItemIcon-root": { minWidth: 32, color: colors.textMuted },
-      "&:hover": { backgroundColor: colors.surfaceHover },
+      color: themeColors.textStrong,
+      "& .MuiListItemIcon-root": { minWidth: 32, color: themeColors.textMuted },
+      "&:hover": { backgroundColor: themeColors.surfaceHover },
       [theme.breakpoints.down("sm")]: { minHeight: 48, fontSize: 16 },
     },
-    profileMenuExternal: { fontSize: 16, color: colors.iconFaint, marginLeft: 8 },
+    profileMenuExternal: { fontSize: 16, color: themeColors.iconFaint, marginLeft: 8 },
     profileMenuDelete: {
-      color: colors.danger,
-      "& .MuiListItemIcon-root": { color: colors.danger },
-      "&:hover": { backgroundColor: colors.dangerSoft },
+      color: themeColors.danger,
+      "& .MuiListItemIcon-root": { color: themeColors.danger },
+      "&:hover": { backgroundColor: themeColors.dangerSoft },
     },
     profileMenuVersion: {
       display: "flex",
@@ -268,11 +268,11 @@ const useStyles = makeStyles((theme: Theme) =>
       gap: 2,
       marginTop: 6,
       padding: "10px 18px 12px",
-      borderTop: `1px solid ${colors.divider}`,
-      background: colors.surface,
+      borderTop: `1px solid ${themeColors.divider}`,
+      background: themeColors.surface,
       fontSize: 12,
       lineHeight: 1.45,
-      color: colors.textMuted,
+      color: themeColors.textMuted,
       userSelect: "text",
       // The researcher menu sets a pointer cursor on everything inside it
       cursor: "text",

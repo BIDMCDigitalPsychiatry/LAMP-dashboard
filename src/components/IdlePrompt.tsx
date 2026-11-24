@@ -3,7 +3,7 @@ import { Dialog, Box, Typography, Button, LinearProgress, makeStyles } from "@ma
 import AccessTimeRoundedIcon from "@material-ui/icons/AccessTimeRounded"
 import { useTranslation } from "react-i18next"
 import { useButtonStyles, useDialogStyles } from "../theme/styles"
-import { colors } from "../theme/tokens"
+import { themeColors } from "../theme/tokens"
 
 const useStyles = makeStyles({
   paper: { width: 420 },
@@ -11,8 +11,8 @@ const useStyles = makeStyles({
     height: 6,
     borderRadius: 3,
     marginTop: 16,
-    backgroundColor: colors.border,
-    "& .MuiLinearProgress-bar": { backgroundColor: colors.primary },
+    backgroundColor: themeColors.border,
+    "& .MuiLinearProgress-bar": { backgroundColor: themeColors.primary },
   },
 })
 

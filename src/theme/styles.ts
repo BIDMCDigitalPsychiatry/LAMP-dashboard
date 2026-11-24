@@ -1,5 +1,5 @@
 import { makeStyles } from "@material-ui/core"
-import { colors, radius, shadow, touchTarget } from "./tokens"
+import { themeColors, radius, shadow, touchTarget } from "./tokens"
 
 // Shared classes for new UI. Combine with a component's own classes for layout, e.g.
 // className={`${buttons.primary} ${classes.reload}`}; the component's classes win.
@@ -17,17 +17,22 @@ const button = {
 export const useButtonStyles = makeStyles({
   primary: {
     ...button,
-    color: colors.white,
-    background: colors.primary,
-    "&:hover": { background: colors.primaryHover },
+    color: themeColors.white,
+    background: themeColors.primary,
+    "&:hover": { background: themeColors.primaryHover },
   },
   secondary: {
     ...button,
-    color: colors.textStrong,
-    background: colors.surfaceHover,
-    "&:hover": { background: colors.border },
+    color: themeColors.textStrong,
+    background: themeColors.surfaceHover,
+    "&:hover": { background: themeColors.border },
   },
-  danger: { ...button, color: colors.white, background: colors.danger, "&:hover": { background: colors.dangerHover } },
+  danger: {
+    ...button,
+    color: themeColors.white,
+    background: themeColors.danger,
+    "&:hover": { background: themeColors.dangerHover },
+  },
 })
 
 /** Confirmation and alert dialogs: icon, title, body, then actions on the right */
@@ -48,11 +53,11 @@ export const useDialogStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: colors.primarySoft,
-    color: colors.primary,
+    background: themeColors.primarySoft,
+    color: themeColors.primary,
   },
-  iconDanger: { background: colors.dangerSoft, color: colors.danger },
-  title: { fontSize: 20, fontWeight: 600, color: colors.text, marginBottom: 8 },
-  body: { fontSize: 15, lineHeight: 1.5, color: colors.textBody },
+  iconDanger: { background: themeColors.dangerSoft, color: themeColors.danger },
+  title: { fontSize: 20, fontWeight: 600, color: themeColors.text, marginBottom: 8 },
+  body: { fontSize: 15, lineHeight: 1.5, color: themeColors.textBody },
   actions: { display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, marginTop: 20 },
 })
