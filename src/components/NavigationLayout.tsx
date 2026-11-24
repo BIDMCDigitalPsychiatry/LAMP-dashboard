@@ -378,12 +378,15 @@ export default function NavigationLayout({
 
   const onDeleteAccount = async () => {
     await LAMP.Type.setAttachment(id, "me", "lamp.is_deleted", true)
-    await LAMP.Credential.list(id).then((cred) => {
-      cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      ;(cred || []).map(async (each) => {
-        await LAMP.Credential.delete(id, each["access_key"])
-      })
-    })
+    const credentials = await LAMP.Credential.list(id)
+    // Wait for every login to be deleted: the logout below reloads the page and would cut them off
+    await Promise.all(
+      (Array.isArray(credentials) ? credentials : [])
+        .filter((c) => c.hasOwnProperty("origin"))
+        .map((each) =>
+          LAMP.Credential.delete(id, each["access_key"]).catch((err) => console.error("Deleting a login failed:", err))
+        )
+    )
     await LAMP.Type.setAttachment(id, "me", "lamp.name", null)
     Service.updateValue("participants", { participants: [{ is_deleted: true, id: id }] }, "is_deleted", "id")
     if (authType === "researcher" || authType === "admin") {
