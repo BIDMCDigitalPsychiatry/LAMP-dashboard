@@ -28,6 +28,10 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Avatar,
+  Divider,
+  ListItemIcon,
+  ListItemText,
 } from "@material-ui/core"
 // Local Imports
 import { CredentialEditor, CredentialManager } from "./CredentialManager"
@@ -38,6 +42,12 @@ import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
 import { useLocation } from "react-router-dom"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
+import ExitToAppRoundedIcon from "@material-ui/icons/ExitToAppRounded"
+import HelpOutlineRoundedIcon from "@material-ui/icons/HelpOutlineRounded"
+import MailOutlineRoundedIcon from "@material-ui/icons/MailOutlineRounded"
+import DeleteOutlineRoundedIcon from "@material-ui/icons/DeleteOutlineRounded"
+import OpenInNewRoundedIcon from "@material-ui/icons/OpenInNewRounded"
+import PersonOutlineRoundedIcon from "@material-ui/icons/PersonOutlineRounded"
 import { Position } from "monaco-editor"
 import Notifications from "./Notifications"
 import { useAuthContext } from "./AuthProvider"
@@ -263,6 +273,56 @@ const useStyles = makeStyles((theme: Theme) =>
         background: "#f6f6f6",
       },
     },
+    // Participant profile menu
+    avatarButton: { padding: 4, marginLeft: 4 },
+    avatar: {
+      width: 36,
+      height: 36,
+      fontSize: 15,
+      fontWeight: 600,
+      color: "#1565C0",
+      background: "#ECF4FF",
+      boxShadow: "0 0 0 2px #FFFFFF, 0 0 0 4px #ECF4FF",
+    },
+    profileMenuPaper: {
+      width: 288,
+      borderRadius: 14,
+      border: "1px solid #E5E7EB",
+      boxShadow: "0 12px 32px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.06)",
+    },
+    profileMenuList: { padding: "6px 0" },
+    profileMenuHeader: {
+      gap: 12,
+      padding: "12px 16px 14px",
+      "&.Mui-disabled": { opacity: 1 },
+    },
+    profileMenuName: {
+      fontSize: 15,
+      fontWeight: 600,
+      color: "#111827",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    profileMenuId: { fontSize: 12.5, color: "#6B7280" },
+    profileMenuDivider: { margin: "4px 0", backgroundColor: "#EEF0F3" },
+    profileMenuItem: {
+      minHeight: 44,
+      margin: "2px 6px",
+      padding: "0 12px",
+      borderRadius: 8,
+      fontSize: 15,
+      color: "#1F2937",
+      "& .MuiListItemIcon-root": { minWidth: 32, color: "#6B7280" },
+      "&:hover": { backgroundColor: "#F3F4F6" },
+      [theme.breakpoints.down("sm")]: { minHeight: 48, fontSize: 16 },
+    },
+    profileMenuExternal: { fontSize: 16, color: "#9CA3AF", marginLeft: 8 },
+    profileMenuDelete: {
+      color: "#B42318",
+      "& .MuiListItemIcon-root": { color: "#B42318" },
+      "&:hover": { backgroundColor: "#FEF3F2" },
+    },
   })
 )
 
@@ -461,6 +521,10 @@ export default function NavigationLayout({
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
+  // Participant menu: the name they signed in with, else the participant number (old server)
+  const userNumber = `${t("User number", { number: (title || "").split(" ")[1] })}`
+  const profileName: string | undefined = authType === "participant" ? sessionInfo?.accessKey || undefined : undefined
+  const profileInitial = profileName ? profileName.charAt(0).toUpperCase() : undefined
   return (
     <Box>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -543,7 +607,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
+                        window.open("https://docs.lamp.digital/docs", "_blank")
                       }}
                     >
                       {`${t("Help & Support")}`}
@@ -552,7 +616,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("mailto:team@digitalpsych.org", "_blank")
+                        window.open("mailto:mindlamp@bidmc.harvard.edu", "_blank")
                       }}
                     >
                       {`${t("Contact Us")}`}
@@ -656,7 +720,8 @@ export default function NavigationLayout({
                 )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
                 <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
+                  {/* The bell only shows lamp.messaging, which the Messages feature writes */}
+                  {MESSAGING_ENABLED && hideNotifications.indexOf(activeTab) < 0 ? (
                     <>
                       <Tooltip title={`${t("Notifications")}`}>
                         <IconButton aria-describedby="notificationPopover" onClick={handleNotificationClick}>
@@ -696,12 +761,15 @@ export default function NavigationLayout({
                 <Box>
                   <Tooltip title={`${t("Profile & Settings")}`}>
                     <IconButton
+                      aria-label={`${t("Profile & Settings")}`}
                       aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
                       aria-haspopup="true"
                       onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
-                      color="default"
+                      className={classes.avatarButton}
                     >
-                      <Icon>account_circle</Icon>
+                      <Avatar className={classes.avatar}>
+                        {profileInitial || <PersonOutlineRoundedIcon fontSize="small" />}
+                      </Avatar>
                     </IconButton>
                   </Tooltip>
                   <Menu
@@ -709,36 +777,68 @@ export default function NavigationLayout({
                     anchorEl={showCustomizeMenu}
                     open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
                     onClose={() => setShowCustomizeMenu(undefined)}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    classes={{ paper: classes.profileMenuPaper, list: classes.profileMenuList }}
                   >
-                    <MenuItem disabled divider>
-                      <b>{`${t("User number", { number: title.split(" ")[1] })}`}</b>
+                    <MenuItem disabled className={classes.profileMenuHeader}>
+                      <Avatar className={classes.avatar}>
+                        {profileInitial || <PersonOutlineRoundedIcon fontSize="small" />}
+                      </Avatar>
+                      <Box minWidth={0}>
+                        <Typography className={classes.profileMenuName}>{profileName || userNumber}</Typography>
+                        {!!profileName && <Typography className={classes.profileMenuId}>{userNumber}</Typography>}
+                      </Box>
                     </MenuItem>
+                    <Divider component="li" className={classes.profileMenuDivider} />
+                    <MenuItem className={classes.profileMenuItem} onClick={() => setConfirmLogout(true)}>
+                      <ListItemIcon>
+                        <ExitToAppRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Logout")}`}</ListItemText>
+                    </MenuItem>
+                    <Divider component="li" className={classes.profileMenuDivider} />
+                    <MenuItem
+                      className={classes.profileMenuItem}
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://docs.lamp.digital/app/", "_blank")
+                      }}
+                    >
+                      <ListItemIcon>
+                        <HelpOutlineRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Help & Support")}`}</ListItemText>
+                      <OpenInNewRoundedIcon className={classes.profileMenuExternal} />
+                    </MenuItem>
+                    <MenuItem
+                      className={classes.profileMenuItem}
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("mailto:mindlamp@bidmc.harvard.edu", "_blank")
+                      }}
+                    >
+                      <ListItemIcon>
+                        <MailOutlineRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Contact Us")}`}</ListItemText>
+                    </MenuItem>
+                    {/* Kept last and in red, away from Logout */}
                     {(isDeleted === null || !isDeleted) && (
-                      <MenuItem divider onClick={() => setConfirmDelete(true)}>
-                        {`${t("Delete Account")}`}
+                      <Divider component="li" className={classes.profileMenuDivider} />
+                    )}
+                    {(isDeleted === null || !isDeleted) && (
+                      <MenuItem
+                        className={`${classes.profileMenuItem} ${classes.profileMenuDelete}`}
+                        onClick={() => setConfirmDelete(true)}
+                      >
+                        <ListItemIcon>
+                          <DeleteOutlineRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText disableTypography>{`${t("Delete Account")}`}</ListItemText>
                       </MenuItem>
                     )}
-                    <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                      {`${t("Logout")}`}
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
-                      }}
-                    >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
-                        window.open("mailto:team@digitalpsych.org", "_blank")
-                      }}
-                    >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
-                    </MenuItem>
                   </Menu>
                 </Box>
               )}
