@@ -401,7 +401,8 @@ export default function NavigationLayout({
       } else {
         setLoading(false)
       }
-      if (!!isMounted) {
+      // Only the Messages badge uses these requests
+      if (!!isMounted && MESSAGING_ENABLED) {
         refresh()
       }
     }
