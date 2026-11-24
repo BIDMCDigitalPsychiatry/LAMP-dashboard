@@ -14,6 +14,10 @@ an allowed cors origin.
     
     If you are using the dashboard to connect to a LAMP-server running elsewhere, or one that is running locally with https enabled run: `npm start`.
 
+## Style guide
+
+Colors, buttons, dialogs, icons and text rules for new UI are in [docs/style-guide.md](docs/style-guide.md).
+
 ## License
 
 LAMP Dashboard is licensed under the [GNU Affero General Public License v3.0](LICENSE.md)

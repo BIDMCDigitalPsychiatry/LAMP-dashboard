@@ -15,6 +15,8 @@ import LAMP from "lamp-core"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ResponsiveMargin } from "./Utils"
+import { dashboardVersion, isInMobileApp } from "./helper"
+import { themeColors } from "../theme/tokens"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 
@@ -59,6 +61,14 @@ export const useLoginStyles = makeStyles((theme: Theme) =>
     loginDisabled: {
       opacity: 0.5,
     },
+    // Version under every login screen, so screenshots of login problems show the build
+    version: {
+      padding: "8px 16px 16px",
+      textAlign: "center",
+      fontSize: 12,
+      lineHeight: 1.45,
+      color: themeColors.textMuted,
+    },
   })
 )
 
@@ -87,7 +97,11 @@ export default function LoginFrame({ children, wide = false }: { children: React
             dense
             onClick={() => {
               setHelpMenu(undefined)
-              window.open("https://docs.lamp.digital/troubleshooting", "_blank")
+              // Participants in the app get the app guide; research staff in a browser get the full docs
+              window.open(
+                isInMobileApp() ? "https://docs.lamp.digital/app/" : "https://docs.lamp.digital/docs",
+                "_blank"
+              )
             }}
           >
             <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
@@ -96,16 +110,7 @@ export default function LoginFrame({ children, wide = false }: { children: React
             dense
             onClick={() => {
               setHelpMenu(undefined)
-              window.open("https://community.lamp.digital", "_blank")
-            }}
-          >
-            <b style={{ color: colors.grey["600"] }}>LAMP {`${t("Community")}`}</b>
-          </MenuItem>
-          <MenuItem
-            dense
-            onClick={() => {
-              setHelpMenu(undefined)
-              window.open("mailto:team@digitalpsych.org", "_blank")
+              window.open("mailto:mindlamp@bidmc.harvard.edu", "_blank")
             }}
           >
             <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
@@ -139,6 +144,7 @@ export default function LoginFrame({ children, wide = false }: { children: React
             {children}
           </Grid>
         </Grid>
+        <Box className={classes.version}>{dashboardVersion()}</Box>
       </ResponsiveMargin>
     </Slide>
   )

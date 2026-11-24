@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 import locale_lang from "../../locale_map.json"
 import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
-import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
+import { saveDataToCache } from "../../components/Researcher/SaveResearcherData"
 import { useAuthContext } from "../AuthProvider"
 
 export default function Researcher({ researcher, onParticipantSelect, mode, tab, ...props }) {
@@ -25,7 +25,6 @@ export default function Researcher({ researcher, onParticipantSelect, mode, tab,
       : "en-US"
     i18n.changeLanguage(language)
     ;(async () => {
-      let lampAuthId = LAMP.Auth._auth.id
       let lampAuthPswd = LAMP.Auth._auth.password
       // if (LAMP.Auth._type === "researcher") {
       //   lampAuthId === "researcher@demo.lamp.digital"
@@ -37,9 +36,7 @@ export default function Researcher({ researcher, onParticipantSelect, mode, tab,
       //   }
       // }
       if (LAMP.Auth._type === "researcher") {
-        lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital"
-          ? saveDemoData()
-          : saveDataToCache(researcher.id, authorizationHeader)
+        saveDataToCache(researcher.id, authorizationHeader)
       } else if (LAMP.Auth._type === "admin") {
         if (researcher.id) {
           saveDataToCache(researcher.id, authorizationHeader)

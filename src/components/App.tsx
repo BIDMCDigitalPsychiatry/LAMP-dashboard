@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, colors, Backdrop, CircularProgress } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, colors } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
-import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Messages from "./Messages"
@@ -23,61 +22,15 @@ import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
-import demo_db from "../demo_db.json"
-import self_help_db from "../self_help_db.json"
-import ConfirmModal from "./shared/ConfirmModal"
+import IdlePrompt from "./IdlePrompt"
+import ErrorScreen from "./ErrorScreen"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
+import SplashScreen from "./SplashScreen"
+import { isInMobileApp } from "./helper"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
 import AuthenticatedRoute from "./AuthenticatedRoute"
 
-function ErrorFallback({ error }) {
-  const [trace, setTrace] = useState([])
-  const { t } = useTranslation()
-
-  useEffect(() => {
-    StackTrace.fromError(error).then(setTrace)
-  }, [])
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        border: "none",
-        zIndex: 2147483647,
-        padding: "0.5rem",
-        fontFamily: "Consolas, Menlo, monospace",
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.5,
-        fontSize: "12px",
-        color: "rgb(232, 59, 70)",
-        background: "rgb(53, 53, 53)",
-      }}
-    >
-      <pre>
-        {/* <code style={{ fontSize: "16px" }}>
-          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
-        </code>
-        <br />
-        <code style={{ color: "#fff" }}>
-          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code> */}
-        <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
-        <br />
-        {/* <code>
-          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code> */}
-        <br />
-        <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
-          {`${t("Back to page.")}`}
-        </a>
-      </pre>
-    </div>
-  )
-}
 function PageTitle({ children, ...props }) {
   useEffect(() => {
     document.title = `${typeof children === "string" ? children : ""}`
@@ -93,7 +46,7 @@ export const changeCase = (text) => {
   }
   return ""
 }
-function AppRouter({ setConfirmSession, ...props }) {
+function AppRouter({ setConfirmSession, logoutRef, ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [isAuthenticated, setAuthenticated] = useState<boolean>(false)
   const search = useLocation().search
@@ -111,18 +64,6 @@ function AppRouter({ setConfirmSession, ...props }) {
       console.log(error)
     }
 
-    const hasRoleFlag = localStorage.getItem("isParticipant")
-
-    if (isLoggedIn && !hasRoleFlag) {
-      const firstPath = window.location.hash
-      const participantRegex = /^#\/participant\/[^\/]+\/assess$/
-
-      if (participantRegex.test(firstPath)) {
-        localStorage.setItem("isParticipant", "true")
-      } else {
-        localStorage.setItem("isParticipant", "false")
-      }
-    }
     // Don't wipe auth state while a ?a= or ?finishLoginToken= login (mobile cold start) is
     // still being processed by the mount effect below — reset()'s concurrent
     // set_identity(undefined) nulls LAMP.configuration mid-login, racing the ?a=
@@ -176,16 +117,12 @@ function AppRouter({ setConfirmSession, ...props }) {
   const [showDemoMessage, setShowDemoMessage] = useState(true)
   const { t } = useTranslation()
   const serverAddressFro2FA = ["api-staging.lamp.digital", "api.lamp.digital", "lamp-api.zcodemo.com"]
-  const [loading, setLoading] = useState(false)
+  // Start on so the login page doesn't flash while the startup login runs
+  const [loading, setLoading] = useState(true)
   const [participantSelected, setParticipantSelected] = useState(false)
 
   useEffect(() => {
     setParticipantSelected(false)
-    if (localStorage.getItem("demo_mode") === "try_it") {
-      LAMP.initializeDemoDB(demo_db)
-    } else if (localStorage.getItem("demo_mode") === "self_help") {
-      LAMP.initializeDemoDB(self_help_db)
-    }
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       setLoading(true)
@@ -213,14 +150,18 @@ function AppRouter({ setConfirmSession, ...props }) {
 
       ;(async () => {
         try {
-          await LAMP.Auth.set_identity({
-            id: userName,
-            password: password,
-            serverAddress:
-              x.length > 2 && typeof x[2] !== "undefined"
-                ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-                : "api.lamp.digital",
-          })
+          await LAMP.Auth.set_identity(
+            {
+              id: userName,
+              password: password,
+              serverAddress:
+                x.length > 2 && typeof x[2] !== "undefined"
+                  ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+                  : "api.lamp.digital",
+            },
+            // Old store apps only keep a login whose LOGIN event includes the credentials
+            true
+          )
           // Complete the login the same way refreshPage() does — without this the
           // app stays on the loading backdrop forever (mobile ?a= cold-start).
           getAdminType()
@@ -243,7 +184,8 @@ function AppRouter({ setConfirmSession, ...props }) {
         }
       })()
     } else if (!state.identity) {
-      refreshPage()
+      refreshPage().finally(() => setLoading(false))
+    } else {
       setLoading(false)
     }
     document.addEventListener("visibilitychange", function logData() {
@@ -391,15 +333,23 @@ function AppRouter({ setConfirmSession, ...props }) {
   }, [state])
 
   const logout = async () => {
+    // reset() clears the server, so remember it for the login screen (otherwise the next login goes to api.lamp.digital)
+    const server = localStorage.getItem("lastServerSelected")
     try {
       await LAMP.Credential.logout()
     } catch (err) {
       console.error("Logout failed:", err)
     } finally {
       await reset()
+      if (server) await LAMP.Auth.set_server(server)
       window.location.replace("/#/")
     }
   }
+
+  // Lets the idle prompt in App log out the same way as the menu
+  useEffect(() => {
+    if (logoutRef) logoutRef.current = logout
+  })
 
   const clearCurrentUser = async () => {
     Service.deleteUserDB()
@@ -432,7 +382,6 @@ function AppRouter({ setConfirmSession, ...props }) {
     }))
     localStorage.setItem("verified", JSON.stringify({ value: false }))
     setIsLoggedIn && setIsLoggedIn(false)
-    localStorage.removeItem("isParticipant")
     localStorage.removeItem("isLoginPage")
   }
 
@@ -442,8 +391,8 @@ function AppRouter({ setConfirmSession, ...props }) {
     }
 
     try {
-      // Login to server
-      await LAMP.Auth.set_identity(identity)
+      // Login to server. Temporary legacy mobile app support: remove the second argument at sunset (LAMP-server#312)
+      await LAMP.Auth.set_identity(identity, isInMobileApp())
       setIsLoggedIn && setIsLoggedIn(true)
 
       // Set up state
@@ -555,15 +504,7 @@ function AppRouter({ setConfirmSession, ...props }) {
   return (
     <>
       {!!loading ? (
-        <Backdrop
-          style={{
-            zIndex: 9999,
-            color: "#fff",
-          }}
-          open={loading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+        <SplashScreen />
       ) : (
         <Switch>
           <Route
@@ -597,31 +538,6 @@ function AppRouter({ setConfirmSession, ...props }) {
               </AuthenticatedRoute>
             )}
           />
-          {/* <Route
-            exact
-            path="/participant/:id/notifications"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
-                    onComplete={() => {
-                      props.history.replace("/")
-                    }}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Notifications")}`}</PageTitle>
-                  <Notifications participant={getParticipant(props.match.params.id)?.id ?? null} from ="app"/>
-                </React.Fragment>
-              )
-            }
-          /> */}
           <Route
             exact
             path="/2fa"
@@ -959,11 +875,6 @@ function AppRouter({ setConfirmSession, ...props }) {
                       authType={state.authType}
                       id={props.match.params.id}
                       title={`User ${getParticipant(props.match.params.id).id}`}
-                      // name={
-                      //   getParticipant(props.match.params.id)?.alias ||
-                      //   getParticipant(props.match.params.id)?.name ||
-                      //   getParticipant(props.match.params.id)?.id
-                      // }
                       goBack={props.history.goBack}
                       onLogout={() => logout()}
                       activeTab={state.activeTab ?? "assess"}
@@ -1049,79 +960,81 @@ function AppRouter({ setConfirmSession, ...props }) {
   )
 }
 
+// Researchers and admins are logged out after this long without activity, after a countdown
+const IDLE_MINUTES = 15
+const LOGOUT_COUNTDOWN_SECONDS = 60
+const ACTIVITY_EVENTS = ["mousemove", "mousedown", "keydown", "wheel", "touchstart", "scroll"]
+const lastActivity = () => parseInt(localStorage.getItem("lastActivity") || "0")
+
 export default function App({ ...props }) {
-  // const INACTIVITY_LIMIT = 30 * 60 * 1000 // 5 minutes
-  // let inactivityTimer: ReturnType<typeof setTimeout> | null = null
-
-  // const resetInactivityTimer = () => {
-  //   clearTimeout(inactivityTimer)
-  //   inactivityTimer = setTimeout(() => {
-  //     localStorage.getItem("isParticipant") === "false"
-  //     if (localStorage.getItem("isLoginPage") === "false" && localStorage.getItem("isParticipant") === "false") {
-  //       alert("Your session has expired. Please login again to continue.")
-  //       window.location.href = "/#/"
-  //       localStorage.removeItem("isParticipant")
-  //       localStorage.removeItem("tokenInfo")
-  //     }
-  //   }, INACTIVITY_LIMIT)
-  // }
-  // const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart"]
-  // activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer))
-
-  // resetInactivityTimer()
-
   const [confirmSession, setConfirmSession] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(LOGOUT_COUNTDOWN_SECONDS)
+  // AppRouter's logout, which also ends the server session
+  const logoutRef = useRef<() => Promise<void>>()
 
-  const onMouseMove = () => {
-    localStorage.setItem("mousemoved", JSON.stringify(Date.now()))
+  const idleLogout = async () => {
+    setConfirmSession(false)
+    if (logoutRef.current) await logoutRef.current()
+    else window.location.replace("/#/")
   }
 
-  useEffect(() => {
+  const stayLoggedIn = () => {
+    localStorage.setItem("lastActivity", JSON.stringify(Date.now()))
     setConfirmSession(false)
-  }, [location?.pathname])
+  }
 
+  // Records activity in localStorage, shared across tabs, at most every 5 seconds
   useEffect(() => {
-    window.addEventListener("mousemove", onMouseMove)
-    return () => window.removeEventListener("mousemove", onMouseMove)
+    let lastWrite = 0
+    const recordActivity = () => {
+      const now = Date.now()
+      if (now - lastWrite < 5000) return
+      lastWrite = now
+      localStorage.setItem("lastActivity", JSON.stringify(now))
+    }
+    recordActivity()
+    ACTIVITY_EVENTS.forEach((event) => window.addEventListener(event, recordActivity, true))
+    return () => ACTIVITY_EVENTS.forEach((event) => window.removeEventListener(event, recordActivity, true))
   }, [])
 
+  // Opens the prompt for researchers and admins (never participants or the login page)
   useEffect(() => {
-    if (confirmSession) {
-      const timeout = setTimeout(() => {
-        setConfirmSession(false)
-        goBackToHome()
-      }, 60 * 1000)
-
-      return () => clearTimeout(timeout)
-    } else {
-      const interval = setInterval(() => {
-        const moved = parseInt(localStorage.getItem("mousemoved") || "0")
-        const now = Date.now()
-        const inactiveMinutes = (now - moved) / 60000
-        if (
-          inactiveMinutes > 15 &&
-          !confirmSession &&
-          localStorage.getItem("isLoginPage") === "false" &&
-          localStorage.getItem("isParticipant") === "false" &&
-          location?.pathname !== "/"
-        ) {
-          setConfirmSession(true)
-        }
-      }, 60 * 1000)
-
-      return () => clearInterval(interval)
-    }
+    if (confirmSession) return
+    const check = setInterval(() => {
+      if (
+        ["researcher", "admin"].includes(LAMP.Auth._type) &&
+        localStorage.getItem("isLoginPage") === "false" &&
+        Date.now() - lastActivity() > IDLE_MINUTES * 60 * 1000
+      ) {
+        setConfirmSession(true)
+      }
+    }, 30 * 1000)
+    return () => clearInterval(check)
   }, [confirmSession])
 
-  const goBackToHome = () => {
-    setConfirmSession(false)
-    sessionStorage.removeItem("tokenInfo")
-    localStorage.removeItem("expiry")
-    window.location.href = "/#/"
-  }
+  // Counts down while the prompt is open; activity in any tab closes it
+  useEffect(() => {
+    if (!confirmSession) return
+    const openedAt = Date.now()
+    setSecondsLeft(LOGOUT_COUNTDOWN_SECONDS)
+    const tick = setInterval(() => {
+      if (lastActivity() > openedAt) {
+        setConfirmSession(false)
+        return
+      }
+      const left = LOGOUT_COUNTDOWN_SECONDS - Math.floor((Date.now() - openedAt) / 1000)
+      if (left <= 0) {
+        clearInterval(tick)
+        idleLogout()
+      } else {
+        setSecondsLeft(left)
+      }
+    }, 1000)
+    return () => clearInterval(tick)
+  }, [confirmSession])
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary FallbackComponent={ErrorScreen}>
       <ThemeProvider
         theme={createTheme({
           typography: {
@@ -1181,38 +1094,21 @@ export default function App({ ...props }) {
         <CssBaseline />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <SnackbarProvider>
-            <ConfirmModal
-              confirm={confirmSession}
-              title="Confirm Session"
-              text="Your session has expired. Do you want to continue or logout?"
-              confirmText="Continue"
-              cancelText="Logout"
-              handleConfirm={() => {
-                localStorage.setItem("mousemoved", JSON.stringify(Date.now()))
-                setConfirmSession(false)
-              }}
-              onCancel={goBackToHome}
-              onClose={() => setConfirmSession(false)}
+            <IdlePrompt
+              open={confirmSession}
+              idleMinutes={IDLE_MINUTES}
+              secondsLeft={secondsLeft}
+              totalSeconds={LOGOUT_COUNTDOWN_SECONDS}
+              onStay={stayLoggedIn}
+              onLogout={idleLogout}
             />
             <HashRouter>
               <AuthContextProvider>
-                <AppRouter {...props} setConfirmSession={setConfirmSession} />
+                <AppRouter {...props} setConfirmSession={setConfirmSession} logoutRef={logoutRef} />
               </AuthContextProvider>
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
-        {/* <span
-          style={{
-            position: "fixed",
-            bottom: 16,
-            left: 16,
-            fontSize: "8",
-            zIndex: -1,
-            opacity: 0.1,
-          }}
-        >
-          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
-        </span> */}
       </ThemeProvider>
     </ErrorBoundary>
   )

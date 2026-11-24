@@ -12,12 +12,9 @@ import {
   Menu,
   Icon,
   Dialog,
-  DialogTitle,
   useTheme,
   useMediaQuery,
   DialogContent,
-  DialogContentText,
-  DialogActions,
   Typography,
   colors,
   Backdrop,
@@ -28,57 +25,35 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Avatar,
+  Divider,
+  ListItemIcon,
+  ListItemText,
 } from "@material-ui/core"
 // Local Imports
-import { CredentialEditor, CredentialManager } from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
 import { useLocation } from "react-router-dom"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
-import { Position } from "monaco-editor"
+import ExitToAppRoundedIcon from "@material-ui/icons/ExitToAppRounded"
+import HelpOutlineRoundedIcon from "@material-ui/icons/HelpOutlineRounded"
+import MailOutlineRoundedIcon from "@material-ui/icons/MailOutlineRounded"
+import DeleteOutlineRoundedIcon from "@material-ui/icons/DeleteOutlineRounded"
+import OpenInNewRoundedIcon from "@material-ui/icons/OpenInNewRounded"
+import PersonOutlineRoundedIcon from "@material-ui/icons/PersonOutlineRounded"
 import Notifications from "./Notifications"
 import { useAuthContext } from "./AuthProvider"
 import { MESSAGING_ENABLED } from "../featureFlags"
 import { useSnackbar } from "notistack"
+import { dashboardVersion, serverAddress } from "./helper"
+import { themeColors, radius, shadow, touchTarget } from "../theme/tokens"
+import { useButtonStyles, useDialogStyles } from "../theme/styles"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    toolbar: {
-      paddingLeft: 20,
-      paddingRight: 20,
-      alignItems: "flex-start",
-      paddingTop: 15,
-      paddingBottom: theme.spacing(1),
-      "& h5": {
-        color: "#555555",
-        fontSize: 25,
-        fontWeight: "bold",
-        paddingTop: 15,
-        // position: "absolute",
-        bottom: 0,
-        [theme.breakpoints.down("sm")]: {
-          marginTop: 30,
-        },
-      },
-    },
-    inlineHeader: {
-      background: "#FFFFFF",
-      boxShadow: "none",
-
-      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
-    },
-    toolbardashboard: {
-      minHeight: 75,
-      padding: "15px 10px 0",
-      [theme.breakpoints.down("xs")]: {
-        display: "block",
-        width: "100%",
-        padding: "0px 10px 0",
-      },
-    },
     headerRight: {
       "& span": {
         color: "rgba(0, 0, 0, 0.54)",
@@ -97,12 +72,6 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 0,
       },
     },
-    backMain: {
-      width: 40,
-      height: 40,
-      marginTop: -8,
-      background: "#fff",
-    },
     thumbContainer: {
       maxWidth: 1055,
       left: 0,
@@ -112,7 +81,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": { fontWeight: "bold", color: "rgba(0, 0, 0, 0.75)", fontSize: 30, padding: "15px 0", background: "#fff" },
 
       [theme.breakpoints.up("md")]: {
-        // paddingLeft: 125,
         width: "80%",
       },
       [theme.breakpoints.up("lg")]: {
@@ -151,7 +119,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
+    logToolbarResearcher: {
+      marginTop: 50,
+      paddingTop: 0,
+      background: "transparent",
+      "& h5": { paddingTop: 35 },
+      "& $participantActions": { top: 30 },
+    },
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -232,36 +206,77 @@ const useStyles = makeStyles((theme: Theme) =>
         right: 17,
       },
     },
-    notificationMain: {
-      width: 400,
-      borderRadius: 16,
-      maxHeight: 400,
-      overflow: "auto",
-      "& h5": {
-        fontSize: "1.3rem",
-        display: "flex",
-        alignItems: "center",
-        fontWeight: "600  ",
-      },
-      "& .MuiDivider-root": {
-        margin: "2px 0",
-      },
+    // Lines the header icons up with the page title, which toolbarResearcher's h5 padding pushes down
+    participantActions: {
+      position: "relative",
+      top: 50,
+      [theme.breakpoints.down("sm")]: { top: 33 },
     },
-    notificationList: {
-      cursor: "pointer",
-      borderRadius: 8,
-      "& p": {
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        width: "100%",
-      },
-      "& *": {
-        cursor: "pointer",
-      },
-      "&:hover": {
-        background: "#f6f6f6",
-      },
+    // Participant profile menu
+    avatarButton: { padding: 4, marginLeft: 4 },
+    avatar: {
+      width: 36,
+      height: 36,
+      fontSize: 15,
+      fontWeight: 600,
+      color: themeColors.primary,
+      background: themeColors.primarySoft,
+      boxShadow: `0 0 0 2px ${themeColors.white}, 0 0 0 4px ${themeColors.primarySoft}`,
+    },
+    profileMenuPaper: {
+      width: 288,
+      borderRadius: radius.menu,
+      border: `1px solid ${themeColors.border}`,
+      boxShadow: shadow.menu,
+    },
+    profileMenuList: { padding: "6px 0 0" },
+    profileMenuHeader: {
+      gap: 12,
+      padding: "12px 16px 14px",
+      "&.Mui-disabled": { opacity: 1 },
+    },
+    profileMenuName: {
+      fontSize: 15,
+      fontWeight: 600,
+      color: themeColors.text,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    profileMenuId: { fontSize: 12.5, color: themeColors.textMuted },
+    profileMenuDivider: { margin: "4px 0", backgroundColor: themeColors.divider },
+    profileMenuItem: {
+      minHeight: touchTarget,
+      margin: "2px 6px",
+      padding: "0 12px",
+      borderRadius: radius.item,
+      fontSize: 15,
+      color: themeColors.textStrong,
+      "& .MuiListItemIcon-root": { minWidth: 32, color: themeColors.textMuted },
+      "&:hover": { backgroundColor: themeColors.surfaceHover },
+      [theme.breakpoints.down("sm")]: { minHeight: 48, fontSize: 16 },
+    },
+    profileMenuExternal: { fontSize: 16, color: themeColors.iconFaint, marginLeft: 8 },
+    profileMenuDelete: {
+      color: themeColors.danger,
+      "& .MuiListItemIcon-root": { color: themeColors.danger },
+      "&:hover": { backgroundColor: themeColors.dangerSoft },
+    },
+    profileMenuVersion: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      marginTop: 6,
+      padding: "10px 18px 12px",
+      borderTop: `1px solid ${themeColors.divider}`,
+      background: themeColors.surface,
+      fontSize: 12,
+      lineHeight: 1.45,
+      color: themeColors.textMuted,
+      userSelect: "text",
+      // The researcher menu sets a pointer cursor on everything inside it
+      cursor: "text",
+      "& span": { cursor: "text" },
     },
   })
 )
@@ -277,7 +292,6 @@ export default function NavigationLayout({
   activeTab,
   sameLineTitle,
   changeResearcherType,
-  // participant,
   ...props
 }: {
   title?: string
@@ -290,7 +304,6 @@ export default function NavigationLayout({
   activeTab?: string
   sameLineTitle?: boolean
   changeResearcherType?: Function
-  // participant?: Participant
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -305,8 +318,9 @@ export default function NavigationLayout({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
+  const dialog = useDialogStyles()
+  const buttons = useButtonStyles()
   const { t } = useTranslation()
-  //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
@@ -341,7 +355,8 @@ export default function NavigationLayout({
       } else {
         setLoading(false)
       }
-      if (!!isMounted) {
+      // Only the Messages badge uses these requests
+      if (!!isMounted && MESSAGING_ENABLED) {
         refresh()
       }
     }
@@ -381,12 +396,15 @@ export default function NavigationLayout({
 
   const onDeleteAccount = async () => {
     await LAMP.Type.setAttachment(id, "me", "lamp.is_deleted", true)
-    await LAMP.Credential.list(id).then((cred) => {
-      cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      ;(cred || []).map(async (each) => {
-        await LAMP.Credential.delete(id, each["access_key"])
-      })
-    })
+    const credentials = await LAMP.Credential.list(id)
+    // Wait for every login to be deleted: the logout below reloads the page and would cut them off
+    await Promise.all(
+      (Array.isArray(credentials) ? credentials : [])
+        .filter((c) => c.hasOwnProperty("origin"))
+        .map((each) =>
+          LAMP.Credential.delete(id, each["access_key"]).catch((err) => console.error("Deleting a login failed:", err))
+        )
+    )
     await LAMP.Type.setAttachment(id, "me", "lamp.name", null)
     Service.updateValue("participants", { participants: [{ is_deleted: true, id: id }] }, "is_deleted", "id")
     if (authType === "researcher" || authType === "admin") {
@@ -461,6 +479,12 @@ export default function NavigationLayout({
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
+  // Participant menu: the name they signed in with, else the participant number (old server)
+  const userNumber = `${t("User number", { number: (title || "").split(" ")[1] })}`
+  const profileName: string | undefined = authType === "participant" ? sessionInfo?.accessKey || undefined : undefined
+  const profileInitial = profileName ? profileName.charAt(0).toUpperCase() : undefined
+  // Researchers viewing a participant delete that participant's account and stay logged in
+  const deletingOwnAccount = authType !== "researcher" && authType !== "admin"
   return (
     <Box>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -543,7 +567,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
+                        window.open("https://docs.lamp.digital/docs", "_blank")
                       }}
                     >
                       {`${t("Help & Support")}`}
@@ -552,7 +576,7 @@ export default function NavigationLayout({
                       dense
                       onClick={() => {
                         setShowCustomizeMenu(undefined)
-                        window.open("mailto:team@digitalpsych.org", "_blank")
+                        window.open("mailto:mindlamp@bidmc.harvard.edu", "_blank")
                       }}
                     >
                       {`${t("Contact Us")}`}
@@ -566,21 +590,10 @@ export default function NavigationLayout({
                     >
                       <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
                     </MenuItem>
+                    <MenuVersion className={classes.profileMenuVersion} />
                   </Popover>
                 </Box>
               )}
-
-              {/**Commenting for now
-               {(authType === "researcher" || authType === "admin") &&
-                title !== "Administrator" &&
-                title !== "User Administrator" &&
-                title !== "Practice Lead" &&
-                !title.startsWith("User") &&
-                !!changeResearcherType && (
-                  <Box>
-                    <ModeToggleButton changeResearcherType={changeResearcherType} />
-                  </Box>
-                )} */}
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
@@ -633,9 +646,7 @@ export default function NavigationLayout({
                 typeof title != "undefined" &&
                 title.startsWith("User") &&
                 title !== "User Administrator" && (
-                  // participant?.isMessagingEnabled && (
-                  // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
-                  <Box className={classes.headerRight}>
+                  <Box className={`${classes.headerRight} ${classes.participantActions}`}>
                     {hideNotifications.indexOf(activeTab) < 0 ? (
                       <Tooltip title={`${t("Messages")}`}>
                         <Badge
@@ -655,8 +666,9 @@ export default function NavigationLayout({
                   </Box>
                 )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                <Box className={classes.headerRight}>
-                  {hideNotifications.indexOf(activeTab) < 0 ? (
+                <Box className={`${classes.headerRight} ${classes.participantActions}`}>
+                  {/* The bell only shows lamp.messaging, which the Messages feature writes */}
+                  {MESSAGING_ENABLED && hideNotifications.indexOf(activeTab) < 0 ? (
                     <>
                       <Tooltip title={`${t("Notifications")}`}>
                         <IconButton aria-describedby="notificationPopover" onClick={handleNotificationClick}>
@@ -693,15 +705,18 @@ export default function NavigationLayout({
                 </Box>
               )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                <Box>
+                <Box className={classes.participantActions}>
                   <Tooltip title={`${t("Profile & Settings")}`}>
                     <IconButton
+                      aria-label={`${t("Profile & Settings")}`}
                       aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
                       aria-haspopup="true"
                       onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
-                      color="default"
+                      className={classes.avatarButton}
                     >
-                      <Icon>account_circle</Icon>
+                      <Avatar className={classes.avatar}>
+                        {profileInitial || <PersonOutlineRoundedIcon fontSize="small" />}
+                      </Avatar>
                     </IconButton>
                   </Tooltip>
                   <Menu
@@ -709,36 +724,69 @@ export default function NavigationLayout({
                     anchorEl={showCustomizeMenu}
                     open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
                     onClose={() => setShowCustomizeMenu(undefined)}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    classes={{ paper: classes.profileMenuPaper, list: classes.profileMenuList }}
                   >
-                    <MenuItem disabled divider>
-                      <b>{`${t("User number", { number: title.split(" ")[1] })}`}</b>
+                    <MenuItem disabled className={classes.profileMenuHeader}>
+                      <Avatar className={classes.avatar}>
+                        {profileInitial || <PersonOutlineRoundedIcon fontSize="small" />}
+                      </Avatar>
+                      <Box minWidth={0}>
+                        <Typography className={classes.profileMenuName}>{profileName || userNumber}</Typography>
+                        {!!profileName && <Typography className={classes.profileMenuId}>{userNumber}</Typography>}
+                      </Box>
                     </MenuItem>
+                    <Divider component="li" className={classes.profileMenuDivider} />
+                    <MenuItem className={classes.profileMenuItem} onClick={() => setConfirmLogout(true)}>
+                      <ListItemIcon>
+                        <ExitToAppRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Logout")}`}</ListItemText>
+                    </MenuItem>
+                    <Divider component="li" className={classes.profileMenuDivider} />
+                    <MenuItem
+                      className={classes.profileMenuItem}
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://docs.lamp.digital/app/", "_blank")
+                      }}
+                    >
+                      <ListItemIcon>
+                        <HelpOutlineRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Help & Support")}`}</ListItemText>
+                      <OpenInNewRoundedIcon className={classes.profileMenuExternal} />
+                    </MenuItem>
+                    <MenuItem
+                      className={classes.profileMenuItem}
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("mailto:mindlamp@bidmc.harvard.edu", "_blank")
+                      }}
+                    >
+                      <ListItemIcon>
+                        <MailOutlineRoundedIcon fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText disableTypography>{`${t("Contact Us")}`}</ListItemText>
+                    </MenuItem>
+                    {/* Kept last and in red, away from Logout */}
                     {(isDeleted === null || !isDeleted) && (
-                      <MenuItem divider onClick={() => setConfirmDelete(true)}>
-                        {`${t("Delete Account")}`}
+                      <Divider component="li" className={classes.profileMenuDivider} />
+                    )}
+                    {(isDeleted === null || !isDeleted) && (
+                      <MenuItem
+                        className={`${classes.profileMenuItem} ${classes.profileMenuDelete}`}
+                        onClick={() => setConfirmDelete(true)}
+                      >
+                        <ListItemIcon>
+                          <DeleteOutlineRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText disableTypography>{`${t("Delete Account")}`}</ListItemText>
                       </MenuItem>
                     )}
-                    <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                      {`${t("Logout")}`}
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
-                        window.open("https://docs.lamp.digital/troubleshooting", "_blank")
-                      }}
-                    >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Help & Support")}`}</b>
-                    </MenuItem>
-                    <MenuItem
-                      dense
-                      onClick={() => {
-                        setShowCustomizeMenu(undefined)
-                        window.open("mailto:team@digitalpsych.org", "_blank")
-                      }}
-                    >
-                      <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
-                    </MenuItem>
+                    <MenuVersion component="li" className={classes.profileMenuVersion} />
                   </Menu>
                 </Box>
               )}
@@ -788,26 +836,44 @@ export default function NavigationLayout({
         }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        classes={{ paper: dialog.paper }}
       >
-        <DialogTitle id="alert-dialog-title">{`${t(
-          !!confirmDelete ? "Confirmation" : "Are you sure you want to log out of LAMP right now?"
-        )}`}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t(
-              !!confirmDelete
-                ? "Are you sure you want to delete account?"
-                : "If you've made some changes, make sure they're saved before you continue to log out."
-            )}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          {!!confirmLogout && (
-            <Button onClick={() => setConfirmLogout(false)} color="secondary">
-              {`${t("Go Back")}`}
-            </Button>
-          )}
+        <Box className={`${dialog.icon} ${!!confirmDelete ? dialog.iconDanger : ""}`}>
+          {!!confirmDelete ? <DeleteOutlineRoundedIcon /> : <ExitToAppRoundedIcon />}
+        </Box>
+        <Typography id="alert-dialog-title" component="h2" className={dialog.title}>
+          {`${t(
+            !!confirmDelete
+              ? deletingOwnAccount
+                ? "Delete your account?"
+                : "Delete this participant's account?"
+              : "Log out?"
+          )}`}
+        </Typography>
+        <Typography id="alert-dialog-description" className={dialog.body}>
+          {`${t(
+            !!confirmDelete
+              ? deletingOwnAccount
+                ? "You'll be logged out and won't be able to log in again. Your study data stays with your research team."
+                : "They won't be able to log in again. Their study data is kept."
+              : "If you've made some changes, make sure they're saved before you continue to log out."
+          )}`}
+        </Typography>
+        <Box className={dialog.actions}>
+          {/* Delete opens on Cancel, so Enter never deletes an account */}
           <Button
+            className={buttons.secondary}
+            autoFocus={!!confirmDelete}
+            onClick={() => {
+              setConfirmLogout(false)
+              setConfirmDelete(false)
+            }}
+          >
+            {`${t(!!confirmDelete ? "Cancel" : "Go Back")}`}
+          </Button>
+          <Button
+            className={!!confirmDelete ? buttons.danger : buttons.primary}
+            autoFocus={!confirmDelete}
             onClick={() => {
               if (!!confirmLogout) {
                 onLogout()
@@ -817,12 +883,10 @@ export default function NavigationLayout({
                 setConfirmDelete(false)
               }
             }}
-            color="primary"
-            autoFocus
           >
-            {`${t(!!confirmDelete ? "Delete" : "Logout")}`}
+            {`${t(!!confirmDelete ? "Delete Account" : "Logout")}`}
           </Button>
-        </DialogActions>
+        </Box>
       </Dialog>
 
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
@@ -836,6 +900,18 @@ export default function NavigationLayout({
           <ChangeMyPassword closeModal={() => setChangeMyPassword(false)} />
         </DialogContent>
       </Dialog>
+    </Box>
+  )
+}
+
+// Bottom of the account menus, so screenshots show which build and server someone is on
+function MenuVersion({ className, component = "div" }: { className: string; component?: React.ElementType }) {
+  const { t } = useTranslation()
+  const server = serverAddress()
+  return (
+    <Box component={component} className={className}>
+      <span>{dashboardVersion()}</span>
+      {!!server && <span>{`${t("Server: {{address}}", { address: server })}`}</span>}
     </Box>
   )
 }
