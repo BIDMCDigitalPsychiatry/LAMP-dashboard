@@ -343,6 +343,8 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onLogout = undefine
   const { refreshSessionInfo } = useAuthContext()
 
   const CODE_REGEX = /^\d{6}$/
+  // The server allows 10 code sends and 10 wrong codes per 15 minutes (rateLimitTwoFactor.ts)
+  const TOO_MANY_REQUESTS = "429.too-many-requests"
 
   const validateCode = () => {
     if (!code.match(CODE_REGEX)) {
@@ -363,6 +365,8 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onLogout = undefine
     }
     if (resendCodeResult?.message === "ok") {
       showSuccess && enqueueSnackbar(t("Successfully sent code"), { variant: "success" })
+    } else if (resendCodeResult?.error === TOO_MANY_REQUESTS) {
+      enqueueSnackbar(t("Too many codes sent. Wait 15 minutes before asking for a new one."), { variant: "error" })
     } else {
       enqueueSnackbar(t("Failed to resend code."), { variant: "error" })
     }
@@ -386,6 +390,8 @@ export function TwoFactorVerifyForm({ onSuccess = undefined, onLogout = undefine
       if (verifyResult?.message === "ok") {
         refreshSessionInfo()
         onSuccess && onSuccess()
+      } else if (verifyResult?.error === TOO_MANY_REQUESTS) {
+        setCodeErrors(t("Too many attempts. Wait 15 minutes and try again."))
       } else {
         setCodeErrors(wrongCode)
       }
