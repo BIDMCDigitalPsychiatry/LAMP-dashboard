@@ -58,18 +58,8 @@ function ErrorFallback({ error }) {
       }}
     >
       <pre>
-        {/* <code style={{ fontSize: "16px" }}>
-          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
-        </code>
-        <br />
-        <code style={{ color: "#fff" }}>
-          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code> */}
         <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
         <br />
-        {/* <code>
-          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code> */}
         <br />
         <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
           {`${t("Back to page.")}`}
@@ -585,31 +575,6 @@ function AppRouter({ setConfirmSession, logoutRef, ...props }) {
               </AuthenticatedRoute>
             )}
           />
-          {/* <Route
-            exact
-            path="/participant/:id/notifications"
-            render={(props) =>
-              !state.identity ? (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
-                  <Login
-                    setIdentity={async (identity) => !!identity && (await reset(identity))}
-                    lastDomain={state.lastDomain}
-                    onComplete={() => {
-                      props.history.replace("/")
-                    }}
-                    setAuthenticated={setAuthenticated}
-                    setConfirmSession={setConfirmSession}
-                  />
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  <PageTitle>mindLAMP | {`${t("Notifications")}`}</PageTitle>
-                  <Notifications participant={getParticipant(props.match.params.id)?.id ?? null} from ="app"/>
-                </React.Fragment>
-              )
-            }
-          /> */}
           <Route
             exact
             path="/2fa"
@@ -947,11 +912,6 @@ function AppRouter({ setConfirmSession, logoutRef, ...props }) {
                       authType={state.authType}
                       id={props.match.params.id}
                       title={`User ${getParticipant(props.match.params.id).id}`}
-                      // name={
-                      //   getParticipant(props.match.params.id)?.alias ||
-                      //   getParticipant(props.match.params.id)?.name ||
-                      //   getParticipant(props.match.params.id)?.id
-                      // }
                       goBack={props.history.goBack}
                       onLogout={() => logout()}
                       activeTab={state.activeTab ?? "assess"}
@@ -1186,18 +1146,6 @@ export default function App({ ...props }) {
             </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
-        {/* <span
-          style={{
-            position: "fixed",
-            bottom: 16,
-            left: 16,
-            fontSize: "8",
-            zIndex: -1,
-            opacity: 0.1,
-          }}
-        >
-          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
-        </span> */}
       </ThemeProvider>
     </ErrorBoundary>
   )
