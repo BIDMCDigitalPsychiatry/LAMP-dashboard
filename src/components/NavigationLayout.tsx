@@ -34,21 +34,19 @@ import {
   ListItemText,
 } from "@material-ui/core"
 // Local Imports
-import { CredentialEditor, CredentialManager } from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import { sensorEventUpdate } from "./BottomMenu"
 import { useLocation } from "react-router-dom"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import ExitToAppRoundedIcon from "@material-ui/icons/ExitToAppRounded"
 import HelpOutlineRoundedIcon from "@material-ui/icons/HelpOutlineRounded"
 import MailOutlineRoundedIcon from "@material-ui/icons/MailOutlineRounded"
 import DeleteOutlineRoundedIcon from "@material-ui/icons/DeleteOutlineRounded"
 import OpenInNewRoundedIcon from "@material-ui/icons/OpenInNewRounded"
 import PersonOutlineRoundedIcon from "@material-ui/icons/PersonOutlineRounded"
-import { Position } from "monaco-editor"
 import Notifications from "./Notifications"
 import { useAuthContext } from "./AuthProvider"
 import { MESSAGING_ENABLED } from "../featureFlags"
@@ -56,39 +54,6 @@ import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    toolbar: {
-      paddingLeft: 20,
-      paddingRight: 20,
-      alignItems: "flex-start",
-      paddingTop: 15,
-      paddingBottom: theme.spacing(1),
-      "& h5": {
-        color: "#555555",
-        fontSize: 25,
-        fontWeight: "bold",
-        paddingTop: 15,
-        // position: "absolute",
-        bottom: 0,
-        [theme.breakpoints.down("sm")]: {
-          marginTop: 30,
-        },
-      },
-    },
-    inlineHeader: {
-      background: "#FFFFFF",
-      boxShadow: "none",
-
-      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
-    },
-    toolbardashboard: {
-      minHeight: 75,
-      padding: "15px 10px 0",
-      [theme.breakpoints.down("xs")]: {
-        display: "block",
-        width: "100%",
-        padding: "0px 10px 0",
-      },
-    },
     headerRight: {
       "& span": {
         color: "rgba(0, 0, 0, 0.54)",
@@ -107,12 +72,6 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 0,
       },
     },
-    backMain: {
-      width: 40,
-      height: 40,
-      marginTop: -8,
-      background: "#fff",
-    },
     thumbContainer: {
       maxWidth: 1055,
       left: 0,
@@ -122,7 +81,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": { fontWeight: "bold", color: "rgba(0, 0, 0, 0.75)", fontSize: 30, padding: "15px 0", background: "#fff" },
 
       [theme.breakpoints.up("md")]: {
-        // paddingLeft: 125,
         width: "80%",
       },
       [theme.breakpoints.up("lg")]: {
@@ -242,37 +200,6 @@ const useStyles = makeStyles((theme: Theme) =>
         right: 17,
       },
     },
-    notificationMain: {
-      width: 400,
-      borderRadius: 16,
-      maxHeight: 400,
-      overflow: "auto",
-      "& h5": {
-        fontSize: "1.3rem",
-        display: "flex",
-        alignItems: "center",
-        fontWeight: "600  ",
-      },
-      "& .MuiDivider-root": {
-        margin: "2px 0",
-      },
-    },
-    notificationList: {
-      cursor: "pointer",
-      borderRadius: 8,
-      "& p": {
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-        width: "100%",
-      },
-      "& *": {
-        cursor: "pointer",
-      },
-      "&:hover": {
-        background: "#f6f6f6",
-      },
-    },
     // Participant profile menu
     avatarButton: { padding: 4, marginLeft: 4 },
     avatar: {
@@ -337,7 +264,6 @@ export default function NavigationLayout({
   activeTab,
   sameLineTitle,
   changeResearcherType,
-  // participant,
   ...props
 }: {
   title?: string
@@ -350,7 +276,6 @@ export default function NavigationLayout({
   activeTab?: string
   sameLineTitle?: boolean
   changeResearcherType?: Function
-  // participant?: Participant
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -366,7 +291,6 @@ export default function NavigationLayout({
   const print = useMediaQuery("print")
   const classes = useStyles()
   const { t } = useTranslation()
-  //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
@@ -634,18 +558,6 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-
-              {/**Commenting for now
-               {(authType === "researcher" || authType === "admin") &&
-                title !== "Administrator" &&
-                title !== "User Administrator" &&
-                title !== "Practice Lead" &&
-                !title.startsWith("User") &&
-                !!changeResearcherType && (
-                  <Box>
-                    <ModeToggleButton changeResearcherType={changeResearcherType} />
-                  </Box>
-                )} */}
             </Toolbar>
           )}
           {((authType !== "researcher" && authType !== "admin") ||
@@ -698,8 +610,6 @@ export default function NavigationLayout({
                 typeof title != "undefined" &&
                 title.startsWith("User") &&
                 title !== "User Administrator" && (
-                  // participant?.isMessagingEnabled && (
-                  // (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) &&
                   <Box className={classes.headerRight}>
                     {hideNotifications.indexOf(activeTab) < 0 ? (
                       <Tooltip title={`${t("Messages")}`}>
