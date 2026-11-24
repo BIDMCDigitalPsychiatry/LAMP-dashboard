@@ -1,3 +1,5 @@
+import LAMP from "lamp-core"
+
 export function extractIdsWithHierarchy(data) {
   return data.map((item) => {
     const result = {
@@ -49,4 +51,17 @@ export function clearLocalStorageItems() {
   }
   localStorage.setItem("loginAttempts", loginAttempts)
   sessionStorage.clear()
+}
+
+// The dashboard build stamped by buildEnv.js, e.g. "mindLAMP 2026.08.05.3 · build 3131 (4598084)".
+// Builds that aren't on a release tag show "dev" in place of the tag.
+export function dashboardVersion() {
+  const tag = process.env.REACT_APP_GIT_SHA || "dev"
+  const commit = process.env.REACT_APP_GIT_COMMIT
+  return `mindLAMP ${tag} · build ${process.env.REACT_APP_GIT_NUM || "?"}${commit ? ` (${commit})` : ""}`
+}
+
+// The server this dashboard is logged in to, without the protocol; empty before login
+export function serverAddress() {
+  return (LAMP.Auth?._auth?.serverAddress || "").replace(/^https?:\/\//, "")
 }

@@ -15,6 +15,7 @@ import LAMP from "lamp-core"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ResponsiveMargin } from "./Utils"
+import { dashboardVersion } from "./helper"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 
@@ -59,6 +60,8 @@ export const useLoginStyles = makeStyles((theme: Theme) =>
     loginDisabled: {
       opacity: 0.5,
     },
+    // Version under every login screen, so screenshots of login problems show the build
+    version: { padding: "8px 16px 16px", textAlign: "center", fontSize: 12, lineHeight: 1.45, color: "#6B7280" },
   })
 )
 
@@ -139,6 +142,7 @@ export default function LoginFrame({ children, wide = false }: { children: React
             {children}
           </Grid>
         </Grid>
+        <Box className={classes.version}>{dashboardVersion()}</Box>
       </ResponsiveMargin>
     </Slide>
   )

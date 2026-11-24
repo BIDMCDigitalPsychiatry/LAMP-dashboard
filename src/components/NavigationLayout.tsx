@@ -48,6 +48,7 @@ import Notifications from "./Notifications"
 import { useAuthContext } from "./AuthProvider"
 import { MESSAGING_ENABLED } from "../featureFlags"
 import { useSnackbar } from "notistack"
+import { dashboardVersion, serverAddress } from "./helper"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -226,7 +227,7 @@ const useStyles = makeStyles((theme: Theme) =>
       border: "1px solid #E5E7EB",
       boxShadow: "0 12px 32px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.06)",
     },
-    profileMenuList: { padding: "6px 0" },
+    profileMenuList: { padding: "6px 0 0" },
     profileMenuHeader: {
       gap: 12,
       padding: "12px 16px 14px",
@@ -258,6 +259,19 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "#B42318",
       "& .MuiListItemIcon-root": { color: "#B42318" },
       "&:hover": { backgroundColor: "#FEF3F2" },
+    },
+    profileMenuVersion: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      marginTop: 6,
+      padding: "10px 18px 12px",
+      borderTop: "1px solid #EEF0F3",
+      background: "#F7F8FA",
+      fontSize: 12,
+      lineHeight: 1.45,
+      color: "#6B7280",
+      userSelect: "text",
     },
     // Logout and delete account confirmation dialog
     confirmPaper: {
@@ -626,6 +640,7 @@ export default function NavigationLayout({
                     >
                       <b style={{ color: colors.grey["600"] }}>{`${t("Privacy Policy")}`}</b>
                     </MenuItem>
+                    <MenuVersion className={classes.profileMenuVersion} />
                   </Popover>
                 </Box>
               )}
@@ -821,6 +836,7 @@ export default function NavigationLayout({
                         <ListItemText disableTypography>{`${t("Delete Account")}`}</ListItemText>
                       </MenuItem>
                     )}
+                    <MenuVersion component="li" className={classes.profileMenuVersion} />
                   </Menu>
                 </Box>
               )}
@@ -934,6 +950,18 @@ export default function NavigationLayout({
           <ChangeMyPassword closeModal={() => setChangeMyPassword(false)} />
         </DialogContent>
       </Dialog>
+    </Box>
+  )
+}
+
+// Bottom of the account menus, so screenshots show which build and server someone is on
+function MenuVersion({ className, component = "div" }: { className: string; component?: React.ElementType }) {
+  const { t } = useTranslation()
+  const server = serverAddress()
+  return (
+    <Box component={component} className={className}>
+      <span>{dashboardVersion()}</span>
+      {!!server && <span>{`${t("Server: {{address}}", { address: server })}`}</span>}
     </Box>
   )
 }

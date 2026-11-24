@@ -65,6 +65,7 @@ function writeFile() {
                 "NODE_ENV=production",
                 `REACT_APP_GIT_NUM=${headCount}`,
                 `REACT_APP_GIT_SHA=${description}`,
+                `REACT_APP_GIT_COMMIT=${latestCommit.slice(0, 7)}`,
                 `REACT_APP_LATEST_LAMP=${latest}`,
                 isDev ? "BROWSER=none" : "CI=false",
                 `REACT_APP_USE_HTTPS=${isDev ? false : true}`,
