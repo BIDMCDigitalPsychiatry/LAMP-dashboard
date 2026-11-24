@@ -49,6 +49,8 @@ import { useAuthContext } from "./AuthProvider"
 import { MESSAGING_ENABLED } from "../featureFlags"
 import { useSnackbar } from "notistack"
 import { dashboardVersion, serverAddress } from "./helper"
+import { colors, radius, shadow, touchTarget } from "../theme/tokens"
+import { useButtonStyles, useDialogStyles } from "../theme/styles"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -217,15 +219,15 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 36,
       fontSize: 15,
       fontWeight: 600,
-      color: "#1565C0",
-      background: "#ECF4FF",
-      boxShadow: "0 0 0 2px #FFFFFF, 0 0 0 4px #ECF4FF",
+      color: colors.primary,
+      background: colors.primarySoft,
+      boxShadow: `0 0 0 2px ${colors.white}, 0 0 0 4px ${colors.primarySoft}`,
     },
     profileMenuPaper: {
       width: 288,
-      borderRadius: 14,
-      border: "1px solid #E5E7EB",
-      boxShadow: "0 12px 32px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.06)",
+      borderRadius: radius.menu,
+      border: `1px solid ${colors.border}`,
+      boxShadow: shadow.menu,
     },
     profileMenuList: { padding: "6px 0 0" },
     profileMenuHeader: {
@@ -236,29 +238,29 @@ const useStyles = makeStyles((theme: Theme) =>
     profileMenuName: {
       fontSize: 15,
       fontWeight: 600,
-      color: "#111827",
+      color: colors.text,
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
     },
-    profileMenuId: { fontSize: 12.5, color: "#6B7280" },
-    profileMenuDivider: { margin: "4px 0", backgroundColor: "#EEF0F3" },
+    profileMenuId: { fontSize: 12.5, color: colors.textMuted },
+    profileMenuDivider: { margin: "4px 0", backgroundColor: colors.divider },
     profileMenuItem: {
-      minHeight: 44,
+      minHeight: touchTarget,
       margin: "2px 6px",
       padding: "0 12px",
-      borderRadius: 8,
+      borderRadius: radius.item,
       fontSize: 15,
-      color: "#1F2937",
-      "& .MuiListItemIcon-root": { minWidth: 32, color: "#6B7280" },
-      "&:hover": { backgroundColor: "#F3F4F6" },
+      color: colors.textStrong,
+      "& .MuiListItemIcon-root": { minWidth: 32, color: colors.textMuted },
+      "&:hover": { backgroundColor: colors.surfaceHover },
       [theme.breakpoints.down("sm")]: { minHeight: 48, fontSize: 16 },
     },
-    profileMenuExternal: { fontSize: 16, color: "#9CA3AF", marginLeft: 8 },
+    profileMenuExternal: { fontSize: 16, color: colors.iconFaint, marginLeft: 8 },
     profileMenuDelete: {
-      color: "#B42318",
-      "& .MuiListItemIcon-root": { color: "#B42318" },
-      "&:hover": { backgroundColor: "#FEF3F2" },
+      color: colors.danger,
+      "& .MuiListItemIcon-root": { color: colors.danger },
+      "&:hover": { backgroundColor: colors.dangerSoft },
     },
     profileMenuVersion: {
       display: "flex",
@@ -266,69 +268,15 @@ const useStyles = makeStyles((theme: Theme) =>
       gap: 2,
       marginTop: 6,
       padding: "10px 18px 12px",
-      borderTop: "1px solid #EEF0F3",
-      background: "#F7F8FA",
+      borderTop: `1px solid ${colors.divider}`,
+      background: colors.surface,
       fontSize: 12,
       lineHeight: 1.45,
-      color: "#6B7280",
+      color: colors.textMuted,
       userSelect: "text",
-    },
-    // Logout and delete account confirmation dialog
-    confirmPaper: {
-      width: 380,
-      maxWidth: "calc(100% - 32px)",
-      margin: 16,
-      borderRadius: 16,
-      padding: "24px 24px 20px",
-      boxShadow: "0 20px 48px rgba(15, 23, 42, 0.24)",
-    },
-    confirmIcon: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      marginBottom: 12,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "#ECF4FF",
-      color: "#1565C0",
-    },
-    confirmIconDanger: { background: "#FEF3F2", color: "#B42318" },
-    confirmTitle: { fontSize: 20, fontWeight: 600, color: "#111827", marginBottom: 8 },
-    confirmBody: { fontSize: 15, lineHeight: 1.5, color: "#4B5563" },
-    confirmActions: { display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, marginTop: 20 },
-    confirmCancel: {
-      height: 44,
-      padding: "0 16px",
-      borderRadius: 10,
-      fontSize: 15,
-      fontWeight: 600,
-      textTransform: "none",
-      color: "#1F2937",
-      background: "#F3F4F6",
-      "&:hover": { background: "#E5E7EB" },
-    },
-    confirmPrimary: {
-      height: 44,
-      padding: "0 16px",
-      borderRadius: 10,
-      fontSize: 15,
-      fontWeight: 600,
-      textTransform: "none",
-      color: "#FFFFFF",
-      background: "#1565C0",
-      "&:hover": { background: "#0D47A1" },
-    },
-    confirmDanger: {
-      height: 44,
-      padding: "0 16px",
-      borderRadius: 10,
-      fontSize: 15,
-      fontWeight: 600,
-      textTransform: "none",
-      color: "#FFFFFF",
-      background: "#B42318",
-      "&:hover": { background: "#912018" },
+      // The researcher menu sets a pointer cursor on everything inside it
+      cursor: "text",
+      "& span": { cursor: "text" },
     },
   })
 )
@@ -370,6 +318,8 @@ export default function NavigationLayout({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
+  const dialog = useDialogStyles()
+  const buttons = useButtonStyles()
   const { t } = useTranslation()
   const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
@@ -886,12 +836,12 @@ export default function NavigationLayout({
         }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        classes={{ paper: classes.confirmPaper }}
+        classes={{ paper: dialog.paper }}
       >
-        <Box className={`${classes.confirmIcon} ${!!confirmDelete ? classes.confirmIconDanger : ""}`}>
+        <Box className={`${dialog.icon} ${!!confirmDelete ? dialog.iconDanger : ""}`}>
           {!!confirmDelete ? <DeleteOutlineRoundedIcon /> : <ExitToAppRoundedIcon />}
         </Box>
-        <Typography id="alert-dialog-title" component="h2" className={classes.confirmTitle}>
+        <Typography id="alert-dialog-title" component="h2" className={dialog.title}>
           {`${t(
             !!confirmDelete
               ? deletingOwnAccount
@@ -900,7 +850,7 @@ export default function NavigationLayout({
               : "Log out?"
           )}`}
         </Typography>
-        <Typography id="alert-dialog-description" className={classes.confirmBody}>
+        <Typography id="alert-dialog-description" className={dialog.body}>
           {`${t(
             !!confirmDelete
               ? deletingOwnAccount
@@ -909,10 +859,10 @@ export default function NavigationLayout({
               : "If you've made some changes, make sure they're saved before you continue to log out."
           )}`}
         </Typography>
-        <Box className={classes.confirmActions}>
+        <Box className={dialog.actions}>
           {/* Delete opens on Cancel, so Enter never deletes an account */}
           <Button
-            className={classes.confirmCancel}
+            className={buttons.secondary}
             autoFocus={!!confirmDelete}
             onClick={() => {
               setConfirmLogout(false)
@@ -922,7 +872,7 @@ export default function NavigationLayout({
             {`${t(!!confirmDelete ? "Cancel" : "Go Back")}`}
           </Button>
           <Button
-            className={!!confirmDelete ? classes.confirmDanger : classes.confirmPrimary}
+            className={!!confirmDelete ? buttons.danger : buttons.primary}
             autoFocus={!confirmDelete}
             onClick={() => {
               if (!!confirmLogout) {

@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next"
 import StackTrace from "stacktrace-js"
 import LAMP from "lamp-core"
 import { dashboardVersion, serverAddress } from "./helper"
+import { colors, fontFamily, radius, shadow } from "../theme/tokens"
+import { useButtonStyles } from "../theme/styles"
 
 // Rendered by the error boundary outside the app's theme, so fonts and colors are set here
 const useStyles = makeStyles({
@@ -15,9 +17,9 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    background: "#F7F8FA",
-    fontFamily: "Inter, Roboto, Helvetica, Arial, sans-serif",
-    color: "#111827",
+    background: colors.surface,
+    fontFamily,
+    color: colors.text,
   },
   card: {
     width: 540,
@@ -27,10 +29,10 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: 12,
-    background: "#FFFFFF",
-    border: "1px solid #E5E7EB",
-    borderRadius: 16,
-    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.06)",
+    background: colors.white,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radius.dialog,
+    boxShadow: shadow.card,
   },
   icon: {
     width: 44,
@@ -39,41 +41,28 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#FEF3F2",
-    color: "#B42318",
+    background: colors.dangerSoft,
+    color: colors.danger,
   },
-  title: { fontFamily: "inherit", fontSize: 22, fontWeight: 600, color: "#111827" },
-  body: { fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, color: "#4B5563" },
-  reload: {
-    alignSelf: "flex-start",
-    height: 44,
-    marginTop: 4,
-    padding: "0 18px",
-    borderRadius: 10,
-    fontFamily: "inherit",
-    fontSize: 15,
-    fontWeight: 600,
-    textTransform: "none",
-    color: "#FFFFFF",
-    background: "#1565C0",
-    "&:hover": { background: "#0D47A1" },
-  },
+  title: { fontFamily: "inherit", fontSize: 22, fontWeight: 600, color: colors.text },
+  body: { fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, color: colors.textBody },
+  reload: { alignSelf: "flex-start", marginTop: 4, fontFamily: "inherit" },
   details: {
     marginTop: 10,
     padding: "14px 16px",
     display: "flex",
     flexDirection: "column",
     gap: 10,
-    background: "#F7F8FA",
-    border: "1px solid #E5E7EB",
-    borderRadius: 10,
+    background: colors.surface,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radius.control,
     userSelect: "text",
   },
   detailsTitle: {
     margin: 0,
     fontSize: 12,
     fontWeight: 600,
-    color: "#4B5563",
+    color: colors.textBody,
     textTransform: "uppercase",
     letterSpacing: "0.04em",
   },
@@ -84,15 +73,16 @@ const useStyles = makeStyles({
     gap: "6px 12px",
     fontSize: 13,
     lineHeight: 1.45,
-    "& dt": { color: "#6B7280" },
+    "& dt": { color: colors.textMuted },
     "& dd": { margin: 0, overflowWrap: "anywhere" },
   },
-  error: { fontFamily: "Menlo, Consolas, monospace", fontSize: 12.5, color: "#B42318" },
+  error: { fontFamily: "Menlo, Consolas, monospace", fontSize: 12.5, color: colors.danger },
 })
 
 /** Shown when the dashboard crashes, with the details support needs to triage a screenshot */
 export default function ErrorScreen({ error }) {
   const classes = useStyles()
+  const buttons = useButtonStyles()
   const { t } = useTranslation()
   const [time] = useState(() =>
     new Date().toLocaleString(undefined, {
@@ -141,7 +131,7 @@ export default function ErrorScreen({ error }) {
                 "Reload the page to try again. If it keeps happening, take a screenshot of this page and send it to your research team."
               )}`}
         </Typography>
-        <Button className={classes.reload} onClick={() => window.location.reload()}>
+        <Button className={`${buttons.primary} ${classes.reload}`} onClick={() => window.location.reload()}>
           {`${t("Reload page")}`}
         </Button>
         <Box component="section" aria-labelledby="support-details" className={classes.details}>
