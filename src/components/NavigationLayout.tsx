@@ -119,7 +119,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
+    logToolbarResearcher: {
+      marginTop: 50,
+      paddingTop: 0,
+      background: "transparent",
+      "& h5": { paddingTop: 35 },
+      "& $participantActions": { top: 30 },
+    },
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -199,6 +205,12 @@ const useStyles = makeStyles((theme: Theme) =>
         top: -17,
         right: 17,
       },
+    },
+    // Lines the header icons up with the page title, which toolbarResearcher's h5 padding pushes down
+    participantActions: {
+      position: "relative",
+      top: 50,
+      [theme.breakpoints.down("sm")]: { top: 33 },
     },
     // Participant profile menu
     avatarButton: { padding: 4, marginLeft: 4 },
@@ -610,7 +622,7 @@ export default function NavigationLayout({
                 typeof title != "undefined" &&
                 title.startsWith("User") &&
                 title !== "User Administrator" && (
-                  <Box className={classes.headerRight}>
+                  <Box className={`${classes.headerRight} ${classes.participantActions}`}>
                     {hideNotifications.indexOf(activeTab) < 0 ? (
                       <Tooltip title={`${t("Messages")}`}>
                         <Badge
@@ -630,7 +642,7 @@ export default function NavigationLayout({
                   </Box>
                 )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                <Box className={classes.headerRight}>
+                <Box className={`${classes.headerRight} ${classes.participantActions}`}>
                   {/* The bell only shows lamp.messaging, which the Messages feature writes */}
                   {MESSAGING_ENABLED && hideNotifications.indexOf(activeTab) < 0 ? (
                     <>
@@ -669,7 +681,7 @@ export default function NavigationLayout({
                 </Box>
               )}
               {typeof title != "undefined" && title.startsWith("User") && title !== "User Administrator" && (
-                <Box>
+                <Box className={classes.participantActions}>
                   <Tooltip title={`${t("Profile & Settings")}`}>
                     <IconButton
                       aria-label={`${t("Profile & Settings")}`}
