@@ -5,7 +5,6 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
-import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Messages from "./Messages"
@@ -24,6 +23,7 @@ import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
 import TwoFA from "./TwoFA"
 import IdlePrompt from "./IdlePrompt"
+import ErrorScreen from "./ErrorScreen"
 import Notifications from "./Notifications"
 import ModuleActivity from "./ModuleActivity"
 import SplashScreen from "./SplashScreen"
@@ -31,43 +31,6 @@ import { isInMobileApp } from "./helper"
 import { AuthContextProvider, useAuthContext } from "./AuthProvider"
 import AuthenticatedRoute from "./AuthenticatedRoute"
 
-function ErrorFallback({ error }) {
-  const [trace, setTrace] = useState([])
-  const { t } = useTranslation()
-
-  useEffect(() => {
-    StackTrace.fromError(error).then(setTrace)
-  }, [])
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        border: "none",
-        zIndex: 2147483647,
-        padding: "0.5rem",
-        fontFamily: "Consolas, Menlo, monospace",
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.5,
-        fontSize: "12px",
-        color: "rgb(232, 59, 70)",
-        background: "rgb(53, 53, 53)",
-      }}
-    >
-      <pre>
-        <code>{`${t("An unexpected error occured. Please try again.")}`}</code>
-        <br />
-        <br />
-        <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
-          {`${t("Back to page.")}`}
-        </a>
-      </pre>
-    </div>
-  )
-}
 function PageTitle({ children, ...props }) {
   useEffect(() => {
     document.title = `${typeof children === "string" ? children : ""}`
@@ -1071,7 +1034,7 @@ export default function App({ ...props }) {
   }, [confirmSession])
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary FallbackComponent={ErrorScreen}>
       <ThemeProvider
         theme={createTheme({
           typography: {
