@@ -12,12 +12,9 @@ import {
   Menu,
   Icon,
   Dialog,
-  DialogTitle,
   useTheme,
   useMediaQuery,
   DialogContent,
-  DialogContentText,
-  DialogActions,
   Typography,
   colors,
   Backdrop,
@@ -262,6 +259,63 @@ const useStyles = makeStyles((theme: Theme) =>
       "& .MuiListItemIcon-root": { color: "#B42318" },
       "&:hover": { backgroundColor: "#FEF3F2" },
     },
+    // Logout and delete account confirmation dialog
+    confirmPaper: {
+      width: 380,
+      maxWidth: "calc(100% - 32px)",
+      margin: 16,
+      borderRadius: 16,
+      padding: "24px 24px 20px",
+      boxShadow: "0 20px 48px rgba(15, 23, 42, 0.24)",
+    },
+    confirmIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      marginBottom: 12,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "#ECF4FF",
+      color: "#1565C0",
+    },
+    confirmIconDanger: { background: "#FEF3F2", color: "#B42318" },
+    confirmTitle: { fontSize: 20, fontWeight: 600, color: "#111827", marginBottom: 8 },
+    confirmBody: { fontSize: 15, lineHeight: 1.5, color: "#4B5563" },
+    confirmActions: { display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: 8, marginTop: 20 },
+    confirmCancel: {
+      height: 44,
+      padding: "0 16px",
+      borderRadius: 10,
+      fontSize: 15,
+      fontWeight: 600,
+      textTransform: "none",
+      color: "#1F2937",
+      background: "#F3F4F6",
+      "&:hover": { background: "#E5E7EB" },
+    },
+    confirmPrimary: {
+      height: 44,
+      padding: "0 16px",
+      borderRadius: 10,
+      fontSize: 15,
+      fontWeight: 600,
+      textTransform: "none",
+      color: "#FFFFFF",
+      background: "#1565C0",
+      "&:hover": { background: "#0D47A1" },
+    },
+    confirmDanger: {
+      height: 44,
+      padding: "0 16px",
+      borderRadius: 10,
+      fontSize: 15,
+      fontWeight: 600,
+      textTransform: "none",
+      color: "#FFFFFF",
+      background: "#B42318",
+      "&:hover": { background: "#912018" },
+    },
   })
 )
 
@@ -465,6 +519,8 @@ export default function NavigationLayout({
   const userNumber = `${t("User number", { number: (title || "").split(" ")[1] })}`
   const profileName: string | undefined = authType === "participant" ? sessionInfo?.accessKey || undefined : undefined
   const profileInitial = profileName ? profileName.charAt(0).toUpperCase() : undefined
+  // Researchers viewing a participant delete that participant's account and stay logged in
+  const deletingOwnAccount = authType !== "researcher" && authType !== "admin"
   return (
     <Box>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -814,26 +870,44 @@ export default function NavigationLayout({
         }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        classes={{ paper: classes.confirmPaper }}
       >
-        <DialogTitle id="alert-dialog-title">{`${t(
-          !!confirmDelete ? "Confirmation" : "Are you sure you want to log out of LAMP right now?"
-        )}`}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {`${t(
-              !!confirmDelete
-                ? "Are you sure you want to delete account?"
-                : "If you've made some changes, make sure they're saved before you continue to log out."
-            )}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          {!!confirmLogout && (
-            <Button onClick={() => setConfirmLogout(false)} color="secondary">
-              {`${t("Go Back")}`}
-            </Button>
-          )}
+        <Box className={`${classes.confirmIcon} ${!!confirmDelete ? classes.confirmIconDanger : ""}`}>
+          {!!confirmDelete ? <DeleteOutlineRoundedIcon /> : <ExitToAppRoundedIcon />}
+        </Box>
+        <Typography id="alert-dialog-title" component="h2" className={classes.confirmTitle}>
+          {`${t(
+            !!confirmDelete
+              ? deletingOwnAccount
+                ? "Delete your account?"
+                : "Delete this participant's account?"
+              : "Log out?"
+          )}`}
+        </Typography>
+        <Typography id="alert-dialog-description" className={classes.confirmBody}>
+          {`${t(
+            !!confirmDelete
+              ? deletingOwnAccount
+                ? "You'll be logged out and won't be able to log in again. Your study data stays with your research team."
+                : "They won't be able to log in again. Their study data is kept."
+              : "If you've made some changes, make sure they're saved before you continue to log out."
+          )}`}
+        </Typography>
+        <Box className={classes.confirmActions}>
+          {/* Delete opens on Cancel, so Enter never deletes an account */}
           <Button
+            className={classes.confirmCancel}
+            autoFocus={!!confirmDelete}
+            onClick={() => {
+              setConfirmLogout(false)
+              setConfirmDelete(false)
+            }}
+          >
+            {`${t(!!confirmDelete ? "Cancel" : "Go Back")}`}
+          </Button>
+          <Button
+            className={!!confirmDelete ? classes.confirmDanger : classes.confirmPrimary}
+            autoFocus={!confirmDelete}
             onClick={() => {
               if (!!confirmLogout) {
                 onLogout()
@@ -843,12 +917,10 @@ export default function NavigationLayout({
                 setConfirmDelete(false)
               }
             }}
-            color="primary"
-            autoFocus
           >
-            {`${t(!!confirmDelete ? "Delete" : "Logout")}`}
+            {`${t(!!confirmDelete ? "Delete Account" : "Logout")}`}
           </Button>
-        </DialogActions>
+        </Box>
       </Dialog>
 
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
